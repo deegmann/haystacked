@@ -460,7 +460,7 @@ def main():
         )
         _mod = importlib.util.module_from_spec(_spec)
         _spec.loader.exec_module(_mod)
-        _xlsx = Path(__file__).parent.parent / "Specs" / "haystacked_AP0_field_spec_v0_10.xlsx"
+        _xlsx = Path(__file__).parent / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
         if _xlsx.exists():
             rc = _mod.generate(_xlsx, DB_PATH, dry_run=False)
             if rc != 0:

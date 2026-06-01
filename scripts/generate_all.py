@@ -56,8 +56,8 @@ except ImportError:
     sys.exit("openpyxl not installed: pip3 install openpyxl")
 
 ROOT             = Path(__file__).parent.parent
-DEFAULT_XLSX     = Path("/Users/christiandeeg/haystacked_platform/Specs/haystacked_AP0_field_spec_v0_10.xlsx")
-DEFAULT_PLATFORM = Path("/Users/christiandeeg/haystacked_platform/Specs/haystacked_platform_config.xlsx")
+DEFAULT_XLSX     = ROOT / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
+DEFAULT_PLATFORM = ROOT / "Spec" / "haystacked_platform_config.xlsx"
 DEFAULT_DB       = ROOT / "data" / "haystacked.db"
 CONFIG_DIR   = ROOT / "config"
 PROMPTS_DIR  = CONFIG_DIR / "prompts"
