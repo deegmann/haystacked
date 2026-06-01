@@ -812,13 +812,14 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             "You are an industrial classification specialist. Pick the single best NACE code from the provided list. Output ONLY valid JSON with exactly the field names shown.")
         (PROMPTS_DIR / "nace_template.txt").write_text(nace_template)
 
-        # Sync README from Synology if mounted and newer
-        readme_remote = Path.home() / "Library" / "CloudStorage" / "SynologyDrive-homeDrive" / "Haystacked" / "Specs" / "haystacked_industry_readme.md"
-        readme_local  = CONFIG_DIR / "industry_readme.md"
-        if readme_remote.exists():
-            if not readme_local.exists() or readme_remote.stat().st_mtime > readme_local.stat().st_mtime:
-                readme_local.write_bytes(readme_remote.read_bytes())
-                print("  Industry README synced from Synology Drive")
+        # Sync README from Spec/ (single source of truth within repo) → config/
+        # config/industry_readme.md is the runtime copy loaded by context_builder.py.
+        readme_spec  = ROOT / "Spec" / "haystacked_industry_readme.md"
+        readme_local = CONFIG_DIR / "industry_readme.md"
+        if readme_spec.exists():
+            if not readme_local.exists() or readme_spec.stat().st_mtime > readme_local.stat().st_mtime:
+                readme_local.write_bytes(readme_spec.read_bytes())
+                print("  Industry README synced from Spec/")
 
         (CONFIG_DIR / "ap0_checksum.txt").write_text(xlsx_md5)
 

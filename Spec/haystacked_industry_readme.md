@@ -152,6 +152,58 @@ For matching the *commercial* counterpart, `distribution_model` and the company 
 
 ---
 
+## 15. Reading tender context to derive the required AGV type
+
+Tenders rarely state the AGV type explicitly. Derive it from the *operational environment and task description*, not from isolated keywords. This section maps the most common tender contexts to the correct required_vehicle_type.
+
+### Production / manufacturing environments → Mobile AMR (or Tugger AGV)
+
+**Signals:** filling lines (Abfülllinie), production hall (Produktionshalle), assembly (Montage), manufacturing cells, production supply, "Versorgung der Produktion", greenfield factory, MES integration, production scheduling.
+
+**Why Mobile AMR and not Forklift:** Production environments require flexible, infrastructure-light transport between dynamic production cells. Filling lines and assembly cells change layout regularly; a fixed-route AGV (forklift) is the wrong fit. The loads are smaller (typically < 1,500 kg), the paths are shorter and more dynamic. A Mobile AMR navigates freely among production machinery.
+
+**Why Tugger is also possible:** If the tender describes a "milk run" circuit — a recurring route supplying multiple production cells in sequence — a Tugger AGV (towing a train of carts) is the right answer.
+
+**The Counterbalanced trap:** Do NOT classify a production/filling-line tender as "Counterbalanced". Counterbalanced forklifts transport heavy pallets on wide aisles (≥ 3 m) between fixed pallet positions (e.g. goods-in dock ↔ buffer). A filling line supply tender is fundamentally different. If you see "filling line" or "production hall" → start with Mobile AMR, then check for tugger signals.
+
+**Worked example:** "AGV system for supplying filling lines in a greenfield beverage production site" → required_vehicle_type = "Mobile AMR" (flexible production supply, no high-bay racking, no wide-aisle pallet transport implied).
+
+---
+
+### High-bay warehouse with racking → Forklift AGV (check for VNA)
+
+**Signals:** high-bay racking (Hochregallager), pallet racking (Palettenregal), rack positions (Stellplätze), storage and retrieval (Ein-/Auslagerung), picking lanes (Kommissioniergassen), VNA, narrow aisle (Schmalgang), warehouse management system (WMS).
+
+**VNA check:** if aisle width < 2 m OR the words "VNA", "Schmalgang", or "turret truck" appear → required_vehicle_type = "VNA", required_vna = true, required_drive_type = "VNA Turret".
+
+**Reach truck:** if aisle 2–3 m, lift > 4 m, racking → "Reach Truck".
+
+**Counterbalanced:** only if aisle ≥ 3 m AND no racking involved (floor-level pallet transport, goods-in/out staging areas, flat warehouses). Counterbalanced forklifts do NOT operate in racking aisles.
+
+---
+
+### Wide-aisle transport / cross-docking → Counterbalanced Forklift or Tugger
+
+**Signals:** transfer stations, dock loading (Verladung), flat warehouse, pallet buffer, goods-in/goods-out (Warenein-/ausgang), no racking mentioned, aisle ≥ 3 m.
+
+**Counterbalanced:** if individual pallet transport between fixed floor-level stations → "Counterbalanced".
+**Tugger:** if multiple loads are moved in a train along a fixed route → "Tugger AGV".
+
+---
+
+### Summary table (use as a checklist before setting required_vehicle_type)
+
+| Environment signal | First candidate | Check for |
+|---|---|---|
+| Filling line / production hall / assembly | Mobile AMR | Tugger if milk-run |
+| High-bay racking + aisle < 2 m | VNA (Forklift AGV) | required_vna = true |
+| High-bay racking + aisle 2–3 m | Reach Truck (Forklift AGV) | Lift height |
+| Wide-aisle warehouse, no racking | Counterbalanced | Tugger if train route |
+| Trailer/dock loading | Counterbalanced or Tugger | auto_hitch |
+| Goods-to-Person picking | Mobile AMR | grid_required = true |
+
+---
+
 ## 14. Out of scope for the PoC (context, so you don't misclassify)
 
 - **ASRS (Automated Storage and Retrieval System)** — fixed storage automation (shuttles, cube-storage like AutoStore, vertical lift modules, crane/RBG systems). Different buyer journey, different tender logic, usually sold as a whole system via integrators. Tracked as its own future main category, **not** mixed into the AGV PoC.
