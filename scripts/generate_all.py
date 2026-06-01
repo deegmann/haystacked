@@ -567,6 +567,7 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list) -> s
              ""]
 
     # Vehicle type classification guide (from Vehicle Types sheet)
+    # BUG-A/F fix: add explicit Chain-of-Thought ordering to prevent LLM defaulting to Counterbalanced
     guide = vehicle_types.get("llm_guide", [])
     if guide:
         lines += ["Vehicle type classification guide (for required_vehicle_type):"]
@@ -580,13 +581,31 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list) -> s
             lines.append(line)
         lines.append("  Key: PRODUCTION/FILLING LINES/MANUFACTURING → Mobile AMR. WAREHOUSE/RACKING/SHIPPING → Forklift AGV type.")
         lines.append("")
+        lines.append("  THINK STEP BY STEP when classifying required_vehicle_type:")
+        lines.append("  (1) Is this a PRODUCTION/MANUFACTURING/FILLING LINE environment? → required_vehicle_type='Mobile AMR'.")
+        lines.append("  (2) Does the doc mention VNA / very narrow aisle / aisle<2m / high-bay racking? → required_vehicle_type='VNA', required_vna=true, required_drive_type='VNA Turret'.")
+        lines.append("  (3) Does the doc mention towing / tugger / milk run / trailer train? → required_vehicle_type='Tugger'.")
+        lines.append("  (4) Only if none of the above apply: use Counterbalanced or Reach Truck based on aisle width.")
+        lines.append("  Do NOT default to Counterbalanced when VNA or Production/AMR signals are present.")
+        lines.append("")
 
     lines.append("Field definitions:")
     for field in extraction_schema:
         if not field["hint"]:
             continue
         mand = " MANDATORY —" if field["mandatory"] else ""
-        lines.append(f'- {field["key"]}:{mand} {field["hint"]}')
+        hint = field["hint"]
+        # BUG-C fix: augment aisle width field with explicit warning about height confusion
+        if field["key"] == "required_min_aisle_width_m":
+            hint += (" WARNING: Do NOT confuse aisle width with transfer station height,"
+                     " rack height, or lift height."
+                     " Source terms: 'Gangbreite', 'aisle width', 'working aisle'."
+                     " If no explicit aisle width is stated → output null.")
+        # BUG-G fix: augment station_types field with explicit warning against defaulting to examples
+        if field["key"] == "required_station_types":
+            hint += (" Output null if not explicitly stated in document."
+                     " DO NOT default to example values.")
+        lines.append(f'- {field["key"]}:{mand} {hint}')
 
     lines += ["",
               "Use null only when a field genuinely cannot be determined from the document.",
@@ -638,11 +657,14 @@ def build_retry_template(extraction_schema: list) -> str:
 def build_nace_template(nace: dict) -> str:
     return "\n".join([
         'A tender is for: "{tender_category}"',
-        'The buyer operates in: "{buyer_industry}"',
         "",
-        f'haystacked is a B2B platform for: {nace["scope_in"]}. These are IN SCOPE.',
+        "SCOPE RULE: Evaluate ONLY what is being PROCURED (the tendered service/product).",
+        "The buyer's industry is IRRELEVANT — an AGV system tender from a beverage company",
+        "is IN SCOPE just as much as one from a logistics company.",
         "",
-        f'Clearly OUT OF SCOPE: {nace["scope_out"]}.',
+        f'IN SCOPE: {nace["scope_in"]}.',
+        "",
+        f'OUT OF SCOPE: {nace["scope_out"]}.',
         "",
         "If OUT OF SCOPE, output the not-in-scope JSON.",
         "Otherwise, pick the single best matching NACE code from this list:",
@@ -719,6 +741,18 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     plausibility      = build_plausibility_config()
     platform          = read_platform(platform_path)
     nace              = platform  # nace data is inside platform dict
+
+    # Enrich vehicle_types with vna_drive_type resolved from field_levels.
+    # This avoids any substring-matching at runtime — app.py reads vehicle_types["vna_drive_type"].
+    # The value comes from AP0 field_levels["drive_type"]["allowed_values"] — the entry flagged VNA.
+    # Convention: the VNA drive type is the single allowed_value for drive_type whose name
+    # contains "VNA" (case-insensitive). If AP0 renames it, generate_all.py warns explicitly.
+    _dt_allowed = field_levels.get("drive_type", {}).get("allowed_values", [])
+    _vna_drive  = next((v for v in _dt_allowed if "vna" in v.lower()), None)
+    if _vna_drive:
+        vehicle_types["vna_drive_type"] = _vna_drive
+    else:
+        print("  [WARN] No VNA drive type found in drive_type allowed_values — vna_drive_type not set")
 
     print(f"  Fields: {len(field_levels)} ({sum(1 for v in field_levels.values() if v['level']=='KO')} KO, {sum(1 for v in field_levels.values() if v['level']=='COND_KO')} COND_KO)")
     print(f"  Vehicle types: {len(vehicle_types.get('vt_map', {}))} mappings, {len(vehicle_types.get('llm_guide',[]))} with LLM guide")

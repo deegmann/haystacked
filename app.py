@@ -83,6 +83,13 @@ _VT_MAP_CFG  = _vehicle_cfg.get("vt_map", {})           # llm_output_lower → c
 _VNA_CFG     = set(_vehicle_cfg.get("vna_subtypes", []))  # set of vna llm outputs
 _VT_OVERRIDES= _vehicle_cfg.get("text_overrides", [])     # [{regex, canonical, vna}]
 
+# ── VNA drive type — resolved once in generate_all.py, stored in vehicle_types.json ──
+# No substring-match at runtime. generate_all.py sets vna_drive_type by scanning
+# field_levels["drive_type"]["allowed_values"]; if AP0 renames it, generate_all.py warns.
+_VNA_DRIVE_TYPE = _vehicle_cfg.get("vna_drive_type")
+if _VNA_DRIVE_TYPE is None:
+    log.warning("vna_drive_type missing from vehicle_types.json — run generate_all.py. VNA drive_type override disabled.")
+
 # ── NACE — loaded from generated config ───────────────────────────────────────
 _nace_cfg     = json.loads((_CONFIG_DIR / "nace_codes.json").read_text())
 CATEGORY_LIST = "\n".join(_nace_cfg.get("codes", []))
@@ -505,6 +512,10 @@ async def analyze(file: UploadFile = File(...)):
                     # Store canonical type and VNA flag in agv_criteria for the frontend
                     agv_criteria["required_vehicle_type_canonical"] = canonical_agv_type
                     agv_criteria["_vna_subtype"] = is_vna_subtype
+                    # If VNA detected via text override (LLM may have returned null for required_vna),
+                    # write required_vna=True back so matching engine applies the VNA K.O. filter.
+                    if is_vna_subtype and not agv_criteria.get("required_vna"):
+                        agv_criteria["required_vna"] = True
 
                     # Build req from agv_criteria (already uses AP0 tender JSON keys).
                     # Only override fields that need unit conversion or logic-derived values.
@@ -538,8 +549,12 @@ async def analyze(file: UploadFile = File(...)):
                         "not_required" if canonical_agv_type == "Forklift AGV" else
                         None
                     )
-                    # Note: required_drive_type is handled by the LLM via the AP0 description rule:
-                    # "if required_vna=true → always output VNA Turret" — no override needed here.
+                    # BUG-B fix: if VNA is detected, override required_drive_type to the
+                    # VNA-specific drive type loaded from AP0 field_levels (allowed_values).
+                    # _VNA_DRIVE_TYPE is read from config/field_levels.json at startup —
+                    # no hardcoded string here.
+                    if is_vna_subtype and _VNA_DRIVE_TYPE:
+                        new_req["required_drive_type"] = _VNA_DRIVE_TYPE
                     matches, matches_all = match_suppliers_new(new_req, _SUPPLIERS, top_n=5)
                 else:
                     matches, matches_all = supplier_db.match_suppliers(agv_criteria, top_n=5)
