@@ -59,6 +59,8 @@ VNA trucks operate in aisles roughly 1.5–1.8 m wide (vs. ~2.5–3.5 m for stan
 
 If none of these is present, VNA is usually *not* required and demanding it would over-spec the tender. Conversely, a wide-aisle site never needs VNA. (`vna_capable`, `min_aisle_width_mm`, `guidance`.)
 
+**Important implication for extraction:** VNA always implies rack operations. If `required_vna = true`, the facility has racking — `required_station_types` must include at least one rack type (e.g. "Standard rack") even if the tender does not explicitly name the rack model. Note: a VNA drive type does not exclude floor or conveyor stations — a VNA truck can also serve floor-level or conveyor pick/drop points in narrow aisles alongside rack operations.
+
 ---
 
 ## 6. Counterbalance vs. reach vs. straddle — the closed-pallet & closed-conveyor problem

@@ -12,13 +12,9 @@ config/plausibility.json
 config/ap0_checksum.txt
 config/prompts/
 
-# ── Generated data (from sync_airtable.py via Airtable API) ──────────────────
-data/raw/companies.csv
-data/raw/products.csv
-data/raw/base_models.csv
-data/raw/base_model_extensions.csv
-data/raw/export_validation_report.txt
-data/haystacked.db
+# ── Airtable data — versioned in git for reproducible snapshots ───────────────
+# data/raw/*.csv and data/haystacked.db are committed alongside each release tag.
+# To rebuild the DB from committed CSVs without Airtable: python3 sync_airtable.py --local
 
 # ── Logs ─────────────────────────────────────────────────────────────────────
 *.log

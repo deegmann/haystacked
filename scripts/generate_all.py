@@ -222,8 +222,37 @@ def read_vehicle_types(wb) -> dict:
     }
 
 
+def read_field_text_fallbacks(wb) -> list:
+    """Read Field Fallbacks sheet → list of {tender_key, regex, value, only_if_null}."""
+    if "Field Fallbacks" not in wb.sheetnames:
+        return []
+    rows = _rows(wb["Field Fallbacks"], min_row=2)
+    hi, cols = _find_header(rows, "Tender Key")
+    if hi is None:
+        return []
+    c_key   = cols.get("Tender Key", 0)
+    c_regex = cols.get("Regex (applied to full PDF text)", 1)
+    c_val   = cols.get("Fallback Value (AP0 allowed value)", 2)
+    c_null  = cols.get("Only If Null", 3)
+    result = []
+    for row in rows[hi+1:]:
+        if not row or not row[c_key]:
+            continue
+        tender_key = str(row[c_key]).strip()
+        regex      = str(row[c_regex]).strip() if c_regex < len(row) and row[c_regex] else ""
+        value      = str(row[c_val]).strip()   if c_val   < len(row) and row[c_val]   else ""
+        only_null  = str(row[c_null]).strip().lower() != "no" if c_null < len(row) and row[c_null] else True
+        if tender_key and regex and value:
+            result.append({"tender_key": tender_key, "regex": regex, "value": value, "only_if_null": only_null})
+    return result
+
+
 def read_scoring_weights(wb) -> dict:
-    """Read scoring weights from inline 'Scoring Weight' column in each sheet."""
+    """Read scoring weights + rules from AP0 xlsx.
+
+    Reads: Scoring Weight, Scoring Rule, Threshold 1, Threshold 2.
+    Output format per field: {"weight": int, "rule": str, "t1": num|None, "t2": num|None}
+    """
     result = {"default": {}, "forklift_specific": {}, "tugger_specific": {}, "amr_specific": {}}
     sheet_map = {
         "SHARED – All AGV Types": "default",
@@ -234,22 +263,38 @@ def read_scoring_weights(wb) -> dict:
     def _int(v):
         try: return int(v) if v is not None and v != '' else 0
         except: return 0
+    def _num(v):
+        if v is None or v == '': return None
+        try:
+            f = float(v)
+            return int(f) if f == int(f) else f
+        except: return None
 
     for sheet, bucket in sheet_map.items():
         if sheet not in wb.sheetnames: continue
         rows = _rows(wb[sheet])
         hi, cols = _find_header(rows)
         if hi is None: continue
-        c_field = cols.get("Field Name", 0)
+        c_field  = cols.get("Field Name", 0)
         c_weight = cols.get("Scoring Weight")
+        c_rule   = cols.get("Scoring Rule")
+        c_t1     = cols.get("Threshold 1")
+        c_t2     = cols.get("Threshold 2")
         if c_weight is None: continue
         for row in rows[hi+1:]:
             if not row or not row[c_field]: continue
             fname = str(row[c_field]).strip()
             if fname.startswith("──"): continue
             w = _int(row[c_weight] if c_weight < len(row) else None)
-            if w:
-                result[bucket][fname] = w
+            if not w: continue
+            rule = (str(row[c_rule]).strip()
+                    if c_rule is not None and c_rule < len(row) and row[c_rule] else "bool")
+            t1   = _num(row[c_t1] if c_t1 is not None and c_t1 < len(row) else None)
+            t2   = _num(row[c_t2] if c_t2 is not None and c_t2 < len(row) else None)
+            entry: dict = {"weight": w, "rule": rule}
+            if t1 is not None: entry["t1"] = t1
+            if t2 is not None: entry["t2"] = t2
+            result[bucket][fname] = entry
     return result
 
 
@@ -475,6 +520,14 @@ def read_sqlite_schema(wb) -> dict:
     ext_lines.append(");")
     extensions_sql = "\n".join(ext_lines)
 
+    # C-6: explicit column list for sync_airtable.py (derived from generated SQL,
+    # so sync_airtable never hardcodes field names)
+    extensions_columns = (
+        ["extension_id", "base_model_id", "agv_type"]
+        + [f for f, _ in ext_fields]
+        + ["extra_fields"]
+    )
+
     return {
         "companies":             companies_sql,
         "products":              products_sql,
@@ -483,6 +536,7 @@ def read_sqlite_schema(wb) -> dict:
         "bool_fields":           sorted(bool_fields),
         "int_fields":            sorted(int_fields),
         "float_fields":          sorted(float_fields),
+        "extensions_columns":    extensions_columns,
     }
 
 
@@ -733,9 +787,11 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     print(f"Reading platform config: {platform_path.name if platform_path.exists() else '(not found)'}")
     wb = openpyxl.load_workbook(str(xlsx_path), read_only=True, data_only=True)
 
-    field_levels      = read_field_levels(wb)
-    vehicle_types     = read_vehicle_types(wb)
-    scoring_weights   = read_scoring_weights(wb)
+    field_levels         = read_field_levels(wb)
+    vehicle_types        = read_vehicle_types(wb)
+    field_text_fallbacks = read_field_text_fallbacks(wb)
+    vehicle_types["field_text_fallbacks"] = field_text_fallbacks
+    scoring_weights      = read_scoring_weights(wb)
     extraction_schema = read_extraction_schema(wb)
     sqlite_schema     = read_sqlite_schema(wb)
     plausibility      = build_plausibility_config()
@@ -753,6 +809,41 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         vehicle_types["vna_drive_type"] = _vna_drive
     else:
         print("  [WARN] No VNA drive type found in drive_type allowed_values — vna_drive_type not set")
+
+    # Additional runtime fields derived from AP0 — written to vehicle_types.json so
+    # Python code never contains canonical type names or AGV-domain keywords.
+
+    # C-2: canonical type → scoring_weights.json bucket name
+    vehicle_types["scoring_bucket_map"] = {
+        canon: bucket
+        for canon, bucket in [("Forklift AGV", "forklift_specific"),
+                               ("Tugger AGV",   "tugger_specific"),
+                               ("Mobile AMR",   "amr_specific")]
+        if canon in vehicle_types.get("vt_map", {}).values()
+        or any(canon == v for v in vehicle_types.get("vt_map", {}).values())
+    }
+    # Ensure all three are always present (in case vt_map is incomplete)
+    for _c, _b in [("Forklift AGV", "forklift_specific"),
+                   ("Tugger AGV",   "tugger_specific"),
+                   ("Mobile AMR",   "amr_specific")]:
+        vehicle_types["scoring_bucket_map"].setdefault(_c, _b)
+
+    # C-5: canonical types for which VNA logic applies
+    vehicle_types["vna_applicable_types"] = ["Forklift AGV"]
+
+    # C-1: flat list of all keyword_map values for is_agv_amr detection
+    _all_kws: list = []
+    for _kws in vehicle_types.get("keyword_map", {}).values():
+        _all_kws.extend(_kws)
+    vehicle_types["agv_detection_keywords"] = list(dict.fromkeys(_all_kws))
+
+    # M-1: ensure Schmalgangstapler text override sets vna=True
+    _schmal_regex = "(?i)schmalgangstapler"
+    _existing = {o.get("regex") for o in vehicle_types.get("text_overrides", [])}
+    if _schmal_regex not in _existing:
+        vehicle_types.setdefault("text_overrides", []).append(
+            {"regex": _schmal_regex, "canonical": "Forklift AGV", "vna": True}
+        )
 
     print(f"  Fields: {len(field_levels)} ({sum(1 for v in field_levels.values() if v['level']=='KO')} KO, {sum(1 for v in field_levels.values() if v['level']=='COND_KO')} COND_KO)")
     print(f"  Vehicle types: {len(vehicle_types.get('vt_map', {}))} mappings, {len(vehicle_types.get('llm_guide',[]))} with LLM guide")
@@ -796,7 +887,14 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             json.dumps(plausibility, indent=2, ensure_ascii=False) + "\n")
 
         (PROMPTS_DIR / "extraction_system.txt").write_text(
-            "You are a warehouse automation specialist. Extract technical AGV/AMR requirements. Output ONLY valid JSON. No markdown, no explanation.")
+            "You are a warehouse automation specialist. Extract technical AGV/AMR requirements from tender documents. Output ONLY valid JSON. No markdown, no explanation.\n\n"
+            "CRITICAL EXTRACTION RULE — CONSERVATIVE VALUES:\n"
+            "When a document lists multiple values for the same parameter, always extract the most demanding value.\n"
+            "- Minimum-capability fields (payload, lift height, operating hours, fleet size, maximum ambient temperature): extract the MAXIMUM value — supplier must meet or exceed this.\n"
+            "  Example: document has '29 kg tare weight' and '1000 kg max loaded weight' → output 1000.\n"
+            "- Maximum-constraint fields (aisle width, minimum ambient temperature): extract the MINIMUM value — supplier must fit within this limit.\n"
+            "  Example: document says 'aisle 2000 mm rack-to-rack, min 1900 mm pallet-to-pallet' → output 1.9 (in meters).\n"
+            "Never average, never omit — always pick the worst case for the supplier.")
         (PROMPTS_DIR / "extraction_template.txt").write_text(extraction_template)
         (PROMPTS_DIR / "extraction_retry_system.txt").write_text(
             "You are a data extraction assistant. Extract facts from tender documents into JSON. Output ONLY valid JSON. No markdown fences, no explanations.")

@@ -48,8 +48,8 @@
           <div class="step-icon">✓</div>
           <div class="step-body"><div class="step-label">Evaluation</div><div class="step-msg" id="msg-parse">Waiting…</div></div>
         </div>
-        <div class="step-line agv-line hidden"></div>
-        <div class="step hidden" id="step-agv">
+        <div class="step-line agv-line"></div>
+        <div class="step" id="step-agv">
           <div class="step-icon">🤖</div>
           <div class="step-body"><div class="step-label">AGV Matching</div><div class="step-msg" id="msg-agv">Waiting…</div></div>
         </div>
@@ -332,8 +332,6 @@ async function handleFile(file) {
   show('progressSection');
   document.getElementById('logOutput').textContent = '';
   ['upload','extract','llm','parse','agv'].forEach(id => setStep(id, 'pending', 'Waiting…'));
-  hide('step-agv');
-  document.querySelectorAll('.agv-line').forEach(el => el.classList.add('hidden'));
   addLog(`File: ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
 
   const form = new FormData();
@@ -364,10 +362,6 @@ async function handleFile(file) {
       try { data = JSON.parse(dataStr); } catch { addLog('Parse error: ' + dataStr); continue; }
 
       if (eventType === 'step') {
-        if (data.id === 'agv') {
-          show('step-agv');
-          document.querySelectorAll('.agv-line').forEach(el => el.classList.remove('hidden'));
-        }
         setStep(data.id, data.status, data.message);
         addLog(`[${data.id}:${data.status}] ${data.message}`);
       } else if (eventType === 'log') {
@@ -431,7 +425,13 @@ function maybeShowClarification(data) {
     max_payload_kg:     () => crit.required_weight_capacity_kg,
     towing_capacity_kg: () => crit.required_towing_capacity_kg,
   };
+
+  // Determine whether the facility has any rack-type stations (floor/conveyor-only → no aisles)
+  const stationTypes = (crit.required_station_types || '').toLowerCase();
+  const hasRackStations = stationTypes === '' || /rack/.test(stationTypes);
+
   const missing = fields.filter(f => {
+    if (f.key === 'min_aisle_width_mm' && !hasRackStations) return false;
     const val = fieldMapping[f.key] ? fieldMapping[f.key]() : null;
     return val === null || val === undefined || val === '';
   });

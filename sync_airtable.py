@@ -40,29 +40,38 @@ DATA_RAW.mkdir(parents=True, exist_ok=True)
 TOKEN   = os.environ.get("AIRTABLE_TOKEN", "")
 BASE_ID = os.environ.get("AIRTABLE_BASE_ID", "")
 
-if not TOKEN or not BASE_ID:
-    sys.exit(
-        "ERROR: AIRTABLE_TOKEN and AIRTABLE_BASE_ID must be set.\n"
-        "  Create a .env file with:\n"
-        "    AIRTABLE_TOKEN=pat...\n"
-        "    AIRTABLE_BASE_ID=app..."
-    )
+# C-6: extension column list from generated sqlite_schema.json (never hardcode field names)
+_SQLITE_SCHEMA = json.loads((BASE_DIR / "config" / "sqlite_schema.json").read_text())
+_EXT_COLUMNS   = _SQLITE_SCHEMA.get("extensions_columns", [])
 
-HEADERS = {"Authorization": f"Bearer {TOKEN}"}
+# Airtable-specific setup — only needed in live-sync mode (not --local)
+_LOCAL_MODE = "--local" in sys.argv
 
-SCHEMA_FILE = BASE_DIR / "airtable" / "airtable_schema_ids.json"
-if not SCHEMA_FILE.exists():
-    sys.exit(f"ERROR: {SCHEMA_FILE} not found. Run airtable/ap2_schema.py first.")
-
-with open(SCHEMA_FILE) as f:
-    _ids = json.load(f)["table_ids"]
-
-TABLES = {
-    "companies": _ids["companies"],
-    "products":  _ids["products"],
-    "base_models": _ids["base_models"],
-    "extensions": _ids["extensions"],
-}
+if _LOCAL_MODE:
+    HEADERS = {}
+    TABLES  = {}
+else:
+    if not TOKEN or not BASE_ID:
+        sys.exit(
+            "ERROR: AIRTABLE_TOKEN and AIRTABLE_BASE_ID must be set.\n"
+            "  Create a .env file with:\n"
+            "    AIRTABLE_TOKEN=pat...\n"
+            "    AIRTABLE_BASE_ID=app...\n"
+            "  Or rebuild the DB from committed CSVs without Airtable:\n"
+            "    python3 sync_airtable.py --local"
+        )
+    HEADERS = {"Authorization": f"Bearer {TOKEN}"}
+    SCHEMA_FILE = BASE_DIR / "airtable" / "airtable_schema_ids.json"
+    if not SCHEMA_FILE.exists():
+        sys.exit(f"ERROR: {SCHEMA_FILE} not found. Run airtable/ap2_schema.py first.")
+    with open(SCHEMA_FILE) as f:
+        _ids = json.load(f)["table_ids"]
+    TABLES = {
+        "companies": _ids["companies"],
+        "products":  _ids["products"],
+        "base_models": _ids["base_models"],
+        "extensions": _ids["extensions"],
+    }
 
 # ── API fetch with pagination and retry ──────────────────────────────────────
 
@@ -358,46 +367,8 @@ def import_to_sqlite(
 
     # Extensions
     exts = csv_rows(extensions_csv)
-    # Get all columns from the CREATE statement to build INSERT dynamically
-    cols_raw = [
-        "extension_id", "base_model_id", "agv_type",
-        "navigation_type", "infrastructure_required", "outdoor_capable",
-        "autonomous_obstacle_bypass", "omnidirectional_movement",
-        "max_payload_kg", "load_type", "multi_load_compatibility",
-        "max_speed_ms", "length_mm", "width_mm",
-        "operating_temp_min_c", "operating_temp_max_c", "operating_humidity_max_pct",
-        "ingress_protection_rating", "cleanroom_class", "max_gradient_pct",
-        "floor_flatness_req", "stop_accuracy_mm",
-        "battery_type", "battery_runtime_h", "charge_time_min",
-        "autonomous_charging", "battery_swap_capable",
-        "safety_standard", "functional_safety_level", "safety_coverage",
-        "fleet_management_system", "fleet_control_architecture",
-        "vda5050_compatible", "max_fleet_size", "multi_fleet_capable",
-        "integration_capability", "installation_process", "modification_process",
-        "station_applications", "manual_usage",
-        "lifting_height_mm", "min_total_height_mm", "fork_type", "fork_spread",
-        "mast_type", "min_aisle_width_mm", "vna_capable", "drive_type",
-        "drop_accuracy_lat_mm", "drop_accuracy_dep_mm", "drop_accuracy_angle_deg",
-        "pick_req_accuracy_lat_mm", "pick_req_accuracy_dep_mm", "pick_req_accuracy_angle_deg",
-        "forks_free_floating", "stacking_capability", "load_detection",
-        "barcode_readers", "stock_line_scanning", "trailer_loading", "trailer_unloading",
-        "guidance", "busbar_compatible",
-        "towing_capacity_kg", "max_trailers", "coupling_type", "auto_hitch",
-        "auto_hitch_position_tolerance_mm", "train_configuration", "load_transfer",
-        "trailer_compatibility", "trailer_steering_technology",
-        "route_type", "route_programming", "intersection_management",
-        "tugger_min_aisle_width_mm", "turning_radius_mm",
-        "workflow_capability", "grid_required", "rotation_capable", "picking_mechanism",
-        "lift_height_mm", "min_ground_clearance_mm", "rack_pin_compatible",
-        "free_lift_open_closed_pallet", "top_module_type", "cart_pickup_height_range_mm",
-        "omnidirectional", "min_turning_radius_mm",
-        "storage_system_type", "shelf_height_mm", "shelf_footprint_mm",
-        "min_grid_area_m2", "throughput_picks_per_hour", "throughput_basis",
-        "concurrent_robots_per_station", "order_lines_per_run", "task_interleaving",
-        "storage_density_factor", "ergonomic_height_adjustable", "onboard_ui",
-        "onboard_container_type", "onboard_container_count", "wms_integration_native",
-        "extra_fields",
-    ]
+    # C-6: column list from config/sqlite_schema.json (generated by generate_all.py from AP0)
+    cols_raw = _EXT_COLUMNS
     placeholders = ",".join("?" * len(cols_raw))
     for row in exts:
         raw_bm  = row.get("base_model_id", "")
@@ -421,21 +392,37 @@ def import_to_sqlite(
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="haystacked Airtable sync")
+    parser.add_argument(
+        "--local", action="store_true",
+        help="Rebuild DB from committed CSVs in data/raw/ without Airtable credentials"
+    )
+    args = parser.parse_args()
+
     print("=" * 60)
-    print("haystacked — Airtable Sync")
+    print("haystacked — Airtable Sync" + (" (local mode)" if args.local else ""))
     print("=" * 60)
 
-    print("\nStep 1: Fetching from Airtable API...")
-    all_records: dict[str, list] = {}
-    for name, tid in TABLES.items():
-        all_records[name] = fetch_table(name, tid)
+    if args.local:
+        print("\nLocal mode: skipping Airtable fetch — using existing data/raw/ CSVs")
+        for name in ["companies.csv", "products.csv", "base_models.csv", "base_model_extensions.csv"]:
+            p = DATA_RAW / name
+            if not p.exists():
+                sys.exit(f"ERROR: {p} not found. Commit the CSV files first or run a full sync.")
+        all_records = {}  # not used in local mode
+    else:
+        print("\nStep 1: Fetching from Airtable API...")
+        all_records: dict[str, list] = {}
+        for name, tid in TABLES.items():
+            all_records[name] = fetch_table(name, tid)
 
-    print("\nStep 2: Writing CSV files...")
-    write_csv(DATA_RAW / "companies.csv",            all_records["companies"])
-    write_csv(DATA_RAW / "products.csv",             all_records["products"])
-    write_csv(DATA_RAW / "base_models.csv",          all_records["base_models"])
-    write_csv(DATA_RAW / "base_model_extensions.csv",all_records["extensions"])
-    print("  CSV files written to data/raw/")
+        print("\nStep 2: Writing CSV files...")
+        write_csv(DATA_RAW / "companies.csv",            all_records["companies"])
+        write_csv(DATA_RAW / "products.csv",             all_records["products"])
+        write_csv(DATA_RAW / "base_models.csv",          all_records["base_models"])
+        write_csv(DATA_RAW / "base_model_extensions.csv",all_records["extensions"])
+        print("  CSV files written to data/raw/")
 
     print("\nStep 3: Validating...")
     ok = validate_csvs(DATA_RAW / "export_validation_report.txt")
@@ -447,9 +434,10 @@ def main():
         DATA_RAW / "base_model_extensions.csv",
     )
 
-    n_co  = len(all_records["companies"])
-    n_pr  = len(all_records["products"])
-    n_ext = len(all_records["extensions"])
+    if not args.local:
+        n_co  = len(all_records["companies"])
+        n_pr  = len(all_records["products"])
+        n_ext = len(all_records["extensions"])
 
     print("\nStep 5: Validating AP0 field spec consistency...")
     try:
@@ -472,7 +460,10 @@ def main():
         print(f"  [WARN] Could not run field level validation: {e}")
 
     print("\n" + "=" * 60)
-    print(f"Sync complete: {n_co} Companies, {n_pr} Products, {n_ext} Extensions")
+    if args.local:
+        print("DB rebuilt from local CSVs")
+    else:
+        print(f"Sync complete: {n_co} Companies, {n_pr} Products, {n_ext} Extensions")
     print(f"Database: {DB_PATH}")
     if not ok:
         print("WARNING: Validation found issues — see data/raw/export_validation_report.txt")

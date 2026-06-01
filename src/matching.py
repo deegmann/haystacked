@@ -54,7 +54,16 @@ def _load_weights() -> dict:
     return {}
 
 
+def _load_vehicle_types() -> dict:
+    p = CONFIG_DIR / "vehicle_types.json"
+    if p.exists():
+        with open(p) as f:
+            return json.load(f)
+    return {}
+
+
 _field_levels = _load_field_levels()
+_SCORING_BUCKET_MAP: dict = _load_vehicle_types().get("scoring_bucket_map", {})
 
 
 def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
@@ -346,14 +355,14 @@ class Matcher:
         self.weights = _load_weights()
 
     def _w(self, key: str, agv_type: str) -> int:
-        default = self.weights.get("default", {}).get(key, 0)
-        type_map = {
-            "Forklift AGV": "forklift_specific",
-            "Tugger AGV":   "tugger_specific",
-            "Mobile AMR":   "amr_specific",
-        }
-        specific = self.weights.get(type_map.get(agv_type, ""), {}).get(key, 0)
-        return max(default, specific)
+        """Weight lookup — reads scoring_bucket_map from vehicle_types.json (C-2)."""
+        bucket   = _SCORING_BUCKET_MAP.get(agv_type, "")
+        default  = self.weights.get("default",  {}).get(key, {})
+        specific = self.weights.get(bucket,     {}).get(key, {})
+        entry = specific if specific else default
+        if isinstance(entry, dict):
+            return entry.get("weight", 0)
+        return int(entry) if entry else 0
 
     def match(self, suppliers: list[SupplierRecord], req: TenderRequirements, top_n: int = 10) -> tuple[list[MatchResult], list[MatchResult]]:
         results = [self._score_one(rec, req) for rec in suppliers]
@@ -414,83 +423,66 @@ class Matcher:
             if req.get(field) is not None and _supplier_val(ext, prod, field) is None:
                 add_score(-NULL_KO_PENALTY, f"{field}_null_penalty", None)
 
-        # ── Scoring (scoring_weights.json) ────────────────────────────────────
-        agv_t = ext.agv_type
+        # ── Scoring (data-driven from scoring_weights.json + vehicle_types.json) ─
+        # No hardcoded AGV type names or numeric thresholds — all from AP0 via config.
+        agv_t  = ext.agv_type
+        bucket = _SCORING_BUCKET_MAP.get(agv_t, "")
 
-        pts = self._w("reference_count", agv_t)
-        add_max(pts)
-        if prod.reference_count is not None and prod.reference_count > 0:
-            add_score(min(pts, int(pts * min(prod.reference_count / 20, 1.0))), "reference_count", prod.reference_count)
+        for section in ("default", bucket):
+            for field, cfg in self.weights.get(section, {}).items():
+                if not isinstance(cfg, dict):
+                    continue
+                pts  = cfg.get("weight", 0)
+                rule = cfg.get("rule", "bool")
+                val  = _supplier_val(ext, prod, field)
 
-        pts = self._w("lead_time_weeks", agv_t)
-        add_max(pts)
-        if prod.lead_time_weeks is not None:
-            score_pts = pts if prod.lead_time_weeks <= 26 else (pts // 2 if prod.lead_time_weeks <= 52 else 0)
-            add_score(score_pts, "lead_time_weeks", prod.lead_time_weeks)
-
-        pts = self._w("vda5050_compatible", agv_t)
-        add_max(pts)
-        if ext.vda5050_compatible is True:
-            bonus = pts if str(req.get("vda5050_compatible")).lower() == "required" else (pts - 2)
-            add_score(max(0, bonus), "vda5050_compatible", True)
-
-        pts = self._w("battery_runtime_h", agv_t)
-        add_max(pts)
-        if ext.battery_runtime_h is not None:
-            add_score(pts if ext.battery_runtime_h >= 8 else pts // 2, "battery_runtime_h", ext.battery_runtime_h)
-
-        pts = self._w("autonomous_charging", agv_t)
-        add_max(pts)
-        if ext.autonomous_charging is True:
-            add_score(pts, "autonomous_charging", True)
-
-        pts = self._w("safety_standard", agv_t)
-        add_max(pts)
-        if ext.safety_standard:
-            add_score(pts, "safety_standard", ext.safety_standard)
-
-        pts = self._w("stop_accuracy_mm", agv_t)
-        add_max(pts)
-        if ext.stop_accuracy_mm is not None:
-            score_pts = pts if ext.stop_accuracy_mm <= 10 else (pts // 2 if ext.stop_accuracy_mm <= 30 else 0)
-            add_score(score_pts, "stop_accuracy_mm", ext.stop_accuracy_mm)
-
-        if agv_t == "Forklift AGV":
-            for fld, w_key in [("drop_accuracy_lat_mm", "drop_accuracy_lat_mm"),
-                                ("pick_req_accuracy_lat_mm", "pick_req_accuracy_lat_mm")]:
-                pts = self._w(w_key, agv_t)
-                add_max(pts)
-                v = getattr(ext, fld, None)
-                if v is not None and v <= 20:
-                    add_score(pts, fld, v)
-
-            pts = self._w("stacking_capability", agv_t)
-            add_max(pts)
-            if ext.stacking_capability is True:
-                add_score(pts, "stacking_capability", True)
-
-        elif agv_t == "Tugger AGV":
-            pts = self._w("auto_hitch", agv_t)
-            add_max(pts)
-            if ext.auto_hitch is True:
-                add_score(pts, "auto_hitch", True)
-
-            pts = self._w("trailer_steering_technology", agv_t)
-            add_max(pts)
-            if ext.trailer_steering_technology:
-                add_score(pts, "trailer_steering_technology", ext.trailer_steering_technology)
-
-        elif agv_t == "Mobile AMR":
-            pts = self._w("rotation_capable", agv_t)
-            add_max(pts)
-            if ext.rotation_capable is True:
-                add_score(pts, "rotation_capable", True)
-
-            pts = self._w("throughput_picks_per_hour", agv_t)
-            add_max(pts)
-            if ext.throughput_picks_per_hour is not None:
-                score_pts = pts if ext.throughput_picks_per_hour >= 300 else (pts // 2 if ext.throughput_picks_per_hour >= 150 else 0)
-                add_score(score_pts, "throughput_picks_per_hour", ext.throughput_picks_per_hour)
+                if rule == "bool_cond":
+                    # Score full pts if tender requires this field, else deduct 2.
+                    add_max(pts)
+                    if val is True:
+                        cond_met = str(req.get(field) or "").lower() == "required"
+                        add_score(pts if cond_met else max(0, pts - 2), field, val)
+                elif rule == "proportional":
+                    add_max(pts)
+                    if val is not None and val > 0:
+                        max_count = cfg.get("t1", 20)
+                        add_score(
+                            min(pts, int(pts * min(val / max_count, 1.0))), field, val
+                        )
+                elif rule == "bool":
+                    add_max(pts)
+                    if val is True:
+                        add_score(pts, field, val)
+                elif rule == "nonempty":
+                    add_max(pts)
+                    if val:
+                        add_score(pts, field, val)
+                elif rule == "threshold_lower":
+                    add_max(pts)
+                    t1 = cfg.get("t1")
+                    if val is not None and t1 is not None and val <= t1:
+                        add_score(pts, field, val)
+                elif rule == "threshold_upper":
+                    add_max(pts)
+                    t1 = cfg.get("t1")
+                    if val is not None and t1 is not None:
+                        add_score(pts if val >= t1 else pts // 2, field, val)
+                elif rule == "tiered_lower":
+                    add_max(pts)
+                    t1, t2 = cfg.get("t1"), cfg.get("t2")
+                    if val is not None and t1 is not None and t2 is not None:
+                        add_score(
+                            pts if val <= t1 else (pts // 2 if val <= t2 else 0),
+                            field, val,
+                        )
+                elif rule == "tiered_upper":
+                    add_max(pts)
+                    t1, t2 = cfg.get("t1"), cfg.get("t2")
+                    if val is not None and t1 is not None and t2 is not None:
+                        add_score(
+                            pts if val >= t1 else (pts // 2 if val >= t2 else 0),
+                            field, val,
+                        )
 
         # Preferred Cond. K.O. bonuses
         if _is_preferred(req.get("vda5050_compatible")) and ext.vda5050_compatible is True:

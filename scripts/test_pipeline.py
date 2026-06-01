@@ -37,19 +37,22 @@ OLLAMA_MODEL     = "qwen2.5:7b"
 import json as _json
 _vt_cfg  = _json.loads((ROOT / "config" / "vehicle_types.json").read_text())
 _VT_MAP  = _vt_cfg.get("vt_map", {})
-_VNA_CFG = set(_vt_cfg.get("vna_subtypes", []))
-_VT_OVR  = _vt_cfg.get("text_overrides", [])
+_VNA_CFG             = set(_vt_cfg.get("vna_subtypes", []))
+_VT_OVR              = _vt_cfg.get("text_overrides", [])
+_VNA_APPLICABLE      = set(_vt_cfg.get("vna_applicable_types", []))
+_FIELD_TEXT_FALLBACKS = _vt_cfg.get("field_text_fallbacks", [])
 
 _plaus   = _json.loads((ROOT / "config" / "plausibility.json").read_text())
-AGV_PLAUSIBILITY = {k: tuple(v) for k, v in _plaus.get("fields", {}).items()}
-_MM_FIELDS = set(_plaus.get("mm_to_m_fields", []))
+AGV_PLAUSIBILITY = {k: (v["min"], v["max"], v["unit"], v["label"])
+                    for k, v in _plaus.items() if isinstance(v, dict)}
+_MM_FIELDS = {k for k, v in _plaus.items() if isinstance(v, dict) and v.get("mm_to_m")}
 
 SUPPLIERS = load_suppliers()
 
 PDFS = [
-    ROOT / "Mama.pdf",
-    ROOT / "CompanyX.pdf",
-    ROOT / "Dragonfly.pdf",
+    ROOT / "tenders" / "Mama.pdf",
+    ROOT / "tenders" / "CompanyX.pdf",
+    ROOT / "tenders" / "Dragonfly.pdf",
 ]
 
 
@@ -62,7 +65,7 @@ def extract_pdf(path: Path) -> str:
 async def llm(system: str, prompt: str, label: str) -> str:
     payload = {
         "model": OLLAMA_MODEL, "system": system, "prompt": prompt,
-        "stream": False, "options": {"temperature": 0.05, "num_predict": 2048, "num_ctx": 32768},
+        "stream": False, "options": {"temperature": 0.0, "num_predict": 2048, "num_ctx": 32768},
     }
     async with httpx.AsyncClient(timeout=180.0) as c:
         r = await c.post(OLLAMA_URL, json=payload)
@@ -131,8 +134,13 @@ async def run_one(pdf_path: Path) -> dict:
             print(f"  ⚠ {w}")
 
     # 3. Normalize + build req dict
-    raw_vt       = crit.get("required_vehicle_type") or ""
-    raw_vt_lower = raw_vt.lower().strip()
+    raw_vt = crit.get("required_vehicle_type") or ""
+    if isinstance(raw_vt, list):
+        raw_vt = next(
+            (item for item in raw_vt if _VT_MAP.get(str(item).lower().strip())),
+            raw_vt[0] if raw_vt else "",
+        ) or ""
+    raw_vt_lower = str(raw_vt).lower().strip()
     canonical    = _VT_MAP.get(raw_vt_lower) or agv_type_keyword_fallback(text)
     is_vna       = raw_vt_lower in _VNA_CFG
     for ovr in _VT_OVR:
@@ -140,6 +148,17 @@ async def run_one(pdf_path: Path) -> dict:
             if ovr.get("canonical"): canonical = ovr["canonical"]
             if ovr.get("vna"):       is_vna = True
             break
+
+    # Field text fallbacks — mirrors app.py logic
+    for _fb in _FIELD_TEXT_FALLBACKS:
+        _key, _rgx, _val = _fb.get("tender_key"), _fb.get("regex"), _fb.get("value")
+        if not _key or not _rgx or not _val:
+            continue
+        if _fb.get("only_if_null") and crit.get(_key) is not None:
+            continue
+        if re.search(_rgx, text or ""):
+            crit[_key] = _val
+            print(f"  Field-text-fallback: {_key} = {_val}")
 
     raw_nav = crit.get("required_navigation") or ""
     nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
@@ -158,7 +177,7 @@ async def run_one(pdf_path: Path) -> dict:
         )
     new_req["required_vna"] = (
         "required"     if is_vna else
-        "not_required" if canonical == "Forklift AGV" else
+        "not_required" if canonical in _VNA_APPLICABLE else
         None
     )
     # required_drive_type comes from LLM via AP0 description rule (no override needed)

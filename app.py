@@ -78,17 +78,20 @@ def _check_and_regen():
 _check_and_regen()
 
 # ── Vehicle types — loaded from generated config (no hardcoding) ──────────────
-_vehicle_cfg = json.loads((_CONFIG_DIR / "vehicle_types.json").read_text())
-_VT_MAP_CFG  = _vehicle_cfg.get("vt_map", {})           # llm_output_lower → canonical
-_VNA_CFG     = set(_vehicle_cfg.get("vna_subtypes", []))  # set of vna llm outputs
-_VT_OVERRIDES= _vehicle_cfg.get("text_overrides", [])     # [{regex, canonical, vna}]
+_vehicle_cfg    = json.loads((_CONFIG_DIR / "vehicle_types.json").read_text())
+_VT_MAP_CFG     = _vehicle_cfg.get("vt_map", {})             # llm_output_lower → canonical
+_VNA_CFG        = set(_vehicle_cfg.get("vna_subtypes", []))   # set of vna llm outputs
+_VT_OVERRIDES   = _vehicle_cfg.get("text_overrides", [])      # [{regex, canonical, vna}]
+_VNA_APPLICABLE = set(_vehicle_cfg.get("vna_applicable_types", []))  # C-5: types where VNA gate applies
+_AGV_DETECT_KWS = _vehicle_cfg.get("agv_detection_keywords", [])     # C-1: is_agv_amr fallback keywords
 
 # ── VNA drive type — resolved once in generate_all.py, stored in vehicle_types.json ──
 # No substring-match at runtime. generate_all.py sets vna_drive_type by scanning
 # field_levels["drive_type"]["allowed_values"]; if AP0 renames it, generate_all.py warns.
-_VNA_DRIVE_TYPE = _vehicle_cfg.get("vna_drive_type")
+_VNA_DRIVE_TYPE      = _vehicle_cfg.get("vna_drive_type")
 if _VNA_DRIVE_TYPE is None:
     log.warning("vna_drive_type missing from vehicle_types.json — run generate_all.py. VNA drive_type override disabled.")
+_FIELD_TEXT_FALLBACKS = _vehicle_cfg.get("field_text_fallbacks", [])  # [{tender_key, regex, value, only_if_null}]
 
 # ── NACE — loaded from generated config ───────────────────────────────────────
 _nace_cfg     = json.loads((_CONFIG_DIR / "nace_codes.json").read_text())
@@ -273,7 +276,7 @@ async def call_ollama(system: str, user: str, label: str) -> str:
         "system": system,
         "prompt": user,
         "stream": False,
-        "options": {"temperature": 0.05, "num_predict": 2048, "num_ctx": 32768},
+        "options": {"temperature": 0.0, "num_predict": 2048, "num_ctx": 32768},
     }
     log.info("Ollama [%s]: system=%d Z., prompt=%d Z.", label, len(system), len(user))
     t0 = datetime.now()
@@ -382,10 +385,8 @@ async def analyze(file: UploadFile = File(...)):
 
         # Keyword fallback: if LLM missed is_agv_amr but doc contains clear AGV terms, force true
         if not result.get("is_agv_amr"):
-            agv_keywords = ["agv", "amr", "automated guided", "autonomous mobile robot",
-                            "fahrerloser", "fahrerloses", "intralogistik", "vna robot"]
             text_lower = text[:5000].lower()
-            if any(kw in text_lower for kw in agv_keywords):
+            if any(kw in text_lower for kw in _AGV_DETECT_KWS):
                 result["is_agv_amr"] = True
                 log.info("AGV-Keyword-Fallback: is_agv_amr auf True gesetzt")
 
@@ -487,11 +488,31 @@ async def analyze(file: UploadFile = File(...)):
 
                 log.info("AGV-Kriterien (validiert): %s", json.dumps(agv_criteria, ensure_ascii=False)[:300])
 
+                # Field text fallbacks: apply regex-based overrides for fields the LLM missed.
+                # Rules loaded from config/vehicle_types.json → field_text_fallbacks (AP0-driven).
+                for _fb in _FIELD_TEXT_FALLBACKS:
+                    _key  = _fb.get("tender_key")
+                    _rgx  = _fb.get("regex")
+                    _val  = _fb.get("value")
+                    if not _key or not _rgx or not _val:
+                        continue
+                    if _fb.get("only_if_null") and agv_criteria.get(_key) is not None:
+                        continue
+                    if re.search(_rgx, text or ""):
+                        agv_criteria[_key] = _val
+                        log.info("Field-text-fallback: %s = %s (regex: %s)", _key, _val, _rgx)
+
                 # Run matching — prefer new SQLite engine, fall back to CSV
                 if _DB_AVAILABLE and _SUPPLIERS:
                     # Normalize LLM vehicle type → canonical (loaded from vehicle_types.json)
-                    raw_vt       = agv_criteria.get("required_vehicle_type") or ""
-                    raw_vt_lower = raw_vt.lower().strip()
+                    raw_vt = agv_criteria.get("required_vehicle_type") or ""
+                    if isinstance(raw_vt, list):
+                        # LLM returned a list — pick first element that maps to a canonical type
+                        raw_vt = next(
+                            (item for item in raw_vt if _VT_MAP_CFG.get(str(item).lower().strip())),
+                            raw_vt[0] if raw_vt else "",
+                        ) or ""
+                    raw_vt_lower = str(raw_vt).lower().strip()
                     canonical_agv_type = _VT_MAP_CFG.get(raw_vt_lower) or agv_type_keyword_fallback(text or "")
 
                     # VNA detection: check LLM output AND text overrides from vehicle_types.json
@@ -546,7 +567,7 @@ async def analyze(file: UploadFile = File(...)):
                     #                    None → no constraint (non-Forklift types)
                     new_req["required_vna"] = (
                         "required"     if is_vna_subtype else
-                        "not_required" if canonical_agv_type == "Forklift AGV" else
+                        "not_required" if canonical_agv_type in _VNA_APPLICABLE else
                         None
                     )
                     # BUG-B fix: if VNA is detected, override required_drive_type to the

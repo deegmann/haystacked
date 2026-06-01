@@ -11,26 +11,6 @@ from src.models import Company, Extension, Product, SupplierRecord
 
 DB_PATH = Path(__file__).parent.parent / "data" / "haystacked.db"
 
-MULTI_SELECT_FIELDS = {
-    "navigation_type", "load_type", "battery_type", "safety_standard",
-    "integration_capability", "station_applications", "fork_type",
-    "load_detection", "guidance", "coupling_type", "load_transfer",
-    "trailer_steering_technology", "workflow_capability", "top_module_type",
-    "onboard_container_type", "wms_integration_native", "installation_process",
-    "modification_process", "certifications_generic", "languages_spoken",
-    "service_coverage", "industries_served",
-}
-
-BOOL_FIELDS = {
-    "infrastructure_required", "autonomous_obstacle_bypass", "omnidirectional_movement",
-    "multi_load_compatibility", "outdoor_capable", "autonomous_charging", "battery_swap_capable",
-    "vda5050_compatible", "multi_fleet_capable", "manual_usage", "vna_capable",
-    "forks_free_floating", "stacking_capability", "barcode_readers", "stock_line_scanning",
-    "trailer_loading", "trailer_unloading", "busbar_compatible", "auto_hitch",
-    "intersection_management", "grid_required", "rotation_capable", "rack_pin_compatible",
-    "free_lift_open_closed_pallet", "task_interleaving", "onboard_ui",
-    "ergonomic_height_adjustable", "export_capable", "is_oem_product", "active", "omnidirectional",
-}
 
 JOIN_SQL = """
 SELECT
