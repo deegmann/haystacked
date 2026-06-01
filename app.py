@@ -52,7 +52,7 @@ OLLAMA_MODEL = "qwen2.5:7b"
 
 # ── Config loading — startup checksum auto-regenerates if AP0 xlsx changed ────
 _CONFIG_DIR = Path(__file__).parent / "config"
-_AP0_PATH   = Path("/Users/christiandeeg/haystacked_platform/Specs/haystacked_AP0_field_spec_v0_10.xlsx")
+_AP0_PATH   = Path(__file__).parent / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
 
 def _check_and_regen():
     """Auto-regenerate all config files if AP0 xlsx has changed (checksum mismatch)."""
@@ -589,6 +589,38 @@ async def match_endpoint(request: Request):
     body = await request.json()
     top, all_results = match_suppliers_new(body, _SUPPLIERS, top_n=10)
     return {"top": top, "all": all_results, "total": len(all_results)}
+
+
+@app.get("/api/field-meta")
+async def field_meta():
+    """Return AP0 field metadata for the frontend — labels, levels, data types.
+    Loaded from config/field_levels.json (generated from AP0 xlsx, never hardcoded)."""
+    field_levels_path = _CONFIG_DIR / "field_levels.json"
+    if not field_levels_path.exists():
+        return JSONResponse({"error": "field_levels.json not found — run generate_all.py"}, status_code=503)
+    fl = json.loads(field_levels_path.read_text())
+    # Build a label from the AP0 field name (snake_case → Title Case words)
+    def _label(key: str) -> str:
+        return " ".join(w.capitalize() for w in key.replace("_", " ").split())
+    meta = {}
+    for db_key, info in fl.items():
+        tender_key = info.get("tender_key")
+        meta[db_key] = {
+            "label":      _label(db_key),
+            "tender_key": tender_key,
+            "level":      info.get("level"),
+            "data_type":  info.get("data_type"),
+            "operator":   info.get("operator"),
+        }
+        if tender_key and tender_key != db_key:
+            meta[tender_key] = {
+                "label":      _label(tender_key),
+                "tender_key": tender_key,
+                "level":      info.get("level"),
+                "data_type":  info.get("data_type"),
+                "operator":   info.get("operator"),
+            }
+    return meta
 
 
 @app.get("/health")

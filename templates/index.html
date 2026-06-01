@@ -181,6 +181,17 @@
           <div id="koList" class="ko-panel-list"></div>
         </div>
 
+        <!-- Extraction Details panel -->
+        <div class="card card-full" id="extractionDetailsCard">
+          <details id="extractionDetailsPanel">
+            <summary class="extraction-summary">
+              Extraction Details — alle extrahierten Felder
+              <span id="extractionDetailsMeta" class="debug-meta"></span>
+            </summary>
+            <div id="extractionDetailsBody" class="extraction-details-grid"></div>
+          </details>
+        </div>
+
         <!-- Match table with score breakdown -->
         <div class="card card-full">
           <h3>Supplier Ranking — Top Results</h3>
@@ -272,7 +283,14 @@
 // ── State ─────────────────────────────────────────────────────────────────────
 let _lastResult = null;
 let _condKoState = {};
+let _fieldMeta = {};        // AP0 field metadata loaded from /api/field-meta
 const DEBUG_MODE = new URLSearchParams(location.search).get('debug') === 'true';
+
+// ── Load AP0 field metadata at startup (no hardcoded labels anywhere) ─────────
+fetch('/api/field-meta')
+  .then(r => r.json())
+  .then(data => { _fieldMeta = data; })
+  .catch(() => { console.warn('field-meta unavailable — labels will fall back to key names'); });
 
 // ── Drag & drop ───────────────────────────────────────────────────────────────
 const dropzone  = document.getElementById('dropzone');
@@ -515,6 +533,7 @@ function showResult(d) {
     show('agvSection');
     renderAgvRequirements(d.agv_criteria);
     initCondKoPanel(d.agv_criteria);
+    renderExtractionDetails(d.agv_criteria);
     if (d.matches && d.matches.length > 0) {
       renderTopMatch(d.matches[0], d.matches);
       renderMatchTable(d.matches);
@@ -540,35 +559,42 @@ function showResult(d) {
   }).catch(() => {});
 }
 
-const AGV_LABELS = {
-  required_vehicle_type:     'Vehicle type',
-  required_weight_capacity_kg:'Payload (kg)',
-  required_max_speed_ms:     'Max speed (m/s)',
-  required_min_aisle_width_m:'Min aisle width (m)',
-  required_max_lift_height_m:'Max lift height (m)',
-  required_temp_min_c:       'Temp min (°C)',
-  required_temp_max_c:       'Temp max (°C)',
-  required_navigation:       'Navigation',
-  required_process:          'Process',
-  required_wms_integration:  'WMS integration',
-  required_conveyor_integration:'Conveyor integration',
-  required_outdoor:          'Outdoor',
-  required_clean_room:       'Cleanroom',
-  required_load_types:       'Load types',
-  required_quantity:         'Vehicle quantity',
-  agv_notes:                 'Notes',
-};
+// ── Field metadata helpers (AP0-driven, no hardcoding) ───────────────────────
+function _fieldLabel(key) {
+  if (_fieldMeta[key]?.label) return _fieldMeta[key].label;
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
 
+// Summary panel: show all tender_key fields that have a non-null extracted value
 function renderAgvRequirements(crit) {
   const container = document.getElementById('agvRequirements');
   container.innerHTML = '';
-  for (const [key, label] of Object.entries(AGV_LABELS)) {
+  // Collect all tender_key → db_key mappings that have a value
+  const shown = new Set();
+  for (const [dbKey, info] of Object.entries(_fieldMeta)) {
+    const tKey = info.tender_key || dbKey;
+    if (shown.has(tKey)) continue;
+    const val = crit[tKey];
+    if (val == null || val === '') continue;
+    shown.add(tKey);
+    const div = document.createElement('div');
+    div.className = 'field';
+    const display = Array.isArray(val) ? val.join(', ') : String(val);
+    div.innerHTML = `<span class="label">${_fieldLabel(tKey)}</span><span class="value">${display}</span>`;
+    container.appendChild(div);
+  }
+  // Fallback: show any extracted key not in AP0 meta (e.g. agv_notes, contact fields)
+  const SUMMARY_EXTRAS = ['agv_notes','required_quantity','required_process',
+    'required_wms_integration','required_conveyor_integration'];
+  for (const key of SUMMARY_EXTRAS) {
+    if (shown.has(key)) continue;
     const val = crit[key];
     if (val == null || val === '') continue;
     const div = document.createElement('div');
     div.className = 'field';
-    const display = Array.isArray(val) ? val.join(', ') : val;
-    div.innerHTML = `<span class="label">${label}</span><span class="value">${display}</span>`;
+    const display = Array.isArray(val) ? val.join(', ') : String(val);
+    div.innerHTML = `<span class="label">${_fieldLabel(key)}</span><span class="value">${display}</span>`;
     container.appendChild(div);
   }
   const warnings = crit._validation_warnings || [];
@@ -581,17 +607,83 @@ function renderAgvRequirements(crit) {
   }
 }
 
-// ── Cond. K.O. Panel ─────────────────────────────────────────────────────────
-const COND_KO_FIELDS = [
-  { key: 'outdoor_capable',       label: 'Outdoor capable' },
-  { key: 'vda5050_compatible',    label: 'VDA 5050' },
-  { key: 'forks_free_floating',   label: 'Forks free-floating (closed pallets)' },
-  { key: 'vna_capable',           label: 'VNA capable' },
-  { key: 'auto_hitch',            label: 'Auto hitch (tugger)' },
-  { key: 'barcode_readers',       label: 'Barcode readers' },
-  { key: 'trailer_loading',       label: 'Trailer loading' },
-  { key: 'grid_required',         label: 'Grid / structured storage' },
-];
+// ── Extraction Details panel — full AP0 field list with levels ────────────────
+function renderExtractionDetails(crit) {
+  const body = document.getElementById('extractionDetailsBody');
+  const meta = document.getElementById('extractionDetailsMeta');
+  body.innerHTML = '';
+
+  // All keys to show: every tender_key in AP0 meta + any extra keys in crit
+  const skipKeys = new Set(['_validation_warnings','_parse_method','_vna_subtype',
+    'required_vehicle_type_canonical','is_agv_amr','text_length','in_scope',
+    'nace_tender','nace_buyer','nace_confidence','nace_explanation']);
+
+  // Build ordered list: AP0-defined tender_keys first, then extras
+  const ap0TenderKeys = [];
+  const seenTk = new Set();
+  for (const info of Object.values(_fieldMeta)) {
+    const tk = info.tender_key;
+    if (tk && !seenTk.has(tk)) { seenTk.add(tk); ap0TenderKeys.push(tk); }
+  }
+  const extraKeys = Object.keys(crit).filter(k => !seenTk.has(k) && !skipKeys.has(k));
+  const allKeys = [...ap0TenderKeys, ...extraKeys];
+
+  let filledCount = 0;
+  for (const key of allKeys) {
+    if (skipKeys.has(key)) continue;
+    const val = crit[key];
+    const level = _fieldLevel(key);
+    const label = _fieldLabel(key);
+    const isFilled = val != null && val !== '';
+    if (isFilled) filledCount++;
+
+    const card = document.createElement('div');
+    card.className = 'ext-field' + (isFilled ? '' : ' ext-field-empty');
+
+    const levelBadge = level
+      ? `<span class="level-badge level-${level}">${level.replace('_',' ')}</span>`
+      : '';
+
+    let valHtml;
+    if (!isFilled) {
+      valHtml = `<span class="ext-field-null">—</span>`;
+    } else if (typeof val === 'boolean') {
+      valHtml = `<span class="ext-field-value">${val ? 'Yes' : 'No'}</span>`;
+    } else if (Array.isArray(val)) {
+      valHtml = `<span class="ext-field-value">${val.join(', ')}</span>`;
+    } else {
+      valHtml = `<span class="ext-field-value">${val}</span>`;
+    }
+
+    card.innerHTML = `
+      <div class="ext-field-header">
+        <span class="ext-field-label">${label}</span>
+        ${levelBadge}
+      </div>
+      ${valHtml}`;
+    body.appendChild(card);
+  }
+
+  const total = allKeys.filter(k => !skipKeys.has(k)).length;
+  meta.textContent = `${filledCount} von ${total} Feldern extrahiert`;
+}
+
+// ── Cond. K.O. Panel — driven by AP0 COND_KO fields ─────────────────────────
+function _condKoFields() {
+  // Build list dynamically from field metadata: all COND_KO fields with Boolean data type
+  if (Object.keys(_fieldMeta).length === 0) return [];
+  const seen = new Set();
+  const result = [];
+  for (const [dbKey, info] of Object.entries(_fieldMeta)) {
+    if (info.level !== 'COND_KO') continue;
+    if (!['Boolean','Boolean (derived)'].includes(info.data_type)) continue;
+    const key = info.tender_key || dbKey;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push({ key, label: _fieldLabel(key) });
+  }
+  return result;
+}
 
 function initCondKoPanel(crit) {
   _condKoState = {};
@@ -599,7 +691,7 @@ function initCondKoPanel(crit) {
   container.innerHTML = '';
   // If VNA was auto-detected, vna_capable is a hard K.O. — exclude from user toggle panel
   const isVna = !!(crit && crit._vna_subtype);
-  const fields = COND_KO_FIELDS.filter(f => !(f.key === 'vna_capable' && isVna));
+  const fields = _condKoFields().filter(f => !(f.key === 'vna_capable' && isVna));
   if (isVna) {
     const notice = document.createElement('div');
     notice.style.cssText = 'grid-column:1/-1;font-size:0.8rem;color:var(--yellow);padding:0.25rem 0 0.5rem';
