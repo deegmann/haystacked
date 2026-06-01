@@ -170,7 +170,10 @@ Tenders rarely state the AGV type explicitly. Derive it from the *operational en
 - **Racking / height > 2 m** → Reach Truck or VNA (see high-bay section below)
 - **No lift at all (roller tops, belt tops)** → Mobile AMR with top module
 
-**The "filling line" trap:** A filling line supply tender transporting heavy pallets (> 1,500 kg) floor-to-floor between warehouse and production stations is a **Counterbalanced Forklift AGV** task. Do not classify as Mobile AMR just because the environment is production. Check: (1) payload, (2) all stations floor-level, (3) buyer names forklift suppliers as preferred.
+**Critical: normal pallets on the floor require forks — AMRs cannot pick them up.**
+Standard EUR pallets (800×1200, 1000×1200, 1200×1200) and IBCs sitting directly on the floor need a fork interface to be lifted and transported. An underride AMR (e.g. iw.hub, MiR, arculee) can only handle loads placed on special elevated docking stations — it cannot pick up a pallet from the floor. If the tender says "Floor delivery" for standard pallet stations with **no mention of special docking infrastructure**, the vehicle must have forks → Forklift AGV (Counterbalanced for floor-level, Reach Truck or VNA for racking). The only AMRs that can handle floor-level standard pallets are dedicated pallet-jack AMRs (e.g. MiR1350 Pallet Jack, AGILOX OCF with free-lift) — check whether these are relevant given the payload requirement.
+
+**The "filling line" trap:** A filling line supply tender transporting heavy pallets floor-to-floor is a **Counterbalanced Forklift AGV** task. Do not classify as Mobile AMR just because the environment is production. Check: (1) payload, (2) all stations floor-level with standard pallets, (3) no special docking infrastructure mentioned, (4) buyer names forklift suppliers as preferred.
 
 **Worked example — Forklift in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → required_vehicle_type = "Counterbalanced" (heavy load, floor-to-floor, forklift suppliers named).
 
