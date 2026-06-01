@@ -156,17 +156,25 @@ For matching the *commercial* counterpart, `distribution_model` and the company 
 
 Tenders rarely state the AGV type explicitly. Derive it from the *operational environment and task description*, not from isolated keywords. This section maps the most common tender contexts to the correct required_vehicle_type.
 
-### Production / manufacturing environments → Mobile AMR (or Tugger AGV)
+### Production / manufacturing environments — use payload and lift height, not environment alone
 
-**Signals:** filling lines (Abfülllinie), production hall (Produktionshalle), assembly (Montage), manufacturing cells, production supply, "Versorgung der Produktion", greenfield factory, MES integration, production scheduling.
+**Critical rule:** The environment alone (filling line, production hall, assembly) does NOT determine the AGV type. A 2,000 kg pallet on a production floor needs a Counterbalanced Forklift AGV, not a Mobile AMR. Use these discriminators:
 
-**Why Mobile AMR and not Forklift:** Production environments require flexible, infrastructure-light transport between dynamic production cells. Filling lines and assembly cells change layout regularly; a fixed-route AGV (forklift) is the wrong fit. The loads are smaller (typically < 1,500 kg), the paths are shorter and more dynamic. A Mobile AMR navigates freely among production machinery.
+**Payload is the primary discriminator:**
+- **≤ 1,500 kg + flexible routing + SLAM navigation** → Mobile AMR
+- **≥ 1,500 kg OR heavy pallets OR multiple pallet sizes** → Forklift AGV (Counterbalanced or Reach Truck)
+- **Towing train, milk-run loop, multiple stops in sequence** → Tugger AGV
 
-**Why Tugger is also possible:** If the tender describes a "milk run" circuit — a recurring route supplying multiple production cells in sequence — a Tugger AGV (towing a train of carts) is the right answer.
+**Lift height is the secondary discriminator:**
+- **Floor-only (lift ~200–400 mm, all stations "floor delivery")** → Counterbalanced Forklift (low-lift transport)
+- **Racking / height > 2 m** → Reach Truck or VNA (see high-bay section below)
+- **No lift at all (roller tops, belt tops)** → Mobile AMR with top module
 
-**The Counterbalanced trap:** Do NOT classify a production/filling-line tender as "Counterbalanced". Counterbalanced forklifts transport heavy pallets on wide aisles (≥ 3 m) between fixed pallet positions (e.g. goods-in dock ↔ buffer). A filling line supply tender is fundamentally different. If you see "filling line" or "production hall" → start with Mobile AMR, then check for tugger signals.
+**The "filling line" trap:** A filling line supply tender transporting heavy pallets (> 1,500 kg) floor-to-floor between warehouse and production stations is a **Counterbalanced Forklift AGV** task. Do not classify as Mobile AMR just because the environment is production. Check: (1) payload, (2) all stations floor-level, (3) buyer names forklift suppliers as preferred.
 
-**Worked example:** "AGV system for supplying filling lines in a greenfield beverage production site" → required_vehicle_type = "Mobile AMR" (flexible production supply, no high-bay racking, no wide-aisle pallet transport implied).
+**Worked example — Forklift in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → required_vehicle_type = "Counterbalanced" (heavy load, floor-to-floor, forklift suppliers named).
+
+**Worked example — AMR in production:** "Autonomous mobile robots for transporting empty containers between assembly workstations, max 300 kg, SLAM navigation, MES dispatching" → required_vehicle_type = "Mobile AMR" (light load, flexible routing, no fixed stations).
 
 ---
 
