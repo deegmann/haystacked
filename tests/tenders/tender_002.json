@@ -1,0 +1,18 @@
+{
+  "tender_id": "tender_002",
+  "description": "Mama -- Mobile AGV/AMR for pallet transport, greenfield production site, filling lines",
+  "source_file": "Mama.pdf",
+  "requirements": {
+    "agv_type": "Mobile AMR",
+    "max_payload_kg": 1000,
+    "navigation_type": ["Natural Feature", "SLAM"],
+    "outdoor_capable": "not_required",
+    "vda5050_compatible": "preferred",
+    "service_coverage_required": ["DACH", "EU"],
+    "workflow_capability": ["Transport"],
+    "operating_temp_min_c": 5
+  },
+  "expected_ko_exclusions": [],
+  "expected_top_3": [],
+  "notes": "Greenfield F&B production. 10 filling lines, packaging supply + finished goods transport. 24/7 operation (Hotmelt lines). Indoor, non-Ex. Minimize shared tracks."
+}

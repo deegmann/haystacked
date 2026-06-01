@@ -1,0 +1,22 @@
+{
+  "tender_id": "tender_001",
+  "description": "Dragonfly -- VNA Forklift AGV, high-bay VNA pallet racking, WMS Reflex integration",
+  "source_file": "Dragonfly.pdf",
+  "requirements": {
+    "agv_type": "Forklift AGV",
+    "lifting_height_mm": 10000,
+    "min_aisle_width_mm": 1800,
+    "navigation_type": ["Natural Feature", "Laser"],
+    "max_payload_kg": 1500,
+    "stacking_capability": true,
+    "service_coverage_required": ["EU", "Global"],
+    "vna_capable": "required",
+    "vda5050_compatible": "preferred",
+    "barcode_readers": "preferred",
+    "outdoor_capable": "not_required",
+    "forks_free_floating": "preferred"
+  },
+  "expected_ko_exclusions": [],
+  "expected_top_3": [],
+  "notes": "VNA APR racking ~54,000 positions, WMS=Reflex, ISO 3691-4 required, 22h/day 364d/year. CA certification needed."
+}

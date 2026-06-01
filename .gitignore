@@ -1,0 +1,47 @@
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+*.env.*
+
+# ── Generated config (from generate_all.py via AP0 xlsx) ─────────────────────
+config/field_levels.json
+config/vehicle_types.json
+config/scoring_weights.json
+config/nace_codes.json
+config/sqlite_schema.json
+config/plausibility.json
+config/ap0_checksum.txt
+config/prompts/
+
+# ── Generated data (from sync_airtable.py via Airtable API) ──────────────────
+data/raw/companies.csv
+data/raw/products.csv
+data/raw/base_models.csv
+data/raw/base_model_extensions.csv
+data/raw/export_validation_report.txt
+data/haystacked.db
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── Claude Code local session data ───────────────────────────────────────────
+.claude/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── Excel lock files ──────────────────────────────────────────────────────────
+~$*.xlsx
+~$*.xls

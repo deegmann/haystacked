@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>haystacked – Tender Analysis</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">hay<span>stacked</span></div>
+    <p class="tagline">Tender Analysis · AGV/AMR Matching</p>
+  </header>
+
+  <!-- Upload -->
+  <section id="uploadSection">
+    <div class="upload-box" id="dropzone">
+      <div class="upload-icon">📄</div>
+      <p>Drop tender PDF here or</p>
+      <label class="btn-upload" for="fileInput">Select file</label>
+      <input type="file" id="fileInput" accept=".pdf" hidden>
+      <p class="hint">PDF only · max 20 MB</p>
+    </div>
+  </section>
+
+  <!-- Progress -->
+  <section id="progressSection" class="hidden">
+    <div class="progress-card">
+      <div class="steps" id="stepsContainer">
+        <div class="step" id="step-upload">
+          <div class="step-icon">⬆</div>
+          <div class="step-body"><div class="step-label">Upload</div><div class="step-msg" id="msg-upload">Waiting…</div></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-extract">
+          <div class="step-icon">📖</div>
+          <div class="step-body"><div class="step-label">Read PDF</div><div class="step-msg" id="msg-extract">Waiting…</div></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-llm">
+          <div class="step-icon">🤖</div>
+          <div class="step-body"><div class="step-label">Analysis</div><div class="step-msg" id="msg-llm">Waiting…</div></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-parse">
+          <div class="step-icon">✓</div>
+          <div class="step-body"><div class="step-label">Evaluation</div><div class="step-msg" id="msg-parse">Waiting…</div></div>
+        </div>
+        <div class="step-line agv-line hidden"></div>
+        <div class="step hidden" id="step-agv">
+          <div class="step-icon">🤖</div>
+          <div class="step-body"><div class="step-label">AGV Matching</div><div class="step-msg" id="msg-agv">Waiting…</div></div>
+        </div>
+      </div>
+      <details class="log-panel">
+        <summary>Debug Log</summary>
+        <div id="logOutput" class="log-output"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Error -->
+  <section id="errorSection" class="hidden">
+    <div class="error-card">
+      <div class="error-icon">⚠</div>
+      <p id="errorText">Error</p>
+      <pre id="errorRaw" class="error-raw hidden"></pre>
+      <button class="btn-reset" onclick="reset()">Try again</button>
+    </div>
+  </section>
+
+  <!-- Clarification -->
+  <section id="clarificationSection" class="hidden">
+    <div class="card" style="margin-bottom:1.5rem">
+      <h3>⚠ Missing Information</h3>
+      <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6">
+        The following fields could not be extracted from the tender document.
+        Please provide them to enable accurate K.O. filtering, or skip to proceed without the filter.
+      </p>
+      <div id="clarificationFields" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem"></div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <button class="btn-rematch" id="clarifyConfirmBtn" onclick="confirmClarification()">Confirm &amp; Run Matching</button>
+        <button class="btn-reset" onclick="skipClarification()">Skip — proceed without these filters</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Result -->
+  <section id="resultSection" class="hidden">
+    <div class="result-header">
+      <h2>Analysis Result</h2>
+      <div id="priorityBadge" class="badge"></div>
+    </div>
+
+    <div class="grid">
+      <!-- Buyer -->
+      <div class="card">
+        <h3>Buyer</h3>
+        <div class="field-group">
+          <div class="field"><span class="label">Company</span><span id="r-buyer" class="value">–</span></div>
+          <div class="field"><span class="label">Industry</span><span id="r-buyer_industry" class="value">–</span></div>
+          <div class="field"><span class="label">NACE (Buyer)</span><span id="r-nace_buyer" class="value mono">–</span></div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="card">
+        <h3>Contact</h3>
+        <div class="field-group">
+          <div class="field"><span class="label">Name</span><span id="r-contact_name" class="value">–</span></div>
+          <div class="field"><span class="label">Email</span><span id="r-contact_email" class="value">–</span></div>
+          <div class="field"><span class="label">Phone</span><span id="r-contact_phone" class="value">–</span></div>
+        </div>
+      </div>
+
+      <!-- Project -->
+      <div class="card">
+        <h3>Project</h3>
+        <div class="field-group">
+          <div class="field"><span class="label">Name</span><span id="r-project_name" class="value">–</span></div>
+          <div class="field"><span class="label">Location</span><span id="r-project_location" class="value">–</span></div>
+          <div class="field"><span class="label">Tender date</span><span id="r-tender_date" class="value">–</span></div>
+          <div class="field"><span class="label">Deadline</span><span id="r-deadline" class="value">–</span></div>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div class="card">
+        <h3>Procurement</h3>
+        <div class="field-group">
+          <div class="field"><span class="label">Category</span><span id="r-tender_category" class="value">–</span></div>
+          <div class="field"><span class="label">NACE Code</span><span id="r-nace_tender" class="value mono">–</span></div>
+          <div class="field"><span class="label">NACE Name</span><span id="r-nace_tender_name" class="value">–</span></div>
+          <div class="field"><span class="label">Confidence</span><span id="r-confidence" class="value">–</span></div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="card card-full">
+        <h3>Summary</h3>
+        <p id="r-summary" class="summary-text">–</p>
+      </div>
+
+      <!-- Missing info -->
+      <div class="card card-full" id="missingCard">
+        <h3>Missing Information</h3>
+        <ul id="missingList" class="missing-list"></ul>
+      </div>
+    </div>
+
+    <!-- AGV Section -->
+    <div id="agvSection" class="hidden">
+      <div class="section-divider"><span>AGV / AMR Matching</span></div>
+
+      <div class="grid">
+        <!-- Requirements -->
+        <div class="card">
+          <h3>Extracted Requirements</h3>
+          <div id="agvRequirements" class="field-group"></div>
+        </div>
+
+        <!-- Top match -->
+        <div class="card">
+          <h3>Best Match</h3>
+          <div id="topMatch"></div>
+        </div>
+
+        <!-- Cond. K.O. override panel -->
+        <div class="card card-full" id="condKoPanel">
+          <h3>Conditional K.O. — Adjust Requirements</h3>
+          <p class="panel-hint">These fields score by default. Set to <strong>Required</strong> to activate as a hard filter, or <strong>Not relevant</strong> to ignore.</p>
+          <div id="condKoToggles" class="cond-ko-grid"></div>
+          <button class="btn-rematch" id="rematchBtn" onclick="rematch()">Re-run Matching</button>
+        </div>
+
+        <!-- K.O. Exclusion panel -->
+        <div class="card card-full" id="koPanel" class="hidden">
+          <h3>K.O. Exclusions</h3>
+          <div id="koList" class="ko-panel-list"></div>
+        </div>
+
+        <!-- Match table with score breakdown -->
+        <div class="card card-full">
+          <h3>Supplier Ranking — Top Results</h3>
+          <div class="table-wrap">
+            <table id="matchTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th>Company</th>
+                  <th>AGV Type</th>
+                  <th>Score</th>
+                  <th>Payload</th>
+                  <th>Lift</th>
+                  <th>Aisle</th>
+                  <th>Navigation</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="matchTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Full debug ranking -->
+        <div class="card card-full">
+          <details id="debugRankingDetails">
+            <summary class="debug-summary">
+              Full ranking — all suppliers
+              <span id="debugRankingMeta" class="debug-meta"></span>
+            </summary>
+            <div class="table-wrap" style="margin-top:0.75rem">
+              <table id="debugTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Company</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>AGV Type</th>
+                    <th>Payload</th>
+                    <th>Lift</th>
+                    <th>Aisle</th>
+                    <th>Reason / K.O.</th>
+                  </tr>
+                </thead>
+                <tbody id="debugTableBody"></tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+
+        <!-- Debug panel (?debug=true) -->
+        <div class="card card-full hidden" id="debugPanel">
+          <h3>Debug Panel</h3>
+          <div class="debug-panel-grid">
+            <div>
+              <div class="debug-section-label">Scoring Weights (live editable)</div>
+              <div id="weightsEditor" class="weights-editor"></div>
+              <button class="btn-rematch" style="margin-top:0.75rem" onclick="rematchWithWeights()">Apply &amp; Re-rank</button>
+            </div>
+            <div>
+              <div class="debug-section-label">Extracted Requirements (raw)</div>
+              <pre id="debugReqRaw" class="debug-raw"></pre>
+            </div>
+            <div>
+              <div class="debug-section-label">All Results (raw JSON)</div>
+              <pre id="debugResultsRaw" class="debug-raw"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span id="metaFilename"></span>
+      <span id="metaLength"></span>
+      <span id="metaDuration"></span>
+      <span id="metaParseMethod"></span>
+      <span id="metaDbStatus" class="meta-db"></span>
+    </div>
+    <button class="btn-reset" onclick="reset()">New Analysis</button>
+  </section>
+
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let _lastResult = null;
+let _condKoState = {};
+const DEBUG_MODE = new URLSearchParams(location.search).get('debug') === 'true';
+
+// ── Drag & drop ───────────────────────────────────────────────────────────────
+const dropzone  = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val || '–'; }
+function fmt(v, unit) { return (v != null && v !== '') ? v + (unit || '') : '–'; }
+
+function addLog(msg) {
+  const el = document.getElementById('logOutput');
+  const ts = new Date().toLocaleTimeString('en', {hour12: false});
+  el.textContent += `[${ts}] ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStep(id, status, msg) {
+  const el = document.getElementById('step-' + id);
+  if (!el) return;
+  el.className = 'step step-' + status;
+  const msgEl = document.getElementById('msg-' + id);
+  if (msgEl) msgEl.textContent = msg;
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+async function handleFile(file) {
+  if (!file.name.toLowerCase().endsWith('.pdf')) { showError('Please select a PDF file.'); return; }
+
+  hide('uploadSection'); hide('resultSection'); hide('errorSection');
+  show('progressSection');
+  document.getElementById('logOutput').textContent = '';
+  ['upload','extract','llm','parse','agv'].forEach(id => setStep(id, 'pending', 'Waiting…'));
+  hide('step-agv');
+  document.querySelectorAll('.agv-line').forEach(el => el.classList.add('hidden'));
+  addLog(`File: ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+
+  const form = new FormData();
+  form.append('file', file);
+  let response;
+  try { response = await fetch('/analyze', { method: 'POST', body: form }); }
+  catch (e) { showError('Network error: ' + e.message); return; }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split('\n\n');
+    buffer = parts.pop();
+    for (const part of parts) {
+      if (!part.trim()) continue;
+      let eventType = 'message', dataStr = '';
+      for (const line of part.split('\n')) {
+        if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+        if (line.startsWith('data: '))  dataStr   = line.slice(6).trim();
+      }
+      if (!dataStr) continue;
+      let data;
+      try { data = JSON.parse(dataStr); } catch { addLog('Parse error: ' + dataStr); continue; }
+
+      if (eventType === 'step') {
+        if (data.id === 'agv') {
+          show('step-agv');
+          document.querySelectorAll('.agv-line').forEach(el => el.classList.remove('hidden'));
+        }
+        setStep(data.id, data.status, data.message);
+        addLog(`[${data.id}:${data.status}] ${data.message}`);
+      } else if (eventType === 'log') {
+        addLog(data.message);
+      } else if (eventType === 'error') {
+        addLog('ERROR: ' + data.message);
+        showError(data.message, data.raw_preview); return;
+      } else if (eventType === 'result') {
+        addLog('Done — rendering result.');
+        // Mark all remaining running steps as done before showing result
+        ['upload','extract','llm','parse','agv'].forEach(id => {
+          const el = document.getElementById('step-' + id);
+          if (el && el.classList.contains('step-running')) setStep(id, 'done', 'Done');
+        });
+        maybeShowClarification(data); return;
+      }
+    }
+  }
+  // Stream ended without a result or error event — stop all animations
+  ['upload','extract','llm','parse','agv'].forEach(id => {
+    const el = document.getElementById('step-' + id);
+    if (el && el.classList.contains('step-running')) setStep(id, 'error', 'Interrupted');
+  });
+}
+
+// ── Clarification Step (AP-C1) ────────────────────────────────────────────────
+// Fields that must be confirmed per AGV type when missing from the tender
+const CLARIFICATION_FIELDS = {
+  'Forklift AGV': [
+    { key: 'lifting_height_mm', label: 'Lifting Height', unit: 'mm', hint: 'VNA high-bay: typically 10,000–17,000 mm' },
+    { key: 'min_aisle_width_mm', label: 'Min. Aisle Width', unit: 'mm', hint: 'VNA: typically 1,600–2,000 mm' },
+    { key: 'max_payload_kg', label: 'Max. Payload', unit: 'kg', hint: 'e.g. 1,000–1,500 kg for EUR/UK pallets' },
+  ],
+  'Tugger AGV': [
+    { key: 'towing_capacity_kg', label: 'Towing Capacity', unit: 'kg', hint: 'Total train weight incl. trailers' },
+    { key: 'max_payload_kg', label: 'Payload per Cart', unit: 'kg', hint: 'e.g. 500–2,000 kg' },
+  ],
+  'Mobile AMR': [
+    { key: 'max_payload_kg', label: 'Max. Payload', unit: 'kg', hint: 'e.g. 250–1,500 kg' },
+  ],
+};
+
+let _pendingResultData = null;
+let _clarificationFields = [];
+
+function maybeShowClarification(data) {
+  const crit = data.agv_criteria || {};
+  const agvType = (crit.required_vehicle_type_canonical || data.matches?.[0]?.agv_type || '');
+  // Map vehicle type to canonical key
+  const typeKey = ['Forklift AGV','Tugger AGV','Mobile AMR'].find(t =>
+    agvType.toLowerCase().includes(t.toLowerCase().replace(' agv','').replace(' amr',''))
+  ) || agvType;
+
+  const fields = CLARIFICATION_FIELDS[typeKey] || [];
+
+  // Check which fields are missing (null/undefined in the resolved new_req)
+  // We check the extracted criteria using original field names
+  const fieldMapping = {
+    lifting_height_mm:  () => crit.required_max_lift_height_m,
+    min_aisle_width_mm: () => crit.required_min_aisle_width_m,
+    max_payload_kg:     () => crit.required_weight_capacity_kg,
+    towing_capacity_kg: () => crit.required_towing_capacity_kg,
+  };
+  const missing = fields.filter(f => {
+    const val = fieldMapping[f.key] ? fieldMapping[f.key]() : null;
+    return val === null || val === undefined || val === '';
+  });
+
+  if (missing.length === 0) { showResult(data); return; }
+
+  _pendingResultData = data;
+  _clarificationFields = missing;
+
+  const container = document.getElementById('clarificationFields');
+  container.innerHTML = '';
+  missing.forEach(f => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:180px 1fr;align-items:center;gap:0.75rem';
+    row.innerHTML = `
+      <label style="font-size:0.85rem;font-weight:600">${f.label} <span style="color:var(--text-muted);font-weight:400">(${f.unit})</span></label>
+      <div>
+        <input type="number" id="clarify-${f.key}" placeholder="${f.hint}"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                 padding:0.4rem 0.75rem;color:var(--text);font-size:0.88rem;width:100%;max-width:260px">
+      </div>`;
+    container.appendChild(row);
+  });
+
+  hide('progressSection');
+  show('clarificationSection');
+}
+
+function confirmClarification() {
+  if (!_pendingResultData) return;
+  const data = _pendingResultData;
+  const overrides = {};
+  _clarificationFields.forEach(f => {
+    const el = document.getElementById('clarify-' + f.key);
+    const val = el ? parseFloat(el.value) : NaN;
+    if (!isNaN(val) && val > 0) overrides[f.key] = val;
+  });
+
+  if (Object.keys(overrides).length === 0) { skipClarification(); return; }
+
+  // Re-run matching with confirmed values via /match endpoint
+  const crit = data.agv_criteria || {};
+  const agvType = data.matches?.[0]?.agv_type || crit.required_vehicle_type_canonical || 'Forklift AGV';
+  const req = {
+    agv_type:          agvType,
+    max_payload_kg:    overrides.max_payload_kg    ?? crit.required_weight_capacity_kg,
+    lifting_height_mm: overrides.lifting_height_mm ?? (crit.required_max_lift_height_m ? crit.required_max_lift_height_m * 1000 : null),
+    min_aisle_width_mm:overrides.min_aisle_width_mm?? (crit.required_min_aisle_width_m ? crit.required_min_aisle_width_m * 1000 : null),
+    towing_capacity_kg:overrides.towing_capacity_kg?? crit.required_towing_capacity_kg,
+    navigation_type:   crit.required_navigation ? crit.required_navigation.split(',').map(s=>s.trim()) : [],
+    vna_capable:       crit._vna_subtype ? 'required' : null,
+    clarifications: { source: 'user_confirmed', fields_confirmed: Object.keys(overrides), ...overrides },
+  };
+  hide('clarificationSection');
+  document.getElementById('clarifyConfirmBtn').disabled = true;
+
+  fetch('/match', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(req) })
+    .then(r => r.json())
+    .then(result => {
+      // Merge match results back into pending data and show
+      _pendingResultData.matches     = result.top || result.matches || [];
+      _pendingResultData.matches_all = result.all || result.matches_all || [];
+      showResult(_pendingResultData);
+    })
+    .catch(e => showError('Matching failed after clarification: ' + e.message));
+}
+
+function skipClarification() {
+  hide('clarificationSection');
+  if (_pendingResultData) showResult(_pendingResultData);
+}
+
+// ── Result rendering ──────────────────────────────────────────────────────────
+function showResult(d) {
+  _lastResult = d;
+  hide('progressSection');
+  show('resultSection');
+
+  ['buyer','buyer_industry','nace_buyer','contact_name','contact_email','contact_phone',
+   'project_name','project_location','tender_date','deadline',
+   'tender_category','nace_tender','nace_tender_name','summary'].forEach(f => set('r-' + f, d[f]));
+
+  const confEl = document.getElementById('r-confidence');
+  if (confEl) { confEl.textContent = d.confidence || '–'; confEl.className = 'value confidence-' + (d.confidence||'').toLowerCase(); }
+
+  const badge = document.getElementById('priorityBadge');
+  if (d.in_scope === false) {
+    badge.textContent = 'Out of scope'; badge.className = 'badge prio-outofscope';
+  } else {
+    const prio = (d.priority || 'UNKNOWN').toUpperCase();
+    badge.textContent = prio; badge.className = 'badge prio-' + prio.toLowerCase();
+  }
+
+  const missing = Array.isArray(d.missing_info) ? d.missing_info : [];
+  document.getElementById('missingList').innerHTML = missing.map(m => `<li>${m}</li>`).join('');
+  document.getElementById('missingCard').style.display = missing.length ? '' : 'none';
+
+  if (d.is_agv_amr && d.agv_criteria) {
+    show('agvSection');
+    renderAgvRequirements(d.agv_criteria);
+    initCondKoPanel(d.agv_criteria);
+    if (d.matches && d.matches.length > 0) {
+      renderTopMatch(d.matches[0], d.matches);
+      renderMatchTable(d.matches);
+    }
+    renderKoPanel(d.matches_all || d.matches || []);
+    if (d.matches_all && d.matches_all.length > 0) renderDebugTable(d.matches_all);
+    if (DEBUG_MODE) renderDebugPanel(d);
+  } else {
+    hide('agvSection');
+  }
+
+  set('metaFilename',  d.filename || '');
+  set('metaLength',    d.text_length ? d.text_length.toLocaleString() + ' chars' : '');
+  set('metaDuration',  d.duration_s  ? d.duration_s + 's' : '');
+  set('metaParseMethod', d.parse_method ? 'Parse: ' + d.parse_method : '');
+
+  // Show DB status
+  fetch('/db-status').then(r => r.json()).then(s => {
+    const el = document.getElementById('metaDbStatus');
+    if (el) el.textContent = s.sqlite_available
+      ? `SQLite · ${s.supplier_count} suppliers`
+      : 'CSV fallback';
+  }).catch(() => {});
+}
+
+const AGV_LABELS = {
+  required_vehicle_type:     'Vehicle type',
+  required_weight_capacity_kg:'Payload (kg)',
+  required_max_speed_ms:     'Max speed (m/s)',
+  required_min_aisle_width_m:'Min aisle width (m)',
+  required_max_lift_height_m:'Max lift height (m)',
+  required_temp_min_c:       'Temp min (°C)',
+  required_temp_max_c:       'Temp max (°C)',
+  required_navigation:       'Navigation',
+  required_process:          'Process',
+  required_wms_integration:  'WMS integration',
+  required_conveyor_integration:'Conveyor integration',
+  required_outdoor:          'Outdoor',
+  required_clean_room:       'Cleanroom',
+  required_load_types:       'Load types',
+  required_quantity:         'Vehicle quantity',
+  agv_notes:                 'Notes',
+};
+
+function renderAgvRequirements(crit) {
+  const container = document.getElementById('agvRequirements');
+  container.innerHTML = '';
+  for (const [key, label] of Object.entries(AGV_LABELS)) {
+    const val = crit[key];
+    if (val == null || val === '') continue;
+    const div = document.createElement('div');
+    div.className = 'field';
+    const display = Array.isArray(val) ? val.join(', ') : val;
+    div.innerHTML = `<span class="label">${label}</span><span class="value">${display}</span>`;
+    container.appendChild(div);
+  }
+  const warnings = crit._validation_warnings || [];
+  if (warnings.length) {
+    const warn = document.createElement('div');
+    warn.className = 'validation-warnings';
+    warn.innerHTML = '<span class="label">⚠ Plausibility warnings</span>' +
+      warnings.map(w => `<div class="warn-item">${w}</div>`).join('');
+    container.appendChild(warn);
+  }
+}
+
+// ── Cond. K.O. Panel ─────────────────────────────────────────────────────────
+const COND_KO_FIELDS = [
+  { key: 'outdoor_capable',       label: 'Outdoor capable' },
+  { key: 'vda5050_compatible',    label: 'VDA 5050' },
+  { key: 'forks_free_floating',   label: 'Forks free-floating (closed pallets)' },
+  { key: 'vna_capable',           label: 'VNA capable' },
+  { key: 'auto_hitch',            label: 'Auto hitch (tugger)' },
+  { key: 'barcode_readers',       label: 'Barcode readers' },
+  { key: 'trailer_loading',       label: 'Trailer loading' },
+  { key: 'grid_required',         label: 'Grid / structured storage' },
+];
+
+function initCondKoPanel(crit) {
+  _condKoState = {};
+  const container = document.getElementById('condKoToggles');
+  container.innerHTML = '';
+  // If VNA was auto-detected, vna_capable is a hard K.O. — exclude from user toggle panel
+  const isVna = !!(crit && crit._vna_subtype);
+  const fields = COND_KO_FIELDS.filter(f => !(f.key === 'vna_capable' && isVna));
+  if (isVna) {
+    const notice = document.createElement('div');
+    notice.style.cssText = 'grid-column:1/-1;font-size:0.8rem;color:var(--yellow);padding:0.25rem 0 0.5rem';
+    notice.textContent = '⚠ VNA detected — "VNA capable" is a hard K.O. and cannot be toggled.';
+    container.appendChild(notice);
+  }
+  fields.forEach(f => {
+    _condKoState[f.key] = 'not_required';
+    const div = document.createElement('div');
+    div.className = 'cond-ko-row';
+    div.innerHTML = `
+      <span class="cond-ko-label">${f.label}</span>
+      <div class="toggle-group" data-field="${f.key}">
+        <button class="toggle-btn" data-val="required">Required</button>
+        <button class="toggle-btn active active-not_required" data-val="not_required">Not relevant</button>
+        <button class="toggle-btn" data-val="preferred">Preferred</button>
+      </div>`;
+    div.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        div.querySelectorAll('.toggle-btn').forEach(b => {
+          b.classList.remove('active', 'active-required', 'active-preferred', 'active-not_required');
+        });
+        btn.classList.add('active', `active-${btn.dataset.val}`);
+        _condKoState[f.key] = btn.dataset.val;
+      });
+    });
+    container.appendChild(div);
+  });
+}
+
+async function rematch() {
+  const d = _lastResult;
+  if (!d || !d.agv_criteria) return;
+  const btn = document.getElementById('rematchBtn');
+  btn.disabled = true; btn.textContent = 'Matching…';
+
+  // Build structured req from extracted + cond ko state
+  const crit = d.agv_criteria;
+  const isVna = !!(crit._vna_subtype);
+  const req = {
+    agv_type:          crit.required_vehicle_type_canonical || crit.required_vehicle_type,
+    max_payload_kg:    crit.required_weight_capacity_kg,
+    lifting_height_mm: crit.required_max_lift_height_m ? Math.round(crit.required_max_lift_height_m * 1000) : null,
+    min_aisle_width_mm: crit.required_min_aisle_width_m ? Math.round(crit.required_min_aisle_width_m * 1000) : null,
+    navigation_type:   crit.required_navigation ? crit.required_navigation.split(',').map(s=>s.trim()) : [],
+    operating_temp_min_c: crit.required_temp_min_c,
+    outdoor_capable:   crit.required_outdoor === 'yes' ? 'required' : (_condKoState.outdoor_capable || 'not_required'),
+    vna_capable:       isVna ? 'required' : (_condKoState.vna_capable || 'not_required'),
+    ...Object.fromEntries(COND_KO_FIELDS.filter(f => f.key !== 'vna_capable').map(f => [f.key, _condKoState[f.key] || 'not_required'])),
+  };
+
+  try {
+    const resp = await fetch('/match', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(req) });
+    if (!resp.ok) { const err = await resp.json(); alert(err.error || 'Matching failed'); return; }
+    const data = await resp.json();
+    if (data.top && data.top.length > 0) {
+      renderTopMatch(data.top[0], data.top);
+      renderMatchTable(data.top.slice(0, 5));
+    }
+    renderKoPanel(data.all || []);
+    if (data.all) renderDebugTable(data.all);
+    if (DEBUG_MODE) {
+      document.getElementById('debugResultsRaw').textContent = JSON.stringify(data.all?.slice(0,5), null, 2);
+    }
+  } catch(e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Re-run Matching';
+  }
+}
+
+// ── K.O. Panel ────────────────────────────────────────────────────────────────
+function renderKoPanel(all) {
+  const disqualified = all.filter(r => r.disqualified);
+  const panel = document.getElementById('koPanel');
+  const list  = document.getElementById('koList');
+  if (!disqualified.length) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  list.innerHTML = '';
+  disqualified.forEach(r => {
+    const reasons = r.disqualified_by || r.knockouts || [];
+    const div = document.createElement('div');
+    div.className = 'ko-entry';
+    div.innerHTML = `
+      <div class="ko-entry-header">
+        <span class="ko-product">${r.product}</span>
+        <span class="ko-company">${r.company}</span>
+      </div>
+      <div class="ko-reasons">
+        ${reasons.map(reason => `<div class="ko-reason-line"><span class="ko-x">✗</span> ${reason}</div>`).join('')}
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+// ── Top match ─────────────────────────────────────────────────────────────────
+function renderTopMatch(m, allMatches) {
+  const el = document.getElementById('topMatch');
+  const best = (allMatches || []).find(r => !r.disqualified) || m;
+  const maxScore = best.max_score || 100;
+  const pct = maxScore > 0 ? Math.round(best.score / maxScore * 100) : 0;
+  const scoreColor = best.disqualified ? 'var(--red)' : pct >= 60 ? 'var(--green)' : pct >= 30 ? 'var(--yellow)' : 'var(--red)';
+  const scoreDetails = (best.score_details || []).slice(0, 6);
+  el.innerHTML = `
+    <div class="top-match-score" style="color:${scoreColor}">${pct}%<span class="top-match-pts"> (${best.score}/${maxScore})</span></div>
+    <div class="top-match-name">${best.product}${best.disqualified ? ' <span class="dq-badge">Disqualified</span>' : ''}</div>
+    <div class="top-match-company">${best.company}${best.origin ? ' · ' + best.origin : ''}</div>
+    ${scoreDetails.length ? `
+    <div class="score-breakdown">
+      ${scoreDetails.map(d => `
+        <div class="sb-row">
+          <span class="sb-field">${d.field}</span>
+          <span class="sb-val">${d.value != null ? d.value : '–'}</span>
+          <span class="sb-pts">+${d.points}</span>
+        </div>`).join('')}
+    </div>` : ''}
+    <div class="top-match-desc">${best.description || ''}</div>`;
+}
+
+// ── Match table ───────────────────────────────────────────────────────────────
+function renderMatchTable(matches) {
+  const tbody = document.getElementById('matchTableBody');
+  tbody.innerHTML = '';
+  const maxScore = matches[0]?.max_score || 100;
+  matches.forEach((m, i) => {
+    const pct = maxScore > 0 ? Math.round(m.score / maxScore * 100) : 0;
+    const scoreColor = m.disqualified ? 'dq' : pct >= 60 ? 'green' : pct >= 30 ? 'yellow' : 'red';
+    const tr = document.createElement('tr');
+    if (m.disqualified) tr.classList.add('row-disqualified');
+    const lift   = m.lifting_height_mm  != null ? (m.lifting_height_mm / 1000).toFixed(1) + 'm' : '–';
+    const aisle  = m.min_aisle_width_mm != null ? (m.min_aisle_width_mm / 1000).toFixed(2) + 'm' : '–';
+    const payload= m.max_payload_kg     != null ? m.max_payload_kg + ' kg' : '–';
+
+    // Score breakdown as expandable row
+    const details = (m.score_details || []);
+    const detailRowId = `detail-${i}`;
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td><strong>${m.product}</strong>${m.disqualified ? ' <span class="dq-badge-sm">DQ</span>' : ''}</td>
+      <td>${m.company}</td>
+      <td><span class="type-pill">${m.agv_type || '–'}</span></td>
+      <td><span class="score-pill score-${scoreColor}">${pct}%<span class="score-max"> ${m.score}/${maxScore}</span></span></td>
+      <td>${payload}</td>
+      <td>${lift}</td>
+      <td>${aisle}</td>
+      <td class="nav-cell">${m.navigation || '–'}</td>
+      <td><button class="btn-expand" onclick="toggleDetail('${detailRowId}')" title="Score breakdown">▼</button></td>`;
+    tbody.appendChild(tr);
+
+    // Hidden detail row
+    const detail = document.createElement('tr');
+    detail.id = detailRowId;
+    detail.className = 'detail-row hidden';
+    detail.innerHTML = `<td colspan="10">
+      <div class="detail-inner">
+        ${m.disqualified
+          ? `<div class="detail-section">
+               <div class="detail-label">K.O. Exclusions</div>
+               ${(m.disqualified_by || m.knockouts || []).map(r => `<div class="ko-reason-line"><span class="ko-x">✗</span> ${r}</div>`).join('')}
+             </div>`
+          : ''}
+        ${details.length
+          ? `<div class="detail-section">
+               <div class="detail-label">Score Breakdown</div>
+               <div class="sb-table">
+                 ${details.map(d => `
+                   <div class="sb-row">
+                     <span class="sb-field">${d.field}</span>
+                     <span class="sb-val">${d.value != null ? d.value : '–'}</span>
+                     <span class="sb-pts">+${d.points} pts</span>
+                   </div>`).join('')}
+                 <div class="sb-row sb-total">
+                   <span class="sb-field">Total</span>
+                   <span class="sb-val"></span>
+                   <span class="sb-pts">${m.score} / ${maxScore}</span>
+                 </div>
+               </div>
+             </div>`
+          : '<div class="detail-section"><em style="color:var(--text-muted);font-size:0.8rem">No scoring details — supplier may be disqualified before scoring.</em></div>'}
+        <div class="detail-meta">
+          ${m.reference_count != null ? `<span>References: ${m.reference_count}</span>` : ''}
+          ${m.lead_time_weeks != null ? `<span>Lead time: ${m.lead_time_weeks} weeks</span>` : ''}
+          ${m.battery_runtime_h != null ? `<span>Battery: ${m.battery_runtime_h}h</span>` : ''}
+          ${m.vda5050 === true ? `<span class="meta-tag">VDA 5050</span>` : ''}
+          ${m.autonomous_charging === true ? `<span class="meta-tag">Auto charging</span>` : ''}
+          ${(m.service_coverage||[]).length ? `<span>Coverage: ${m.service_coverage.join(', ')}</span>` : ''}
+        </div>
+      </div>
+    </td>`;
+    tbody.appendChild(detail);
+  });
+}
+
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isHidden = el.classList.contains('hidden');
+  el.classList.toggle('hidden');
+  // Rotate arrow on button
+  const rowBefore = el.previousElementSibling;
+  const btn = rowBefore?.querySelector('.btn-expand');
+  if (btn) btn.textContent = isHidden ? '▲' : '▼';
+}
+
+// ── Debug table ───────────────────────────────────────────────────────────────
+function renderDebugTable(all) {
+  const tbody = document.getElementById('debugTableBody');
+  tbody.innerHTML = '';
+  const maxScore = all[0]?.max_score || 100;
+  const nQual = all.filter(r => !r.disqualified).length;
+  const nDq   = all.filter(r =>  r.disqualified).length;
+  document.getElementById('debugRankingMeta').textContent =
+    ` — ${all.length} suppliers · ${nQual} qualified · ${nDq} disqualified`;
+
+  all.forEach(r => {
+    const pct  = maxScore > 0 ? Math.round(r.score / maxScore * 100) : 0;
+    const tr   = document.createElement('tr');
+    if (r.disqualified) tr.classList.add('row-disqualified');
+    const scoreColor = r.disqualified ? 'dq' : pct >= 60 ? 'green' : pct >= 30 ? 'yellow' : 'red';
+    const statusHtml = r.disqualified ? `<span class="dq-badge-sm">DQ</span>` : `<span class="qual-badge-sm">OK</span>`;
+    const koHtml   = (r.disqualified_by || r.knockouts || []).map(x => `<span class="ko-tag sm">✗ ${x}</span>`).join(' ');
+    const lift   = r.lifting_height_mm != null ? (r.lifting_height_mm/1000).toFixed(1)+'m' : '–';
+    const aisle  = r.min_aisle_width_mm != null ? (r.min_aisle_width_mm/1000).toFixed(2)+'m' : '–';
+    const payload= r.max_payload_kg != null ? r.max_payload_kg+'kg' : '–';
+    tr.innerHTML = `
+      <td class="debug-rank">${r.rank||''}</td>
+      <td><strong>${r.product}</strong></td>
+      <td>${r.company}</td>
+      <td><span class="score-pill score-${scoreColor}">${pct}%<span class="score-max"> ${r.score}/${maxScore}</span></span></td>
+      <td>${statusHtml}</td>
+      <td class="debug-vtype"><span class="type-pill type-pill-sm">${r.agv_type||'–'}</span></td>
+      <td>${payload}</td>
+      <td>${lift}</td>
+      <td>${aisle}</td>
+      <td class="debug-reasons">${koHtml || '<span class="no-match">scored</span>'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Debug panel ───────────────────────────────────────────────────────────────
+function renderDebugPanel(d) {
+  show('debugPanel');
+
+  // Raw requirements
+  document.getElementById('debugReqRaw').textContent = JSON.stringify(d.agv_criteria, null, 2);
+  document.getElementById('debugResultsRaw').textContent = JSON.stringify(
+    (d.matches_all || d.matches || []).slice(0, 5), null, 2
+  );
+
+  // Scoring weights editor
+  fetch('/match', {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
+    .catch(() => {});
+
+  // Read config/scoring_weights.json from backend status (we don't expose it as API yet)
+  // Show static weights for now
+  const weights = {
+    reference_count: 15, lead_time_weeks: 10, vda5050_compatible: 8,
+    battery_runtime_h: 7, autonomous_charging: 6, safety_standard: 5, stop_accuracy_mm: 5,
+  };
+  const editor = document.getElementById('weightsEditor');
+  editor.innerHTML = '';
+  _editWeights = {...weights};
+  Object.entries(weights).forEach(([k, v]) => {
+    const row = document.createElement('div');
+    row.className = 'weight-row';
+    row.innerHTML = `<label class="weight-label">${k}</label>
+      <input type="range" min="0" max="25" value="${v}" class="weight-slider" data-key="${k}">
+      <span class="weight-val" id="wv-${k}">${v}</span>`;
+    row.querySelector('input').addEventListener('input', function() {
+      _editWeights[this.dataset.key] = parseInt(this.value);
+      document.getElementById('wv-' + this.dataset.key).textContent = this.value;
+    });
+    editor.appendChild(row);
+  });
+}
+
+let _editWeights = {};
+async function rematchWithWeights() {
+  const d = _lastResult;
+  if (!d || !d.agv_criteria) return;
+  const crit = d.agv_criteria;
+  const req = {
+    agv_type: crit.required_vehicle_type,
+    max_payload_kg: crit.required_weight_capacity_kg,
+    _weights: _editWeights,
+  };
+  try {
+    const resp = await fetch('/match', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(req)});
+    const data = await resp.json();
+    if (data.top) { renderMatchTable(data.top.slice(0,5)); renderKoPanel(data.all||[]); }
+    document.getElementById('debugResultsRaw').textContent = JSON.stringify(data.all?.slice(0,5), null, 2);
+  } catch(e) { alert(e.message); }
+}
+
+// ── Error / reset ─────────────────────────────────────────────────────────────
+function showError(msg, raw) {
+  hide('progressSection'); hide('resultSection'); show('errorSection');
+  set('errorText', msg);
+  const rawEl = document.getElementById('errorRaw');
+  if (raw) { rawEl.textContent = raw; rawEl.classList.remove('hidden'); }
+  else { rawEl.classList.add('hidden'); }
+}
+
+function reset() {
+  hide('resultSection'); hide('errorSection'); hide('progressSection');
+  show('uploadSection');
+  fileInput.value = ''; _lastResult = null; _condKoState = {};
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "tender_id": "tender_003",
+  "description": "OeA-199-25 (CompanyX) -- Website redesign TU Berlin -- OUT OF SCOPE",
+  "source_file": "OeA-199-25 Leistungsbeschreibung.pdf",
+  "in_scope": false,
+  "requirements": {},
+  "expected_ko_exclusions": [],
+  "expected_top_3": [],
+  "notes": "TU Berlin website redesign. Clearly out of scope for haystacked AGV/AMR matching. in_scope=false should be set. No AGV supplier matching should run."
+}
