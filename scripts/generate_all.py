@@ -633,14 +633,19 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list) -> s
             if vt.get("key_indicators"):
                 line += f'. Signals: {vt["key_indicators"]}'
             lines.append(line)
-        lines.append("  Key: PRODUCTION/FILLING LINES/MANUFACTURING → Mobile AMR. WAREHOUSE/RACKING/SHIPPING → Forklift AGV type.")
+        lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+        lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
         lines.append("")
         lines.append("  THINK STEP BY STEP when classifying required_vehicle_type:")
-        lines.append("  (1) Is this a PRODUCTION/MANUFACTURING/FILLING LINE environment? → required_vehicle_type='Mobile AMR'.")
+        lines.append("  (1) Does the task involve transporting PALLETS, IBCs, drums, or heavy loads (>1000 kg)?")
+        lines.append("      → required_vehicle_type='Forklift AGV' (Counterbalanced). This applies even in production/manufacturing/filling-line environments.")
+        lines.append("      → Strong signals: 'pallet', 'IBC', 'Hobbock', 'drum', 'replacing forklifts', warehouse-to-line transport, payload >1000 kg.")
+        lines.append("      → A tender that mentions filling lines AND pallet transport is a Forklift AGV tender, not Mobile AMR.")
         lines.append("  (2) Does the doc mention VNA / very narrow aisle / aisle<2m / high-bay racking? → required_vehicle_type='VNA', required_vna=true, required_drive_type='VNA Turret'.")
         lines.append("  (3) Does the doc mention towing / tugger / milk run / trailer train? → required_vehicle_type='Tugger'.")
-        lines.append("  (4) Only if none of the above apply: use Counterbalanced or Reach Truck based on aisle width.")
-        lines.append("  Do NOT default to Counterbalanced when VNA or Production/AMR signals are present.")
+        lines.append("  (4) Is this a production/manufacturing/filling-line environment with LIGHT loads (<1000 kg), totes, bins, or shelf-based picking? → required_vehicle_type='Mobile AMR'.")
+        lines.append("  (5) Only if none of the above apply: use Counterbalanced or Reach Truck based on aisle width.")
+        lines.append("  Do NOT classify as Mobile AMR just because filling lines or MES are mentioned — check the load type first.")
         lines.append("")
 
     lines.append("Field definitions:")
