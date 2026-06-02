@@ -1,7 +1,7 @@
 # Haystacked Matching Rules
 
-**Version:** based on AP0 v0.10  
-**Last updated:** 2026-06-01
+**Version:** based on AP0 v0.10 (v1.3)  
+**Last updated:** 2026-06-02 (run 9)
 
 This document explains how the haystacked matching engine decides which suppliers qualify for a tender and how they are ranked. It is written for the project team — no programming knowledge required, but some familiarity with the AGV/AMR domain helps.
 
@@ -145,15 +145,13 @@ This ranks fully-documented suppliers above undocumented ones without excluding 
 
 ## How drive_type matching works
 
-`drive_type` is a **Cond. K.O.** field (as of AP0 v0.10, after the 2026-06-01 fix).
+`drive_type` is a **Context** field as of AP0 v0.10 (updated 2026-06-02). It is displayed in the results panel but does **not** affect filtering or scoring.
 
-**Key design decision:** the extraction prompt explicitly instructs the LLM: "ONLY extract if tender explicitly names drive type — do NOT infer from task description." Floor-level pallet transport does not imply Counterbalanced; only extract if the buyer specifies it.
+**Why demoted from Cond. K.O. to Context:** The prior Cond. K.O. operator caused real-world harm: the LLM inferred drive type from the described task (e.g. "Counterbalanced" from floor pallet transport) rather than from explicit text in the tender. This wrongly excluded Reach Truck suppliers who are equally capable of floor-level pallet transport. A Reach Truck AGV and a Counterbalanced AGV are both physically capable of most floor transport tasks — only buyers who explicitly name the drive type in their tender documents actually care about this distinction.
 
-**Why this matters:** A Reach Truck AGV can transport floor pallets just as well as a Counterbalanced AGV. If the tender says "transport pallets from receiving to storage" without specifying the machine type, the LLM must return `null` for `required_drive_type` — not `"Counterbalanced"`. Extracting `"Counterbalanced"` and applying a K.O. would wrongly exclude Reach Truck suppliers who are equally capable.
+**Extraction rule still applies:** the extraction prompt instructs the LLM: "ONLY extract if tender explicitly names drive type — do NOT infer from task description." This instruction remains in the template to prevent `required_drive_type` from being populated with inferred values that would mislead readers of the result panel.
 
-**When drive_type does filter:** if a tender document explicitly states the drive type (e.g. "Gegengewichtsstapler", "counterbalanced forklift", "Schubmaststapler"), the Cond. K.O. fires.
-
-**VNA special case:** when VNA is detected (via LLM output or text override), `app.py` sets `required_drive_type = "VNA Turret"` regardless of what the LLM extracted. This value comes from `config/vehicle_types.json → vna_drive_type`, which is resolved by `generate_all.py` from the AP0 allowed values — no hardcoded string in Python.
+**VNA and drive_type:** VNA detection no longer injects a `required_drive_type` value. The VNA gate is enforced entirely through the `vna_capable` field using `KO_BOOL_EXCLUSIVE`. The dead code that previously set `required_drive_type = "VNA Turret"` in `app.py` has been removed.
 
 ---
 
@@ -171,6 +169,12 @@ VNA (Very Narrow Aisle) uses `KO_BOOL_EXCLUSIVE`, which is bidirectional — it 
 
 - Suppliers with `vna_capable=True` → K.O. (VNA turret trucks need guide rail infrastructure not present in a standard warehouse)
 - Suppliers with `vna_capable=False` or `None` → pass
+
+### VNA always implies rack operations
+
+When the system detects VNA, the LLM is instructed (via the industry README injected into the system prompt) that the facility must have racking. `required_station_types` will include at least one rack type as a result. This is enforced at the extraction stage, not in the matching engine.
+
+**VNA does not exclude floor or conveyor stations.** A VNA facility commonly has floor or conveyor pick/drop points alongside its narrow-aisle racking. The presence of floor or conveyor station types alongside a VNA classification is correct and expected. Only the rack station drives the `min_aisle_width_mm` K.O.; floor and conveyor stations do not require an aisle width check.
 
 ### How VNA is detected
 

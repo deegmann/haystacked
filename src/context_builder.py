@@ -82,6 +82,7 @@ def build_system_context() -> str:
 6. Tugger AGVs cannot interface with conveyor belts -- if conveyors are required, Tugger is not appropriate.
 7. VDA 5050 is an open fleet interface standard -- increasingly a hard requirement for large European buyers.
 8. CONSERVATIVE VALUE EXTRACTION (critical): When a document lists multiple values for the same parameter, always extract the most demanding value. For minimum-capability fields (payload, lift height, operating hours, fleet size, maximum ambient temperature): extract the MAXIMUM value found -- the supplier must meet or exceed this. For maximum-constraint fields (aisle width, minimum ambient temperature): extract the MINIMUM value found -- the supplier must fit within this limit. Never average or omit ambiguous values -- always pick the worst case for the supplier.
+9. ANTI-HALLUCINATION (critical): Before outputting any non-null value you must be able to identify the exact sentence in the document that states it. Do NOT infer specifications from warehouse type or AGV type -- a VNA warehouse does NOT imply IP65, cold-storage temperature, high humidity, ramp gradient, or VDA 5050 unless these are written in the document. Do NOT read numbers from dates, filenames, revision codes, version strings, or project metadata as specification values -- '25th May 2022' is a date, NOT a temperature; 'v1.3' is a version, NOT a floor flatness value. If a field's value is not directly stated in the document text, output null -- never apply typical industry values.
 """
     return context
 

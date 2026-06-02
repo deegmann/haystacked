@@ -570,12 +570,8 @@ async def analyze(file: UploadFile = File(...)):
                         "not_required" if canonical_agv_type in _VNA_APPLICABLE else
                         None
                     )
-                    # BUG-B fix: if VNA is detected, override required_drive_type to the
-                    # VNA-specific drive type loaded from AP0 field_levels (allowed_values).
-                    # _VNA_DRIVE_TYPE is read from config/field_levels.json at startup —
-                    # no hardcoded string here.
-                    if is_vna_subtype and _VNA_DRIVE_TYPE:
-                        new_req["required_drive_type"] = _VNA_DRIVE_TYPE
+                    # drive_type is CONTEXT level — no matching operator, injection removed.
+                    # VNA is hard-gated via vna_capable (KO_BOOL_EXCLUSIVE) in field_levels.json.
                     matches, matches_all = match_suppliers_new(new_req, _SUPPLIERS, top_n=5)
                 else:
                     matches, matches_all = supplier_db.match_suppliers(agv_criteria, top_n=5)

@@ -894,7 +894,13 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             "  Example: document has '29 kg tare weight' and '1000 kg max loaded weight' → output 1000.\n"
             "- Maximum-constraint fields (aisle width, minimum ambient temperature): extract the MINIMUM value — supplier must fit within this limit.\n"
             "  Example: document says 'aisle 2000 mm rack-to-rack, min 1900 mm pallet-to-pallet' → output 1.9 (in meters).\n"
-            "Never average, never omit — always pick the worst case for the supplier.")
+            "Never average, never omit — always pick the worst case for the supplier.\n\n"
+            "ANTI-HALLUCINATION RULE — NULL IF NOT EXPLICITLY STATED:\n"
+            "Before outputting any non-null value you must be able to identify the exact sentence in the document that states it.\n"
+            "- Do NOT infer specifications from warehouse type or AGV type: a VNA warehouse does NOT imply IP65, cold-storage temperature, high humidity, ramp gradient, or VDA 5050 unless these are written in the document.\n"
+            "- Do NOT read numbers from dates, filenames, revision codes, version strings, or project metadata as specification values.\n"
+            "  Example: '25th May 2022' is a date — NOT a temperature. 'v1.3' is a version — NOT a floor flatness value.\n"
+            "- If a field's value is not directly stated in the document text, output null — never apply 'typical' industry values.")
         (PROMPTS_DIR / "extraction_template.txt").write_text(extraction_template)
         (PROMPTS_DIR / "extraction_retry_system.txt").write_text(
             "You are a data extraction assistant. Extract facts from tender documents into JSON. Output ONLY valid JSON. No markdown fences, no explanations.")

@@ -1,7 +1,7 @@
 # AP0 Change Guide
 
-**Version:** based on AP0 v0.10  
-**Last updated:** 2026-06-01
+**Version:** based on AP0 v0.10 (v1.3)  
+**Last updated:** 2026-06-01 (run 8)
 
 This guide is for anyone who needs to change how the matching engine works, add a new supplier field, improve LLM extraction, or add a new vehicle type. All of these changes happen in the AP0 xlsx — not in Python code.
 
@@ -184,7 +184,7 @@ Adding a new matchable field requires changes in two places: the AP0 xlsx (for m
 **After adding to AP0:**
 
 1. Run `python3 scripts/generate_all.py` — this updates all config files including the SQLite schema
-2. Run `python3 sync_airtable.py` — this creates the new column in SQLite (the `_migrate_table` function in `sync_airtable.py` adds new columns non-destructively) and pulls the latest Airtable data
+2. Run `python3 sync_airtable.py` — this creates the new column in SQLite (the `_migrate_table` function in `sync_airtable.py` adds new columns non-destructively) and pulls the latest Airtable data. If you do not have Airtable credentials, use `python3 sync_airtable.py --local` to rebuild from the committed CSVs instead.
 3. Verify the new field appears in `config/field_levels.json`
 4. Verify the column exists in `data/haystacked.db` using a SQLite browser or the validate command
 
