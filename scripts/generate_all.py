@@ -329,7 +329,7 @@ def read_extraction_schema(wb) -> list:
             seen.add(jk)
             hint = str(row[c_desc]).strip() if c_desc is not None and c_desc < len(row) and row[c_desc] else ""
             mand = bool(row[c_mand]) if c_mand is not None and c_mand < len(row) else False
-            schema.append({"key": jk, "db_field": fname, "mandatory": mand, "hint": hint})
+            schema.append({"key": jk, "db_field": fname, "mandatory": mand, "hint": hint, "sheet": sheet})
 
     # All extraction fields now come from AP0 xlsx via the Tender JSON Key column:
     #   required_vehicle_type  ← agv_type         (SHARED, K.O.)
@@ -616,15 +616,16 @@ def read_platform(platform_path: Path) -> dict:
 
 # ── Prompt builders ───────────────────────────────────────────────────────────
 
-def build_extraction_template(vehicle_types: dict, extraction_schema: list) -> str:
-    lines = ["Extract AGV/AMR technical requirements from this tender. Values may appear in running text OR in tables — extract from both.",
-             ""]
-
-    # Vehicle type classification guide (from Vehicle Types sheet)
-    # BUG-A/F fix: add explicit Chain-of-Thought ordering to prevent LLM defaulting to Counterbalanced
+def build_vehicle_type_template(vehicle_types: dict) -> str:
+    """Pass 4a template — classify vehicle type and VNA flag only."""
+    lines = [
+        "Classify the required AGV/AMR vehicle type from this tender document.",
+        "Output ONLY the JSON object shown below — nothing else.",
+        "",
+    ]
     guide = vehicle_types.get("llm_guide", [])
     if guide:
-        lines += ["Vehicle type classification guide (for required_vehicle_type):"]
+        lines.append("Vehicle type classification guide:")
         seen_names = set()
         for vt in guide:
             if vt["name"] in seen_names: continue
@@ -634,37 +635,117 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list) -> s
                 line += f'. Signals: {vt["key_indicators"]}'
             lines.append(line)
         lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
-        lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
         lines.append("")
-        lines.append("  THINK STEP BY STEP when classifying required_vehicle_type:")
-        lines.append("  (1) Does the task involve transporting PALLETS, IBCs, drums, or heavy loads (>1000 kg)?")
-        lines.append("      → required_vehicle_type='Forklift AGV' (Counterbalanced). This applies even in production/manufacturing/filling-line environments.")
-        lines.append("      → Strong signals: 'pallet', 'IBC', 'Hobbock', 'drum', 'replacing forklifts', warehouse-to-line transport, payload >1000 kg.")
-        lines.append("      → A tender that mentions filling lines AND pallet transport is a Forklift AGV tender, not Mobile AMR.")
-        lines.append("  (2) Does the doc mention VNA / very narrow aisle / aisle<2m / high-bay racking? → required_vehicle_type='VNA', required_vna=true, required_drive_type='VNA Turret'.")
-        lines.append("  (3) Does the doc mention towing / tugger / milk run / trailer train? → required_vehicle_type='Tugger'.")
-        lines.append("  (4) Is this a production/manufacturing/filling-line environment with LIGHT loads (<1000 kg), totes, bins, or shelf-based picking? → required_vehicle_type='Mobile AMR'.")
-        lines.append("  (5) Only if none of the above apply: use Counterbalanced or Reach Truck based on aisle width.")
-        lines.append("  Do NOT classify as Mobile AMR just because filling lines or MES are mentioned — check the load type first.")
+        lines.append("  THINK STEP BY STEP:")
+        lines.append("  IMPORTANT: Only three values are valid: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+        lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+        lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_vehicle_type='Tugger AGV'.")
+        lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_vehicle_type='Mobile AMR'.")
+        lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_vehicle_type='Forklift AGV'.")
+        lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
+        lines.append("      If VNA / very narrow aisle / aisle<2m → required_vehicle_type='Forklift AGV' AND required_vna=true.")
         lines.append("")
+    lines += [
+        "Fields:",
+        "- required_vehicle_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
+        "- required_vna: true if VNA / Schmalgang / very narrow aisle / aisle<2m with high-bay racking. Only applicable when required_vehicle_type='Forklift AGV'. false otherwise.",
+        "",
+        "DOCUMENT:",
+        "{text}",
+        "",
+        "JSON:",
+        '{"required_vehicle_type":null,"required_vna":null}',
+    ]
+    return "\n".join(lines)
+
+
+# Fields determined in Pass 4a — excluded from Pass 4b templates
+_4A_FIELDS = {"required_vehicle_type", "required_vna"}
+
+
+_OPERATOR_DIRECTION = {
+    "KO_IF_LT": "CONSERVATIVE EXTRACTION: if multiple values are stated, extract the MAXIMUM — the supplier must meet or exceed this threshold.",
+    "KO_IF_GT": "CONSERVATIVE EXTRACTION: if multiple values are stated, extract the MINIMUM — the supplier must not exceed this constraint.",
+}
+_NUMERIC_DTYPES = {"Float", "Integer"}
+
+
+def build_extraction_template(vehicle_types: dict, extraction_schema: list,
+                               sheet_filter: str = None, field_levels: dict = None) -> str:
+    """Build LLM extraction template.
+
+    sheet_filter=None  → full combined template (backward compat / JSON-retry fallback).
+    sheet_filter=<sheet> → Pass 4b type-specific template; includes SHARED + that sheet only,
+                           excludes fields already determined in Pass 4a.
+                           Placeholders {vehicle_type} and {vna_context} filled by app.py at runtime.
+    """
+    if sheet_filter:
+        # Pass 4b: only relevant fields for this vehicle type
+        schema_to_use = [
+            f for f in extraction_schema
+            if f.get("sheet") in ("SHARED – All AGV Types", sheet_filter)
+            and f["key"] not in _4A_FIELDS
+        ]
+        lines = [
+            "The vehicle type for this tender has been determined: {vehicle_type}. {vna_context}",
+            "Extract the technical requirements listed below from the tender document.",
+            "Values may appear in running text OR in tables — extract from both.",
+            "Output ONLY the JSON object shown at the end — nothing else.",
+            "",
+        ]
+    else:
+        # Full combined template (backward compat)
+        schema_to_use = extraction_schema
+        lines = ["Extract AGV/AMR technical requirements from this tender. Values may appear in running text OR in tables — extract from both.",
+                 ""]
+        guide = vehicle_types.get("llm_guide", [])
+        if guide:
+            lines += ["Vehicle type classification guide (for required_vehicle_type):"]
+            seen_names = set()
+            for vt in guide:
+                if vt["name"] in seen_names: continue
+                seen_names.add(vt["name"])
+                line = f'  * "{vt["name"]}" → {vt["description"]}'
+                if vt.get("key_indicators"):
+                    line += f'. Signals: {vt["key_indicators"]}'
+                lines.append(line)
+            lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+            lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
+            lines.append("")
+            lines.append("  THINK STEP BY STEP when classifying required_vehicle_type:")
+            lines.append("  IMPORTANT: Only three values are valid for required_vehicle_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+            lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+            lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_vehicle_type='Tugger AGV'.")
+            lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_vehicle_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_vehicle_type='Forklift AGV'.")
+            lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_vehicle_type='Forklift AGV' AND required_vna=true.")
+            lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
+            lines.append("")
 
     lines.append("Field definitions:")
-    for field in extraction_schema:
+    _source_instrumented = set()  # numeric KO fields that get a _source companion
+    for field in schema_to_use:
         if not field["hint"]:
             continue
         mand = " MANDATORY —" if field["mandatory"] else ""
         hint = field["hint"]
-        # BUG-C fix: augment aisle width field with explicit warning about height confusion
-        if field["key"] == "required_min_aisle_width_m":
-            hint += (" WARNING: Do NOT confuse aisle width with transfer station height,"
-                     " rack height, or lift height."
-                     " Source terms: 'Gangbreite', 'aisle width', 'working aisle'."
-                     " If no explicit aisle width is stated → output null.")
-        # BUG-G fix: augment station_types field with explicit warning against defaulting to examples
-        if field["key"] == "required_station_types":
-            hint += (" Output null if not explicitly stated in document."
-                     " DO NOT default to example values.")
+        needs_source = False
+        if field_levels:
+            fl  = field_levels.get(field["db_field"], {})
+            op  = fl.get("operator", "")
+            dt  = fl.get("data_type", "")
+            if op in _OPERATOR_DIRECTION and dt in _NUMERIC_DTYPES:
+                hint = hint + " " + _OPERATOR_DIRECTION[op]
+                needs_source = True
         lines.append(f'- {field["key"]}:{mand} {hint}')
+        if needs_source:
+            _source_instrumented.add(field["key"])
+            lines.append(
+                f'- {field["key"]}_source: The EXACT verbatim sentence or phrase from the document '
+                f'that contains the value above. null if the value was not found explicitly in the '
+                f'document — in which case {field["key"]} MUST also be null.'
+            )
 
     lines += ["",
               "Use null only when a field genuinely cannot be determined from the document.",
@@ -674,13 +755,14 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list) -> s
               "",
               "JSON:"]
 
-    # JSON schema line — generated from Extraction Schema, no duplicates
     seen_keys = set()
     json_fields = []
-    for field in extraction_schema:
+    for field in schema_to_use:
         if field["key"] not in seen_keys:
             seen_keys.add(field["key"])
             json_fields.append(f'"{field["key"]}":null')
+            if field["key"] in _source_instrumented:
+                json_fields.append(f'"{field["key"]}_source":null')
     lines.append("{" + ",".join(json_fields) + "}")
 
     return "\n".join(lines)
@@ -803,18 +885,6 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     platform          = read_platform(platform_path)
     nace              = platform  # nace data is inside platform dict
 
-    # Enrich vehicle_types with vna_drive_type resolved from field_levels.
-    # This avoids any substring-matching at runtime — app.py reads vehicle_types["vna_drive_type"].
-    # The value comes from AP0 field_levels["drive_type"]["allowed_values"] — the entry flagged VNA.
-    # Convention: the VNA drive type is the single allowed_value for drive_type whose name
-    # contains "VNA" (case-insensitive). If AP0 renames it, generate_all.py warns explicitly.
-    _dt_allowed = field_levels.get("drive_type", {}).get("allowed_values", [])
-    _vna_drive  = next((v for v in _dt_allowed if "vna" in v.lower()), None)
-    if _vna_drive:
-        vehicle_types["vna_drive_type"] = _vna_drive
-    else:
-        print("  [WARN] No VNA drive type found in drive_type allowed_values — vna_drive_type not set")
-
     # Additional runtime fields derived from AP0 — written to vehicle_types.json so
     # Python code never contains canonical type names or AGV-domain keywords.
 
@@ -859,8 +929,25 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     print(f"  Plausibility ranges: {len(plausibility)} fields")
 
     # Build prompts
-    extraction_template = build_extraction_template(vehicle_types, extraction_schema)
-    retry_template      = build_retry_template(extraction_schema)
+    vehicle_type_template = build_vehicle_type_template(vehicle_types)
+    extraction_template   = build_extraction_template(vehicle_types, extraction_schema, field_levels=field_levels)
+    retry_template        = build_retry_template(extraction_schema)
+
+    # Build type-specific Pass 4b templates — derived from DATA_SHEETS, no hardcoded type names
+    # vt_prompt_map written to vehicle_types.json so app.py never needs to know canonical names.
+    vt_prompt_map: dict = {}
+    type_templates: dict = {}
+    for _sheet in DATA_SHEETS:
+        if _sheet == "SHARED – All AGV Types":
+            continue
+        _slug  = _sheet.lower().replace(" ", "_")          # e.g. "forklift_agv"
+        _fname = f"extraction_template_{_slug}.txt"
+        vt_prompt_map[_sheet] = _fname
+        type_templates[_sheet] = build_extraction_template(vehicle_types, extraction_schema,
+                                                            sheet_filter=_sheet, field_levels=field_levels)
+    vehicle_types["vt_prompt_map"]     = vt_prompt_map
+    vehicle_types["4a_fields"]         = list(_4A_FIELDS)   # fields owned by Pass 4a, excluded from 4b
+    vehicle_types["vna_context_hint"]  = "VNA (very narrow aisle) operation is required."
     nace_template       = build_nace_template(nace)
     basic_template      = build_basic_template()
 
@@ -893,23 +980,32 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
 
         (PROMPTS_DIR / "extraction_system.txt").write_text(
             "You are a warehouse automation specialist. Extract technical AGV/AMR requirements from tender documents. Output ONLY valid JSON. No markdown, no explanation.\n\n"
-            "CRITICAL EXTRACTION RULE — CONSERVATIVE VALUES:\n"
-            "When a document lists multiple values for the same parameter, always extract the most demanding value.\n"
-            "- Minimum-capability fields (payload, lift height, operating hours, fleet size, maximum ambient temperature): extract the MAXIMUM value — supplier must meet or exceed this.\n"
-            "  Example: document has '29 kg tare weight' and '1000 kg max loaded weight' → output 1000.\n"
-            "- Maximum-constraint fields (aisle width, minimum ambient temperature): extract the MINIMUM value — supplier must fit within this limit.\n"
-            "  Example: document says 'aisle 2000 mm rack-to-rack, min 1900 mm pallet-to-pallet' → output 1.9 (in meters).\n"
-            "Never average, never omit — always pick the worst case for the supplier.\n\n"
             "ANTI-HALLUCINATION RULE — NULL IF NOT EXPLICITLY STATED:\n"
             "Before outputting any non-null value you must be able to identify the exact sentence in the document that states it.\n"
             "- Do NOT infer specifications from warehouse type or AGV type: a VNA warehouse does NOT imply IP65, cold-storage temperature, high humidity, ramp gradient, or VDA 5050 unless these are written in the document.\n"
             "- Do NOT read numbers from dates, filenames, revision codes, version strings, or project metadata as specification values.\n"
             "  Example: '25th May 2022' is a date — NOT a temperature. 'v1.3' is a version — NOT a floor flatness value.\n"
             "- If a field's value is not directly stated in the document text, output null — never apply 'typical' industry values.")
+        (PROMPTS_DIR / "vehicle_type_template.txt").write_text(vehicle_type_template)
         (PROMPTS_DIR / "extraction_template.txt").write_text(extraction_template)
+        for _sheet, _tmpl in type_templates.items():
+            _slug = _sheet.lower().replace(" ", "_")
+            (PROMPTS_DIR / f"extraction_template_{_slug}.txt").write_text(_tmpl)
         (PROMPTS_DIR / "extraction_retry_system.txt").write_text(
             "You are a data extraction assistant. Extract facts from tender documents into JSON. Output ONLY valid JSON. No markdown fences, no explanations.")
         (PROMPTS_DIR / "extraction_retry_template.txt").write_text(retry_template)
+
+        # Prune stale extraction_template_*.txt files not in the current vt_prompt_map
+        expected = set(vt_prompt_map.values()) | {
+            "extraction_template.txt", "extraction_retry_template.txt",
+            "extraction_retry_system.txt", "extraction_system.txt",
+            "vehicle_type_template.txt", "basic_system.txt",
+            "basic_template.txt", "nace_template.txt",
+        }
+        for stale in PROMPTS_DIR.glob("extraction_template_*.txt"):
+            if stale.name not in expected:
+                stale.unlink()
+                print(f"  [PRUNE] Deleted stale prompt: {stale.name}")
         (PROMPTS_DIR / "basic_system.txt").write_text(
             "You are a data extraction assistant. Extract facts from tender documents into JSON. Output ONLY valid JSON. No markdown fences, no explanations.")
         (PROMPTS_DIR / "basic_template.txt").write_text(basic_template)
