@@ -44,6 +44,8 @@ pytest tests/unit/test_matching_logic.py::test_U_M_01_ko_payload_too_low -v
 - `config/scoring_weights.json`
 - `config/nace_codes.json`
 - `config/plausibility.json`
+- `config/sqlite_schema.json` — CREATE TABLE SQL consumed by `sync_airtable.py`
+- `config/extraction_hints.json` — tender_key → {hint, sheet} map consumed by Pass 4c in `app.py`
 - `config/prompts/*.txt` — all LLM prompt files, especially `extraction_template.txt`
 
 At startup, `app.py` checksums the AP0 xlsx and auto-regenerates all config if it changed.

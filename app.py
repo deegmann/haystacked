@@ -113,6 +113,45 @@ _NUMERIC_KO_TENDER_KEYS: frozenset = frozenset(
     and _fl_meta.get("data_type") in ("Float", "Integer")
 )
 
+# ── Pass 4c: per-field extraction hints ──────────────────────────────────────
+# Maps tender_key → {hint, sheet} for numeric KO fields — used in Pass 4c to
+# build one focused LLM prompt per field instead of a single 40-field batch.
+_hints_path = _CONFIG_DIR / "extraction_hints.json"
+_extraction_hints: dict = json.loads(_hints_path.read_text()) if _hints_path.exists() else {}
+# Only the numeric KO fields that have a hint and belong to a specific sheet.
+# Sheet mapping determines which fields are relevant per vehicle type at runtime.
+_NUMERIC_KO_FIELD_HINTS: dict = {
+    k: v for k, v in _extraction_hints.items()
+    if k in _NUMERIC_KO_TENDER_KEYS and v.get("hint") and v.get("sheet")
+}
+
+# Operator-driven extraction direction for Pass 4c prompts — derived from field_levels.json.
+# KO_IF_LT means the supplier must meet or exceed the tender's threshold → extract MAXIMUM.
+# KO_IF_GT means the supplier must not exceed the tender's limit → extract MINIMUM.
+_4C_EXTRACTION_DIRECTION: dict = {}
+for _fl_key, _fl_meta in _field_levels.items():
+    _tk = _fl_meta.get("tender_key", _fl_key)
+    _op = _fl_meta.get("operator")
+    if _op == "KO_IF_LT":
+        _4C_EXTRACTION_DIRECTION[_tk] = (
+            "If multiple values are present, extract the MAXIMUM — "
+            "the supplier must meet or exceed this threshold."
+        )
+    elif _op == "KO_IF_GT":
+        _4C_EXTRACTION_DIRECTION[_tk] = (
+            "If multiple values are present, extract the MINIMUM — "
+            "the supplier must not exceed this constraint."
+        )
+
+assert _NUMERIC_KO_TENDER_KEYS, (
+    "field_levels.json has no KO_IF_LT/KO_IF_GT Float/Integer fields — "
+    "source-span enforcement is inactive. Run generate_all.py."
+)
+assert _4C_EXTRACTION_DIRECTION, (
+    "field_levels.json has no KO_IF_LT/KO_IF_GT fields — "
+    "Pass 4c has no extraction direction. Run generate_all.py."
+)
+
 
 def _find_invalid_ap0_fields(criteria: dict, skip: frozenset = frozenset()) -> dict:
     """Return {tender_key: (raw_value, allowed_list)} for every non-null field whose
@@ -167,6 +206,7 @@ _VNA_APPLICABLE = set(_vehicle_cfg.get("vna_applicable_types", []))  # C-5: type
 _AGV_DETECT_KWS = _vehicle_cfg.get("agv_detection_keywords", [])     # C-1: is_agv_amr fallback keywords
 
 _FIELD_TEXT_FALLBACKS = _vehicle_cfg.get("field_text_fallbacks", [])  # [{tender_key, regex, value, only_if_null}]
+_SHARED_SHEET         = _vehicle_cfg.get("shared_sheet_name", "SHARED – All AGV Types")  # C-6: AP0 shared sheet name
 
 # ── NACE — loaded from generated config ───────────────────────────────────────
 _nace_cfg     = json.loads((_CONFIG_DIR / "nace_codes.json").read_text())
@@ -181,6 +221,29 @@ log.info("NACE codes loaded: %d Prio-1 entries", len(_nace_cfg.get("codes", []))
 def _load_prompt(filename: str) -> str:
     p = Path(__file__).parent / "config" / "prompts" / filename
     return p.read_text(encoding="utf-8").strip()
+
+def _source_confirms_value(value, source_text: str) -> bool:
+    """Return True if source_text contains a number matching value within unit-scale tolerance.
+
+    Handles:
+    - Thousands separators: "1,000" treated as 1000
+    - mm/m scale: value 2.0 matches 2000 in source (and vice versa)
+    Zero values always pass (deliberate zero, not an inference hallucination).
+    """
+    try:
+        v = float(str(value).replace(",", ""))
+    except (TypeError, ValueError):
+        return bool(source_text.strip())
+    if v == 0:
+        return True
+    nums: set = set()
+    for raw in re.findall(r"\d[\d,\.]*", source_text):
+        try:
+            nums.add(float(raw.replace(",", "")))
+        except ValueError:
+            pass
+    return v in nums or (v * 1000) in nums or (v != 0 and round(v / 1000, 6) in nums)
+
 
 def _fill(template: str, **kwargs) -> str:
     """Replace {key} placeholders in a prompt template without touching JSON braces.
@@ -270,10 +333,30 @@ def repair_and_parse(raw: str) -> dict:
     cleaned = re.sub(r"```(?:json)?\s*", "", raw).replace("```", "").strip()
 
     start = cleaned.find("{")
-    end   = cleaned.rfind("}") + 1
-    if start == -1 or end == 0:
+    if start == -1:
         raise ValueError("Kein JSON-Objekt in der Antwort")
-    candidate = cleaned[start:end]
+
+    # 0. brace-balanced match — find the shortest complete JSON object from `start`,
+    #    avoiding rfind("}" ) grabbing stray braces in trailing explanation prose.
+    _depth, _in_str, _esc, _bal_end = 0, False, False, -1
+    for _i, _ch in enumerate(cleaned[start:], start):
+        if _esc:
+            _esc = False
+        elif _ch == "\\" and _in_str:
+            _esc = True
+        elif _ch == '"':
+            _in_str = not _in_str
+        elif not _in_str:
+            if _ch == "{":
+                _depth += 1
+            elif _ch == "}":
+                _depth -= 1
+                if _depth == 0:
+                    _bal_end = _i + 1
+                    break
+    candidate = cleaned[start:_bal_end] if _bal_end != -1 else cleaned[start:cleaned.rfind("}") + 1]
+    if not candidate:
+        raise ValueError("Kein JSON-Objekt in der Antwort")
 
     # 1. direct
     try:
@@ -683,17 +766,87 @@ async def analyze(file: UploadFile = File(...)):
                 log.exception("Pass 4b fehlgeschlagen")
                 yield sse("log", {"message": f"⚠ 4b Fehler: {e}"})
 
+            # ── Pass 4c: per-field extraction for numeric KO fields ──────────────
+            # Each numeric KO field gets its own focused LLM call (one field + document).
+            # Shorter prompt → more attention budget per field → fewer inference hallucinations.
+            # Results override 4b values; source-span enforcement (below) still applies.
+            # canonical_agv_type == AP0 sheet name ("Forklift AGV", "Tugger AGV", "Mobile AMR")
+            _4c_fields = {
+                k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
+                if v["sheet"] in (_SHARED_SHEET, canonical_agv_type)
+            }
+            if _4c_fields:
+                yield sse("step", {"id": "agv", "status": "running",
+                                   "message": f"Pass 4c: {len(_4c_fields)} numerische Felder einzeln…"})
+                await asyncio.sleep(0)
+                _4c_count    = 0
+                _4c_abstained: set = set()   # fields where 4c returned null (used in enforcement below)
+                for _fk, _fmeta in _4c_fields.items():
+                    # Semantic definition only — NULL RULE / CONSERVATIVE EXTRACTION prose stripped
+                    # to avoid tripling the null-bias already present in the system prompt.
+                    _fhint_full = _fmeta["hint"]
+                    _fhint_def  = _fhint_full.split("NULL RULE:")[0].strip()
+                    _per_user = (
+                        f"Vehicle type: {canonical_agv_type}. {vna_context}\n\n"
+                        f"Find the value of '{_fk}' in the tender document.\n\n"
+                        f"Field meaning: {_fhint_def}\n\n"
+                        f"Step 1: Scan the document for any sentence, table cell, or labelled line "
+                        f"that states this value directly.\n"
+                        f"Step 2: If found, copy it verbatim as the source and extract the number "
+                        f"(note: commas in numbers are thousands separators — '1,000' means 1000). "
+                        f"{_4C_EXTRACTION_DIRECTION.get(_fk, '')}\n"
+                        f"Step 3: If not found anywhere in the document text, output null for both "
+                        f"— do NOT infer from vehicle type, warehouse layout, or industry standards.\n\n"
+                        f"DOCUMENT:\n{text}\n\n"
+                        f"Output ONLY this JSON:\n"
+                        f'{{"{_fk}": <number or null>, "{_fk}_source": "<verbatim quote or null>"}}'
+                    )
+                    try:
+                        _per_raw    = await call_ollama(AGV_SYSTEM, _per_user, f"agv_4c_{_fk}")
+                        _per_parsed = repair_and_parse(_per_raw)
+                        if _fk in _per_parsed:
+                            _4c_val = _per_parsed[_fk]
+                            _4c_src = _per_parsed.get(f"{_fk}_source")
+                            if _4c_val is not None:
+                                # 4c found a value → use it (focused extraction wins)
+                                agv_criteria[_fk]              = _4c_val
+                                agv_criteria[f"{_fk}_source"]  = _4c_src
+                                _4c_count += 1
+                            else:
+                                # 4c explicitly returned null → abstained
+                                _4c_abstained.add(_fk)
+                            log.debug("4c %s: %s (src: %s)", _fk, _4c_val,
+                                      str(_4c_src or "")[:60])
+                        else:
+                            # Field key absent from parsed dict (regex-fallback path) → abstained
+                            _4c_abstained.add(_fk)
+                            log.debug("4c %s: field absent in parse result → abstained", _fk)
+                    except Exception as _pe:
+                        # Parse or call failure → abstained so L2 can still check 4b value
+                        _4c_abstained.add(_fk)
+                        log.warning("4c '%s' fehlgeschlagen (→ abstained): %s", _fk, _pe)
+                log.info("Pass 4c: %d Felder neu extrahiert, %d abstained",
+                         _4c_count, len(_4c_abstained))
+
             # ── Source-span enforcement (generic, field-agnostic) ────────────────
-            # For every numeric KO field the extraction template requires a companion
-            # <field>_source. If absent or null the LLM had no explicit source →
-            # null the value to prevent inference hallucinations.
+            # Layer 1: source absent/null → LLM had no explicit source → null value.
+            # Layer 2 (scoped to 4c abstentions): 4c said null AND 4b source doesn't
+            #   numerically confirm the value → 4b was likely hallucinating → null value.
+            #   Uses _source_confirms_value (strips thousands separators, tests mm/m scale).
+            _4c_abstained_ref = _4c_abstained if _4c_fields else set()
             for _key in _NUMERIC_KO_TENDER_KEYS:
                 if agv_criteria.get(_key) is None:
                     continue
                 _src_val = agv_criteria.get(f"{_key}_source")
                 if not _src_val:
-                    log.warning("Source-span null: %s=%s → null (kein Quellenbeleg)", _key, agv_criteria[_key])
+                    log.warning("Source-span L1: %s=%s → null (kein Quellenbeleg)",
+                                _key, agv_criteria[_key])
                     yield sse("log", {"message": f"⚠ Kein Quellenbeleg: {_key}={agv_criteria[_key]} → null"})
+                    agv_criteria[_key] = None
+                elif _key in _4c_abstained_ref and not _source_confirms_value(agv_criteria[_key], str(_src_val)):
+                    log.warning("Source-span L2: %s=%s — 4c abstained, Quelle bestätigt Wert nicht → null",
+                                _key, agv_criteria[_key])
+                    yield sse("log", {"message": f"⚠ 4c Abstention: {_key}={agv_criteria[_key]} → null"})
                     agv_criteria[_key] = None
 
             # Merge 4a results into agv_criteria

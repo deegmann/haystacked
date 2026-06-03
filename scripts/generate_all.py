@@ -906,6 +906,10 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     # C-5: canonical types for which VNA logic applies
     vehicle_types["vna_applicable_types"] = ["Forklift AGV"]
 
+    # C-6: name of the shared (cross-vehicle-type) AP0 sheet — consumed by Pass 4c in app.py
+    # so the string never needs to be hardcoded in Python.
+    vehicle_types["shared_sheet_name"] = DATA_SHEETS[0]
+
     # C-1: flat list of all keyword_map values for is_agv_amr detection
     _all_kws: list = []
     for _kws in vehicle_types.get("keyword_map", {}).values():
@@ -958,7 +962,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     if dry_run:
         print("\n[DRY RUN] Would write:")
         print("  config/field_levels.json, vehicle_types.json, scoring_weights.json, nace_codes.json")
-        print("  config/sqlite_schema.json, config/plausibility.json")
+        print("  config/sqlite_schema.json, config/plausibility.json, config/extraction_hints.json")
         print("  config/prompts/extraction_template.txt (and others)")
         print(f"\nExtraction template preview (first 400 chars):\n{extraction_template[:400]}")
         print(f"\nSQLite companies preview:\n{sqlite_schema['companies'][:400]}")
@@ -1016,6 +1020,17 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         (PROMPTS_DIR / "nace_system.txt").write_text(
             "You are an industrial classification specialist. Pick the single best NACE code from the provided list. Output ONLY valid JSON with exactly the field names shown.")
         (PROMPTS_DIR / "nace_template.txt").write_text(nace_template)
+
+        # extraction_hints.json — maps tender_key → {hint, sheet} for all extraction fields.
+        # Consumed by Pass 4c per-field extraction in app.py.
+        extraction_hints = {
+            f["key"]: {"hint": f["hint"], "sheet": f["sheet"]}
+            for f in extraction_schema
+            if f.get("hint") and f.get("key") and f.get("sheet")
+        }
+        (CONFIG_DIR / "extraction_hints.json").write_text(
+            json.dumps(extraction_hints, indent=2, ensure_ascii=False) + "\n"
+        )
 
         # Sync README from Spec/ (single source of truth within repo) → config/
         # config/industry_readme.md is the runtime copy loaded by context_builder.py.
