@@ -7,7 +7,7 @@ knowledge — it is a pure rule engine interpreter.
 
 To add a new field or change a K.O. condition:
     1. Edit the AP0 xlsx (Matching Operator column)
-    2. Run: python3 scripts/generate_field_levels.py
+    2. Run: python3 scripts/generate_all.py
     3. Restart the app — no Python changes needed.
 
 Operator semantics:
@@ -483,14 +483,6 @@ class Matcher:
                             pts if val >= t1 else (pts // 2 if val >= t2 else 0),
                             field, val,
                         )
-
-        # Preferred Cond. K.O. bonuses
-        if _is_preferred(req.get("vda5050_compatible")) and ext.vda5050_compatible is True:
-            add_score(3, "vda5050_preferred_bonus", True)
-        if _is_preferred(req.get("outdoor_capable")) and ext.outdoor_capable is True:
-            add_score(2, "outdoor_preferred_bonus", True)
-        if _is_preferred(req.get("auto_hitch")) and ext.auto_hitch is True:
-            add_score(2, "auto_hitch_preferred_bonus", True)
 
         return r
 

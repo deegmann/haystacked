@@ -196,7 +196,7 @@ EXT_FLOAT = [
 EXT_MULTI = [
     "navigation_type", "load_type", "battery_type", "safety_standard",
     "integration_capability", "station_applications", "industries_served",
-    "fork_type", "load_detection", "guidance",
+    "special_fork_option", "load_detection", "guidance",
     "coupling_type", "load_transfer", "trailer_steering_technology",
     "workflow_capability", "top_module_type", "onboard_container_type", "wms_integration_native",
     # AP0 v0.6 additions

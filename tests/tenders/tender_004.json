@@ -1,0 +1,27 @@
+{
+  "tender_id": "tender_004",
+  "description": "Nordlicht -- Counterbalanced Forklift AGV, coffee production, 3.4m aisle, 10m lift, 1200kg payload",
+  "source_file": "Beispielausschreibung_AGV_Nordlicht.pdf",
+  "in_scope": true,
+  "requirements": {
+    "agv_type": "Forklift AGV",
+    "required_weight_capacity_kg": 1200,
+    "required_max_lift_height_m": 10,
+    "required_min_aisle_width_m": 3.4,
+    "required_temp_min_c": 10,
+    "required_temp_max_c": 30,
+    "required_vna": "not_required"
+  },
+  "golden_extraction": {
+    "required_weight_capacity_kg": 1200,
+    "required_max_lift_height_m": 10,
+    "required_min_aisle_width_m": 3.4
+  },
+  "known_issues": [
+    "L2 source-span bug: German decimal comma '3,4' fails _source_confirms_value(3.4, ...) — aisle nulled",
+    "4c false abstention on temp_min/max despite clear 'Umgebungstemperatur 10 – 30 °C'",
+    "required_integration: 'REST / OPC UA' rejected by AP0 (format mismatch)"
+  ],
+  "expected_ko_exclusions": [],
+  "expected_top_3": []
+}

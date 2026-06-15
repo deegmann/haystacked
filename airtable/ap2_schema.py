@@ -200,7 +200,7 @@ EXTENSIONS_FIELDS = [
     # Forklift AGV — type-specific
     num_int("lifting_height_mm"),
     num_int("min_total_height_mm"),
-    ms("fork_type", ["Standard Fork", "Telescopic", "Side-Shift", "Rotating", "Clamp"]),
+    ms("special_fork_option", ["Telescopic", "Side-Shift", "Clamp"]),
     ss("fork_spread", ["None", "Manual", "Auto"]),
     ss("mast_type", ["Simplex", "Duplex", "Triplex", "Quadruplex"]),
     num_int("min_aisle_width_mm"),

@@ -1,9 +1,10 @@
-"""Unit tests for repair_and_parse (U-J-01 to U-J-08)."""
+"""Unit tests for repair_and_parse (U-J-01 to U-J-10)."""
 import sys
+import pytest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.llm_client import repair_and_parse
+from src.json_repair import repair_and_parse
 
 
 def test_U_J_01_clean_json():
@@ -55,5 +56,21 @@ def test_U_J_07_unescaped_newlines():
 
 def test_U_J_08_completely_unparseable():
     raw = "This is not JSON at all. Just prose."
+    with pytest.raises(ValueError):
+        repair_and_parse(raw)
+
+
+def test_U_J_09_stray_brace_after_json():
+    # Stage 0 brace-balance: trailing } in prose must not extend the candidate
+    raw = '{"agv_type": "Forklift AGV"} and then some prose with a stray }'
     result = repair_and_parse(raw)
-    assert isinstance(result, dict)  # Empty dict, no crash
+    assert result["agv_type"] == "Forklift AGV"
+    assert len(result) == 1
+
+
+def test_U_J_10_nested_braces():
+    # Stage 0 brace-balance: nested objects must be handled correctly
+    raw = '{"outer": "val", "inner": {"key": "nested"}} trailing text'
+    result = repair_and_parse(raw)
+    assert result["outer"] == "val"
+    assert result["inner"]["key"] == "nested"

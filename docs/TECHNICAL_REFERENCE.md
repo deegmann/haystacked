@@ -1,7 +1,7 @@
 ---
 title: Haystacked Platform — Technical Reference
 version: auto-generated
-date: 2026-06-03
+date: 2026-06-15
 author: app-documentation-writer agent
 ---
 
@@ -79,7 +79,7 @@ app.py (FastAPI + SSE streaming)
 | Supplier data source | Airtable REST API |
 | Config generation | openpyxl (reads AP0 xlsx) |
 | Frontend | Server-Sent Events, Jinja2 templates |
-| Testing | pytest (68 tests) |
+| Testing | pytest (123 tests) |
 
 ---
 
@@ -107,7 +107,8 @@ app.py (FastAPI + SSE streaming)
 │   ├── data_loader.py          SQLite 3-way JOIN → list[SupplierRecord]
 │   ├── models.py               Dataclasses: Company, Product, Extension, SupplierRecord
 │   ├── context_builder.py      Builds AGV_SYSTEM prompt; keyword fallback
-│   └── llm_client.py           Standalone LLM client with repair_and_parse (used by tests)
+│   ├── llm_client.py           Standalone LLM client (call_llm, retry logic)
+│   └── json_repair.py          Canonical repair_and_parse — shared by app.py, llm_client, tests
 │
 ├── config/                     ALL generated — never edit manually
 │   ├── field_levels.json       Matching rules per field
@@ -816,17 +817,35 @@ data: { "buyer": "...", "agv_criteria": {...}, "matches": [...], "matches_all": 
 
 **`tests/unit/test_matching_logic.py`** — 28 tests (U-M-01 to U-M-28)
 
-Covers: KO_IF_LT payload check; null payload not disqualified; wrong AGV type; navigation no match; COND_KO outdoor not-required; COND_KO outdoor required + False; COND_KO outdoor required + None; forks_free_floating required; scoring reference_count ranking; null reference_count; VDA5050 preferred no filter; empty tender returns all; VNA KO_BOOL_EXCLUSIVE (both directions, pass, null); special_fork_option (null tender, mismatch, match); null KO penalty fires; null KO penalty absent when tender null; VDA5050 not double-counted; no hardcoded preferred-bonus labels.
+Covers: KO_IF_LT payload check; null payload not disqualified; wrong AGV type; navigation no match; COND_KO outdoor not-required; COND_KO outdoor required + False; COND_KO outdoor required + None; forks_free_floating required; scoring reference_count ranking; null reference_count; VDA5050 preferred no filter; empty tender returns all; VNA KO_BOOL_EXCLUSIVE (both directions, pass, null); special_fork_option (null tender, mismatch, match); null KO penalty fires; null KO penalty absent when tender null; VDA5050 not double-counted; no hardcoded preferred-bonus labels; service_coverage KO_SUBSET DACH vs EU-only (U-M-14 — uses correct tender_key `required_service_coverage`).
 
 **`tests/unit/test_extraction_nulls.py`** — 7 tests (U-E-01 to U-E-07)
 
 Covers: Dragonfly.pdf golden values (lift height must be null, aisle width 1.9m, payload 1000kg, VNA required); null lift height survives validate_agv_criteria; `_source_confirms_value` boundary conditions (direct match, thousands separator, mm/m scale, false positive guard, zero); `_NUMERIC_KO_TENDER_KEYS` non-empty and contains expected keys.
 
-**`tests/unit/test_json_repair_parser.py`** — 8 tests (U-J-01 to U-J-08)
+**`tests/unit/test_source_span_enforcement.py`** — Layer 1 and Layer 2 source-span guard tests.
 
-Covers: clean JSON; markdown fences; prose before JSON; string "null"; string booleans; truncated JSON; unescaped newlines; completely unparseable (no crash).
+Covers: Layer 1 nulls value when `_source` key absent; Layer 2 nulls 4b value when 4c abstained + source does not confirm; Layer 2 preserves 4b value when 4c abstained + source confirms; Layer 1 does not fire when source present (4c win); Layer 2 does not fire when 4c did not abstain.
 
-Note: These tests call `src/llm_client.repair_and_parse`, not the inline version in `app.py`. The two implementations may diverge.
+**`tests/unit/test_source_confirms_value.py`** / **`test_source_confirms_value_german.py`** — `_source_confirms_value()` boundary tests.
+
+Covers: direct numeric match; thousands-separator comma; mm/m unit scale (×1000, ÷1000); false positive guard (different number); German decimal comma (`3,4` interpreted as `3.4`); negative temperatures.
+
+**`tests/unit/test_validate_tender_values.py`** — AP0 allowed-values filter tests.
+
+Covers: valid Dropdown values pass; invalid values nulled; Multi-Select intersection filtering; case-insensitive substring matching.
+
+**`tests/unit/test_4c_direction_constants.py`** — Pass 4c direction constant tests.
+
+Covers: `_4C_EXTRACTION_DIRECTION` non-empty; KO_IF_LT fields map to "MAXIMUM"; KO_IF_GT fields map to "MINIMUM"; no unknown direction values.
+
+**`tests/unit/test_find_invalid_ap0_fields.py`** — AP0 constraint violation detection tests.
+
+**`tests/unit/test_json_repair_parser.py`** — 10 tests (U-J-01 to U-J-10)
+
+Covers: clean JSON; markdown fences; prose before JSON; string "null"; string booleans; truncated JSON; unescaped newlines; completely unparseable (raises ValueError); stray brace in trailing prose (Stage 0 brace-balance); nested braces.
+
+Tests import from `src.json_repair` — the single canonical implementation used by app.py, llm_client.py, and tests.
 
 **`tests/unit/test_agv_keyword_fallback.py`** — 8 tests (U-K-01 to U-K-08)
 
@@ -835,6 +854,10 @@ Covers: VNA, Schmalgangstapler, Routenzug, milk run, AMR, goods-to-person, no ke
 **`tests/unit/test_data_loader.py`** — 14 tests (U-D-01 to U-D-16, some IDs skipped)
 
 Covers: pipe-separated multiselect; empty string → []; None → []; bool parsing (int, string, None); int/float parsing; empty string → None; UUID format; embedded comma in multiselect; whitespace trimming; NaN → None.
+
+**`tests/unit/test_golden_extraction.py`** — Golden-run regression test.
+
+Pins exact expected field values for a known tender. Run against live Ollama (golden fixture loaded from `tests/tenders/`). Asserts weight, lift, aisle, and top-matched supplier match the golden file exactly.
 
 **`tests/integration/test_llm_preflight.py`** — 2 tests (I-S-01, I-S-02)
 
@@ -864,12 +887,12 @@ Requires a running Ollama instance with qwen2.5:7b. Run separately: `pytest test
 |---|---|---|
 | No live extraction tests | High — hallucinations may go undetected until reported | Pin golden values for additional known tenders beyond Dragonfly |
 | No end-to-end SSE test | Medium — streaming pipeline not integration-tested | Test with TestClient + httpx streaming |
-| `app.py` `repair_and_parse` not tested | Medium — inline version may diverge from llm_client version | Extract to shared module, or duplicate tests |
-| Layer 1 source-span enforcement | High — guard may be silently inactive | Test: value set with null source → nulled after guard |
-| Layer 2 source-span enforcement | High — dual-condition guard may misfire | Test: 4c abstained + bad source → null; 4c abstained + good source → preserved |
+| ~~`app.py` `repair_and_parse` not tested~~ | ~~Medium~~ | **Resolved** — extracted to `src/json_repair.py`; all tests use canonical version |
+| ~~Layer 1 source-span enforcement~~ | ~~High~~ | **Resolved** — covered by `test_source_span_enforcement.py` |
+| ~~Layer 2 source-span enforcement~~ | ~~High~~ | **Resolved** — covered by `test_source_span_enforcement.py` |
 | mm→m conversion in validate_agv_criteria | Medium | Test: value 1900 + mm_to_m field → stored as 1.9 |
 | Field text fallbacks | Medium | Test: regex matches → tender_key overridden |
-| brace-balanced Step 0 in repair_and_parse | Low | Test: JSON with stray } in trailing prose → correct parse |
+| ~~brace-balanced Step 0 in repair_and_parse~~ | ~~Low~~ | **Resolved** — U-J-09 in test_json_repair_parser.py |
 | _build_correction_prompt format | Low | Test: output contains field name, bad value, allowed list |
 
 ### 9.3 Recommended Additional Tests
@@ -1091,9 +1114,39 @@ To strengthen a null rule without adding domain logic, add a NULL RULE clause to
 
 The seven plausibility ranges (min/max/unit per field) are defined in a module-level dict in `generate_all.py`, not in the AP0 xlsx. A new tender field with a numeric KO operator will not get plausibility validation until someone edits generate_all.py. Should be moved to a dedicated AP0 sheet (e.g. "Plausibility Ranges") and read like all other config. Workaround: edit PLAUSIBILITY_RANGES in generate_all.py.
 
-**C-2: src/llm_client.py `repair_and_parse` divergence**
+~~**C-2: src/llm_client.py `repair_and_parse` divergence**~~
 
-`src/llm_client.py` has its own `repair_and_parse()` implementation used by test_json_repair_parser.py. The production path in `app.py` has a different (newer) inline implementation with the brace-balanced Step 0. Tests cover the llm_client version, not production. Either extract to a shared module or duplicate the brace-balanced logic in llm_client.py.
+**Resolved (2026-06-04).** Canonical `repair_and_parse` extracted to `src/json_repair.py` (includes brace-balanced Stage 0, generic Stage 5 regex — no field names). Both `app.py` and `src/llm_client.py` now import from `src.json_repair`. Tests updated to import the same. AP0 boundary violation (hardcoded field list in Stage 5) also removed.
+
+### Safeguards Applied (2026-06-15)
+
+After the 2026-06-15 architecture audit, three safeguards were applied:
+
+**S-1: `_SHARED_SHEET` startup assertion**
+
+Changed from `_vehicle_cfg.get("shared_sheet_name", "SHARED – All AGV Types")` (silent fallback) to an empty-string default with `assert _SHARED_SHEET`. If `vehicle_types.json` is missing the key (e.g. after a failed `generate_all.py` run), the app now fails loudly at startup instead of silently using a stale hardcoded string.
+
+**S-2: `is not None` in lift/aisle mm→m conversion**
+
+`app.py` lines converting `required_max_lift_height_m` and `required_min_aisle_width_m` to mm used `if raw_val else None` — falsely treating zero as absent. Changed to `if raw_val is not None else None`. Zero lift height is nonsensical in practice but the code should not have a latent bug.
+
+**S-3: `test_U_M_14` vacuous assertion** — see H-1 above.
+
+### Benchmark Baseline (2026-06-15)
+
+File: `tests/benchmark_results/benchmark_qwen2_5_7b_20260615_163232.json`  
+Model: `qwen2.5:7b` — AP0 checksum `2b38100e`  
+Result: **5/5 tenders, 65/65 fields — 100% golden-file match, 123 tests pass**
+
+| Tender | Vehicle | Key fields | Top match |
+|---|---|---|---|
+| Nordlicht | Forklift AGV | weight=1200 kg, lift=10 m, aisle=3.4 m | REACHY |
+| Dragonfly | Forklift AGV (VNA) | weight=1000 kg, aisle=2.0 m, lift=null (L2) | VEENY |
+| Mama | Forklift AGV | weight=2000 kg, temp 10–30 °C | AMADEUS Classic |
+| CompanyX | Forklift AGV | weight=1000 kg, lift=4.8 m, aisle=3.6 m, temp −25–40 °C, humidity=95 %, gradient=10 % | FM-X iGo |
+| OeA-199-25 | Out of scope | is_agv_amr=False | — |
+
+Known minor issues (not regressions): Dragonfly 4c self-contradiction on aisle (1.9 vs 2.0, golden has 2.0); Nordlicht 4c false abstention on temperature (4b correctly extracts); CompanyX 4c abstains on all fields (4b+L2 correct).
 
 ### Test Gaps
 
@@ -1105,9 +1158,9 @@ The extraction null tests (U-E-01 to U-E-07) pin expected golden values but do n
 
 The `/analyze` endpoint has no integration test. A streaming response test with FastAPI TestClient + event parsing would catch pipeline regressions.
 
-**T-3: Source-span guard not unit-tested**
+~~**T-3: Source-span guard not unit-tested**~~
 
-Layer 1 and Layer 2 enforcement are not tested. The logic is tested indirectly via U-E-06 (`_source_confirms_value`), but the enforcement loop itself is not covered.
+**Resolved (2026-06-15).** Both layers covered by `tests/unit/test_source_span_enforcement.py`.
 
 **T-4: validate_agv_criteria mm→m conversion not tested**
 
@@ -1136,9 +1189,9 @@ Based on prior audits:
 
 ### Housekeeping
 
-**H-1: test_U_M_14 service_coverage test is vacuous**
+~~**H-1: test_U_M_14 service_coverage test is vacuous**~~
 
-`test_U_M_14_service_coverage_dach_required_eu_only_excluded` asserts `isinstance(top[0].disqualified, bool)` — this always passes and tests nothing.
+**Resolved (2026-06-15).** Fixed wrong tender_key (`service_coverage_required` → `required_service_coverage` per AP0) and replaced `isinstance(top[0].disqualified, bool)` with `assert top[0].disqualified`.
 
 **H-2: `docs/sync_anleitung.md` may be outdated**
 

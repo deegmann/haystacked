@@ -86,20 +86,6 @@ SQLITE_SKIP = {
     "min_project_value_eur","max_project_value_eur",
 }
 
-# Plausibility ranges for LLM-extracted values.
-# Format: json_key → (min, max, unit, label, mm_to_m_conversion)
-# mm_to_m_conversion: True if value > 10 should be auto-converted from mm to m.
-# These ranges are used in validate_agv_criteria() in app.py.
-# Stored in config/plausibility.json so app.py never hardcodes domain knowledge.
-PLAUSIBILITY_RANGES = {
-    "required_weight_capacity_kg": (100,   50_000, "kg",  "Traglast",       False),
-    "required_max_speed_ms":       (0.3,   5.0,    "m/s", "Geschwindigkeit", False),
-    "required_min_aisle_width_m":  (0.5,   5.0,    "m",   "Gangbreite",      True),
-    "required_max_lift_height_m":  (0.5,   30.0,   "m",   "Hubhöhe",         True),
-    "required_temp_min_c":         (-40,   30,     "°C",  "Temp. min",       False),
-    "required_temp_max_c":         (0,     60,     "°C",  "Temp. max",       False),
-    "required_quantity":           (1,     10_000, "Stk", "Anzahl",          False),
-}
 
 
 # ── Readers ───────────────────────────────────────────────────────────────────
@@ -540,30 +526,101 @@ def read_sqlite_schema(wb) -> dict:
     }
 
 
-def build_plausibility_config() -> dict:
-    """Return plausibility config from the module-level PLAUSIBILITY_RANGES dict.
-    Written to config/plausibility.json so app.py reads it from config, not hardcoded.
-    Format per key: {min, max, unit, label, mm_to_m}
+def read_plausibility(wb) -> dict:
+    """Read plausibility ranges from AP0 xlsx — tender_key → {min, max, unit, label}.
+
+    Unit conversion rules are read separately from haystacked_platform_config.xlsx
+    via read_unit_conversions(), then combined in build_plausibility_config().
+    """
+    plausibility: dict = {}
+
+    for sheet_name in DATA_SHEETS:
+        if sheet_name not in wb.sheetnames:
+            continue
+        rows = _rows(wb[sheet_name])
+        hi, cols = _find_header(rows)
+        if hi is None:
+            continue
+
+        col_tkey  = cols.get("Tender JSON Key")
+        col_pmin  = cols.get("Plausibility Min")
+        col_pmax  = cols.get("Plausibility Max")
+        col_unit  = cols.get("Tender Unit")
+
+        if None in (col_tkey, col_pmin, col_pmax, col_unit):
+            print(f"  [WARN] Plausibility columns missing in {sheet_name} — run generate_all.py after adding them to xlsx")
+            continue
+
+        for row in rows[hi + 1:]:
+            fname = row[0]
+            if not fname or str(fname).startswith("──"):
+                continue
+            tkey = row[col_tkey] if col_tkey < len(row) else None
+            pmin = row[col_pmin] if col_pmin < len(row) else None
+            pmax = row[col_pmax] if col_pmax < len(row) else None
+            unit = row[col_unit] if col_unit < len(row) else None
+
+            if tkey and pmin is not None and pmax is not None:
+                if tkey not in plausibility:  # first occurrence wins (SHARED before type-specific)
+                    plausibility[tkey] = {
+                        "min":   float(pmin),
+                        "max":   float(pmax),
+                        "unit":  str(unit) if unit else "",
+                        "label": str(fname),
+                    }
+
+    return plausibility
+
+
+def read_unit_conversions(wb_platform) -> dict:
+    """Read unit conversion rules from haystacked_platform_config.xlsx — Unit Conversions sheet.
+
+    Cross-industry rules (e.g. m ↔ mm) live in the platform config, not in the AGV AP0.
+    Returns: tender_unit → {llm_alias, factor, threshold}
+    """
+    unit_conversions: dict = {}
+    if "Unit Conversions" not in wb_platform.sheetnames:
+        print("  [WARN] Unit Conversions sheet missing from platform config")
+        return unit_conversions
+    uc_rows = _rows(wb_platform["Unit Conversions"], min_row=3)  # row 1 = description, row 2 = header
+    for row in uc_rows:
+        if row and row[0] and row[1]:
+            unit_conversions[str(row[0])] = {
+                "llm_alias": str(row[1]),
+                "factor":    float(row[2]),
+                "threshold": float(row[3]),
+            }
+    return unit_conversions
+
+
+def build_plausibility_config(plausibility: dict, unit_conversions: dict) -> dict:
+    """Combine plausibility ranges with unit conversion rules into config/plausibility.json format.
+
+    Conversion block is added when the field's Tender Unit has a matching rule in the
+    Unit Conversions sheet — no field-specific flags, no hardcoded factors.
     """
     result = {}
-    for key, (lo, hi, unit, label, mm_to_m) in PLAUSIBILITY_RANGES.items():
-        result[key] = {
-            "min":     lo,
-            "max":     hi,
-            "unit":    unit,
-            "label":   label,
-            "mm_to_m": mm_to_m,
-        }
+    for key, data in plausibility.items():
+        entry = dict(data)
+        conv = unit_conversions.get(data.get("unit"))
+        entry["conversion"] = {
+            "llm_alias": conv["llm_alias"],
+            "factor":    conv["factor"],
+            "threshold": conv["threshold"],
+        } if conv else None
+        result[key] = entry
     return result
 
 
-def read_platform(platform_path: Path) -> dict:
-    """Read platform_config.xlsx — cross-industry: NACE, basic schema, scope."""
-    if not platform_path.exists():
+def read_platform(wb, platform_path: Path) -> dict:
+    """Read platform_config.xlsx — cross-industry: NACE, basic schema, scope.
+
+    Accepts an already-opened workbook (wb) to avoid double-loading.
+    platform_path is used only for the not-found warning message.
+    """
+    if wb is None:
         print(f"  [WARN] platform_config not found: {platform_path}")
         return {"scope_in": "", "scope_out": "", "codes": [], "basic_schema": []}
-
-    wb = openpyxl.load_workbook(str(platform_path), read_only=True, data_only=True)
 
     # Platform scope
     scope_in = scope_out = ""
@@ -881,8 +938,29 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     scoring_weights      = read_scoring_weights(wb)
     extraction_schema = read_extraction_schema(wb)
     sqlite_schema     = read_sqlite_schema(wb)
-    plausibility      = build_plausibility_config()
-    platform          = read_platform(platform_path)
+    plausibility_raw  = read_plausibility(wb)
+
+    wb_platform       = openpyxl.load_workbook(str(platform_path), read_only=True, data_only=True) \
+                        if platform_path.exists() else None
+    unit_conversions  = read_unit_conversions(wb_platform) if wb_platform else {}
+    plausibility      = build_plausibility_config(plausibility_raw, unit_conversions)
+
+    # Assert all numeric KO fields (Float/Integer, KO_IF_LT/KO_IF_GT) have plausibility
+    # ranges defined in the AP0 xlsx. Missing entries cause silent validation gaps.
+    _numeric_ko_keys = {
+        meta["tender_key"]
+        for meta in field_levels.values()
+        if meta.get("operator") in ("KO_IF_LT", "KO_IF_GT")
+        and meta.get("data_type") in ("Float", "Integer")
+        and "tender_key" in meta
+    }
+    _missing = _numeric_ko_keys - set(plausibility_raw)
+    assert not _missing, (
+        f"[FEHLER] Numeric KO-Felder ohne Plausibility-Daten in AP0 xlsx: {_missing}. "
+        "Plausibility Min / Plausibility Max / Tender Unit in der AP0-Tabelle ergänzen."
+    )
+
+    platform          = read_platform(wb_platform, platform_path)
     nace              = platform  # nace data is inside platform dict
 
     # Additional runtime fields derived from AP0 — written to vehicle_types.json so

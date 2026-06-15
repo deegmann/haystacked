@@ -88,7 +88,7 @@ class Extension:
     # Forklift-specific
     lifting_height_mm:          Optional[int]   = None
     min_total_height_mm:        Optional[int]   = None
-    fork_type:                  list[str]     = field(default_factory=list)
+    special_fork_option:        list[str]     = field(default_factory=list)
     fork_spread:                Optional[str]   = None
     mast_type:                  Optional[str]   = None
     min_aisle_width_mm:         Optional[int]   = None
@@ -135,7 +135,6 @@ class Extension:
     free_lift_open_closed_pallet: Optional[bool] = None
     top_module_type:            list[str]     = field(default_factory=list)
     cart_pickup_height_range_mm: Optional[str]  = None
-    omnidirectional:            Optional[bool]  = None
     min_turning_radius_mm:      Optional[int]   = None
     storage_system_type:        Optional[str]   = None
     shelf_height_mm:            Optional[int]   = None
