@@ -1,7 +1,7 @@
 ---
 title: Haystacked Platform — Technical Reference
 version: auto-generated
-date: 2026-06-15
+date: 2026-06-17
 author: app-documentation-writer agent
 ---
 
@@ -59,9 +59,10 @@ app.py (FastAPI + SSE streaming)
         ├─► Pass 4b: agv_batch      ~40 fields in one JSON
         │     └─► correction1/2     AP0 allowed-values retry
         ├─► Pass 4c: per_field      ~8 focused calls
-        ├─► Source-span guard
+        ├─► Source-span guard  (enforce_source_spans() in src/json_repair.py)
         │     ├─► Layer 1  source absent → null value
-        │     └─► Layer 2  4c abstained + bad source → null
+        │     ├─► Layer 0  source not grounded in document → null value
+        │     └─► Layer 2  4c abstained + source digit mismatch → null
         ├─► validate_tender_values()
         ├─► validate_agv_criteria()
         ├─► field_text_fallbacks
@@ -79,7 +80,7 @@ app.py (FastAPI + SSE streaming)
 | Supplier data source | Airtable REST API |
 | Config generation | openpyxl (reads AP0 xlsx) |
 | Frontend | Server-Sent Events, Jinja2 templates |
-| Testing | pytest (123 tests) |
+| Testing | pytest (139 tests as of 2026-06-17) |
 
 ---
 
@@ -108,7 +109,7 @@ app.py (FastAPI + SSE streaming)
 │   ├── models.py               Dataclasses: Company, Product, Extension, SupplierRecord
 │   ├── context_builder.py      Builds AGV_SYSTEM prompt; keyword fallback
 │   ├── llm_client.py           Standalone LLM client (call_llm, retry logic)
-│   └── json_repair.py          Canonical repair_and_parse — shared by app.py, llm_client, tests
+│   └── json_repair.py          repair_and_parse; enforce_source_spans(); source_is_grounded(); source_confirms_value()
 │
 ├── config/                     ALL generated — never edit manually
 │   ├── field_levels.json       Matching rules per field
@@ -142,20 +143,30 @@ app.py (FastAPI + SSE streaming)
 │
 ├── tests/
 │   ├── unit/
-│   │   ├── test_matching_logic.py     U-M-01–U-M-28
-│   │   ├── test_extraction_nulls.py   U-E-01–U-E-07
-│   │   ├── test_json_repair_parser.py U-J-01–U-J-08
-│   │   ├── test_agv_keyword_fallback.py U-K-01–U-K-08
-│   │   └── test_data_loader.py        U-D-01–U-D-16
-│   └── integration/
-│       └── test_llm_preflight.py      I-S-01–I-S-02 (requires live Ollama)
+│   │   ├── test_matching_logic.py           U-M-01–U-M-28
+│   │   ├── test_extraction_nulls.py         U-E-01–U-E-07
+│   │   ├── test_source_span_enforcement.py  U-SS-01–U-SS-11 (enforce_source_spans, all 3 layers)
+│   │   ├── test_source_is_grounded.py       U-SG-01–U-SG-12 (source_is_grounded)
+│   │   ├── test_source_confirms_value.py    source_confirms_value boundary cases
+│   │   ├── test_source_confirms_value_german.py  German locale / negative temperatures
+│   │   ├── test_4c_direction_constants.py   _4C_EXTRACTION_DIRECTION completeness
+│   │   ├── test_find_invalid_ap0_fields.py  _find_invalid_ap0_fields()
+│   │   ├── test_validate_tender_values.py   U-V-01–U-V-08
+│   │   ├── test_golden_extraction.py        U-GE-xx parametrized (≥5 tenders)
+│   │   ├── test_json_repair_parser.py       U-J-01–U-J-10
+│   │   ├── test_agv_keyword_fallback.py     U-K-01–U-K-08
+│   │   └── test_data_loader.py              U-D-01–U-D-16
+│   ├── integration/
+│   │   └── test_llm_preflight.py            I-S-01–I-S-02 (requires live Ollama)
+│   ├── tenders/                             Tender JSON fixtures + golden run files
+│   └── benchmark_results/                   timestamped benchmark JSON files
 │
 ├── docs/
-│   ├── architecture.md         Detailed architecture reference (updated 2026-06-03)
+│   ├── architecture.md         Detailed architecture reference
 │   ├── TECHNICAL_REFERENCE.md  This document
 │   ├── matching-rules.md       Operator reference for non-engineers
 │   ├── ap0-change-guide.md     How to make changes via the AP0 xlsx
-│   └── test-report-2026-06-01.md
+│   └── test-report-*.md        Timestamped test reports
 │
 ├── airtable/
 │   ├── ap2_schema.py           Fetches Airtable table IDs → airtable_schema_ids.json
@@ -456,32 +467,52 @@ Key design decisions:
 
 ### 5.3 Source-Span Hallucination Guard
 
-After Pass 4c, `app.py` iterates over every field in `_NUMERIC_KO_TENDER_KEYS`:
+After Pass 4c, `app.py` calls `enforce_source_spans(agv_criteria, document_text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained)` from `src/json_repair.py`. This pure function (no async, no I/O) applies three enforcement layers per field; the first match nulls the value and stops:
 
-```python
-for _key in _NUMERIC_KO_TENDER_KEYS:
-    if agv_criteria.get(_key) is None:
-        continue
-    _src_val = agv_criteria.get(f"{_key}_source")
-
-    # Layer 1: source absent → null value
-    if not _src_val:
-        agv_criteria[_key] = None
-
-    # Layer 2: 4c abstained AND source does not numerically confirm value → null value
-    elif _key in _4c_abstained_ref and not _source_confirms_value(agv_criteria[_key], str(_src_val)):
-        agv_criteria[_key] = None
+```
+Layer 1: source absent/empty → null (no citation = inference)
+Layer 0: source present but not grounded in real document → null
+Layer 2 (4c abstentions only): source's own digit doesn't confirm value → null
 ```
 
-**`_source_confirms_value(value, source_text)`** (app.py):
-- Converts value to float; strips commas from source numbers
-- Returns True if: value is zero (deliberate zero), direct match, value × 1000 in source, value ÷ 1000 in source
-- Returns False otherwise
-- Field-agnostic: no field names, no domain knowledge
+Returns `(agv_criteria, messages)` — messages is a list of human-readable log strings surfaced as SSE `log` events.
 
-**Why the two-layer design:**
-- Layer 1 catches cases where the LLM fabricated a value with no source at all — easy to detect, low false-positive risk
-- Layer 2 targets a subtler hallucination pattern: the LLM writes a plausible-sounding source sentence but the number in that sentence does not match the extracted value. The 4c abstention provides the independent signal — if a focused single-field pass also failed to find the value, the 4b source is suspect.
+**Layer 1 — missing source (always active)**
+
+If `<field>_source` is absent or null for a non-null field value: value is set to null. No citation = the LLM inferred the value rather than reading it from the document.
+
+**Layer 0 — source not grounded in the real document (always active)**
+
+`source_is_grounded(value, source, document)` in `src/json_repair.py`:
+
+Two binary conditions must both hold:
+1. **Anchor**: value's digit-string (locale-aware via `_interpret_number_token()`, with ×1000/÷1000 unit-scale variants) must occur somewhere in the real document text.
+2. **Co-location**: at least one distinctive content word from the source quote (length > 3, not in the DE/EN function-word set `_FUNCTION_WORDS`) must appear within `_GROUNDING_WINDOW_CHARS` (80 chars) of an anchor occurrence.
+
+Zero values always pass (LL-06). Non-numeric values return True (field-agnostic). The 80-character window is a corpus-derived text-layout property — not a calibrated parameter.
+
+**Real regression case (CompanyX, 2026-06-16):** The model fabricated 7 numeric KO values, each paired with a self-consistent but document-absent quote. Examples:
+- `required_max_lift_height_m=4.8` with quote "The maximum lift height of the AGVs is up to 4.8 m." — the digit "4.8" does not appear anywhere in the 17,900-character CompanyX.pdf text.
+- `required_temp_max_c=40` with quote "from -25 °C to +40 °C." — "40" does occur in the document (in an unrelated shelf/transfer-point table), but none of the quote's content words ("operating", "temperature", "range") appear within 80 characters of those occurrences. Anchor-only detection would false-accept this; co-location correctly rejects it.
+
+All 7 fabrications are now pinned as regression tests in `tests/unit/test_source_is_grounded.py` (U-SG-07, U-SG-08) and `tests/unit/test_source_span_enforcement.py` (U-SS-04, U-SS-11).
+
+**Layer 2 — abstention + numeric mismatch (scoped to 4c abstentions)**
+
+Triggered only when both conditions hold:
+1. The field is in `_4c_abstained` (Pass 4c returned null or failed)
+2. `source_confirms_value(value, source_text)` in `src/json_repair.py` returns False
+
+`source_confirms_value(value, source_text)`:
+- Uses `_interpret_number_token()` for locale-aware number parsing (handles "3,4" → 3.4, "1,000" → 1000)
+- Returns True if: value is zero; direct float match; value × 1000 in source; value ÷ 1000 in source
+- Field-agnostic: no field names, no domain knowledge
+- Note: this function was previously named `_source_confirms_value()` in `app.py`; it was extracted to `src/json_repair.py` and made public in this branch
+
+**Why three layers, and why Layer 0 runs unconditionally:**
+- Layer 1 catches absent citations — easy, high confidence
+- Layer 0 catches fabricated citations (value + quote both fabricated) — the fabricated quote is internally consistent but absent from the document. This is unconditional because a citation not in the real document is always wrong, regardless of what 4c did.
+- Layer 2 catches a narrower case: the source quote is genuinely in the document (L0 passes) but the quote's own digit doesn't spell out the extracted value. This could be a legitimate paraphrase — so the 4c abstention is required as additional evidence before nulling.
 
 ### 5.4 Post-LLM Validation
 
@@ -821,13 +852,19 @@ Covers: KO_IF_LT payload check; null payload not disqualified; wrong AGV type; n
 
 **`tests/unit/test_extraction_nulls.py`** — 7 tests (U-E-01 to U-E-07)
 
-Covers: Dragonfly.pdf golden values (lift height must be null, aisle width 1.9m, payload 1000kg, VNA required); null lift height survives validate_agv_criteria; `_source_confirms_value` boundary conditions (direct match, thousands separator, mm/m scale, false positive guard, zero); `_NUMERIC_KO_TENDER_KEYS` non-empty and contains expected keys.
+Covers: Dragonfly.pdf golden values (lift height must be null, aisle width 1.9m, payload 1000kg, VNA required); null lift height survives validate_agv_criteria; `source_confirms_value()` boundary conditions (direct match, thousands separator, mm/m scale, false positive guard, zero); `_NUMERIC_KO_TENDER_KEYS` non-empty and contains expected keys.
 
-**`tests/unit/test_source_span_enforcement.py`** — Layer 1 and Layer 2 source-span guard tests.
+**`tests/unit/test_source_span_enforcement.py`** — 11 tests (U-SS-01 to U-SS-11). Imports `enforce_source_spans()` from `src/json_repair.py` directly.
 
-Covers: Layer 1 nulls value when `_source` key absent; Layer 2 nulls 4b value when 4c abstained + source does not confirm; Layer 2 preserves 4b value when 4c abstained + source confirms; Layer 1 does not fire when source present (4c win); Layer 2 does not fire when 4c did not abstain.
+Covers: Layer 1 (source None; source empty string); Layer 0 (fabricated CompanyX lift-height value with self-consistent but document-absent quote nulled; genuine CompanyX weight with paraphrased quote preserved; German decimal comma grounded; PDF private-use-area glyph does not merge temperature numbers); Layer 2 (digit-free but grounded quote + 4c abstained → nulled; same quote without abstention → preserved); None value skipped entirely; documented gradient/10 residual regression.
 
-**`tests/unit/test_source_confirms_value.py`** / **`test_source_confirms_value_german.py`** — `_source_confirms_value()` boundary tests.
+Note: this file previously contained a hand-maintained inline copy of the enforcement loop. It now imports the real production function — ensuring tests cannot drift from the code that actually runs.
+
+**`tests/unit/test_source_is_grounded.py`** — 12 tests (U-SG-01 to U-SG-12). All cases use real value/quote/document triples from the tender corpus.
+
+Covers: genuine verbatim quote (Dragonfly); genuine paraphrased quote (CompanyX); German decimal comma (Nordlicht "3,4 m"); unit-scale mismatch meter/mm (Dragonfly); PDF glyph artifact in temperature range (Mama); bullet-glyph noise near weight value (Mama); all 7 CompanyX fabrications rejected as a batch (U-SG-07); temp_max=40 anchor-present-but-colocation-fails case (U-SG-08, the anchor-only false-positive trap); lift-height=4.8 anchor-absent case (U-SG-09); zero always grounded; empty/None source; non-numeric value passthrough.
+
+**`tests/unit/test_source_confirms_value.py`** / **`test_source_confirms_value_german.py`** — `source_confirms_value()` boundary tests (function is in `src/json_repair.py`).
 
 Covers: direct numeric match; thousands-separator comma; mm/m unit scale (×1000, ÷1000); false positive guard (different number); German decimal comma (`3,4` interpreted as `3.4`); negative temperatures.
 
@@ -855,9 +892,9 @@ Covers: VNA, Schmalgangstapler, Routenzug, milk run, AMR, goods-to-person, no ke
 
 Covers: pipe-separated multiselect; empty string → []; None → []; bool parsing (int, string, None); int/float parsing; empty string → None; UUID format; embedded comma in multiselect; whitespace trimming; NaN → None.
 
-**`tests/unit/test_golden_extraction.py`** — Golden-run regression test.
+**`tests/unit/test_golden_extraction.py`** — Parametrized golden-run regression test.
 
-Pins exact expected field values for a known tender. Run against live Ollama (golden fixture loaded from `tests/tenders/`). Asserts weight, lift, aisle, and top-matched supplier match the golden file exactly.
+Loads all `tests/tenders/tender_XXX.json` fixtures that have `golden_extraction` or `expected_out_of_scope=true` and compares against the corresponding `golden_run_tender_XXX.json` output files. As of 2026-06-17, covers 5 fixtures (tender_001 Nordlicht, tender_002 Dragonfly, tender_003 OeA-199-25 out-of-scope, tender_004 Mama, tender_005 CompanyX). Includes a floor guard asserting at least 5 fixtures are always collected. Covers all 8 numeric KO fields per tender (not just a subset). CompanyX (tender_005) is the key regression case: all 7 fabricated fields must be null in the golden run.
 
 **`tests/integration/test_llm_preflight.py`** — 2 tests (I-S-01, I-S-02)
 
@@ -875,55 +912,28 @@ Requires a running Ollama instance with qwen2.5:7b. Run separately: `pytest test
 - Null rule (LL-06) in both directions
 - VNA KO_BOOL_EXCLUSIVE bidirectional gate
 - Null KO penalty mechanism
-- JSON repair and parse edge cases
+- JSON repair and parse edge cases (including Stage 0 brace-balance)
 - Data loader type coercions
 - Keyword fallback boundary behavior
-- `_source_confirms_value` boundary conditions
+- `source_confirms_value()` boundary conditions (including German decimal comma, unit scale)
 - `_NUMERIC_KO_TENDER_KEYS` completeness guard
+- All three source-span guard layers (L1, L0, L2) — including corpus-grounded real CompanyX cases
+- `source_is_grounded()` — anchor-only false-positive trap, PDF glyph artifacts, paraphrase vs. verbatim
+- Golden extraction regression for 5 tenders including out-of-scope case
 
 **Identified gaps:**
 
 | Gap | Risk | Recommended test |
 |---|---|---|
-| No live extraction tests | High — hallucinations may go undetected until reported | Pin golden values for additional known tenders beyond Dragonfly |
+| No live extraction tests | High — hallucinations only caught on live runs | Run `scripts/capture_pipeline_run.py` for new tenders; commit golden run files |
 | No end-to-end SSE test | Medium — streaming pipeline not integration-tested | Test with TestClient + httpx streaming |
-| ~~`app.py` `repair_and_parse` not tested~~ | ~~Medium~~ | **Resolved** — extracted to `src/json_repair.py`; all tests use canonical version |
-| ~~Layer 1 source-span enforcement~~ | ~~High~~ | **Resolved** — covered by `test_source_span_enforcement.py` |
-| ~~Layer 2 source-span enforcement~~ | ~~High~~ | **Resolved** — covered by `test_source_span_enforcement.py` |
 | mm→m conversion in validate_agv_criteria | Medium | Test: value 1900 + mm_to_m field → stored as 1.9 |
 | Field text fallbacks | Medium | Test: regex matches → tender_key overridden |
-| ~~brace-balanced Step 0 in repair_and_parse~~ | ~~Low~~ | **Resolved** — U-J-09 in test_json_repair_parser.py |
 | _build_correction_prompt format | Low | Test: output contains field name, bad value, allowed list |
 
 ### 9.3 Recommended Additional Tests
 
-**U-E-08: Layer 1 source-span guard**
-```python
-# If source is absent, value must be nulled regardless of 4c
-agv_criteria = {"required_weight_capacity_kg": 1000}  # no _source key
-# after enforcement loop: assert agv_criteria["required_weight_capacity_kg"] is None
-```
-
-**U-E-09: Layer 2 source-span guard — bad source nulls 4b value**
-```python
-# 4c abstained; source present but doesn't confirm value
-agv_criteria = {"required_weight_capacity_kg": 1000,
-                "required_weight_capacity_kg_source": "Outbound 1734"}
-# _4c_abstained contains "required_weight_capacity_kg"
-# _source_confirms_value(1000, "Outbound 1734") is False
-# assert agv_criteria["required_weight_capacity_kg"] is None
-```
-
-**U-E-10: Layer 2 — good source preserves 4b value**
-```python
-agv_criteria = {"required_weight_capacity_kg": 1000,
-                "required_weight_capacity_kg_source": "Max Loaded weight (KG) 1000"}
-# _4c_abstained contains "required_weight_capacity_kg"
-# _source_confirms_value(1000, "Max Loaded weight (KG) 1000") is True
-# assert agv_criteria["required_weight_capacity_kg"] == 1000
-```
-
-**U-E-11: validate_agv_criteria mm→m conversion**
+**U-E-next: validate_agv_criteria mm→m conversion**
 ```python
 criteria = {"required_min_aisle_width_m": 1900}  # mm value for an m field
 cleaned, _ = validate_agv_criteria(criteria)
@@ -933,12 +943,7 @@ assert cleaned["required_min_aisle_width_m"] == pytest.approx(1.9)
 **U-M-29: COND_KO + CONTEXT field does not trigger KO**
 Ensure a field with level=CONTEXT and no operator is never evaluated as a KO rule.
 
-**U-J-09: brace-balanced Step 0 in repair_and_parse**
-```python
-raw = '{"field": "value"} some trailing prose with } brace'
-result = repair_and_parse(raw)
-assert result == {"field": "value"}
-```
+Note: U-E-08 (Layer 1 guard), U-E-09/U-E-10 (Layer 2 guard), and U-J-09 (Stage 0 brace-balance) from prior versions of this document are now fully covered by `test_source_span_enforcement.py` and `test_json_repair_parser.py`.
 
 ---
 
@@ -1132,27 +1137,27 @@ Changed from `_vehicle_cfg.get("shared_sheet_name", "SHARED – All AGV Types")`
 
 **S-3: `test_U_M_14` vacuous assertion** — see H-1 above.
 
-### Benchmark Baseline (2026-06-15)
+### Benchmark Baseline (2026-06-16)
 
-File: `tests/benchmark_results/benchmark_qwen2_5_7b_20260615_163232.json`  
+File: `tests/benchmark_results/benchmark_qwen2_5_7b_20260616_140000.json`  
 Model: `qwen2.5:7b` — AP0 checksum `2b38100e`  
-Result: **5/5 tenders, 65/65 fields — 100% golden-file match, 123 tests pass**
+Result: **5/5 tenders, 139 tests pass** (with Layer 0 source-grounding guard active)
 
-| Tender | Vehicle | Key fields | Top match |
+| Tender | Vehicle | Key fields after source-span guard | Top match |
 |---|---|---|---|
 | Nordlicht | Forklift AGV | weight=1200 kg, lift=10 m, aisle=3.4 m | REACHY |
 | Dragonfly | Forklift AGV (VNA) | weight=1000 kg, aisle=2.0 m, lift=null (L2) | VEENY |
 | Mama | Forklift AGV | weight=2000 kg, temp 10–30 °C | AMADEUS Classic |
-| CompanyX | Forklift AGV | weight=1000 kg, lift=4.8 m, aisle=3.6 m, temp −25–40 °C, humidity=95 %, gradient=10 % | FM-X iGo |
+| CompanyX | Forklift AGV | weight=1000 kg; lift/aisle/temp/humidity/gradient all null (L0 nulled 6, weight correct) | FM-X iGo |
 | OeA-199-25 | Out of scope | is_agv_amr=False | — |
 
-Known minor issues (not regressions): Dragonfly 4c self-contradiction on aisle (1.9 vs 2.0, golden has 2.0); Nordlicht 4c false abstention on temperature (4b correctly extracts); CompanyX 4c abstains on all fields (4b+L2 correct).
+The CompanyX result is the regression case for Layer 0: all 7 fields the model previously hallucinated are now null. The one genuinely-specified field (weight=1000 kg) correctly survives.
 
 ### Test Gaps
 
 **T-1: No live extraction tests**
 
-The extraction null tests (U-E-01 to U-E-07) pin expected golden values but do not call Ollama. Hallucinations are only discovered on live runs. Need: tests that call `call_ollama` with real PDFs and assert against golden extraction dicts (requires live Ollama fixture, similar to test_llm_preflight.py).
+`test_golden_extraction.py` compares against pre-captured golden run files but does not call Ollama itself. A fresh golden run must be generated manually when the model or prompts change. Need: a CI fixture that runs the actual LLM pipeline and asserts against golden extractions (requires live Ollama in CI).
 
 **T-2: No SSE end-to-end test**
 
@@ -1160,7 +1165,7 @@ The `/analyze` endpoint has no integration test. A streaming response test with 
 
 ~~**T-3: Source-span guard not unit-tested**~~
 
-**Resolved (2026-06-15).** Both layers covered by `tests/unit/test_source_span_enforcement.py`.
+**Resolved (2026-06-16).** All three layers covered by `test_source_span_enforcement.py` (U-SS-01 to U-SS-11) and `test_source_is_grounded.py` (U-SG-01 to U-SG-12) using real corpus-grounded triples.
 
 **T-4: validate_agv_criteria mm→m conversion not tested**
 
@@ -1168,9 +1173,9 @@ The `/analyze` endpoint has no integration test. A streaming response test with 
 
 ### Architecture Improvements
 
-**A-1: Pass 4c abstention vs. override semantics should be documented in code**
+**A-1: `enforce_source_spans()` is now in `src/json_repair.py` — docstring in `app.py` should cross-reference**
 
-The interaction between 4c abstentions and Layer 2 is non-obvious. Add a module-level comment or docstring in `app.py` near the source-span enforcement loop.
+The call site in `app.py` should reference `enforce_source_spans()` in `src/json_repair.py` with a comment explaining the three-layer contract and the layer order (L1 → L0 → L2).
 
 **A-2: Extraction direction dictionary could be generated as a config file**
 

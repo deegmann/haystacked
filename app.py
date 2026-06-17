@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import io
 import supplier_db
-from src.json_repair import repair_and_parse, source_confirms_value as _source_confirms_value
+from src.json_repair import repair_and_parse, enforce_source_spans
 
 # ── New structured matching engine (AP-I1) ────────────────────────────────────
 try:
@@ -48,8 +48,9 @@ app = FastAPI(title="haystacked – Ausschreibungsanalyse")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-OLLAMA_URL   = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "qwen2.5:7b"
+OLLAMA_URL      = "http://localhost:11434/api/generate"
+OLLAMA_MODEL    = "qwen2.5:7b"
+_OLLAMA_NUM_CTX = 32_768  # must match num_ctx in call_ollama() options
 # ── Config loading — startup checksum auto-regenerates if AP0 xlsx changed ────
 _CONFIG_DIR = Path(__file__).parent / "config"
 _AP0_PATH   = Path(__file__).parent / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
@@ -101,6 +102,13 @@ for _fl_key, _fl_meta in _field_levels.items():
             "allowed":      {v.lower() for v in _av},
             "allowed_list": _av,
         }
+# Guard: if AP0 ever adds allowed_values to a skip-listed field, downstream coercion
+# logic must be updated before removing it from _AP0_SKIP_VALIDATION.
+for _sk in _AP0_SKIP_VALIDATION:
+    assert _sk not in _AP0_CONSTRAINED_FIELDS, (
+        f"{_sk} is in _AP0_SKIP_VALIDATION but AP0 now defines allowed_values for it — "
+        f"review the downstream coercion logic and remove from skip list."
+    )
 
 # ── Numeric KO fields requiring source-span citation ─────────────────────────
 # Built from field_levels.json — any Float/Integer field with KO_IF_LT or KO_IF_GT.
@@ -323,7 +331,7 @@ async def call_ollama(system: str, user: str, label: str) -> str:
         "system": system,
         "prompt": user,
         "stream": False,
-        "options": {"temperature": 0.0, "num_predict": 4096, "num_ctx": 32768},
+        "options": {"temperature": 0.0, "num_predict": 4096, "num_ctx": _OLLAMA_NUM_CTX},
     }
     log.info("Ollama [%s]: system=%d Z., prompt=%d Z.", label, len(system), len(user))
     t0 = datetime.now()
@@ -585,12 +593,11 @@ async def analyze(file: UploadFile = File(...)):
             _TEXT_TOKEN_ESTIMATE = len(text) // 4
             _FIXED_OVERHEAD_TOKENS = 10_100  # AGV_SYSTEM (~5500) + 4b template (~4600)
             _TOTAL_ESTIMATE = _TEXT_TOKEN_ESTIMATE + _FIXED_OVERHEAD_TOKENS
-            _CTX_LIMIT = 32_768
-            if _TOTAL_ESTIMATE > _CTX_LIMIT:
+            if _TOTAL_ESTIMATE > _OLLAMA_NUM_CTX:
                 yield sse("log", {
                     "message": (
                         f"⚠ Dokument zu groß für zuverlässige Extraktion "
-                        f"(~{_TOTAL_ESTIMATE:,} Token geschätzt, Limit: {_CTX_LIMIT:,}). "
+                        f"(~{_TOTAL_ESTIMATE:,} Token geschätzt, Limit: {_OLLAMA_NUM_CTX:,}). "
                         f"Bitte nur den technischen Spezifikationsteil hochladen "
                         f"(typischerweise 5–15 Seiten) statt des vollständigen Ausschreibungsdokuments. "
                         f"Ergebnisse können unvollständig sein."
@@ -725,24 +732,18 @@ async def analyze(file: UploadFile = File(...)):
 
             # ── Source-span enforcement (generic, field-agnostic) ────────────────
             # Layer 1: source absent/null → LLM had no explicit source → null value.
+            # Layer 0: source present but not grounded in the real document → null
+            #   (catches a fabricated value with a fabricated-but-self-consistent
+            #   quote; runs unconditionally, not scoped to 4c abstention).
             # Layer 2 (scoped to 4c abstentions): 4c said null AND 4b source doesn't
             #   numerically confirm the value → 4b was likely hallucinating → null value.
-            #   Uses _source_confirms_value (strips thousands separators, tests mm/m scale).
+            # See src/json_repair.py::enforce_source_spans for the full logic.
             _4c_abstained_ref = _4c_abstained if _4c_fields else set()
-            for _key in _NUMERIC_KO_TENDER_KEYS:
-                if agv_criteria.get(_key) is None:
-                    continue
-                _src_val = agv_criteria.get(f"{_key}_source")
-                if not _src_val:
-                    log.warning("Source-span L1: %s=%s → null (kein Quellenbeleg)",
-                                _key, agv_criteria[_key])
-                    yield sse("log", {"message": f"⚠ Kein Quellenbeleg: {_key}={agv_criteria[_key]} → null"})
-                    agv_criteria[_key] = None
-                elif _key in _4c_abstained_ref and not _source_confirms_value(agv_criteria[_key], str(_src_val)):
-                    log.warning("Source-span L2: %s=%s — 4c abstained, Quelle bestätigt Wert nicht → null",
-                                _key, agv_criteria[_key])
-                    yield sse("log", {"message": f"⚠ 4c Abstention: {_key}={agv_criteria[_key]} → null"})
-                    agv_criteria[_key] = None
+            agv_criteria, _span_messages = enforce_source_spans(
+                agv_criteria, text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained_ref
+            )
+            for _msg in _span_messages:
+                yield sse("log", {"message": _msg})
 
             # Merge 4a results into agv_criteria
             agv_criteria["required_vehicle_type"] = vt_criteria.get("required_vehicle_type")

@@ -64,9 +64,10 @@ PDF upload
       4b. agv_extraction: batch extraction of all ~40 fields in one JSON blob
           └─ AP0 allowed-values correction (max 2 retry calls)
       4c. per_field_extraction: one focused call per numeric KO field (~8 calls)
-      — source-span enforcement (not an LLM call) —
+      — source-span enforcement (not an LLM call — enforce_source_spans() in src/json_repair.py) —
       Layer 1: null value if <field>_source is absent (no citation = inference)
-      Layer 2: null value if 4c abstained AND _source_confirms_value() fails
+      Layer 0: null value if source not grounded in real document (source_is_grounded())
+      Layer 2: null value if 4c abstained AND source_confirms_value() fails
   → validate_tender_values(): AP0 allowed_values filter (rejects LLM hallucinations)
   → validate_agv_criteria(): plausibility ranges + mm→m auto-conversion
   → field_text_fallbacks: regex-driven overrides (from vehicle_types.json)
@@ -80,11 +81,14 @@ PDF upload
 
 **Pass 4c** runs after 4b and before validation. It calls the LLM once per numeric KO field (KO_IF_LT or KO_IF_GT Float/Integer) scoped to the detected vehicle type. Typical: ~8 calls. Non-null 4c results override 4b values; null 4c results are recorded in `_4c_abstained`.
 
-**Source-span guard** — two layers run after 4c:
+**Source-span guard** — three layers run after 4c, implemented in `enforce_source_spans()` in `src/json_repair.py`. First match nulls the value and stops:
 - **Layer 1 (always):** if `<field>_source` is absent or null → null the value. No citation = inference.
-- **Layer 2 (4c abstentions only):** if 4c returned null AND `_source_confirms_value()` returns False for the 4b source → null the 4b value.
+- **Layer 0 (always):** if source is present but NOT grounded in the real document text → null the value. Catches fabricated value+quote pairs where the LLM invented a self-consistent but document-absent citation. Implemented by `source_is_grounded()`.
+- **Layer 2 (4c abstentions only):** if 4c returned null AND `source_confirms_value()` returns False for the 4b source → null the 4b value.
 
-`_source_confirms_value()` is a pure numeric function: strips thousands separators, tests direct match and ×1000/÷1000 unit scale. No field names, no domain logic.
+`source_confirms_value()` (`src/json_repair.py`) is a pure numeric function: strips thousands separators, tests direct match and ×1000/÷1000 unit scale. No field names, no domain logic.
+
+`source_is_grounded(value, source, document)` (`src/json_repair.py`) checks whether the LLM's self-reported quote is actually anchored in the real extracted PDF text. Two binary conditions must both hold: (1) the value's digit-string must occur somewhere in the real document (anchor), and (2) at least one distinctive content word from the quote must appear within 80 characters of an anchor occurrence (co-location). Pure function — no domain knowledge, no field names.
 
 Module-level constants built from config at startup:
 - `_NUMERIC_KO_TENDER_KEYS` — frozenset of tender keys subject to source-span guard; asserted non-empty.
@@ -145,5 +149,6 @@ All prompts live in `config/prompts/*.txt`. The `_fill()` function in `app.py` r
 - `extraction_template.txt` and `extraction_hints.json` are always generated — never manually edit them.
 - After any AP0 xlsx change: run `python3 scripts/generate_all.py` before testing.
 - **No numeric literals in AP0 Description cells**: a 7B model copies example numbers as hallucinations. Describe patterns verbally (e.g. "a maximum of X kg" not "a maximum of 1000 kg").
-- **`_source_confirms_value()` is field-agnostic**: it contains no field names, no AP0 allowed-value lists, no domain knowledge. Never add field-specific logic to it.
+- **`source_confirms_value()` is field-agnostic** (`src/json_repair.py`): it contains no field names, no AP0 allowed-value lists, no domain knowledge. Never add field-specific logic to it.
+- **`source_is_grounded()` is field-agnostic** (`src/json_repair.py`): anchor + co-location check against the real document text. No domain knowledge, no field names, no AP0 lists. Never add field-specific logic to it.
 - **Pass 4c abstention ≠ unconditional override**: a 4c null result does not null the 4b value unless Layer 2 also fires. Abstention is evidence, not proof.

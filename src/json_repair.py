@@ -183,3 +183,120 @@ def source_confirms_value(value, source_text: str) -> bool:
     for raw in re.findall(r"\d[\d,\.]*", source_text):
         nums.update(_interpret_number_token(raw))
     return av in nums or (av * 1000) in nums or round(av / 1000, 6) in nums
+
+
+# Empirically safe band is [15, 90] chars across the full tender corpus (Nordlicht,
+# CompanyX, Dragonfly, Mama): the thinnest genuine field needs >=15, the one known
+# coincidental-collision leak (a fabricated small integer near unrelated boilerplate)
+# first appears at >=95. 80 sits with margin on both sides. This is a generic
+# text-layout property (how far a number sits from its describing words), not a
+# fitted cutoff — there is no fraction here to retune when a new document shows up.
+_GROUNDING_WINDOW_CHARS = 80
+
+# Deliberately SHORT — function words only (DE+EN articles/prepositions/auxiliaries).
+# Domain words like "maximum"/"minimum"/"weight" must survive this filter: genuine
+# quotes sometimes share only boilerplate vocabulary with the source document.
+_FUNCTION_WORDS = frozenset({
+    "the", "a", "an", "is", "of", "to", "for", "and", "or", "in", "on", "at",
+    "must", "up", "from", "are", "be", "that", "this", "with", "as", "it",
+    "its", "have", "has", "will", "shall", "not", "than", "into", "per",
+    "der", "die", "das", "und", "oder", "ist", "sind", "für", "von", "bis",
+    "auf", "mit", "bei", "ein", "eine", "einer", "im", "am", "zu", "zur",
+    "zum", "muss", "müssen", "nicht", "als", "wird", "werden",
+})
+
+
+def _content_words(text: str) -> set:
+    """Distinctive words from a quote: length > 3, function words dropped."""
+    return {
+        w.lower()
+        for w in re.findall(r"[A-Za-zÄÖÜäöüß]+", text)
+        if len(w) > 3 and w.lower() not in _FUNCTION_WORDS
+    }
+
+
+def source_is_grounded(value, source: str, document: str, window: int = _GROUNDING_WINDOW_CHARS) -> bool:
+    """Return True if `source` (the LLM's self-reported quote) is actually grounded in
+    `document` (the real extracted PDF text) — not just numerically self-consistent
+    with `value`, which is all `source_confirms_value()` checks.
+
+    Two necessary, binary conditions (no fraction, no calibrated cutoff):
+      1. Anchor: value's digit-string (locale + x1000/x0.001 unit-scale tolerance,
+         via the same `_interpret_number_token` used elsewhere in this module) must
+         occur somewhere in the real document — not just in the LLM's own quote.
+      2. Co-location: at least one distinctive word from `source` must appear within
+         `window` chars of at least one anchor occurrence in the document.
+
+    Zero values always pass (LL-06: a deliberate zero is not an inference hallucination).
+    """
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return True
+    if v == 0:
+        return True
+    if not source or not str(source).strip():
+        return False
+
+    av = abs(v)
+    targets = {av, av * 1000, round(av / 1000, 6)}
+
+    positions = []
+    for m in re.finditer(r"\d[\d,\.]*", document):
+        if _interpret_number_token(m.group()) & targets:
+            positions.append(m.start())
+    if not positions:
+        return False
+
+    quote_words = _content_words(str(source))
+    if not quote_words:
+        return False
+
+    for pos in positions:
+        window_text = document[max(0, pos - window): pos + window].lower()
+        if any(w in window_text for w in quote_words):
+            return True
+    return False
+
+
+def enforce_source_spans(
+    agv_criteria: dict,
+    document_text: str,
+    numeric_ko_keys,
+    four_c_abstained: set,
+) -> tuple:
+    """Null out numeric KO fields whose `<field>_source` fails the source-span guard.
+
+    Runs three layers per field, in order (first match nulls the value and stops):
+      Layer 1: source absent/empty -> null (no citation = inference).
+      Layer 0: source present but not grounded in the real document -> null
+               (catches a fabricated value with a fabricated-but-self-consistent
+               quote; runs unconditionally, not scoped to 4c abstention).
+      Layer 2 (4c-abstention only): source numerically inconsistent with its own
+               claimed value -> null.
+
+    Pure function — no async, no I/O — so tests can import and call it directly
+    instead of replicating this logic inline.
+
+    Returns (agv_criteria, messages) where messages is a list of human-readable
+    log lines for each field nulled, for the caller to surface (e.g. via SSE).
+    """
+    messages = []
+    for key in numeric_ko_keys:
+        if agv_criteria.get(key) is None:
+            continue
+        value = agv_criteria[key]
+        src_val = agv_criteria.get(f"{key}_source")
+        if not src_val:
+            log.warning("Source-span L1: %s=%s -> null (kein Quellenbeleg)", key, value)
+            messages.append(f"⚠ Kein Quellenbeleg: {key}={value} → null")
+            agv_criteria[key] = None
+        elif not source_is_grounded(value, str(src_val), document_text):
+            log.warning("Source-span L0: %s=%s -> null (Zitat nicht im Dokument verankert)", key, value)
+            messages.append(f"⚠ Quelle nicht im Dokument verankert: {key}={value} → null")
+            agv_criteria[key] = None
+        elif key in four_c_abstained and not source_confirms_value(value, str(src_val)):
+            log.warning("Source-span L2: %s=%s — 4c abstained, Quelle bestätigt Wert nicht -> null", key, value)
+            messages.append(f"⚠ 4c Abstention: {key}={value} → null")
+            agv_criteria[key] = None
+    return agv_criteria, messages

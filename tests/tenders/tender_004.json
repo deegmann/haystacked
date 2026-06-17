@@ -15,10 +15,16 @@
   "golden_extraction": {
     "required_weight_capacity_kg": 1200,
     "required_max_lift_height_m": 10,
-    "required_min_aisle_width_m": 3.4
+    "required_min_aisle_width_m": 3.4,
+    "required_temp_min_c": null,
+    "required_temp_max_c": null,
+    "required_humidity_max_pct": null,
+    "required_max_gradient_pct": null,
+    "required_max_vehicle_height_mm": null
   },
+  "golden_run_file": "golden_run_tender_nordlicht.json",
   "known_issues": [
-    "L2 source-span bug: German decimal comma '3,4' fails _source_confirms_value(3.4, ...) — aisle nulled",
+    "RESOLVED 2026-06-16: German decimal comma '3,4' was suspected to fail source_confirms_value(3.4, ...), but direct re-test confirms _interpret_number_token() already normalizes DE commas correctly — aisle is not nulled by this path",
     "4c false abstention on temp_min/max despite clear 'Umgebungstemperatur 10 – 30 °C'",
     "required_integration: 'REST / OPC UA' rejected by AP0 (format mismatch)"
   ],

@@ -1,63 +1,39 @@
 """Unit tests for source-span enforcement logic (U-SS-xx).
 
-Tests the Layer 1 and Layer 2 source-span enforcement invariants from app.py
-(lines 711-730). The production loop is async/generator-bound, so we replicate
-the core logic here as a pure function to make it testable without an HTTP server.
+Imports the real production function `enforce_source_spans()` from
+src/json_repair.py directly — this used to be replicated inline here (a copy
+of app.py's loop kept in sync by hand), which is exactly how the Layer 0
+grounding gap went undetected: the test exercised a stale copy of the logic,
+not the code that actually runs. `enforce_source_spans()` is a pure function
+(no async, no I/O) specifically so it can be imported and called directly.
 
-The enforcement loop in app.py is:
-    for _key in _NUMERIC_KO_TENDER_KEYS:
-        if agv_criteria.get(_key) is None:
-            continue
-        _src_val = agv_criteria.get(f"{_key}_source")
-        if not _src_val:
-            # Layer 1: no source → null value
-            agv_criteria[_key] = None
-        elif _key in _4c_abstained_ref and not _source_confirms_value(agv_criteria[_key], str(_src_val)):
-            # Layer 2: 4c abstained AND source doesn't confirm → null value
-            agv_criteria[_key] = None
+Layer order (first match nulls the value and stops):
+  Layer 1: source absent/empty -> null (no citation = inference).
+  Layer 0: source present but not grounded in the real document text -> null
+    (catches a fabricated value paired with a fabricated-but-self-consistent
+    quote; runs unconditionally, not scoped to 4c abstention).
+  Layer 2 (4c-abstention only): source's own digits don't numerically confirm
+    the value -> null.
 
-We replicate this loop inline (not importing from app.py) to avoid async dependencies.
-All domain knowledge (field list, scv function) comes from the production modules.
+Several cases below use real extracted text from the tender PDFs in tenders/
+(Dragonfly, CompanyX, Nordlicht, Mama) rather than synthetic strings, captured
+during the 2026-06-16 source-grounding investigation.
 """
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from app import _NUMERIC_KO_TENDER_KEYS
-from src.json_repair import source_confirms_value
+from src.json_repair import enforce_source_spans, source_confirms_value
 
 
-def _apply_source_span_enforcement(
-    criteria: dict,
-    _4c_abstained: set,
-    _4c_active: bool = True,
-) -> dict:
-    """Replicated source-span enforcement logic from app.py lines 711-730.
-
-    Pure function — no side effects, no SSE, no logging.
-    Operates on a copy of `criteria`.
-
-    Args:
-        criteria: dict with tender field values and <field>_source companions.
-        _4c_abstained: set of tender_keys for which Pass 4c returned null.
-        _4c_active: if False, Layer 2 is inactive (mirrors _4c_abstained_ref = set()).
+def _apply(criteria: dict, document_text: str, four_c_abstained: set = frozenset()) -> dict:
+    """Thin call-site adapter — not a reimplementation. Discards the messages
+    list (app.py turns those into SSE events; tests only need the resulting dict).
     """
-    result = dict(criteria)
-    _4c_abstained_ref = _4c_abstained if _4c_active else set()
-
-    for _key in _NUMERIC_KO_TENDER_KEYS:
-        if result.get(_key) is None:
-            continue
-        _src_val = result.get(f"{_key}_source")
-        if not _src_val:
-            # Layer 1
-            result[_key] = None
-        elif _key in _4c_abstained_ref and not source_confirms_value(
-            result[_key], str(_src_val)
-        ):
-            # Layer 2
-            result[_key] = None
-
+    result, _messages = enforce_source_spans(
+        dict(criteria), document_text, _NUMERIC_KO_TENDER_KEYS, set(four_c_abstained)
+    )
     return result
 
 
@@ -69,187 +45,206 @@ def test_U_SS_01_l1_source_none_nulls_value():
     """Layer 1: if the source field is None, the value must be nulled.
 
     No citation = LLM inference. Layer 1 enforces that every numeric KO value
-    must have an explicit source string.
+    must have an explicit source string. Fires before Layer 0 ever needs a
+    document, so the document text is irrelevant here.
     """
     key = "required_weight_capacity_kg"
-    criteria = {
-        key: 1000,
-        f"{key}_source": None,
-    }
-    result = _apply_source_span_enforcement(criteria, _4c_abstained=set())
-    assert result[key] is None, (
-        f"L1: {key}=1000 with source=None must be nulled"
-    )
+    criteria = {key: 1000, f"{key}_source": None}
+    result = _apply(criteria, document_text="")
+    assert result[key] is None, f"L1: {key}=1000 with source=None must be nulled"
 
-
-# ---------------------------------------------------------------------------
-# U-SS-02: L1 — value set + source is empty string → value becomes None
-# ---------------------------------------------------------------------------
 
 def test_U_SS_02_l1_source_empty_string_nulls_value():
-    """Layer 1: if the source field is an empty string, the value must be nulled.
-
-    An empty string is falsy in Python and treated the same as None.
-    """
+    """Layer 1: an empty-string source is treated the same as None (falsy)."""
     key = "required_weight_capacity_kg"
-    criteria = {
-        key: 1000,
-        f"{key}_source": "",
-    }
-    result = _apply_source_span_enforcement(criteria, _4c_abstained=set())
-    assert result[key] is None, (
-        f"L1: {key}=1000 with source='' must be nulled"
-    )
+    criteria = {key: 1000, f"{key}_source": ""}
+    result = _apply(criteria, document_text="")
+    assert result[key] is None, f"L1: {key}=1000 with source='' must be nulled"
 
 
 # ---------------------------------------------------------------------------
-# U-SS-03: L1 — value set + source is non-empty string → value unchanged
+# U-SS-03: source present, grounded in the real document → value survives L1+L0
 # ---------------------------------------------------------------------------
 
 def test_U_SS_03_l1_source_present_value_unchanged():
-    """Layer 1: if source is a non-empty string, the value must NOT be nulled by L1.
+    """A non-empty, document-grounded source passes both L1 and L0.
 
-    L1 only fires on absent/null sources. A non-empty source passes L1.
+    Real Dragonfly.pdf text: 'Max Loaded weight (KG) (Footprint) 1000'.
     """
     key = "required_weight_capacity_kg"
-    criteria = {
-        key: 1000,
-        f"{key}_source": "Max Loaded weight (KG) (Footprint) 1000",
-    }
-    result = _apply_source_span_enforcement(criteria, _4c_abstained=set())
-    assert result[key] == 1000, (
-        f"L1: {key}=1000 with a non-empty source must remain 1000"
-    )
+    document = "Max Loaded weight (KG) (Footprint) 1000"
+    criteria = {key: 1000, f"{key}_source": document}
+    result = _apply(criteria, document_text=document)
+    assert result[key] == 1000, f"{key}=1000 with a grounded source must remain 1000"
 
 
 # ---------------------------------------------------------------------------
-# U-SS-04: L2 — field in 4c_abstained AND source does NOT confirm → value becomes None
+# U-SS-04..05: Layer 0 — fabricated vs. genuine-but-paraphrased CompanyX pair
 # ---------------------------------------------------------------------------
 
-def test_U_SS_04_l2_abstained_bad_source_nulls_value():
-    """Layer 2: 4c abstained + source doesn't confirm the value → null.
+def _companyx_pdf_text() -> str:
+    import pdfplumber
+    pdf_path = Path(__file__).parent.parent.parent / "tenders" / "CompanyX.pdf"
+    with pdfplumber.open(pdf_path) as pdf:
+        return "\n".join(p.extract_text() or "" for p in pdf.pages)
 
-    This is the Dragonfly lift-height case: 4b extracted 6.0 with source
-    'Outbound 1734 / Replenishment 133' (which doesn't contain 6 or 6000).
-    4c also abstained. Layer 2 correctly nulls the hallucination.
+
+def test_U_SS_04_l0_fabricated_value_with_self_consistent_fake_quote_nulls():
+    """Layer 0: a fabricated value whose self-reported quote is numerically
+    self-consistent (would pass the old source_confirms_value-only guard) but
+    whose quote text does not occur anywhere in the real document must be nulled.
+
+    This is the exact CompanyX regression: the model fabricated
+    required_max_lift_height_m=4.8 with the plausible quote 'The maximum lift
+    height of the AGVs is up to 4.8 m.' — '4.8' never appears in the real
+    17.9k-char CompanyX.pdf text.
     """
     key = "required_max_lift_height_m"
-    bad_source = "Outbound 1734\nReplenishment (also halfs and to aisle 60 area) 133"
-    criteria = {
-        key: 6.0,
-        f"{key}_source": bad_source,
-    }
-    result = _apply_source_span_enforcement(
-        criteria,
-        _4c_abstained={key},
-    )
+    fabricated_quote = "The maximum lift height of the AGVs is up to 4.8 m."
+    criteria = {key: 4.8, f"{key}_source": fabricated_quote}
+    result = _apply(criteria, document_text=_companyx_pdf_text())
     assert result[key] is None, (
-        f"L2: {key}=6.0 with non-confirming source must be nulled when 4c abstained"
+        "L0 must null a fabricated value even when its own quote is internally "
+        "self-consistent — the quote itself is not grounded in the real document"
     )
 
 
-# ---------------------------------------------------------------------------
-# U-SS-05: L2 — field in 4c_abstained AND source confirms → value unchanged
-# ---------------------------------------------------------------------------
+def test_U_SS_05_l0_genuine_value_with_paraphrased_quote_survives():
+    """Layer 0: a genuine value survives even when the model's quote paraphrases
+    the document rather than copying it verbatim.
 
-def test_U_SS_05_l2_abstained_good_source_value_unchanged():
-    """Layer 2: 4c abstained but source DOES confirm the value → value kept.
-
-    This is the Dragonfly weight-capacity case: 4c abstained because it
-    misidentified the table row. 4b correctly extracted 1000 with source
-    'Max Loaded weight (KG) (Footprint) 1000'. Layer 2 confirms 1000 is in
-    the source → value kept.
+    Real CompanyX.pdf text: 'Most pallet weights are less than 500 kg, with a
+    maximum of 1,000 kg.' The model's actual (genuine) self-reported quote was
+    'The maximum loaded weight of the AGVs is up to 1,000 kg.' — different
+    words, same number, same topic.
     """
     key = "required_weight_capacity_kg"
-    good_source = "Max Loaded weight (KG) (Footprint) 1000"
-    criteria = {
-        key: 1000,
-        f"{key}_source": good_source,
-    }
-    result = _apply_source_span_enforcement(
-        criteria,
-        _4c_abstained={key},
-    )
+    paraphrased_quote = "The maximum loaded weight of the AGVs is up to 1,000 kg."
+    criteria = {key: 1000, f"{key}_source": paraphrased_quote}
+    result = _apply(criteria, document_text=_companyx_pdf_text())
     assert result[key] == 1000, (
-        f"L2: {key}=1000 with confirming source must be kept even when 4c abstained"
+        "L0 must not null a genuine value just because the model paraphrased "
+        "the source instead of quoting it verbatim"
     )
 
 
 # ---------------------------------------------------------------------------
-# U-SS-06: L2 — field NOT in 4c_abstained → Layer 2 does not fire
+# U-SS-06: Layer 0 — German decimal comma, real Nordlicht text
 # ---------------------------------------------------------------------------
 
-def test_U_SS_06_l2_not_abstained_bad_source_value_kept():
-    """Layer 2 must NOT fire for fields that are NOT in _4c_abstained.
+def test_U_SS_06_l0_german_decimal_comma_survives():
+    """Layer 0 must handle the German comma-as-decimal-separator convention.
 
-    If 4c returned a non-null value (field not in _4c_abstained), L2 is skipped
-    regardless of whether the source confirms the value. Only the 4c result is used.
-    The source check is only a fallback for 4c abstentions.
+    Real Beispielausschreibung_AGV_Nordlicht.pdf text: 'Regalbreite
+    (Gassenbreite) 3,4 m'. The value 3.4 must be recognized as anchored to
+    the document's '3,4', not treated as absent because of the locale mismatch.
+    """
+    key = "required_min_aisle_width_m"
+    document = "Regalbreite (Gassenbreite) 3,4 m\nLagerhöhe 10 m"
+    quote = "Regalbreite (Gassenbreite) 3,4 m"
+    criteria = {key: 3.4, f"{key}_source": quote}
+    result = _apply(criteria, document_text=document)
+    assert result[key] == 3.4, "L0 must recognize German decimal comma '3,4' as anchoring 3.4"
+
+
+# ---------------------------------------------------------------------------
+# U-SS-07: Layer 0 — non-standard PDF separator glyph between two numbers
+# ---------------------------------------------------------------------------
+
+def test_U_SS_07_l0_pdf_glyph_artifact_does_not_merge_numbers():
+    """Real Mama.pdf text extracts the en-dash in '10-30°C' as a private-use-area
+    glyph (U+E088), not a normal hyphen: 'ambient temperatures ranging from
+    10\\ue08830°C indoors.' This must NOT cause '10' and '30' to merge into a
+    single '1030' token — both temperatures must independently ground.
+    """
+    document = "ambient temperatures ranging from 1030°C\nindoors."
+    quote = "The AGVS must be able to operate in ambient temperatures ranging from 10-30°C indoors."
+
+    min_criteria = {"required_temp_min_c": 10, "required_temp_min_c_source": quote}
+    max_criteria = {"required_temp_max_c": 30, "required_temp_max_c_source": quote}
+
+    min_result = _apply(min_criteria, document_text=document)
+    max_result = _apply(max_criteria, document_text=document)
+
+    assert min_result["required_temp_min_c"] == 10, "10 must ground despite the glyph artifact"
+    assert max_result["required_temp_max_c"] == 30, "30 must ground despite the glyph artifact"
+
+
+# ---------------------------------------------------------------------------
+# U-SS-08: Layer 2 — abstained + quote has no parseable digit → nulls
+# ---------------------------------------------------------------------------
+
+def test_U_SS_08_l2_abstained_quote_with_no_digits_nulls():
+    """Layer 2 specifically: a quote that is grounded (L0 passes — the number
+    and descriptive words really do sit together in the document) but whose
+    own text never spells the value out in digits at all cannot numerically
+    self-confirm. Only fires when 4c also abstained.
     """
     key = "required_max_lift_height_m"
-    bad_source = "Outbound 1734\nReplenishment 133"  # does not contain 6 or 6000
-    criteria = {
-        key: 6.0,
-        f"{key}_source": bad_source,
-    }
-    # Field is NOT in _4c_abstained
-    result = _apply_source_span_enforcement(
-        criteria,
-        _4c_abstained=set(),  # empty set — field not abstained
-    )
-    assert result[key] == 6.0, (
-        f"L2 must not fire when field is not in _4c_abstained. "
-        f"{key}=6.0 must be kept."
-    )
+    document = "The mast reaches a height of 6 m when extended, approximately six meters tall in total."
+    quote = "approximately six meters tall"
+    criteria = {key: 6.0, f"{key}_source": quote}
 
-
-# ---------------------------------------------------------------------------
-# U-SS-07: None value skipped entirely — neither L1 nor L2 fires
-# ---------------------------------------------------------------------------
-
-def test_U_SS_07_none_value_skipped():
-    """If the value is already None, the enforcement loop skips the field entirely.
-
-    Neither L1 nor L2 should do anything when the value is already null.
-    The _source field (even if absent) must not cause an error.
-    """
-    key = "required_max_lift_height_m"
-    criteria = {
-        key: None,
-        # source field absent entirely
-    }
-    result = _apply_source_span_enforcement(
-        criteria,
-        _4c_abstained={key},
-    )
+    result = _apply(criteria, document_text=document, four_c_abstained={key})
     assert result[key] is None, (
-        "Already-null value must remain null and not raise an error"
+        "L2 must null when 4c abstained and the quote contains no digit "
+        "confirming the value, even though L0 (grounding) passed"
     )
 
 
-# ---------------------------------------------------------------------------
-# U-SS-08: L2 inactive when 4c was not run (_4c_active=False)
-# ---------------------------------------------------------------------------
-
-def test_U_SS_08_l2_inactive_when_4c_not_run():
-    """When _4c_active=False (4c fields set is empty), Layer 2 must not fire.
-
-    In app.py: _4c_abstained_ref = _4c_abstained if _4c_fields else set()
-    When _4c_fields is empty (4c not run for this vehicle type), _4c_abstained_ref
-    is forced to empty set → L2 cannot fire for any field.
+def test_U_SS_09_l2_not_abstained_keeps_value_despite_no_digit_quote():
+    """The same grounded-but-digit-free quote as U-SS-08, but the field is NOT
+    in 4c_abstained this time → Layer 2 must not fire, value is kept.
+    Isolates that L2 is conditional on abstention while L0 is not.
     """
     key = "required_max_lift_height_m"
-    bad_source = "Outbound 1734\nReplenishment 133"
-    criteria = {
-        key: 6.0,
-        f"{key}_source": bad_source,
-    }
-    result = _apply_source_span_enforcement(
-        criteria,
-        _4c_abstained={key},
-        _4c_active=False,  # 4c was not run
-    )
-    assert result[key] == 6.0, (
-        "L2 must be inactive when 4c was not run (_4c_active=False). "
-        "Value must be kept despite bad source."
+    document = "The mast reaches a height of 6 m when extended, approximately six meters tall in total."
+    quote = "approximately six meters tall"
+    criteria = {key: 6.0, f"{key}_source": quote}
+
+    result = _apply(criteria, document_text=document, four_c_abstained=set())
+    assert result[key] == 6.0, "L2 must not fire when the field is not in four_c_abstained"
+
+
+# ---------------------------------------------------------------------------
+# U-SS-10: None value skipped entirely — no layer fires, no error
+# ---------------------------------------------------------------------------
+
+def test_U_SS_10_none_value_skipped():
+    """If the value is already None, the enforcement loop skips the field
+    entirely — including when the source key is absent from the dict.
+    """
+    key = "required_max_lift_height_m"
+    criteria = {key: None}
+    result = _apply(criteria, document_text="", four_c_abstained={key})
+    assert result[key] is None, "Already-null value must remain null and not raise an error"
+
+
+# ---------------------------------------------------------------------------
+# U-SS-11: documented bounded residual — small round integer near unrelated text
+# ---------------------------------------------------------------------------
+
+def test_U_SS_11_documented_residual_gradient_collision_case():
+    """Regression check for the one residual case flagged during the 2026-06-16
+    investigation: CompanyX's fabricated required_max_gradient_pct=10 was
+    suspected to risk a coincidental '10' collision elsewhere in the document
+    (e.g. '10 years' / '10 %' boilerplate). Direct verification against the
+    real CompanyX.pdf text shows no such collision currently occurs — L0
+    correctly nulls this fabrication. This test pins that result so a future
+    change to the window/stopword constants can't silently reopen the leak
+    without a visible test failure.
+    """
+    import pdfplumber
+
+    with pdfplumber.open(Path(__file__).parent.parent.parent / "tenders" / "CompanyX.pdf") as pdf:
+        document = "\n".join(p.extract_text() or "" for p in pdf.pages)
+
+    key = "required_max_gradient_pct"
+    fabricated_quote = "The maximum gradeability of the loaded unit is up to 10 %."
+    criteria = {key: 10, f"{key}_source": fabricated_quote}
+    result = _apply(criteria, document_text=document)
+    assert result[key] is None, (
+        "Fabricated gradient=10 must be nulled — if this starts failing, the "
+        "documented residual collision risk has materialized and needs a real fix, "
+        "not a threshold nudge"
     )

@@ -26,26 +26,28 @@ def test_U_J_03_prose_before_json():
     assert result["agv_type"] == "Mobile AMR"
 
 
-def test_U_J_04_string_null_normalised():
+def test_U_J_04_string_null_field_survives():
     raw = '{"agv_type": "Forklift AGV", "payload": "null"}'
     result = repair_and_parse(raw)
-    # After normalisation payload should be null (Python None) or string
-    # We accept either — the key point is no crash
-    assert "agv_type" in result
+    assert "agv_type" in result and "payload" in result, (
+        "Both fields must be present after parsing"
+    )
 
 
-def test_U_J_05_string_true_false_normalised():
+def test_U_J_05_string_bool_fields_survive():
     raw = '{"outdoor": "true", "vda5050": "false"}'
     result = repair_and_parse(raw)
-    # After normalisation booleans or strings both acceptable — no crash
-    assert "outdoor" in result
+    assert "outdoor" in result and "vda5050" in result, (
+        "Both fields must be present after parsing"
+    )
 
 
 def test_U_J_06_truncated_json():
     raw = '{"agv_type": "Forklift AGV", "payload": 1500, "incomplete'
     result = repair_and_parse(raw)
-    # Should not crash and should return at least the complete field
-    assert isinstance(result, dict)
+    assert result.get("agv_type") == "Forklift AGV", (
+        "Complete field before truncation point must survive repair"
+    )
 
 
 def test_U_J_07_unescaped_newlines():

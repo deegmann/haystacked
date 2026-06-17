@@ -1,7 +1,7 @@
 # Haystacked Platform — Architecture
 
-**Version:** based on AP0 v0.10 (v1.3)  
-**Last updated:** 2026-06-03 (run 10 — Pass 4c + source-span hallucination guard)
+**Version:** based on AP0 v0.10 (v1.4)  
+**Last updated:** 2026-06-17 (run 11 — Layer 0 source-grounding guard; enforce_source_spans() in src/json_repair.py; 139 tests)
 
 ---
 
@@ -59,7 +59,7 @@ app.py (FastAPI, SSE streaming)
         ├─► LLM Pass 4b: agv_extraction (all ~40 fields in one JSON blob)
         │       └─► AP0 allowed-values retry (max 2 correction calls)
         ├─► LLM Pass 4c: per_field_extraction (8 focused calls, numeric KO fields)
-        ├─► Source-span enforcement (Layer 1 + Layer 2 hallucination guard)
+        ├─► Source-span enforcement (Layer 1 + Layer 0 + Layer 2 hallucination guard)
         ├─► validate_tender_values()   (AP0 allowed_values filter)
         ├─► validate_agv_criteria()    (plausibility ranges + mm→m)
         │
@@ -204,24 +204,39 @@ If `is_agv_amr=false`, processing stops here (no AGV passes). Total: 2–3 LLM c
 
 ### 5. Source-span hallucination guard
 
-After Pass 4c, `app.py` iterates over all fields in `_NUMERIC_KO_TENDER_KEYS` and applies two enforcement layers in sequence:
+After Pass 4c, `app.py` calls `enforce_source_spans()` from `src/json_repair.py`. This pure function (no async, no I/O — importable directly in tests) iterates over all fields in `_NUMERIC_KO_TENDER_KEYS` and applies three enforcement layers per field. The first matching layer nulls the value and stops:
 
 **Layer 1 — missing source (always active)**
 If `<field>_source` is absent or null for a field that has a non-null value: the value is set to null. Rationale: if the LLM had an explicit textual source it would have cited it. Absence of citation implies inference.
 
-**Layer 2 — abstention + fake source (scoped to 4c abstentions)**
+**Layer 0 — source not grounded in the real document (always active)**
+Triggered when the source is present but `source_is_grounded(value, source, document_text)` returns False. Catches the more dangerous hallucination pattern: the LLM fabricates both a value and a plausible-looking source citation, producing an internally self-consistent but document-absent pair. Layer 1 cannot catch this; Layer 2 (alone) cannot either because the fabricated quote naturally agrees with the fabricated value.
+
+`source_is_grounded(value, source, document)` — in `src/json_repair.py`:
+- Two binary conditions must both hold (no calibrated thresholds):
+  1. **Anchor**: value's digit-string (locale-aware interpretation via `_interpret_number_token()`, with ×1000/÷1000 unit-scale variants) must occur somewhere in the real document.
+  2. **Co-location**: at least one distinctive content word from the source quote (length > 3, not a DE/EN function word from `_FUNCTION_WORDS`) must appear within `_GROUNDING_WINDOW_CHARS` (80) characters of at least one anchor occurrence in the document.
+- Zero values always pass (LL-06: deliberate zero is not an inference hallucination).
+- Non-numeric values return True (field-agnostic — no domain knowledge in this function).
+- The 80-character window is derived from corpus observation of how far a number sits from its descriptive label in real AGV tender PDFs (not a fitted parameter — use caution before tuning it).
+
+**Real regression case (2026-06-16, CompanyX):** The model fabricated 7 numeric KO field values, each paired with a different plausible-sounding quote. `source_confirms_value()` alone (the old Layer 2) could not catch these because each fabricated quote contained the fabricated value's own digit-string — internally consistent. All 7 were correctly nulled by Layer 0 once `source_is_grounded()` was added. Test: `tests/unit/test_source_is_grounded.py` U-SG-07.
+
+**Layer 2 — abstention + numeric mismatch (scoped to 4c abstentions)**
 Triggered only when both conditions hold:
 1. The field is in `_4c_abstained` (Pass 4c returned null or failed for this field)
-2. `_source_confirms_value(agv_criteria[field], agv_criteria[field+"_source"])` returns False
+2. `source_confirms_value(agv_criteria[field], agv_criteria[field+"_source"])` returns False
 
-`_source_confirms_value()` is a pure numeric check in `app.py`:
-- Strips thousands separators ("1,000" → 1000)
-- Tests direct match
-- Tests mm/m scale (value 1.9 matches 1900 in source; value 2000 matches 2.0)
-- Zero values always pass (a deliberate zero is not hallucination)
-- Contains no field names, no domain logic — fully field-agnostic
+`source_confirms_value(value, source_text)` — in `src/json_repair.py` (moved from `_source_confirms_value()` private function in `app.py`):
+- Uses `_interpret_number_token()` for locale-aware number parsing
+- Returns True if: value is zero; direct float match; value × 1000 in source; value ÷ 1000 in source
+- Returns False otherwise
+- Field-agnostic: no field names, no domain knowledge
 
-When Layer 2 fires, the value from 4b is nulled. This catches the specific case where 4b extracted a value AND wrote a plausible-looking source sentence, but the independent 4c pass (shorter, more focused prompt) abstained. The 4c abstention is evidence that the 4b source may be a fabricated citation.
+When Layer 2 fires, the value from 4b is nulled. This catches the additional case where the 4b source is numerically inconsistent with the extracted value — valid evidence of a problem when 4c independently abstained.
+
+**Why Layer 0 runs unconditionally but Layer 2 is scoped to abstentions:**
+Layer 0 checks document grounding: a citation that is absent from the real document is always wrong. Layer 2 checks numeric self-consistency only: a quote that doesn't spell out the exact digit might simply be a paraphrase (e.g. "approximately six meters"). The 4c abstention provides the additional evidence that makes numeric mismatch actionable rather than a false positive.
 
 ### 6. Post-LLM validation
 
@@ -339,9 +354,11 @@ These constants are built at startup from the generated config files and are the
 
 **No numeric literals in AP0 Description cells.** A 7B model copies example numbers in extraction hints as hallucinations (the "prompt poisoning" failure mode documented in project_companyx_hallucinations.md). Describe patterns verbally instead of numerically.
 
-**_source_confirms_value() is field-agnostic.** It contains no field names, no domain knowledge, and no AP0 allowed-value lists. It is a pure numeric string-matching function. Any domain logic added to it is an architecture violation.
+**`source_confirms_value()` is field-agnostic** (`src/json_repair.py`). It contains no field names, no domain knowledge, and no AP0 allowed-value lists. It is a pure numeric string-matching function. Any domain logic added to it is an architecture violation.
 
-**Pass 4c abstentions are not unconditional overrides.** When 4c returns null, the 4b value is preserved unless Layer 2 also fires. Abstention alone does not null a field.
+**`source_is_grounded()` is field-agnostic** (`src/json_repair.py`). Anchor + co-location against the real document text — no field names, no domain knowledge, no AP0 lists. The 80-character window and function-word stop-list are generic text-layout properties, not domain-specific cutoffs. Any field-specific logic added here is an architecture violation.
+
+**Pass 4c abstentions are not unconditional overrides.** When 4c returns null, the 4b value is preserved unless Layer 0 or Layer 2 also fires. Abstention alone does not null a field.
 
 ---
 
@@ -365,21 +382,26 @@ These constants are built at startup from the generated config files and are the
 | Module | Test IDs | Coverage |
 |---|---|---|
 | `tests/unit/test_matching_logic.py` | U-M-01 to U-M-28 | KO operators, COND_KO, scoring, VNA gate, null penalty, regression guards |
-| `tests/unit/test_extraction_nulls.py` | U-E-01 to U-E-07 | Golden extraction values for Dragonfly tender; _source_confirms_value boundaries; _NUMERIC_KO_TENDER_KEYS non-empty guard |
-| `tests/unit/test_json_repair_parser.py` | U-J-01 to U-J-08 | repair_and_parse (markdown fences, prose before JSON, truncated JSON, unescaped newlines) |
-| `tests/unit/test_agv_keyword_fallback.py` | U-K-01 to U-K-08 | agv_type_keyword_fallback (VNA, Schmalgangstapler, Routenzug, AMR, no-match, 5000-char boundary) |
+| `tests/unit/test_extraction_nulls.py` | U-E-01 to U-E-07 | Golden extraction values for Dragonfly tender; source_confirms_value boundaries; _NUMERIC_KO_TENDER_KEYS non-empty guard |
+| `tests/unit/test_source_span_enforcement.py` | U-SS-01 to U-SS-11 | enforce_source_spans(): Layer 1 (absent/empty source), Layer 0 (fabricated vs. genuine+paraphrased CompanyX pair, German comma, PDF glyph artifact), Layer 2 (digit-free quote + abstention), layer isolation |
+| `tests/unit/test_source_is_grounded.py` | U-SG-01 to U-SG-12 | source_is_grounded(): genuine verbatim/paraphrased/German-comma/unit-scale/glyph-noise cases; all 7 CompanyX fabrications; anchor-only false-accept guard; zero always passes; empty source; non-numeric passthrough |
+| `tests/unit/test_source_confirms_value.py` | — | source_confirms_value(): direct match, thousands separator, mm/m scale, false positive guard |
+| `tests/unit/test_source_confirms_value_german.py` | — | German decimal comma ("3,4" → 3.4); negative temperatures |
+| `tests/unit/test_4c_direction_constants.py` | — | _4C_EXTRACTION_DIRECTION: non-empty; KO_IF_LT → MAXIMUM; KO_IF_GT → MINIMUM; no unknown values |
+| `tests/unit/test_find_invalid_ap0_fields.py` | — | _find_invalid_ap0_fields(): AP0 constraint violation detection |
+| `tests/unit/test_validate_tender_values.py` | U-V-01 to U-V-08 | validate_tender_values(): valid/invalid Dropdown; Multi-Select; case-insensitive substring; None passthrough |
+| `tests/unit/test_golden_extraction.py` | U-GE-xx, parametrized | Golden regression for ≥5 tenders (001–005 as of 2026-06-17); fixture-floor guard; out-of-scope tender_003 (OeA-199-25); CompanyX tender_005 regression |
+| `tests/unit/test_json_repair_parser.py` | U-J-01 to U-J-10 | repair_and_parse: markdown fences, prose before JSON, truncated JSON, unescaped newlines, stray brace (Stage 0), nested braces |
+| `tests/unit/test_agv_keyword_fallback.py` | U-K-01 to U-K-08 | agv_type_keyword_fallback: VNA, Schmalgangstapler, Routenzug, AMR, no-match, 5,000-char boundary |
 | `tests/unit/test_data_loader.py` | U-D-01 to U-D-16 | _parse_multiselect, _parse_bool, _parse_int, _parse_float edge cases |
 | `tests/integration/test_llm_preflight.py` | I-S-01 to I-S-02 | Ollama reachability; qwen2.5:7b in manifest; JSON inference smoke test |
 
-**Total: 68 tests** (28 matching + 7 extraction + 8 JSON repair + 8 keyword fallback + 14 data loader + 2 integration + 1 integration smoke)
+**Total: 137 unit tests + 2 integration tests = 139 tests** (as of 2026-06-17)
 
 ### Coverage gaps
 
-- No live extraction tests: the unit tests pin expected null/value outcomes but do not call Ollama
+- No live extraction tests: unit tests pin expected golden values but do not call Ollama
 - No end-to-end SSE test: the streaming endpoint has no integration test
-- No test for `repair_and_parse` brace-balanced Step 0 (the new stray-`}` guard)
 - No test for `_build_correction_prompt` output format
 - No test for `validate_agv_criteria` mm→m conversion
-- No test for Layer 1 source-span enforcement (field nulled when `_source` absent)
-- No test for Layer 2 source-span enforcement (4b value nulled when 4c abstained and source does not confirm)
 - No test for field text fallbacks (regex → forced value)
