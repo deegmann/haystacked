@@ -1,59 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>haystacked – Tender Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+
+<!-- ── Topbar ── -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="hs-logo" href="/">
+      <svg class="hs-mark" viewBox="0 0 100 54.67" aria-hidden="true">
+        <rect x="0" y="0"     width="60"  height="13.33" rx="2.22" fill="#B49AD6"/>
+        <rect x="0" y="20.67" width="80"  height="13.33" rx="2.22" fill="#005B69"/>
+        <rect x="0" y="41.33" width="100" height="13.33" rx="2.22" fill="#003942"/>
+      </svg>
+      <span class="hs-wordmark">haystacked</span>
+    </a>
+    <span class="topbar-tagline">Tender Analysis · AGV / AMR</span>
+  </div>
+</header>
+
 <div class="container">
 
-  <header>
-    <div class="logo">hay<span>stacked</span></div>
-    <p class="tagline">Tender Analysis · AGV/AMR Matching</p>
-  </header>
-
-  <!-- Upload -->
+  <!-- ── Upload ── -->
   <section id="uploadSection">
+    <p class="upload-eyebrow">AGV · AMR · Intralogistik</p>
+    <h1 class="upload-heading">From haystack to <em>shortlist.</em></h1>
+    <p class="upload-sub">Lade eine Ausschreibung hoch — wir analysieren automatisch und liefern die passende Supplier-Shortlist.</p>
     <div class="upload-box" id="dropzone">
-      <div class="upload-icon">📄</div>
-      <p>Drop tender PDF here or</p>
-      <label class="btn-upload" for="fileInput">Select file</label>
+      <div class="upload-mark">
+        <svg viewBox="0 0 100 54.67" width="72" aria-hidden="true">
+          <rect x="0" y="0"     width="60"  height="13.33" rx="2.22" fill="#B49AD6"/>
+          <rect x="0" y="20.67" width="80"  height="13.33" rx="2.22" fill="#005B69"/>
+          <rect x="0" y="41.33" width="100" height="13.33" rx="2.22" fill="#003942"/>
+        </svg>
+      </div>
+      <p>Ausschreibungs-PDF hier ablegen oder</p>
+      <label class="btn-upload" for="fileInput">Datei auswählen</label>
       <input type="file" id="fileInput" accept=".pdf" hidden>
       <p class="hint">PDF only · max 20 MB</p>
     </div>
   </section>
 
-  <!-- Progress -->
+  <!-- ── Progress ── -->
   <section id="progressSection" class="hidden">
     <div class="progress-card">
+      <div class="progress-animation">
+        <!-- V2 Scan & Find — bars start muted, scanline sweeps, lock to brand colours -->
+        <svg class="hs-loading-mark" viewBox="0 0 100 54.67" style="overflow:visible" aria-label="Analyse läuft">
+          <rect class="r1" x="0" y="0"     width="60"  height="13.33" rx="2.22"/>
+          <rect class="r2" x="0" y="20.67" width="80"  height="13.33" rx="2.22"/>
+          <rect class="r3" x="0" y="41.33" width="100" height="13.33" rx="2.22"/>
+          <rect class="scanline" x="0" y="-3" width="2" height="60.67" rx="1" fill="#6E55A0"/>
+        </svg>
+        <p class="progress-headline">Analysiere Ausschreibung…</p>
+      </div>
+
       <div class="steps" id="stepsContainer">
         <div class="step" id="step-upload">
-          <div class="step-icon">⬆</div>
-          <div class="step-body"><div class="step-label">Upload</div><div class="step-msg" id="msg-upload">Waiting…</div></div>
+          <div class="step-icon">01</div>
+          <div class="step-body">
+            <div class="step-label">Upload</div>
+            <div class="step-msg" id="msg-upload">Waiting…</div>
+          </div>
         </div>
         <div class="step-line"></div>
         <div class="step" id="step-extract">
-          <div class="step-icon">📖</div>
-          <div class="step-body"><div class="step-label">Read PDF</div><div class="step-msg" id="msg-extract">Waiting…</div></div>
+          <div class="step-icon">02</div>
+          <div class="step-body">
+            <div class="step-label">PDF lesen</div>
+            <div class="step-msg" id="msg-extract">Waiting…</div>
+          </div>
         </div>
         <div class="step-line"></div>
         <div class="step" id="step-llm">
-          <div class="step-icon">🤖</div>
-          <div class="step-body"><div class="step-label">Analysis</div><div class="step-msg" id="msg-llm">Waiting…</div></div>
+          <div class="step-icon">03</div>
+          <div class="step-body">
+            <div class="step-label">Analyse</div>
+            <div class="step-msg" id="msg-llm">Waiting…</div>
+          </div>
         </div>
         <div class="step-line"></div>
         <div class="step" id="step-parse">
-          <div class="step-icon">✓</div>
-          <div class="step-body"><div class="step-label">Evaluation</div><div class="step-msg" id="msg-parse">Waiting…</div></div>
+          <div class="step-icon">04</div>
+          <div class="step-body">
+            <div class="step-label">Auswertung</div>
+            <div class="step-msg" id="msg-parse">Waiting…</div>
+          </div>
         </div>
         <div class="step-line agv-line"></div>
         <div class="step" id="step-agv">
-          <div class="step-icon">🤖</div>
-          <div class="step-body"><div class="step-label">AGV Matching</div><div class="step-msg" id="msg-agv">Waiting…</div></div>
+          <div class="step-icon">05</div>
+          <div class="step-body">
+            <div class="step-label">AGV Matching</div>
+            <div class="step-msg" id="msg-agv">Waiting…</div>
+          </div>
         </div>
       </div>
+
       <details class="log-panel">
         <summary>Debug Log</summary>
         <div id="logOutput" class="log-output"></div>
@@ -61,91 +111,85 @@
     </div>
   </section>
 
-  <!-- Error -->
+  <!-- ── Error ── -->
   <section id="errorSection" class="hidden">
     <div class="error-card">
-      <div class="error-icon">⚠</div>
-      <p id="errorText">Error</p>
+      <div class="error-card-symbol">✕</div>
+      <p id="errorText">Fehler</p>
       <pre id="errorRaw" class="error-raw hidden"></pre>
-      <button class="btn-reset" onclick="reset()">Try again</button>
+      <button class="btn-reset" onclick="reset()">Erneut versuchen</button>
     </div>
   </section>
 
-  <!-- Clarification -->
+  <!-- ── Clarification ── -->
   <section id="clarificationSection" class="hidden">
     <div class="card" style="margin-bottom:1.5rem">
-      <h3>⚠ Missing Information</h3>
-      <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6">
-        The following fields could not be extracted from the tender document.
-        Please provide them to enable accurate K.O. filtering, or skip to proceed without the filter.
+      <h3>Fehlende Angaben</h3>
+      <p style="font-size:13px;color:var(--steel);margin-bottom:20px;line-height:1.6">
+        Die folgenden Felder konnten aus der Ausschreibung nicht extrahiert werden.
+        Bitte ergänzen für präzises K.O.-Filtering, oder überspringen.
       </p>
       <div id="clarificationFields" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem"></div>
-      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
-        <button class="btn-rematch" id="clarifyConfirmBtn" onclick="confirmClarification()">Confirm &amp; Run Matching</button>
-        <button class="btn-reset" onclick="skipClarification()">Skip — proceed without these filters</button>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn-rematch" id="clarifyConfirmBtn" onclick="confirmClarification()">Bestätigen &amp; Matching starten</button>
+        <button class="btn-reset" onclick="skipClarification()">Überspringen — ohne diese Filter</button>
       </div>
     </div>
   </section>
 
-  <!-- Result -->
+  <!-- ── Result ── -->
   <section id="resultSection" class="hidden">
     <div class="result-header">
-      <h2>Analysis Result</h2>
+      <h2>Analyse-Ergebnis</h2>
       <div id="priorityBadge" class="badge"></div>
     </div>
 
     <div class="grid">
-      <!-- Buyer -->
       <div class="card">
-        <h3>Buyer</h3>
+        <h3>Käufer</h3>
         <div class="field-group">
-          <div class="field"><span class="label">Company</span><span id="r-buyer" class="value">–</span></div>
-          <div class="field"><span class="label">Industry</span><span id="r-buyer_industry" class="value">–</span></div>
-          <div class="field"><span class="label">NACE (Buyer)</span><span id="r-nace_buyer" class="value mono">–</span></div>
+          <div class="field"><span class="label">Unternehmen</span><span id="r-buyer" class="value">–</span></div>
+          <div class="field"><span class="label">Branche</span><span id="r-buyer_industry" class="value">–</span></div>
+          <div class="field"><span class="label">NACE (Käufer)</span><span id="r-nace_buyer" class="value mono">–</span></div>
         </div>
       </div>
 
-      <!-- Contact -->
       <div class="card">
-        <h3>Contact</h3>
+        <h3>Kontakt</h3>
         <div class="field-group">
           <div class="field"><span class="label">Name</span><span id="r-contact_name" class="value">–</span></div>
-          <div class="field"><span class="label">Email</span><span id="r-contact_email" class="value">–</span></div>
-          <div class="field"><span class="label">Phone</span><span id="r-contact_phone" class="value">–</span></div>
+          <div class="field"><span class="label">E-Mail</span><span id="r-contact_email" class="value">–</span></div>
+          <div class="field"><span class="label">Telefon</span><span id="r-contact_phone" class="value">–</span></div>
         </div>
       </div>
 
-      <!-- Project -->
       <div class="card">
-        <h3>Project</h3>
+        <h3>Projekt</h3>
         <div class="field-group">
           <div class="field"><span class="label">Name</span><span id="r-project_name" class="value">–</span></div>
-          <div class="field"><span class="label">Location</span><span id="r-project_location" class="value">–</span></div>
-          <div class="field"><span class="label">Tender date</span><span id="r-tender_date" class="value">–</span></div>
-          <div class="field"><span class="label">Deadline</span><span id="r-deadline" class="value">–</span></div>
+          <div class="field"><span class="label">Standort</span><span id="r-project_location" class="value">–</span></div>
+          <div class="field"><span class="label">Ausschreibungsdatum</span><span id="r-tender_date" class="value">–</span></div>
+          <div class="field"><span class="label">Frist</span><span id="r-deadline" class="value">–</span></div>
         </div>
       </div>
 
-      <!-- Category -->
       <div class="card">
-        <h3>Procurement</h3>
+        <h3>Beschaffung</h3>
         <div class="field-group">
-          <div class="field"><span class="label">Category</span><span id="r-tender_category" class="value">–</span></div>
-          <div class="field"><span class="label">NACE Code</span><span id="r-nace_tender" class="value mono">–</span></div>
-          <div class="field"><span class="label">NACE Name</span><span id="r-nace_tender_name" class="value">–</span></div>
-          <div class="field"><span class="label">Confidence</span><span id="r-confidence" class="value">–</span></div>
+          <div class="field"><span class="label">Kategorie</span><span id="r-tender_category" class="value">–</span></div>
+          <div class="field"><span class="label">NACE-Code</span><span id="r-nace_tender" class="value mono">–</span></div>
+          <div class="field"><span class="label">NACE-Name</span><span id="r-nace_tender_name" class="value">–</span></div>
+          <div class="field"><span class="label">Konfidenz</span><span id="r-confidence" class="value">–</span></div>
         </div>
       </div>
 
-      <!-- Summary -->
       <div class="card card-full">
-        <h3>Summary</h3>
+        <h3>Zusammenfassung</h3>
         <p id="r-summary" class="summary-text">–</p>
       </div>
 
-      <!-- Missing info -->
       <div class="card card-full" id="missingCard">
-        <h3>Missing Information</h3>
+        <h3>Fehlende Informationen</h3>
         <ul id="missingList" class="missing-list"></ul>
       </div>
     </div>
@@ -155,58 +199,52 @@
       <div class="section-divider"><span>AGV / AMR Matching</span></div>
 
       <div class="grid">
-        <!-- Requirements -->
         <div class="card">
-          <h3>Extracted Requirements</h3>
+          <h3>Extrahierte Anforderungen</h3>
           <div id="agvRequirements" class="field-group"></div>
         </div>
 
-        <!-- Top match -->
         <div class="card">
-          <h3>Best Match</h3>
+          <h3>Bester Treffer</h3>
           <div id="topMatch"></div>
         </div>
 
-        <!-- Cond. K.O. override panel -->
         <div class="card card-full" id="condKoPanel">
-          <h3>Conditional K.O. — Adjust Requirements</h3>
-          <p class="panel-hint">These fields score by default. Set to <strong>Required</strong> to activate as a hard filter, or <strong>Not relevant</strong> to ignore.</p>
+          <h3>Conditional K.O. — Anforderungen anpassen</h3>
+          <p class="panel-hint">Diese Felder werden standardmäßig bewertet. Auf <strong>Required</strong> setzen für hartes Filter, oder <strong>Not relevant</strong> zum Ignorieren.</p>
           <div id="condKoToggles" class="cond-ko-grid"></div>
-          <button class="btn-rematch" id="rematchBtn" onclick="rematch()">Re-run Matching</button>
+          <button class="btn-rematch" id="rematchBtn" onclick="rematch()">Matching neu starten</button>
         </div>
 
-        <!-- K.O. Exclusion panel -->
         <div class="card card-full" id="koPanel" class="hidden">
-          <h3>K.O. Exclusions</h3>
+          <h3>K.O. Ausschlüsse</h3>
           <div id="koList" class="ko-panel-list"></div>
         </div>
 
-        <!-- Extraction Details panel -->
         <div class="card card-full" id="extractionDetailsCard">
           <details id="extractionDetailsPanel">
             <summary class="extraction-summary">
-              Extraction Details — alle extrahierten Felder
+              Extraktions-Details — alle extrahierten Felder
               <span id="extractionDetailsMeta" class="debug-meta"></span>
             </summary>
             <div id="extractionDetailsBody" class="extraction-details-grid"></div>
           </details>
         </div>
 
-        <!-- Match table with score breakdown -->
         <div class="card card-full">
-          <h3>Supplier Ranking — Top Results</h3>
+          <h3>Supplier-Ranking — Top-Ergebnisse</h3>
           <div class="table-wrap">
             <table id="matchTable">
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Product</th>
-                  <th>Company</th>
-                  <th>AGV Type</th>
+                  <th>Produkt</th>
+                  <th>Unternehmen</th>
+                  <th>AGV-Typ</th>
                   <th>Score</th>
                   <th>Payload</th>
                   <th>Lift</th>
-                  <th>Aisle</th>
+                  <th>Gang</th>
                   <th>Navigation</th>
                   <th></th>
                 </tr>
@@ -216,27 +254,26 @@
           </div>
         </div>
 
-        <!-- Full debug ranking -->
         <div class="card card-full">
           <details id="debugRankingDetails">
             <summary class="debug-summary">
-              Full ranking — all suppliers
+              Vollständiges Ranking — alle Supplier
               <span id="debugRankingMeta" class="debug-meta"></span>
             </summary>
-            <div class="table-wrap" style="margin-top:0.75rem">
+            <div class="table-wrap" style="margin-top:12px">
               <table id="debugTable">
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Product</th>
-                    <th>Company</th>
+                    <th>Produkt</th>
+                    <th>Unternehmen</th>
                     <th>Score</th>
                     <th>Status</th>
-                    <th>AGV Type</th>
+                    <th>AGV-Typ</th>
                     <th>Payload</th>
                     <th>Lift</th>
-                    <th>Aisle</th>
-                    <th>Reason / K.O.</th>
+                    <th>Gang</th>
+                    <th>Grund / K.O.</th>
                   </tr>
                 </thead>
                 <tbody id="debugTableBody"></tbody>
@@ -245,21 +282,20 @@
           </details>
         </div>
 
-        <!-- Debug panel (?debug=true) -->
         <div class="card card-full hidden" id="debugPanel">
           <h3>Debug Panel</h3>
           <div class="debug-panel-grid">
             <div>
-              <div class="debug-section-label">Scoring Weights (live editable)</div>
+              <div class="debug-section-label">Scoring Weights (live editierbar)</div>
               <div id="weightsEditor" class="weights-editor"></div>
-              <button class="btn-rematch" style="margin-top:0.75rem" onclick="rematchWithWeights()">Apply &amp; Re-rank</button>
+              <button class="btn-rematch" style="margin-top:12px" onclick="rematchWithWeights()">Apply &amp; Re-rank</button>
             </div>
             <div>
-              <div class="debug-section-label">Extracted Requirements (raw)</div>
+              <div class="debug-section-label">Extrahierte Anforderungen (raw)</div>
               <pre id="debugReqRaw" class="debug-raw"></pre>
             </div>
             <div>
-              <div class="debug-section-label">All Results (raw JSON)</div>
+              <div class="debug-section-label">Alle Ergebnisse (raw JSON)</div>
               <pre id="debugResultsRaw" class="debug-raw"></pre>
             </div>
           </div>
@@ -274,7 +310,7 @@
       <span id="metaParseMethod"></span>
       <span id="metaDbStatus" class="meta-db"></span>
     </div>
-    <button class="btn-reset" onclick="reset()">New Analysis</button>
+    <button class="btn-reset" onclick="reset()">Neue Analyse</button>
   </section>
 
 </div>
@@ -447,11 +483,10 @@ function maybeShowClarification(data) {
     const row = document.createElement('div');
     row.style.cssText = 'display:grid;grid-template-columns:180px 1fr;align-items:center;gap:0.75rem';
     row.innerHTML = `
-      <label style="font-size:0.85rem;font-weight:600">${f.label} <span style="color:var(--text-muted);font-weight:400">(${f.unit})</span></label>
+      <label style="font-size:0.85rem;font-weight:600">${f.label} <span style="color:var(--steel);font-weight:400">(${f.unit})</span></label>
       <div>
         <input type="number" id="clarify-${f.key}" placeholder="${f.hint}"
-          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
-                 padding:0.4rem 0.75rem;color:var(--text);font-size:0.88rem;width:100%;max-width:260px">
+          style="width:100%;max-width:260px">
       </div>`;
     container.appendChild(row);
   });
@@ -694,7 +729,7 @@ function initCondKoPanel(crit) {
   const fields = _condKoFields().filter(f => !(f.key === 'vna_capable' && isVna));
   if (isVna) {
     const notice = document.createElement('div');
-    notice.style.cssText = 'grid-column:1/-1;font-size:0.8rem;color:var(--yellow);padding:0.25rem 0 0.5rem';
+    notice.style.cssText = 'grid-column:1/-1;font-size:0.8rem;color:var(--warn);padding:0.25rem 0 0.5rem';
     notice.textContent = '⚠ VNA detected — "VNA capable" is a hard K.O. and cannot be toggled.';
     container.appendChild(notice);
   }
@@ -870,7 +905,7 @@ function renderMatchTable(matches) {
                  </div>
                </div>
              </div>`
-          : '<div class="detail-section"><em style="color:var(--text-muted);font-size:0.8rem">No scoring details — supplier may be disqualified before scoring.</em></div>'}
+          : '<div class="detail-section"><em style="color:var(--steel);font-size:0.8rem">No scoring details — supplier may be disqualified before scoring.</em></div>'}
         <div class="detail-meta">
           ${m.reference_count != null ? `<span>References: ${m.reference_count}</span>` : ''}
           ${m.lead_time_weeks != null ? `<span>Lead time: ${m.lead_time_weeks} weeks</span>` : ''}
