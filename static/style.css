@@ -216,6 +216,44 @@ body {
 
 @keyframes hs-pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
 
+/* Sub-progress bar */
+.step-progress {
+  height: 3px; width: 100%; border-radius: 2px;
+  background: var(--mist); overflow: hidden; margin-top: 5px;
+}
+.step-progress-fill {
+  height: 100%; width: 0%; border-radius: 2px;
+  background: var(--orchid);
+  transition: width 0.35s cubic-bezier(0.2, 0, 0.2, 1);
+}
+/* Indeterminate shimmer when total is unknown */
+.step-progress.indeterminate .step-progress-fill {
+  width: 35%;
+  animation: hs-shimmer 1.5s ease-in-out infinite;
+}
+@keyframes hs-shimmer {
+  0%   { transform: translateX(-200%); }
+  100% { transform: translateX(450%); }
+}
+/* Step done → fill to 100%, switch to teal */
+.step-done .step-progress-fill {
+  width: 100% !important;
+  background: var(--teal);
+  animation: none;
+}
+/* Step error → fill with signal colour */
+.step-error .step-progress-fill {
+  background: var(--signal);
+  animation: none;
+}
+/* Progress count label */
+.step-progress-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--steel); margin-top: 3px;
+  letter-spacing: 0.04em;
+}
+.step-running .step-progress-count { color: var(--orchiddeep); font-weight: 500; }
+
 /* Debug log */
 .log-panel { margin-top: 12px; }
 .log-panel summary {

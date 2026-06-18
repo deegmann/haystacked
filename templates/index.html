@@ -68,6 +68,7 @@
           <div class="step-body">
             <div class="step-label">Upload</div>
             <div class="step-msg" id="msg-upload">Waiting…</div>
+            <div class="step-progress hidden" id="progress-bar-upload"><div class="step-progress-fill" id="progress-fill-upload"></div></div>
           </div>
         </div>
         <div class="step-line"></div>
@@ -76,6 +77,7 @@
           <div class="step-body">
             <div class="step-label">PDF lesen</div>
             <div class="step-msg" id="msg-extract">Waiting…</div>
+            <div class="step-progress hidden" id="progress-bar-extract"><div class="step-progress-fill" id="progress-fill-extract"></div></div>
           </div>
         </div>
         <div class="step-line"></div>
@@ -84,6 +86,7 @@
           <div class="step-body">
             <div class="step-label">Analyse</div>
             <div class="step-msg" id="msg-llm">Waiting…</div>
+            <div class="step-progress hidden" id="progress-bar-llm"><div class="step-progress-fill" id="progress-fill-llm"></div></div>
           </div>
         </div>
         <div class="step-line"></div>
@@ -92,6 +95,7 @@
           <div class="step-body">
             <div class="step-label">Auswertung</div>
             <div class="step-msg" id="msg-parse">Waiting…</div>
+            <div class="step-progress hidden" id="progress-bar-parse"><div class="step-progress-fill" id="progress-fill-parse"></div></div>
           </div>
         </div>
         <div class="step-line agv-line"></div>
@@ -100,6 +104,8 @@
           <div class="step-body">
             <div class="step-label">AGV Matching</div>
             <div class="step-msg" id="msg-agv">Waiting…</div>
+            <div class="step-progress hidden" id="progress-bar-agv"><div class="step-progress-fill" id="progress-fill-agv"></div></div>
+            <div class="step-progress-count hidden" id="progress-count-agv"></div>
           </div>
         </div>
       </div>
@@ -352,12 +358,46 @@ function addLog(msg) {
   el.scrollTop = el.scrollHeight;
 }
 
-function setStep(id, status, msg) {
+function setStep(id, status, msg, done, total) {
   const el = document.getElementById('step-' + id);
   if (!el) return;
   el.className = 'step step-' + status;
   const msgEl = document.getElementById('msg-' + id);
   if (msgEl) msgEl.textContent = msg;
+  _updateStepProgress(id, status, done, total);
+}
+
+function _updateStepProgress(id, status, done, total) {
+  const bar   = document.getElementById('progress-bar-'  + id);
+  const fill  = document.getElementById('progress-fill-' + id);
+  const count = document.getElementById('progress-count-' + id);
+  if (!bar || !fill) return;
+
+  if (status === 'done' || status === 'error') {
+    bar.classList.remove('hidden', 'indeterminate');
+    fill.style.width = status === 'done' ? '100%' : fill.style.width;
+    if (count) count.classList.add('hidden');
+    return;
+  }
+
+  // Only show bar when there is something to track (total >= 3 or at least done is set)
+  if (done == null) return;
+
+  bar.classList.remove('hidden');
+
+  if (total != null && total >= 3) {
+    bar.classList.remove('indeterminate');
+    const pct = total > 0 ? Math.min(100, Math.round(done / total * 100)) : 0;
+    fill.style.width = pct + '%';
+    if (count) {
+      count.classList.remove('hidden');
+      count.textContent = `${done} / ${total}`;
+    }
+  } else {
+    // indeterminate: total unknown or < 3
+    bar.classList.add('indeterminate');
+    if (count) count.classList.add('hidden');
+  }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -398,7 +438,7 @@ async function handleFile(file) {
       try { data = JSON.parse(dataStr); } catch { addLog('Parse error: ' + dataStr); continue; }
 
       if (eventType === 'step') {
-        setStep(data.id, data.status, data.message);
+        setStep(data.id, data.status, data.message, data.done, data.total);
         addLog(`[${data.id}:${data.status}] ${data.message}`);
       } else if (eventType === 'log') {
         addLog(data.message);
@@ -1034,6 +1074,15 @@ function reset() {
   hide('resultSection'); hide('errorSection'); hide('progressSection');
   show('uploadSection');
   fileInput.value = ''; _lastResult = null; _condKoState = {};
+  // Reset all progress bars
+  ['upload','extract','llm','parse','agv'].forEach(id => {
+    const bar  = document.getElementById('progress-bar-'  + id);
+    const fill = document.getElementById('progress-fill-' + id);
+    const cnt  = document.getElementById('progress-count-' + id);
+    if (bar)  { bar.classList.add('hidden'); bar.classList.remove('indeterminate'); }
+    if (fill) fill.style.width = '0%';
+    if (cnt)  cnt.classList.add('hidden');
+  });
 }
 </script>
 </body>

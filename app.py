@@ -585,8 +585,15 @@ async def analyze(file: UploadFile = File(...)):
 
             vna_label = " (VNA)" if is_vna_subtype else ""
             log.info("Pass 4a: vehicle_type=%s%s", canonical_agv_type, vna_label)
+            # Pre-compute 4c field set now that vehicle type is known; needed for progress total
+            _4c_fields = {
+                k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
+                if v["sheet"] in (_SHARED_SHEET, canonical_agv_type)
+            }
+            _agv_total = 2 + len(_4c_fields)   # 4a(1) + 4b(1) + N×4c
             yield sse("step", {"id": "agv", "status": "running",
-                                "message": f"Fahrzeugtyp: {canonical_agv_type}{vna_label} — Kriterien werden extrahiert…"})
+                                "message": f"Fahrzeugtyp: {canonical_agv_type}{vna_label} — Kriterien werden extrahiert…",
+                                "done": 1, "total": _agv_total})
             await asyncio.sleep(0)
 
             # ── Pass 4b: extract type-specific fields ─────────────────────────
@@ -668,22 +675,24 @@ async def analyze(file: UploadFile = File(...)):
                 log.exception("Pass 4b fehlgeschlagen")
                 yield sse("log", {"message": f"⚠ 4b Fehler: {e}"})
 
+            yield sse("step", {"id": "agv", "status": "running",
+                                "message": "Pass 4b: Batch-Extraktion abgeschlossen",
+                                "done": 2, "total": _agv_total})
+            await asyncio.sleep(0)
+
             # ── Pass 4c: per-field extraction for numeric KO fields ──────────────
             # Each numeric KO field gets its own focused LLM call (one field + document).
             # Shorter prompt → more attention budget per field → fewer inference hallucinations.
             # Results override 4b values; source-span enforcement (below) still applies.
             # canonical_agv_type == AP0 sheet name ("Forklift AGV", "Tugger AGV", "Mobile AMR")
-            _4c_fields = {
-                k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
-                if v["sheet"] in (_SHARED_SHEET, canonical_agv_type)
-            }
             if _4c_fields:
                 yield sse("step", {"id": "agv", "status": "running",
-                                   "message": f"Pass 4c: {len(_4c_fields)} numerische Felder einzeln…"})
+                                   "message": f"Pass 4c: {len(_4c_fields)} numerische Felder einzeln…",
+                                   "done": 2, "total": _agv_total})
                 await asyncio.sleep(0)
                 _4c_count    = 0
                 _4c_abstained: set = set()   # fields where 4c returned null (used in enforcement below)
-                for _fk, _fmeta in _4c_fields.items():
+                for _4c_i, (_fk, _fmeta) in enumerate(_4c_fields.items(), start=1):
                     # Semantic definition only — NULL RULE / CONSERVATIVE EXTRACTION prose stripped
                     # to avoid tripling the null-bias already present in the system prompt.
                     _fhint_full = _fmeta["hint"]
@@ -727,6 +736,10 @@ async def analyze(file: UploadFile = File(...)):
                         # Parse or call failure → abstained so L2 can still check 4b value
                         _4c_abstained.add(_fk)
                         log.warning("4c '%s' fehlgeschlagen (→ abstained): %s", _fk, _pe)
+                    yield sse("step", {"id": "agv", "status": "running",
+                                       "message": f"Pass 4c ({_4c_i}/{len(_4c_fields)}): {_fk}",
+                                       "done": 2 + _4c_i, "total": _agv_total})
+                    await asyncio.sleep(0)
                 log.info("Pass 4c: %d Felder neu extrahiert, %d abstained",
                          _4c_count, len(_4c_abstained))
 
