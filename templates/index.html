@@ -64,47 +64,67 @@
 
       <div class="steps" id="stepsContainer">
         <div class="step" id="step-upload">
-          <div class="step-icon">01</div>
+          <svg class="step-icon" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
+            <circle class="step-ring-bg"   cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
+            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-upload"/>
+            <circle class="step-ring-inner" cx="18" cy="18" r="12"/>
+            <text class="step-ring-num" x="18" y="22" text-anchor="middle">01</text>
+          </svg>
           <div class="step-body">
             <div class="step-label">Upload</div>
             <div class="step-msg" id="msg-upload">Waiting…</div>
-            <div class="step-progress hidden" id="progress-bar-upload"><div class="step-progress-fill" id="progress-fill-upload"></div></div>
           </div>
         </div>
         <div class="step-line"></div>
         <div class="step" id="step-extract">
-          <div class="step-icon">02</div>
+          <svg class="step-icon" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
+            <circle class="step-ring-bg"   cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
+            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-extract"/>
+            <circle class="step-ring-inner" cx="18" cy="18" r="12"/>
+            <text class="step-ring-num" x="18" y="22" text-anchor="middle">02</text>
+          </svg>
           <div class="step-body">
             <div class="step-label">PDF lesen</div>
             <div class="step-msg" id="msg-extract">Waiting…</div>
-            <div class="step-progress hidden" id="progress-bar-extract"><div class="step-progress-fill" id="progress-fill-extract"></div></div>
           </div>
         </div>
         <div class="step-line"></div>
         <div class="step" id="step-llm">
-          <div class="step-icon">03</div>
+          <svg class="step-icon" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
+            <circle class="step-ring-bg"   cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
+            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-llm"/>
+            <circle class="step-ring-inner" cx="18" cy="18" r="12"/>
+            <text class="step-ring-num" x="18" y="22" text-anchor="middle">03</text>
+          </svg>
           <div class="step-body">
             <div class="step-label">Analyse</div>
             <div class="step-msg" id="msg-llm">Waiting…</div>
-            <div class="step-progress hidden" id="progress-bar-llm"><div class="step-progress-fill" id="progress-fill-llm"></div></div>
           </div>
         </div>
         <div class="step-line"></div>
         <div class="step" id="step-parse">
-          <div class="step-icon">04</div>
+          <svg class="step-icon" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
+            <circle class="step-ring-bg"   cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
+            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-parse"/>
+            <circle class="step-ring-inner" cx="18" cy="18" r="12"/>
+            <text class="step-ring-num" x="18" y="22" text-anchor="middle">04</text>
+          </svg>
           <div class="step-body">
             <div class="step-label">Auswertung</div>
             <div class="step-msg" id="msg-parse">Waiting…</div>
-            <div class="step-progress hidden" id="progress-bar-parse"><div class="step-progress-fill" id="progress-fill-parse"></div></div>
           </div>
         </div>
         <div class="step-line agv-line"></div>
         <div class="step" id="step-agv">
-          <div class="step-icon">05</div>
+          <svg class="step-icon" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
+            <circle class="step-ring-bg"   cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
+            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-agv"/>
+            <circle class="step-ring-inner" cx="18" cy="18" r="12"/>
+            <text class="step-ring-num" x="18" y="22" text-anchor="middle">05</text>
+          </svg>
           <div class="step-body">
             <div class="step-label">AGV Matching</div>
             <div class="step-msg" id="msg-agv">Waiting…</div>
-            <div class="step-progress hidden" id="progress-bar-agv"><div class="step-progress-fill" id="progress-fill-agv"></div></div>
             <div class="step-progress-count hidden" id="progress-count-agv"></div>
           </div>
         </div>
@@ -367,35 +387,42 @@ function setStep(id, status, msg, done, total) {
   _updateStepProgress(id, status, done, total);
 }
 
-function _updateStepProgress(id, status, done, total) {
-  const bar   = document.getElementById('progress-bar-'  + id);
-  const fill  = document.getElementById('progress-fill-' + id);
-  const count = document.getElementById('progress-count-' + id);
-  if (!bar || !fill) return;
+const _RING_CIRC = 94.25; // 2 * π * 15
 
-  if (status === 'done' || status === 'error') {
-    bar.classList.remove('hidden', 'indeterminate');
-    fill.style.width = status === 'done' ? '100%' : fill.style.width;
+function _updateStepProgress(id, status, done, total) {
+  const ring  = document.getElementById('ring-fill-' + id);
+  const count = document.getElementById('progress-count-' + id);
+  if (!ring) return;
+
+  if (status === 'done') {
+    ring.classList.remove('indeterminate');
+    ring.style.strokeDashoffset = 0;
+    if (count) count.classList.add('hidden');
+    return;
+  }
+  if (status === 'error') {
+    ring.classList.remove('indeterminate');
     if (count) count.classList.add('hidden');
     return;
   }
 
-  // Only show bar when there is something to track (total >= 3 or at least done is set)
-  if (done == null) return;
+  // Running — show indeterminate spin until we have real progress
+  if (done == null) {
+    ring.classList.add('indeterminate');
+    return;
+  }
 
-  bar.classList.remove('hidden');
-
+  // Determinate progress
+  ring.classList.remove('indeterminate');
   if (total != null && total >= 3) {
-    bar.classList.remove('indeterminate');
-    const pct = total > 0 ? Math.min(100, Math.round(done / total * 100)) : 0;
-    fill.style.width = pct + '%';
+    const offset = _RING_CIRC * (1 - Math.min(1, done / total));
+    ring.style.strokeDashoffset = offset;
     if (count) {
       count.classList.remove('hidden');
       count.textContent = `${done} / ${total}`;
     }
   } else {
-    // indeterminate: total unknown or < 3
-    bar.classList.add('indeterminate');
+    ring.classList.add('indeterminate');
     if (count) count.classList.add('hidden');
   }
 }
@@ -1074,13 +1101,11 @@ function reset() {
   hide('resultSection'); hide('errorSection'); hide('progressSection');
   show('uploadSection');
   fileInput.value = ''; _lastResult = null; _condKoState = {};
-  // Reset all progress bars
+  // Reset all ring progress indicators
   ['upload','extract','llm','parse','agv'].forEach(id => {
-    const bar  = document.getElementById('progress-bar-'  + id);
-    const fill = document.getElementById('progress-fill-' + id);
+    const ring = document.getElementById('ring-fill-' + id);
     const cnt  = document.getElementById('progress-count-' + id);
-    if (bar)  { bar.classList.add('hidden'); bar.classList.remove('indeterminate'); }
-    if (fill) fill.style.width = '0%';
+    if (ring) { ring.classList.remove('indeterminate'); ring.style.strokeDashoffset = _RING_CIRC; }
     if (cnt)  cnt.classList.add('hidden');
   });
 }

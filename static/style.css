@@ -182,15 +182,35 @@ body {
   margin-top: 14px; flex-shrink: 0;
   transition: background 0.3s;
 }
-.step-icon {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--sand2);
-  border: 2px solid rgba(11,20,24,0.12);
-  display: flex; align-items: center; justify-content: center;
+/* Step icon — SVG ring */
+.step-icon { flex-shrink: 0; }
+.step-ring-bg   { stroke: rgba(11,20,24,0.1); }
+.step-ring-inner { fill: var(--sand2); transition: fill 0.3s; }
+.step-ring-num  {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px; font-weight: 500; color: var(--steel);
-  flex-shrink: 0; transition: background 0.3s, border-color 0.3s;
+  font-size: 10px; font-weight: 500; fill: var(--steel);
+  transition: fill 0.3s;
 }
+.step-ring-fill {
+  stroke: rgba(11,20,24,0.1);
+  stroke-dasharray: 94.25 94.25;
+  stroke-dashoffset: 94.25;
+  transform-box: fill-box; transform-origin: center;
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset 0.35s cubic-bezier(0.2,0,0.2,1), stroke 0.3s;
+}
+/* Indeterminate — short arc spins */
+.step-ring-fill.indeterminate {
+  stroke: var(--orchid);
+  stroke-dasharray: 28 66.25;
+  stroke-dashoffset: 0;
+  animation: hs-ring-spin 1s linear infinite;
+}
+@keyframes hs-ring-spin {
+  from { transform: rotate(-90deg); }
+  to   { transform: rotate(270deg); }
+}
+
 .step-body { text-align: center; min-width: 0; width: 100%; }
 .step-label {
   font-family: 'JetBrains Mono', monospace;
@@ -201,52 +221,22 @@ body {
 .step-msg { font-size: 10px; color: var(--steel); margin-top: 2px; word-break: break-word; }
 
 /* Step states */
-.step-done .step-icon   { background: rgba(0,91,105,0.1); border-color: var(--teal); color: var(--teal); }
-.step-done .step-label  { color: var(--teal); }
+.step-done .step-ring-fill  { stroke: var(--teal); animation: none; }
+.step-done .step-ring-inner { fill: rgba(0,91,105,0.08); }
+.step-done .step-ring-num   { fill: var(--teal); }
+.step-done .step-label      { color: var(--teal); }
 
-.step-running .step-icon {
-  background: rgba(180,154,214,0.15); border-color: var(--orchid);
-  animation: hs-pulse 1.4s ease-in-out infinite;
-}
-.step-running .step-label { color: var(--orchiddeep); }
-.step-running .step-msg   { color: var(--graphite); font-weight: 600; }
+.step-running .step-ring-fill  { stroke: var(--orchid); }
+.step-running .step-ring-num   { fill: var(--orchiddeep); }
+.step-running .step-label      { color: var(--orchiddeep); }
+.step-running .step-msg        { color: var(--graphite); font-weight: 600; }
 
-.step-error .step-icon   { background: rgba(192,57,43,0.1); border-color: var(--signal); color: var(--signal); }
-.step-error .step-label  { color: var(--signal); }
+.step-error .step-ring-fill  { stroke: var(--signal); animation: none; }
+.step-error .step-ring-inner { fill: rgba(192,57,43,0.08); }
+.step-error .step-ring-num   { fill: var(--signal); }
+.step-error .step-label      { color: var(--signal); }
 
-@keyframes hs-pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
-
-/* Sub-progress bar */
-.step-progress {
-  height: 3px; width: 100%; border-radius: 2px;
-  background: var(--mist); overflow: hidden; margin-top: 5px;
-}
-.step-progress-fill {
-  height: 100%; width: 0%; border-radius: 2px;
-  background: var(--orchid);
-  transition: width 0.35s cubic-bezier(0.2, 0, 0.2, 1);
-}
-/* Indeterminate shimmer when total is unknown */
-.step-progress.indeterminate .step-progress-fill {
-  width: 35%;
-  animation: hs-shimmer 1.5s ease-in-out infinite;
-}
-@keyframes hs-shimmer {
-  0%   { transform: translateX(-200%); }
-  100% { transform: translateX(450%); }
-}
-/* Step done → fill to 100%, switch to teal */
-.step-done .step-progress-fill {
-  width: 100% !important;
-  background: var(--teal);
-  animation: none;
-}
-/* Step error → fill with signal colour */
-.step-error .step-progress-fill {
-  background: var(--signal);
-  animation: none;
-}
-/* Progress count label */
+/* Count label below ring */
 .step-progress-count {
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px; color: var(--steel); margin-top: 3px;

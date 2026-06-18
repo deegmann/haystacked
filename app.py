@@ -737,7 +737,7 @@ async def analyze(file: UploadFile = File(...)):
                         _4c_abstained.add(_fk)
                         log.warning("4c '%s' fehlgeschlagen (→ abstained): %s", _fk, _pe)
                     yield sse("step", {"id": "agv", "status": "running",
-                                       "message": f"Pass 4c ({_4c_i}/{len(_4c_fields)}): {_fk}",
+                                       "message": f"Pass 4c ({_4c_i}/{len(_4c_fields)})",
                                        "done": 2 + _4c_i, "total": _agv_total})
                     await asyncio.sleep(0)
                 log.info("Pass 4c: %d Felder neu extrahiert, %d abstained",
