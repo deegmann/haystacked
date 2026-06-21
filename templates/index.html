@@ -6,7 +6,7 @@
   <title>haystacked – Tender Analysis</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/haystacked/haystacked.css">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -22,7 +22,10 @@
       </svg>
       <span class="hs-wordmark">haystacked</span>
     </a>
-    <span class="topbar-tagline">Tender Analysis · AGV / AMR</span>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span class="topbar-tagline">Tender Analysis · AGV / AMR</span>
+      <a href="/db" target="_blank" class="topbar-link">DB Browser</a>
+    </div>
   </div>
 </header>
 
@@ -225,107 +228,20 @@
       <div class="section-divider"><span>AGV / AMR Matching</span></div>
 
       <div class="grid">
-        <div class="card">
+        <div class="card card-full">
           <h3>Extrahierte Anforderungen</h3>
-          <div id="agvRequirements" class="field-group"></div>
+          <div id="agvRequirements" class="agv-req-grid"></div>
         </div>
+      </div>
 
-        <div class="card">
-          <h3>Bester Treffer</h3>
-          <div id="topMatch"></div>
+      <!-- Top 5 Supplier Cards -->
+      <div class="supplier-shortlist">
+        <div class="shortlist-header">
+          <h3 class="shortlist-title">Supplier-Shortlist</h3>
+          <button class="btn-debug" id="debugBtn" onclick="openDebug()">Vollständige Analyse →</button>
         </div>
-
-        <div class="card card-full" id="condKoPanel">
-          <h3>Conditional K.O. — Anforderungen anpassen</h3>
-          <p class="panel-hint">Diese Felder werden standardmäßig bewertet. Auf <strong>Required</strong> setzen für hartes Filter, oder <strong>Not relevant</strong> zum Ignorieren.</p>
-          <div id="condKoToggles" class="cond-ko-grid"></div>
-          <button class="btn-rematch" id="rematchBtn" onclick="rematch()">Matching neu starten</button>
-        </div>
-
-        <div class="card card-full" id="koPanel" class="hidden">
-          <h3>K.O. Ausschlüsse</h3>
-          <div id="koList" class="ko-panel-list"></div>
-        </div>
-
-        <div class="card card-full" id="extractionDetailsCard">
-          <details id="extractionDetailsPanel">
-            <summary class="extraction-summary">
-              Extraktions-Details — alle extrahierten Felder
-              <span id="extractionDetailsMeta" class="debug-meta"></span>
-            </summary>
-            <div id="extractionDetailsBody" class="extraction-details-grid"></div>
-          </details>
-        </div>
-
-        <div class="card card-full">
-          <h3>Supplier-Ranking — Top-Ergebnisse</h3>
-          <div class="table-wrap">
-            <table id="matchTable">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Produkt</th>
-                  <th>Unternehmen</th>
-                  <th>AGV-Typ</th>
-                  <th>Score</th>
-                  <th>Payload</th>
-                  <th>Lift</th>
-                  <th>Gang</th>
-                  <th>Navigation</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="matchTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card card-full">
-          <details id="debugRankingDetails">
-            <summary class="debug-summary">
-              Vollständiges Ranking — alle Supplier
-              <span id="debugRankingMeta" class="debug-meta"></span>
-            </summary>
-            <div class="table-wrap" style="margin-top:12px">
-              <table id="debugTable">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Produkt</th>
-                    <th>Unternehmen</th>
-                    <th>Score</th>
-                    <th>Status</th>
-                    <th>AGV-Typ</th>
-                    <th>Payload</th>
-                    <th>Lift</th>
-                    <th>Gang</th>
-                    <th>Grund / K.O.</th>
-                  </tr>
-                </thead>
-                <tbody id="debugTableBody"></tbody>
-              </table>
-            </div>
-          </details>
-        </div>
-
-        <div class="card card-full hidden" id="debugPanel">
-          <h3>Debug Panel</h3>
-          <div class="debug-panel-grid">
-            <div>
-              <div class="debug-section-label">Scoring Weights (live editierbar)</div>
-              <div id="weightsEditor" class="weights-editor"></div>
-              <button class="btn-rematch" style="margin-top:12px" onclick="rematchWithWeights()">Apply &amp; Re-rank</button>
-            </div>
-            <div>
-              <div class="debug-section-label">Extrahierte Anforderungen (raw)</div>
-              <pre id="debugReqRaw" class="debug-raw"></pre>
-            </div>
-            <div>
-              <div class="debug-section-label">Alle Ergebnisse (raw JSON)</div>
-              <pre id="debugResultsRaw" class="debug-raw"></pre>
-            </div>
-          </div>
-        </div>
+        <div id="supplierCards" class="supplier-cards"></div>
+        <div id="supplierExcludedNote" class="excluded-note hidden"></div>
       </div>
     </div>
 
@@ -344,7 +260,6 @@
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
 let _lastResult = null;
-let _condKoState = {};
 let _fieldMeta = {};        // AP0 field metadata loaded from /api/field-meta
 const DEBUG_MODE = new URLSearchParams(location.search).get('debug') === 'true';
 
@@ -564,7 +479,6 @@ function maybeShowClarification(data) {
 
 function confirmClarification() {
   if (!_pendingResultData) return;
-  const data = _pendingResultData;
   const overrides = {};
   _clarificationFields.forEach(f => {
     const el = document.getElementById('clarify-' + f.key);
@@ -574,31 +488,19 @@ function confirmClarification() {
 
   if (Object.keys(overrides).length === 0) { skipClarification(); return; }
 
-  // Re-run matching with confirmed values via /match endpoint
-  const crit = data.agv_criteria || {};
-  const agvType = data.matches?.[0]?.agv_type || crit.required_vehicle_type_canonical || 'Forklift AGV';
-  const req = {
-    agv_type:          agvType,
-    max_payload_kg:    overrides.max_payload_kg    ?? crit.required_weight_capacity_kg,
-    lifting_height_mm: overrides.lifting_height_mm ?? (crit.required_max_lift_height_m ? crit.required_max_lift_height_m * 1000 : null),
-    min_aisle_width_mm:overrides.min_aisle_width_mm?? (crit.required_min_aisle_width_m ? crit.required_min_aisle_width_m * 1000 : null),
-    towing_capacity_kg:overrides.towing_capacity_kg?? crit.required_towing_capacity_kg,
-    navigation_type:   crit.required_navigation ? crit.required_navigation.split(',').map(s=>s.trim()) : [],
-    vna_capable:       crit._vna_subtype ? 'required' : null,
-    clarifications: { source: 'user_confirmed', fields_confirmed: Object.keys(overrides), ...overrides },
-  };
   hide('clarificationSection');
   document.getElementById('clarifyConfirmBtn').disabled = true;
 
-  fetch('/match', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(req) })
+  fetch('/rematch', { method: 'POST', headers: {'Content-Type':'application/json'},
+                      body: JSON.stringify({ overrides }) })
     .then(r => r.json())
     .then(result => {
-      // Merge match results back into pending data and show
-      _pendingResultData.matches     = result.top || result.matches || [];
-      _pendingResultData.matches_all = result.all || result.matches_all || [];
+      _pendingResultData.matches     = result.top  || [];
+      _pendingResultData.matches_all = result.all  || [];
+      _lastResult = _pendingResultData;
       showResult(_pendingResultData);
     })
-    .catch(e => showError('Matching failed after clarification: ' + e.message));
+    .catch(e => showError('Rematch fehlgeschlagen: ' + e.message));
 }
 
 function skipClarification() {
@@ -634,15 +536,7 @@ function showResult(d) {
   if (d.is_agv_amr && d.agv_criteria) {
     show('agvSection');
     renderAgvRequirements(d.agv_criteria);
-    initCondKoPanel(d.agv_criteria);
-    renderExtractionDetails(d.agv_criteria);
-    if (d.matches && d.matches.length > 0) {
-      renderTopMatch(d.matches[0], d.matches);
-      renderMatchTable(d.matches);
-    }
-    renderKoPanel(d.matches_all || d.matches || []);
-    if (d.matches_all && d.matches_all.length > 0) renderDebugTable(d.matches_all);
-    if (DEBUG_MODE) renderDebugPanel(d);
+    renderSupplierCards(d.matches_all || d.matches || []);
   } else {
     hide('agvSection');
   }
@@ -672,421 +566,158 @@ function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
 function renderAgvRequirements(crit) {
   const container = document.getElementById('agvRequirements');
   container.innerHTML = '';
-  // Collect all tender_key → db_key mappings that have a value
   const shown = new Set();
-  for (const [dbKey, info] of Object.entries(_fieldMeta)) {
-    const tKey = info.tender_key || dbKey;
-    if (shown.has(tKey)) continue;
-    const val = crit[tKey];
-    if (val == null || val === '') continue;
-    shown.add(tKey);
-    const div = document.createElement('div');
-    div.className = 'field';
-    const display = Array.isArray(val) ? val.join(', ') : String(val);
-    div.innerHTML = `<span class="label">${_fieldLabel(tKey)}</span><span class="value">${display}</span>`;
-    container.appendChild(div);
-  }
-  // Fallback: show any extracted key not in AP0 meta (e.g. agv_notes, contact fields)
   const SUMMARY_EXTRAS = ['agv_notes','required_quantity','required_process',
     'required_wms_integration','required_conveyor_integration'];
+  const allKeys = [];
+  for (const [dbKey, info] of Object.entries(_fieldMeta)) {
+    const tKey = info.tender_key || dbKey;
+    if (!shown.has(tKey)) { shown.add(tKey); allKeys.push(tKey); }
+  }
   for (const key of SUMMARY_EXTRAS) {
-    if (shown.has(key)) continue;
+    if (!shown.has(key)) { shown.add(key); allKeys.push(key); }
+  }
+  let count = 0;
+  for (const key of allKeys) {
     const val = crit[key];
     if (val == null || val === '') continue;
-    const div = document.createElement('div');
-    div.className = 'field';
     const display = Array.isArray(val) ? val.join(', ') : String(val);
-    div.innerHTML = `<span class="label">${_fieldLabel(key)}</span><span class="value">${display}</span>`;
+    const div = document.createElement('div');
+    div.className = 'req-chip';
+    div.innerHTML = `<span class="req-chip-label">${_fieldLabel(key)}</span><span class="req-chip-val">${display}</span>`;
     container.appendChild(div);
+    count++;
+  }
+  if (!count) {
+    container.innerHTML = '<span style="color:var(--steel);font-size:13px">Keine AGV-Anforderungen extrahiert.</span>';
   }
   const warnings = crit._validation_warnings || [];
   if (warnings.length) {
     const warn = document.createElement('div');
     warn.className = 'validation-warnings';
-    warn.innerHTML = '<span class="label">⚠ Plausibility warnings</span>' +
-      warnings.map(w => `<div class="warn-item">${w}</div>`).join('');
+    warn.style.gridColumn = '1/-1';
+    warn.innerHTML = warnings.map(w => `<div class="warn-item">⚠ ${w}</div>`).join('');
     container.appendChild(warn);
   }
 }
 
-// ── Extraction Details panel — full AP0 field list with levels ────────────────
-function renderExtractionDetails(crit) {
-  const body = document.getElementById('extractionDetailsBody');
-  const meta = document.getElementById('extractionDetailsMeta');
-  body.innerHTML = '';
-
-  // All keys to show: every tender_key in AP0 meta + any extra keys in crit
-  const skipKeys = new Set(['_validation_warnings','_parse_method','_vna_subtype',
-    'required_vehicle_type_canonical','is_agv_amr','text_length','in_scope',
-    'nace_tender','nace_buyer','nace_confidence','nace_explanation']);
-
-  // Build ordered list: AP0-defined tender_keys first, then extras
-  const ap0TenderKeys = [];
-  const seenTk = new Set();
-  for (const info of Object.values(_fieldMeta)) {
-    const tk = info.tender_key;
-    if (tk && !seenTk.has(tk)) { seenTk.add(tk); ap0TenderKeys.push(tk); }
-  }
-  const extraKeys = Object.keys(crit).filter(k => !seenTk.has(k) && !skipKeys.has(k));
-  const allKeys = [...ap0TenderKeys, ...extraKeys];
-
-  let filledCount = 0;
-  for (const key of allKeys) {
-    if (skipKeys.has(key)) continue;
-    const val = crit[key];
-    const level = _fieldLevel(key);
-    const label = _fieldLabel(key);
-    const isFilled = val != null && val !== '';
-    if (isFilled) filledCount++;
-
-    const card = document.createElement('div');
-    card.className = 'ext-field' + (isFilled ? '' : ' ext-field-empty');
-
-    const levelBadge = level
-      ? `<span class="level-badge level-${level}">${level.replace('_',' ')}</span>`
-      : '';
-
-    let valHtml;
-    if (!isFilled) {
-      valHtml = `<span class="ext-field-null">—</span>`;
-    } else if (typeof val === 'boolean') {
-      valHtml = `<span class="ext-field-value">${val ? 'Yes' : 'No'}</span>`;
-    } else if (Array.isArray(val)) {
-      valHtml = `<span class="ext-field-value">${val.join(', ')}</span>`;
-    } else {
-      valHtml = `<span class="ext-field-value">${val}</span>`;
+let _debugWindow = null;
+function openDebug() {
+  if (_debugWindow && !_debugWindow.closed) { _debugWindow.focus(); return; }
+  _debugWindow = window.open('/debug-page', '_blank', 'noopener,noreferrer');
+  if (!_debugWindow) {
+    // Popup blocked — show inline fallback link
+    let note = document.getElementById('_popup_note');
+    if (!note) {
+      note = document.createElement('div');
+      note.id = '_popup_note';
+      note.style.cssText = 'position:fixed;top:68px;right:20px;background:var(--hs-teal);color:#fff;' +
+        'padding:10px 14px;border-radius:4px;z-index:200;font-size:12px;line-height:1.5;' +
+        'box-shadow:0 4px 16px rgba(0,0,0,.18);';
+      note.innerHTML = 'Popup blockiert.<br>' +
+        '<a href="/debug-page" target="_blank" rel="noopener" ' +
+        'style="color:#fff;text-decoration:underline;font-weight:600;">→ Vollständige Analyse öffnen</a>';
+      document.body.appendChild(note);
+      setTimeout(() => note.remove(), 10000);
     }
-
-    card.innerHTML = `
-      <div class="ext-field-header">
-        <span class="ext-field-label">${label}</span>
-        ${levelBadge}
-      </div>
-      ${valHtml}`;
-    body.appendChild(card);
   }
-
-  const total = allKeys.filter(k => !skipKeys.has(k)).length;
-  meta.textContent = `${filledCount} von ${total} Feldern extrahiert`;
 }
 
-// ── Cond. K.O. Panel — driven by AP0 COND_KO fields ─────────────────────────
-function _condKoFields() {
-  // Build list dynamically from field metadata: all COND_KO fields with Boolean data type
-  if (Object.keys(_fieldMeta).length === 0) return [];
-  const seen = new Set();
-  const result = [];
-  for (const [dbKey, info] of Object.entries(_fieldMeta)) {
-    if (info.level !== 'COND_KO') continue;
-    if (!['Boolean','Boolean (derived)'].includes(info.data_type)) continue;
-    const key = info.tender_key || dbKey;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push({ key, label: _fieldLabel(key) });
+// ── KO chip renderer — driven by AP0 field metadata ──────────────────────────
+// Reads KO numeric fields from _fieldMeta (loaded from /api/field-meta at startup).
+// Unit display derived from key naming convention (_mm, _kg, etc.) — no domain knowledge.
+const _MM_KEYS = new Set(); // populated once _fieldMeta loads
+function _fmtValue(key, val) {
+  if (key.endsWith('_mm'))  return `${(val / 1000).toFixed(2).replace(/\.?0+$/, '')} m`;
+  if (key.endsWith('_kg'))  return `${val} kg`;
+  if (key.endsWith('_pct')) return `${val}%`;
+  if (key.endsWith('_h'))   return `${val} h`;
+  if (key.endsWith('_ms'))  return `${val} m/s`;
+  return `${val}`;
+}
+function _koChips(matchResult, maxChips = 3) {
+  const chips = [];
+  for (const [key, info] of Object.entries(_fieldMeta)) {
+    if (info.level !== 'KO') continue;
+    if (!['Float', 'Integer'].includes(info.data_type)) continue;
+    const val = matchResult[key];
+    if (val == null) continue;
+    chips.push(`${info.label}: ${_fmtValue(key, val)}`);
+    if (chips.length >= maxChips) break;
   }
-  return result;
+  return chips;
 }
 
-function initCondKoPanel(crit) {
-  _condKoState = {};
-  const container = document.getElementById('condKoToggles');
+// ── Supplier Cards (company-level aggregation) ────────────────────────────────
+function _aggregateByCompany(allResults) {
+  const companies = {};
+  for (const r of allResults) {
+    const key = r.company;
+    if (!companies[key]) companies[key] = { company: r.company, products: [], best: null };
+    companies[key].products.push(r);
+    const cur = companies[key].best;
+    if (!cur ||
+        (!r.disqualified && cur.disqualified) ||
+        (!r.disqualified && !cur.disqualified && r.score > cur.score) ||
+        (r.disqualified && cur.disqualified && r.score > cur.score)) {
+      companies[key].best = r;
+    }
+  }
+  return Object.values(companies).sort((a, b) => {
+    if (a.best.disqualified !== b.best.disqualified) return a.best.disqualified ? 1 : -1;
+    return b.best.score - a.best.score;
+  });
+}
+
+function renderSupplierCards(allResults) {
+  const container = document.getElementById('supplierCards');
+  const note      = document.getElementById('supplierExcludedNote');
   container.innerHTML = '';
-  // If VNA was auto-detected, vna_capable is a hard K.O. — exclude from user toggle panel
-  const isVna = !!(crit && crit._vna_subtype);
-  const fields = _condKoFields().filter(f => !(f.key === 'vna_capable' && isVna));
-  if (isVna) {
-    const notice = document.createElement('div');
-    notice.style.cssText = 'grid-column:1/-1;font-size:0.8rem;color:var(--warn);padding:0.25rem 0 0.5rem';
-    notice.textContent = '⚠ VNA detected — "VNA capable" is a hard K.O. and cannot be toggled.';
-    container.appendChild(notice);
+  if (!allResults || !allResults.length) {
+    container.innerHTML = '<p style="color:var(--steel);font-size:14px">Keine Ergebnisse.</p>';
+    note.classList.add('hidden');
+    return;
   }
-  fields.forEach(f => {
-    _condKoState[f.key] = 'not_required';
-    const div = document.createElement('div');
-    div.className = 'cond-ko-row';
-    div.innerHTML = `
-      <span class="cond-ko-label">${f.label}</span>
-      <div class="toggle-group" data-field="${f.key}">
-        <button class="toggle-btn" data-val="required">Required</button>
-        <button class="toggle-btn active active-not_required" data-val="not_required">Not relevant</button>
-        <button class="toggle-btn" data-val="preferred">Preferred</button>
-      </div>`;
-    div.querySelectorAll('.toggle-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        div.querySelectorAll('.toggle-btn').forEach(b => {
-          b.classList.remove('active', 'active-required', 'active-preferred', 'active-not_required');
-        });
-        btn.classList.add('active', `active-${btn.dataset.val}`);
-        _condKoState[f.key] = btn.dataset.val;
-      });
-    });
-    container.appendChild(div);
-  });
-}
+  const maxScore  = allResults[0]?.max_score || 100;
+  const companies = _aggregateByCompany(allResults);
+  const qualified = companies.filter(c => !c.best.disqualified).slice(0, 5);
+  const excluded  = companies.filter(c => c.best.disqualified);
 
-async function rematch() {
-  const d = _lastResult;
-  if (!d || !d.agv_criteria) return;
-  const btn = document.getElementById('rematchBtn');
-  btn.disabled = true; btn.textContent = 'Matching…';
-
-  // Build structured req from extracted + cond ko state
-  const crit = d.agv_criteria;
-  const isVna = !!(crit._vna_subtype);
-  const req = {
-    agv_type:          crit.required_vehicle_type_canonical || crit.required_vehicle_type,
-    max_payload_kg:    crit.required_weight_capacity_kg,
-    lifting_height_mm: crit.required_max_lift_height_m ? Math.round(crit.required_max_lift_height_m * 1000) : null,
-    min_aisle_width_mm: crit.required_min_aisle_width_m ? Math.round(crit.required_min_aisle_width_m * 1000) : null,
-    navigation_type:   crit.required_navigation ? crit.required_navigation.split(',').map(s=>s.trim()) : [],
-    operating_temp_min_c: crit.required_temp_min_c,
-    outdoor_capable:   crit.required_outdoor === 'yes' ? 'required' : (_condKoState.outdoor_capable || 'not_required'),
-    vna_capable:       isVna ? 'required' : (_condKoState.vna_capable || 'not_required'),
-    ...Object.fromEntries(COND_KO_FIELDS.filter(f => f.key !== 'vna_capable').map(f => [f.key, _condKoState[f.key] || 'not_required'])),
-  };
-
-  try {
-    const resp = await fetch('/match', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(req) });
-    if (!resp.ok) { const err = await resp.json(); alert(err.error || 'Matching failed'); return; }
-    const data = await resp.json();
-    if (data.top && data.top.length > 0) {
-      renderTopMatch(data.top[0], data.top);
-      renderMatchTable(data.top.slice(0, 5));
-    }
-    renderKoPanel(data.all || []);
-    if (data.all) renderDebugTable(data.all);
-    if (DEBUG_MODE) {
-      document.getElementById('debugResultsRaw').textContent = JSON.stringify(data.all?.slice(0,5), null, 2);
-    }
-  } catch(e) {
-    alert('Error: ' + e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Re-run Matching';
-  }
-}
-
-// ── K.O. Panel ────────────────────────────────────────────────────────────────
-function renderKoPanel(all) {
-  const disqualified = all.filter(r => r.disqualified);
-  const panel = document.getElementById('koPanel');
-  const list  = document.getElementById('koList');
-  if (!disqualified.length) { panel.classList.add('hidden'); return; }
-  panel.classList.remove('hidden');
-  list.innerHTML = '';
-  disqualified.forEach(r => {
-    const reasons = r.disqualified_by || r.knockouts || [];
-    const div = document.createElement('div');
-    div.className = 'ko-entry';
-    div.innerHTML = `
-      <div class="ko-entry-header">
-        <span class="ko-product">${r.product}</span>
-        <span class="ko-company">${r.company}</span>
-      </div>
-      <div class="ko-reasons">
-        ${reasons.map(reason => `<div class="ko-reason-line"><span class="ko-x">✗</span> ${reason}</div>`).join('')}
-      </div>`;
-    list.appendChild(div);
-  });
-}
-
-// ── Top match ─────────────────────────────────────────────────────────────────
-function renderTopMatch(m, allMatches) {
-  const el = document.getElementById('topMatch');
-  const best = (allMatches || []).find(r => !r.disqualified) || m;
-  const maxScore = best.max_score || 100;
-  const pct = maxScore > 0 ? Math.round(best.score / maxScore * 100) : 0;
-  const scoreColor = best.disqualified ? 'var(--red)' : pct >= 60 ? 'var(--green)' : pct >= 30 ? 'var(--yellow)' : 'var(--red)';
-  const scoreDetails = (best.score_details || []).slice(0, 6);
-  el.innerHTML = `
-    <div class="top-match-score" style="color:${scoreColor}">${pct}%<span class="top-match-pts"> (${best.score}/${maxScore})</span></div>
-    <div class="top-match-name">${best.product}${best.disqualified ? ' <span class="dq-badge">Disqualified</span>' : ''}</div>
-    <div class="top-match-company">${best.company}${best.origin ? ' · ' + best.origin : ''}</div>
-    ${scoreDetails.length ? `
-    <div class="score-breakdown">
-      ${scoreDetails.map(d => `
-        <div class="sb-row">
-          <span class="sb-field">${d.field}</span>
-          <span class="sb-val">${d.value != null ? d.value : '–'}</span>
-          <span class="sb-pts">+${d.points}</span>
-        </div>`).join('')}
-    </div>` : ''}
-    <div class="top-match-desc">${best.description || ''}</div>`;
-}
-
-// ── Match table ───────────────────────────────────────────────────────────────
-function renderMatchTable(matches) {
-  const tbody = document.getElementById('matchTableBody');
-  tbody.innerHTML = '';
-  const maxScore = matches[0]?.max_score || 100;
-  matches.forEach((m, i) => {
-    const pct = maxScore > 0 ? Math.round(m.score / maxScore * 100) : 0;
-    const scoreColor = m.disqualified ? 'dq' : pct >= 60 ? 'green' : pct >= 30 ? 'yellow' : 'red';
-    const tr = document.createElement('tr');
-    if (m.disqualified) tr.classList.add('row-disqualified');
-    const lift   = m.lifting_height_mm  != null ? (m.lifting_height_mm / 1000).toFixed(1) + 'm' : '–';
-    const aisle  = m.min_aisle_width_mm != null ? (m.min_aisle_width_mm / 1000).toFixed(2) + 'm' : '–';
-    const payload= m.max_payload_kg     != null ? m.max_payload_kg + ' kg' : '–';
-
-    // Score breakdown as expandable row
-    const details = (m.score_details || []);
-    const detailRowId = `detail-${i}`;
-    tr.innerHTML = `
-      <td>${i+1}</td>
-      <td><strong>${m.product}</strong>${m.disqualified ? ' <span class="dq-badge-sm">DQ</span>' : ''}</td>
-      <td>${m.company}</td>
-      <td><span class="type-pill">${m.agv_type || '–'}</span></td>
-      <td><span class="score-pill score-${scoreColor}">${pct}%<span class="score-max"> ${m.score}/${maxScore}</span></span></td>
-      <td>${payload}</td>
-      <td>${lift}</td>
-      <td>${aisle}</td>
-      <td class="nav-cell">${m.navigation || '–'}</td>
-      <td><button class="btn-expand" onclick="toggleDetail('${detailRowId}')" title="Score breakdown">▼</button></td>`;
-    tbody.appendChild(tr);
-
-    // Hidden detail row
-    const detail = document.createElement('tr');
-    detail.id = detailRowId;
-    detail.className = 'detail-row hidden';
-    detail.innerHTML = `<td colspan="10">
-      <div class="detail-inner">
-        ${m.disqualified
-          ? `<div class="detail-section">
-               <div class="detail-label">K.O. Exclusions</div>
-               ${(m.disqualified_by || m.knockouts || []).map(r => `<div class="ko-reason-line"><span class="ko-x">✗</span> ${r}</div>`).join('')}
-             </div>`
-          : ''}
-        ${details.length
-          ? `<div class="detail-section">
-               <div class="detail-label">Score Breakdown</div>
-               <div class="sb-table">
-                 ${details.map(d => `
-                   <div class="sb-row">
-                     <span class="sb-field">${d.field}</span>
-                     <span class="sb-val">${d.value != null ? d.value : '–'}</span>
-                     <span class="sb-pts">+${d.points} pts</span>
-                   </div>`).join('')}
-                 <div class="sb-row sb-total">
-                   <span class="sb-field">Total</span>
-                   <span class="sb-val"></span>
-                   <span class="sb-pts">${m.score} / ${maxScore}</span>
-                 </div>
-               </div>
-             </div>`
-          : '<div class="detail-section"><em style="color:var(--steel);font-size:0.8rem">No scoring details — supplier may be disqualified before scoring.</em></div>'}
-        <div class="detail-meta">
-          ${m.reference_count != null ? `<span>References: ${m.reference_count}</span>` : ''}
-          ${m.lead_time_weeks != null ? `<span>Lead time: ${m.lead_time_weeks} weeks</span>` : ''}
-          ${m.battery_runtime_h != null ? `<span>Battery: ${m.battery_runtime_h}h</span>` : ''}
-          ${m.vda5050 === true ? `<span class="meta-tag">VDA 5050</span>` : ''}
-          ${m.autonomous_charging === true ? `<span class="meta-tag">Auto charging</span>` : ''}
-          ${(m.service_coverage||[]).length ? `<span>Coverage: ${m.service_coverage.join(', ')}</span>` : ''}
+  qualified.forEach((c, i) => {
+    const m   = c.best;
+    const pct = maxScore > 0 ? Math.max(0, Math.round(m.score / maxScore * 100)) : 0;
+    const label = pct >= 70 ? 'Top Match' : pct >= 40 ? 'Good Match' : 'Partial Match';
+    const cls   = pct >= 70 ? 'match-great' : pct >= 40 ? 'match-good' : 'match-partial';
+    const chips = _koChips(m);
+    const card = document.createElement('div');
+    card.className = 'sc-card';
+    card.innerHTML = `
+      <div class="sc-rank">${i + 1}</div>
+      <div class="sc-body">
+        <div class="sc-header">
+          <div class="sc-company">${m.company}</div>
+          <span class="sc-label ${cls}">${label}</span>
         </div>
-      </div>
-    </td>`;
-    tbody.appendChild(detail);
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:${pct}%" data-pct="${pct}"></div></div>
+        <div class="sc-product">
+          <span class="type-pill">${m.agv_type || '–'}</span>
+          <span class="sc-product-name">${m.product}</span>
+        </div>
+        ${chips.length ? `<div class="sc-chips">${chips.map(ch => `<span class="sc-chip">${ch}</span>`).join('')}</div>` : ''}
+      </div>`;
+    container.appendChild(card);
   });
+
+  if (!qualified.length) {
+    container.innerHTML = '<p class="sc-empty">Kein Supplier erfüllt alle K.O.-Kriterien. Vollständige Analyse öffnen für Details.</p>';
+  }
+
+  note.classList.toggle('hidden', !excluded.length);
+  if (excluded.length) {
+    note.textContent = `${excluded.length} weitere Supplier nach K.O.-Kriterien ausgeschlossen — Details in der vollständigen Analyse.`;
+  }
 }
 
-function toggleDetail(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const isHidden = el.classList.contains('hidden');
-  el.classList.toggle('hidden');
-  // Rotate arrow on button
-  const rowBefore = el.previousElementSibling;
-  const btn = rowBefore?.querySelector('.btn-expand');
-  if (btn) btn.textContent = isHidden ? '▲' : '▼';
-}
-
-// ── Debug table ───────────────────────────────────────────────────────────────
-function renderDebugTable(all) {
-  const tbody = document.getElementById('debugTableBody');
-  tbody.innerHTML = '';
-  const maxScore = all[0]?.max_score || 100;
-  const nQual = all.filter(r => !r.disqualified).length;
-  const nDq   = all.filter(r =>  r.disqualified).length;
-  document.getElementById('debugRankingMeta').textContent =
-    ` — ${all.length} suppliers · ${nQual} qualified · ${nDq} disqualified`;
-
-  all.forEach(r => {
-    const pct  = maxScore > 0 ? Math.round(r.score / maxScore * 100) : 0;
-    const tr   = document.createElement('tr');
-    if (r.disqualified) tr.classList.add('row-disqualified');
-    const scoreColor = r.disqualified ? 'dq' : pct >= 60 ? 'green' : pct >= 30 ? 'yellow' : 'red';
-    const statusHtml = r.disqualified ? `<span class="dq-badge-sm">DQ</span>` : `<span class="qual-badge-sm">OK</span>`;
-    const koHtml   = (r.disqualified_by || r.knockouts || []).map(x => `<span class="ko-tag sm">✗ ${x}</span>`).join(' ');
-    const lift   = r.lifting_height_mm != null ? (r.lifting_height_mm/1000).toFixed(1)+'m' : '–';
-    const aisle  = r.min_aisle_width_mm != null ? (r.min_aisle_width_mm/1000).toFixed(2)+'m' : '–';
-    const payload= r.max_payload_kg != null ? r.max_payload_kg+'kg' : '–';
-    tr.innerHTML = `
-      <td class="debug-rank">${r.rank||''}</td>
-      <td><strong>${r.product}</strong></td>
-      <td>${r.company}</td>
-      <td><span class="score-pill score-${scoreColor}">${pct}%<span class="score-max"> ${r.score}/${maxScore}</span></span></td>
-      <td>${statusHtml}</td>
-      <td class="debug-vtype"><span class="type-pill type-pill-sm">${r.agv_type||'–'}</span></td>
-      <td>${payload}</td>
-      <td>${lift}</td>
-      <td>${aisle}</td>
-      <td class="debug-reasons">${koHtml || '<span class="no-match">scored</span>'}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// ── Debug panel ───────────────────────────────────────────────────────────────
-function renderDebugPanel(d) {
-  show('debugPanel');
-
-  // Raw requirements
-  document.getElementById('debugReqRaw').textContent = JSON.stringify(d.agv_criteria, null, 2);
-  document.getElementById('debugResultsRaw').textContent = JSON.stringify(
-    (d.matches_all || d.matches || []).slice(0, 5), null, 2
-  );
-
-  // Scoring weights editor
-  fetch('/match', {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
-    .catch(() => {});
-
-  // Read config/scoring_weights.json from backend status (we don't expose it as API yet)
-  // Show static weights for now
-  const weights = {
-    reference_count: 15, lead_time_weeks: 10, vda5050_compatible: 8,
-    battery_runtime_h: 7, autonomous_charging: 6, safety_standard: 5, stop_accuracy_mm: 5,
-  };
-  const editor = document.getElementById('weightsEditor');
-  editor.innerHTML = '';
-  _editWeights = {...weights};
-  Object.entries(weights).forEach(([k, v]) => {
-    const row = document.createElement('div');
-    row.className = 'weight-row';
-    row.innerHTML = `<label class="weight-label">${k}</label>
-      <input type="range" min="0" max="25" value="${v}" class="weight-slider" data-key="${k}">
-      <span class="weight-val" id="wv-${k}">${v}</span>`;
-    row.querySelector('input').addEventListener('input', function() {
-      _editWeights[this.dataset.key] = parseInt(this.value);
-      document.getElementById('wv-' + this.dataset.key).textContent = this.value;
-    });
-    editor.appendChild(row);
-  });
-}
-
-let _editWeights = {};
-async function rematchWithWeights() {
-  const d = _lastResult;
-  if (!d || !d.agv_criteria) return;
-  const crit = d.agv_criteria;
-  const req = {
-    agv_type: crit.required_vehicle_type,
-    max_payload_kg: crit.required_weight_capacity_kg,
-    _weights: _editWeights,
-  };
-  try {
-    const resp = await fetch('/match', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(req)});
-    const data = await resp.json();
-    if (data.top) { renderMatchTable(data.top.slice(0,5)); renderKoPanel(data.all||[]); }
-    document.getElementById('debugResultsRaw').textContent = JSON.stringify(data.all?.slice(0,5), null, 2);
-  } catch(e) { alert(e.message); }
-}
 
 // ── Error / reset ─────────────────────────────────────────────────────────────
 function showError(msg, raw) {
@@ -1100,7 +731,7 @@ function showError(msg, raw) {
 function reset() {
   hide('resultSection'); hide('errorSection'); hide('progressSection');
   show('uploadSection');
-  fileInput.value = ''; _lastResult = null; _condKoState = {};
+  fileInput.value = ''; _lastResult = null; _debugWindow = null;
   // Reset all ring progress indicators
   ['upload','extract','llm','parse','agv'].forEach(id => {
     const ring = document.getElementById('ring-fill-' + id);

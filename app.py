@@ -11,23 +11,15 @@ from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import io
-import supplier_db
 from src.json_repair import repair_and_parse, enforce_source_spans
 
 # ── New structured matching engine (AP-I1) ────────────────────────────────────
-try:
-    from src.data_loader import load_suppliers
-    from src.matching import match_suppliers_new, TenderRequirements, Matcher
-    from src.context_builder import agv_type_keyword_fallback, build_system_context, AGV_KEYWORDS
-    _DB_AVAILABLE = True
-    _SUPPLIERS = load_suppliers()
-    log_setup = logging.getLogger("haystacked")
-    log_setup.info("SQLite DB loaded: %d active supplier records", len(_SUPPLIERS))
-except FileNotFoundError:
-    _DB_AVAILABLE = False
-    _SUPPLIERS = []
-    log_setup = logging.getLogger("haystacked")
-    log_setup.warning("SQLite DB not found — run sync_airtable.py. Falling back to CSV matching.")
+from src.data_loader import load_suppliers
+from src.matching import match_suppliers_new, TenderRequirements, Matcher
+from src.context_builder import agv_type_keyword_fallback, build_system_context, AGV_KEYWORDS
+_SUPPLIERS = load_suppliers()
+log_setup = logging.getLogger("haystacked")
+log_setup.info("SQLite DB loaded: %d active supplier records", len(_SUPPLIERS))
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -51,6 +43,9 @@ templates = Jinja2Templates(directory="templates")
 OLLAMA_URL      = "http://localhost:11434/api/generate"
 OLLAMA_MODEL    = "qwen2.5:7b"
 _OLLAMA_NUM_CTX = 32_768  # must match num_ctx in call_ollama() options
+
+# ── Last analysis result — in-memory cache for /debug-page ───────────────────
+_last_analysis_result: dict = {}
 # ── Config loading — startup checksum auto-regenerates if AP0 xlsx changed ────
 _CONFIG_DIR = Path(__file__).parent / "config"
 _AP0_PATH   = Path(__file__).parent / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
@@ -83,6 +78,26 @@ _vehicle_cfg    = json.loads((_CONFIG_DIR / "vehicle_types.json").read_text())
 _field_levels   = json.loads((_CONFIG_DIR / "field_levels.json").read_text())
 # _VALID_VEHICLE_TYPES kept for backward-compat (still used in VNA normalisation downstream)
 _VALID_VEHICLE_TYPES = set(_field_levels.get("agv_type", {}).get("allowed_values", []))
+
+# ── Extension column list — loaded once at startup from AP0-generated schema ──
+_schema_path = _CONFIG_DIR / "sqlite_schema.json"
+_EXT_COLUMNS: list[str] = (
+    json.loads(_schema_path.read_text()).get("extensions_columns", [])
+    if _schema_path.exists() else []
+)
+
+def _check_extension_gaps() -> None:
+    """Warn at startup for any extensions_columns field not in the Extension dataclass.
+    These fields will return None from /api/suppliers until models.py is updated."""
+    import dataclasses
+    from src.models import Extension
+    ext_fields = {f.name for f in dataclasses.fields(Extension)}
+    skip = {"extension_id", "base_model_id", "extra_fields"}
+    for col in _EXT_COLUMNS:
+        if col not in skip and col not in ext_fields:
+            log.warning("Model gap: extensions_columns field %r has no Extension attribute", col)
+
+_check_extension_gaps()
 
 # ── AP0 allowed-values index — built once at startup from field_levels.json ───
 # Maps tender_key → (allowed_values_set, field_label) for every Dropdown/Multi-Select
@@ -247,7 +262,7 @@ NACE_SYSTEM          = _load_prompt("nace_system.txt")
 NACE_USER_TEMPLATE   = _load_prompt("nace_template.txt")
 # AGV system prompt = extraction role + full industry README (loaded via context_builder)
 # This gives the LLM domain knowledge about VNA, G2P, OEM rebadging, etc.
-AGV_SYSTEM              = build_system_context() if _DB_AVAILABLE else _load_prompt("extraction_system.txt")
+AGV_SYSTEM              = build_system_context()
 AGV_USER_TEMPLATE       = _load_prompt("extraction_template.txt")          # full fallback template
 VEHICLE_TYPE_TEMPLATE   = _load_prompt("vehicle_type_template.txt")         # Pass 4a
 # Pass 4b templates — loaded from vt_prompt_map in vehicle_types.json (AP0-driven, no hardcoded type names)
@@ -267,6 +282,12 @@ AGV_RETRY_TEMPLATE   = _load_prompt("extraction_retry_template.txt")
 # Edit Plausibility Min/Max/Tender Unit columns in the AP0 xlsx — never hardcode here.
 _plausibility_cfg = json.loads((_CONFIG_DIR / "plausibility.json").read_text()) \
     if (_CONFIG_DIR / "plausibility.json").exists() else {}
+
+# Conversion keys used in the tender→supplier unit conversion (m→mm matching path).
+# If plausibility.json loses these, app.py would KeyError at request time — catch it at startup.
+for _conv_key in ("required_max_lift_height_m", "required_min_aisle_width_m"):
+    assert (_plausibility_cfg.get(_conv_key) or {}).get("conversion", {}).get("factor"), \
+        f"plausibility.json missing {_conv_key}.conversion.factor — run generate_all.py"
 
 
 def validate_agv_criteria(crit: dict) -> tuple:
@@ -792,60 +813,59 @@ async def analyze(file: UploadFile = File(...)):
                     agv_criteria[_key] = _val
                     log.info("Field-text-fallback: %s = %s (regex: %s)", _key, _val, _rgx)
 
-            # Run matching — prefer new SQLite engine, fall back to CSV
-            if _DB_AVAILABLE and _SUPPLIERS:
-                # canonical_agv_type and is_vna_subtype already set in Pass 4a;
-                # re-derive here as safety net (idempotent for valid values).
-                raw_vt = agv_criteria.get("required_vehicle_type") or ""
-                if isinstance(raw_vt, list):
-                    raw_vt = next(
-                        (item for item in raw_vt if _VT_MAP_CFG.get(str(item).lower().strip())),
-                        raw_vt[0] if raw_vt else "",
-                    ) or ""
-                raw_vt_lower = str(raw_vt).lower().strip()
-                canonical_agv_type = _VT_MAP_CFG.get(raw_vt_lower) or canonical_agv_type
+            # Run matching against SQLite supplier records
+            # canonical_agv_type and is_vna_subtype already set in Pass 4a;
+            # re-derive here as safety net (idempotent for valid values).
+            raw_vt = agv_criteria.get("required_vehicle_type") or ""
+            if isinstance(raw_vt, list):
+                raw_vt = next(
+                    (item for item in raw_vt if _VT_MAP_CFG.get(str(item).lower().strip())),
+                    raw_vt[0] if raw_vt else "",
+                ) or ""
+            raw_vt_lower = str(raw_vt).lower().strip()
+            canonical_agv_type = _VT_MAP_CFG.get(raw_vt_lower) or canonical_agv_type
 
-                for override in _VT_OVERRIDES:
-                    if override.get("regex") and re.search(override["regex"], text or ""):
-                        if override.get("canonical"):
-                            canonical_agv_type = override["canonical"]
-                        if override.get("vna"):
-                            is_vna_subtype = True
-                        break
+            for override in _VT_OVERRIDES:
+                if override.get("regex") and re.search(override["regex"], text or ""):
+                    if override.get("canonical"):
+                        canonical_agv_type = override["canonical"]
+                    if override.get("vna"):
+                        is_vna_subtype = True
+                    break
 
-                # Split navigation string into list (e.g. "SLAM, QR Code" → ["SLAM", "QR Code"])
-                raw_nav = agv_criteria.get("required_navigation") or ""
-                nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
+            # Split navigation string into list (e.g. "SLAM, QR Code" → ["SLAM", "QR Code"])
+            raw_nav = agv_criteria.get("required_navigation") or ""
+            nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
 
-                # Store canonical type and VNA flag in agv_criteria for the frontend
-                agv_criteria["required_vehicle_type_canonical"] = canonical_agv_type
-                agv_criteria["_vna_subtype"] = is_vna_subtype
-                if is_vna_subtype and not agv_criteria.get("required_vna"):
-                    agv_criteria["required_vna"] = True
+            # Store canonical type and VNA flag in agv_criteria for the frontend
+            agv_criteria["required_vehicle_type_canonical"] = canonical_agv_type
+            agv_criteria["_vna_subtype"] = is_vna_subtype
+            if is_vna_subtype and not agv_criteria.get("required_vna"):
+                agv_criteria["required_vna"] = True
 
-                new_req = dict(agv_criteria)
-                new_req["required_vehicle_type"] = canonical_agv_type
-                new_req["required_navigation"] = nav_list
+            new_req = dict(agv_criteria)
+            new_req["required_vehicle_type"] = canonical_agv_type
+            new_req["required_navigation"] = nav_list
 
-                raw_lift_m = agv_criteria.get("required_max_lift_height_m")
-                new_req["required_max_lift_height_m"] = int(float(raw_lift_m) * 1000) if raw_lift_m is not None else None
-                raw_aisle_m = agv_criteria.get("required_min_aisle_width_m")
-                new_req["required_min_aisle_width_m"] = int(float(raw_aisle_m) * 1000) if raw_aisle_m is not None else None
+            raw_lift_m = agv_criteria.get("required_max_lift_height_m")
+            _lift_conv = ((_plausibility_cfg.get("required_max_lift_height_m") or {}).get("conversion") or {})
+            new_req["required_max_lift_height_m"] = int(float(raw_lift_m) / _lift_conv["factor"]) if raw_lift_m is not None else None
+            raw_aisle_m = agv_criteria.get("required_min_aisle_width_m")
+            _aisle_conv = ((_plausibility_cfg.get("required_min_aisle_width_m") or {}).get("conversion") or {})
+            new_req["required_min_aisle_width_m"] = int(float(raw_aisle_m) / _aisle_conv["factor"]) if raw_aisle_m is not None else None
 
-                raw_outdoor = agv_criteria.get("required_outdoor")
-                if raw_outdoor is not None:
-                    new_req["required_outdoor"] = (
-                        "required" if str(raw_outdoor).lower() in ("yes", "true", "required") else "not_required"
-                    )
-
-                new_req["required_vna"] = (
-                    "required"     if is_vna_subtype else
-                    "not_required" if canonical_agv_type in _VNA_APPLICABLE else
-                    None
+            raw_outdoor = agv_criteria.get("required_outdoor")
+            if raw_outdoor is not None:
+                new_req["required_outdoor"] = (
+                    "required" if str(raw_outdoor).lower() in ("yes", "true", "required") else "not_required"
                 )
-                matches, matches_all = match_suppliers_new(new_req, _SUPPLIERS, top_n=5)
-            else:
-                matches, matches_all = supplier_db.match_suppliers(agv_criteria, top_n=5)
+
+            new_req["required_vna"] = (
+                "required"     if is_vna_subtype else
+                "not_required" if canonical_agv_type in _VNA_APPLICABLE else
+                None
+            )
+            matches, matches_all = match_suppliers_new(new_req, _SUPPLIERS, top_n=5)
             log.info("Matching: Top-Match %s (Score %d)", matches[0]["product"] if matches else "–",
                      matches[0]["score"] if matches else 0)
 
@@ -864,6 +884,8 @@ async def analyze(file: UploadFile = File(...)):
         result["matches_all"]  = matches_all if matches_all else []
 
         yield sse("log", {"message": f"Gesamt: {total:.1f}s"})
+        global _last_analysis_result
+        _last_analysis_result = result
         yield sse("result", result)
         log.info("=== Fertig: %s in %.1fs ===", filename, total)
 
@@ -874,51 +896,105 @@ async def analyze(file: UploadFile = File(...)):
 @app.get("/db-status")
 async def db_status():
     return {
-        "sqlite_available": _DB_AVAILABLE,
+        "sqlite_available": True,
         "supplier_count":   len(_SUPPLIERS),
-        "message": "Using SQLite matching engine" if _DB_AVAILABLE else "Using CSV fallback — run sync_airtable.py",
+        "message": "Using SQLite matching engine",
     }
 
 
 @app.post("/match")
 async def match_endpoint(request: Request):
     """Direct matching API — accepts structured tender requirements JSON."""
-    if not _DB_AVAILABLE or not _SUPPLIERS:
-        return JSONResponse({"error": "SQLite DB not available. Run sync_airtable.py first."}, status_code=503)
+    if not _SUPPLIERS:
+        return JSONResponse({"error": "No supplier records loaded. Run sync_airtable.py first."}, status_code=503)
     body = await request.json()
     top, all_results = match_suppliers_new(body, _SUPPLIERS, top_n=10)
     return {"top": top, "all": all_results, "total": len(all_results)}
 
 
+@app.post("/rematch")
+async def rematch_endpoint(request: Request):
+    """Re-run matching after user clarification.
+
+    Accepts {"overrides": {"lifting_height_mm": 12000, ...}} — AP0 field names
+    with values in AP0 units (mm for lengths, kg for weights). Uses the server-side
+    cached agv_criteria as base so all previously extracted KO fields are preserved.
+    Updates _last_analysis_result so /api/last-result stays in sync.
+    """
+    global _last_analysis_result
+    if not _last_analysis_result:
+        return JSONResponse({"error": "No analysis to rematch."}, status_code=400)
+    body = await request.json()
+    overrides = body.get("overrides", {})
+
+    criteria = dict(_last_analysis_result.get("agv_criteria", {}))
+    for field_name, value in overrides.items():
+        meta = _field_levels.get(field_name, {})
+        tender_key = meta.get("tender_key", field_name)
+        if field_name.endswith("_mm") and tender_key.endswith("_m") and isinstance(value, (int, float)):
+            value = value / 1000.0
+        criteria[tender_key] = value
+
+    top, all_results = match_suppliers_new(criteria, _SUPPLIERS, top_n=10)
+
+    _last_analysis_result["matches"]      = top
+    _last_analysis_result["matches_all"]  = all_results
+    _last_analysis_result["agv_criteria"] = criteria
+
+    return {"top": top, "all": all_results, "total": len(all_results)}
+
+
 @app.get("/api/field-meta")
 async def field_meta():
-    """Return AP0 field metadata for the frontend — labels, levels, data types.
-    Loaded from config/field_levels.json (generated from AP0 xlsx, never hardcoded)."""
+    """Return AP0 field metadata for the frontend — labels, levels, data types, and sheet (vehicle-type group).
+    Loaded from config/field_levels.json + extraction_hints.json + vehicle_types.json (all generated from AP0)."""
     field_levels_path = _CONFIG_DIR / "field_levels.json"
     if not field_levels_path.exists():
         return JSONResponse({"error": "field_levels.json not found — run generate_all.py"}, status_code=503)
     fl = json.loads(field_levels_path.read_text())
-    # Build a label from the AP0 field name (snake_case → Title Case words)
+    hints_path = _CONFIG_DIR / "extraction_hints.json"
+    hints = json.loads(hints_path.read_text()) if hints_path.exists() else {}
+    vt_path = _CONFIG_DIR / "vehicle_types.json"
+    vt_cfg = json.loads(vt_path.read_text()) if vt_path.exists() else {}
+    # Build a label from the AP0 field name.
+    # Strips known unit suffixes and appends them in parentheses so consumers
+    # get "Max Payload (kg)" instead of "Max Payload Kg".
+    _UNITS = {"_kg":"kg","_mm":"mm","_pct":"%","_h":"h","_ms":"m/s",
+              "_c":"°C","_eur":"EUR","_min":"min","_m":"m","_deg":"°"}
+    # Known abbreviations that must stay uppercase
+    _ABBR = {"Agv":"AGV","Amr":"AMR","Vda":"VDA","Vda5050":"VDA 5050","Wms":"WMS","Oem":"OEM",
+             "Ko":"KO","Ui":"UI","Id":"ID","Ip":"IP","Fps":"FPS","Roi":"ROI"}
     def _label(key: str) -> str:
-        return " ".join(w.capitalize() for w in key.replace("_", " ").split())
+        k = key
+        unit = None
+        for suf, u in _UNITS.items():
+            if k.endswith(suf):
+                k = k[:-len(suf)]
+                unit = u
+                break
+        words = [_ABBR.get(w.capitalize(), w.capitalize()) for w in k.replace("_", " ").split()]
+        label = " ".join(words)
+        return f"{label} ({unit})" if unit else label
     meta = {}
     for db_key, info in fl.items():
         tender_key = info.get("tender_key")
-        meta[db_key] = {
+        sheet = hints.get(tender_key, {}).get("sheet") if tender_key else None
+        entry = {
             "label":      _label(db_key),
             "tender_key": tender_key,
             "level":      info.get("level"),
             "data_type":  info.get("data_type"),
             "operator":   info.get("operator"),
+            "sheet":      sheet,
         }
+        meta[db_key] = entry
         if tender_key and tender_key != db_key:
-            meta[tender_key] = {
-                "label":      _label(tender_key),
-                "tender_key": tender_key,
-                "level":      info.get("level"),
-                "data_type":  info.get("data_type"),
-                "operator":   info.get("operator"),
-            }
+            meta[tender_key] = {**entry, "label": _label(tender_key)}
+    # VT config for frontend column grouping — read entirely from generated config files
+    meta["__vt_config__"] = {
+        "shared_sheet_name": vt_cfg.get("shared_sheet_name", ""),
+        "vehicle_types":     list(vt_cfg.get("scoring_bucket_map", {}).keys()),
+    }
     return meta
 
 
@@ -938,3 +1014,73 @@ async def health():
         }
     except Exception:
         return {"status": "degraded", "ollama": "not reachable", "model_available": False}
+
+
+@app.get("/debug-page", response_class=HTMLResponse)
+async def debug_page(request: Request):
+    return templates.TemplateResponse("debug.html", {"request": request})
+
+
+@app.get("/db", response_class=HTMLResponse)
+async def db_page(request: Request):
+    return templates.TemplateResponse("db.html", {"request": request})
+
+
+@app.get("/api/last-result")
+async def last_result():
+    if not _last_analysis_result:
+        return JSONResponse({"error": "No analysis result available yet."}, status_code=404)
+    return _last_analysis_result
+
+
+@app.get("/api/suppliers")
+async def suppliers_list():
+    """Return all supplier records.
+
+    Column set and order are driven entirely by config/sqlite_schema.json
+    (generated from AP0 xlsx by generate_all.py).  No field names are
+    hardcoded here — adding a new VT sheet to AP0 automatically surfaces
+    its fields without touching this file.
+    """
+    if not _SUPPLIERS:
+        return JSONResponse({"error": "Database not available."}, status_code=503)
+
+    import dataclasses as _dc
+
+    _ext_cols = _EXT_COLUMNS  # loaded once at startup from AP0-generated sqlite_schema.json
+    # Internal join keys never exposed to the frontend.
+    _EXT_INTERNAL = {"extension_id", "base_model_id", "extra_fields"}
+    # Product dataclass fields that are internal / already in the identity prefix.
+    _PROD_SKIP = {
+        "company_id", "base_model_id", "is_oem_product", "active",
+        "product_description", "product_id", "company_name", "product_name", "agv_type",
+    }
+
+    out = []
+    for sr in _SUPPLIERS:
+        p = sr.product
+        e = sr.extension
+        # Identity prefix — always first so frontend sticky columns are stable.
+        row: dict = {
+            "product_id":   p.product_id,
+            "company_name": p.company_name,
+            "product_name": p.product_name,
+            "description":  p.product_description,
+        }
+        # All extension-table columns in AP0 schema order.
+        # Extension dataclass is tried first; Product covers join-through fields
+        # (country, service_coverage, …) that live in the company/product tables.
+        for col in _ext_cols:
+            if col in _EXT_INTERNAL or col in row:
+                continue
+            val = getattr(e, col, None)
+            if val is None:
+                val = getattr(p, col, None)
+            row[col] = val
+        # Product-only commercial fields not captured by the extension-column loop
+        # (e.g. min_project_value_eur, max_project_value_eur).
+        for f in _dc.fields(p):
+            if f.name not in _PROD_SKIP and f.name not in row:
+                row[f.name] = getattr(p, f.name)
+        out.append(row)
+    return out
