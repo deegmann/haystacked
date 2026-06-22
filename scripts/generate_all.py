@@ -110,11 +110,12 @@ def read_field_levels(wb) -> dict:
         hi, cols = _find_header(rows)
         if hi is None:
             continue
-        col_level   = cols.get("Level")
-        col_op      = cols.get("Matching Operator")
-        col_tkey    = cols.get("Tender JSON Key")
-        col_dtype   = cols.get("Data Type")
-        col_allowed = cols.get("Allowed Values / Unit")
+        col_level       = cols.get("Level")
+        col_op          = cols.get("Matching Operator")
+        col_tkey        = cols.get("Tender JSON Key")
+        col_dtype       = cols.get("Data Type")
+        col_allowed     = cols.get("Allowed Values / Unit")
+        col_result_card = cols.get("result_card")
         for row in rows[hi+1:]:
             fname = row[0]
             if not fname or str(fname).startswith("──"):
@@ -142,6 +143,8 @@ def read_field_levels(wb) -> dict:
                 av_list = [v.strip() for v in raw_av.split("|") if v.strip() and v.strip() not in ("…", "")]
                 if av_list:
                     entry["allowed_values"] = av_list
+            if col_result_card is not None and col_result_card < len(row) and row[col_result_card]:
+                entry["result_card"] = True
             if level in ("KO","COND_KO") and "operator" not in entry:
                 print(f"  [WARN] '{fname}' is {level} but has no operator")
             if level in ("KO","COND_KO") and "operator" in entry and "tender_key" not in entry:
@@ -459,11 +462,12 @@ def read_sqlite_schema(wb) -> dict:
     base_models_sql = "\n".join(bm_lines)
 
     # ── base_model_extensions: read all fields from AGV-type sheets ───────────
-    ext_fields   = []   # list of (name, sqlite_type)
-    ext_seen     = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
-    bool_fields  = []
-    int_fields   = []
-    float_fields = []
+    ext_fields        = []   # list of (name, sqlite_type)
+    ext_seen          = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
+    bool_fields       = []
+    int_fields        = []
+    float_fields      = []
+    multiselect_fields = []
 
     for sheet in DATA_SHEETS:
         if sheet not in wb.sheetnames:
@@ -492,6 +496,8 @@ def read_sqlite_schema(wb) -> dict:
                 int_fields.append(fname)
             elif raw_dt in ("Real", "Float"):
                 float_fields.append(fname)
+            elif raw_dt == "Multi-Select":
+                multiselect_fields.append(fname)
 
     ext_lines = [
         "CREATE TABLE IF NOT EXISTS base_model_extensions (",
@@ -506,23 +512,41 @@ def read_sqlite_schema(wb) -> dict:
     ext_lines.append(");")
     extensions_sql = "\n".join(ext_lines)
 
-    # C-6: explicit column list for sync_airtable.py (derived from generated SQL,
+    # C-6: explicit column lists for sync_airtable.py (derived from generated SQL,
     # so sync_airtable never hardcodes field names)
+    companies_columns  = [entry[0] for entry in l1]
+    products_columns   = [entry[0] for entry in l2]
     extensions_columns = (
         ["extension_id", "base_model_id", "agv_type"]
         + [f for f, _ in ext_fields]
         + ["extra_fields"]
     )
 
+    # Fields from the SHARED AGV sheet that land in extensions_columns but are
+    # semantically owned by Product or Company — loaded into Product in data_loader.py.
+    # Exceptions: employee_count_range, hq_city, founding_year come from the companies
+    # table but are intentionally loaded into Extension (company context on the record).
+    _structural    = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
+    _company_in_ext = {"employee_count_range", "hq_city", "founding_year"}
+    _ext_set = set(extensions_columns)
+    shared_in_product_columns = sorted(
+        ((set(products_columns) | set(companies_columns)) & _ext_set)
+        - _structural - _company_in_ext
+    )
+
     return {
-        "companies":             companies_sql,
-        "products":              products_sql,
-        "base_models":           base_models_sql,
-        "base_model_extensions": extensions_sql,
-        "bool_fields":           sorted(bool_fields),
-        "int_fields":            sorted(int_fields),
-        "float_fields":          sorted(float_fields),
-        "extensions_columns":    extensions_columns,
+        "companies":                  companies_sql,
+        "products":                   products_sql,
+        "base_models":                base_models_sql,
+        "base_model_extensions":      extensions_sql,
+        "bool_fields":                sorted(bool_fields),
+        "int_fields":                 sorted(int_fields),
+        "float_fields":               sorted(float_fields),
+        "multiselect_fields":         sorted(multiselect_fields),
+        "companies_columns":          companies_columns,
+        "products_columns":           products_columns,
+        "extensions_columns":         extensions_columns,
+        "shared_in_product_columns":  shared_in_product_columns,
     }
 
 
@@ -923,6 +947,54 @@ def validate_vs_sqlite(field_levels: dict, db_path: Path) -> list:
     return warnings
 
 
+# ── Generated models ──────────────────────────────────────────────────────────
+
+def generate_models_py(sqlite_schema: dict) -> str:
+    """Return Python source for src/generated_models.py — Extension dataclass."""
+    bool_f = set(sqlite_schema["bool_fields"])
+    int_f  = set(sqlite_schema["int_fields"])
+    float_f = set(sqlite_schema["float_fields"])
+    ms_f   = set(sqlite_schema["multiselect_fields"])
+    shared = set(sqlite_schema["shared_in_product_columns"])
+    structural = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
+
+    lines = [
+        "# AUTO-GENERATED by scripts/generate_all.py — DO NOT EDIT MANUALLY.",
+        "# To update: edit the AP0 xlsx, then run: python3 scripts/generate_all.py",
+        "import sys",
+        "if __name__ == '__main__':",
+        "    sys.exit('Run generate_all.py to regenerate this file.')",
+        "from dataclasses import dataclass, field",
+        "from typing import Optional",
+        "",
+        "",
+        "@dataclass",
+        "class Extension:",
+        "    # Structural identity fields (always present)",
+        "    extension_id:  str = ''",
+        "    base_model_id: str = ''",
+        "    agv_type:      str = ''",
+    ]
+
+    for col in sqlite_schema["extensions_columns"]:
+        if col in structural or col in shared:
+            continue
+        if col in bool_f:
+            lines.append(f"    {col}: Optional[bool] = None")
+        elif col in int_f:
+            lines.append(f"    {col}: Optional[int] = None")
+        elif col in float_f:
+            lines.append(f"    {col}: Optional[float] = None")
+        elif col in ms_f:
+            lines.append(f"    {col}: list[str] = field(default_factory=list)")
+        else:
+            lines.append(f"    {col}: Optional[str] = None")
+
+    lines.append("    extra_fields: Optional[str] = None")
+    lines.append("")
+    return "\n".join(lines)
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
@@ -1041,6 +1113,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         print("\n[DRY RUN] Would write:")
         print("  config/field_levels.json, vehicle_types.json, scoring_weights.json, nace_codes.json")
         print("  config/sqlite_schema.json, config/plausibility.json, config/extraction_hints.json")
+        print("  src/generated_models.py")
         print("  config/prompts/extraction_template.txt (and others)")
         print(f"\nExtraction template preview (first 400 chars):\n{extraction_template[:400]}")
         print(f"\nSQLite companies preview:\n{sqlite_schema['companies'][:400]}")
@@ -1057,6 +1130,8 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             json.dumps(nace, indent=2, ensure_ascii=False) + "\n")
         (CONFIG_DIR / "sqlite_schema.json").write_text(
             json.dumps(sqlite_schema, indent=2, ensure_ascii=False) + "\n")
+        (ROOT / "src" / "generated_models.py").write_text(
+            generate_models_py(sqlite_schema), encoding="utf-8")
         (CONFIG_DIR / "plausibility.json").write_text(
             json.dumps(plausibility, indent=2, ensure_ascii=False) + "\n")
 

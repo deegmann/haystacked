@@ -1,0 +1,9 @@
+/* ============================================================================
+   haystacked — single entry point
+   Link THIS one file and you get fonts + tokens + base + all components.
+   (Or import the parts individually if you only need tokens.)
+   ============================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('tokens/tokens.css');
+@import url('css/base.css');
+@import url('css/components.css');

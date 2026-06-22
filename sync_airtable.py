@@ -40,8 +40,10 @@ DATA_RAW.mkdir(parents=True, exist_ok=True)
 TOKEN   = os.environ.get("AIRTABLE_TOKEN", "")
 BASE_ID = os.environ.get("AIRTABLE_BASE_ID", "")
 
-# C-6: extension column list from generated sqlite_schema.json (never hardcode field names)
+# C-6: column lists from generated sqlite_schema.json (never hardcode field names)
 _SQLITE_SCHEMA = json.loads((BASE_DIR / "config" / "sqlite_schema.json").read_text())
+_CO_COLUMNS    = _SQLITE_SCHEMA.get("companies_columns", [])
+_PROD_COLUMNS  = _SQLITE_SCHEMA.get("products_columns", [])
 _EXT_COLUMNS   = _SQLITE_SCHEMA.get("extensions_columns", [])
 
 # Airtable-specific setup — only needed in live-sync mode (not --local)
@@ -303,25 +305,17 @@ def import_to_sqlite(
         with open(path, encoding="utf-8", newline="") as f:
             return list(csv.DictReader(f))
 
-    # Companies
+    # Companies — dynamic INSERT from config/sqlite_schema.json companies_columns
+    assert _CO_COLUMNS, "sqlite_schema.json missing 'companies_columns' — run generate_all.py"
+    _CO_DEFAULTS = {"company_name": "UNKNOWN"}
+    co_sql = (
+        f"INSERT OR REPLACE INTO companies ({','.join(_CO_COLUMNS)}) "
+        f"VALUES ({','.join('?' * len(_CO_COLUMNS))})"
+    )
     cos = csv_rows(companies_csv)
     for row in cos:
-        cur.execute(
-            "INSERT OR REPLACE INTO companies VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-            (
-                row.get("company_id") or None,
-                row.get("company_name") or "UNKNOWN",
-                row.get("country") or None,
-                row.get("hq_city") or None,
-                row.get("employee_count_range") or None,
-                _coerce("founding_year", row.get("founding_year", "")),
-                row.get("website") or None,
-                row.get("certifications_generic") or None,
-                row.get("languages_spoken") or None,
-                _coerce("export_capable", row.get("export_capable", "")),
-                row.get("last_updated") or None,
-            ),
-        )
+        vals = [_coerce(col, row.get(col, _CO_DEFAULTS.get(col, ""))) for col in _CO_COLUMNS]
+        cur.execute(co_sql, vals)
     print(f"  SQLite companies: {len(cos)} rows")
 
     # Build lookup: airtable_id → company_id UUID (for FK resolution in products)
@@ -335,7 +329,13 @@ def import_to_sqlite(
     for row in bm_rows:
         at_id_to_bm_uuid[row.get("airtable_id", "")] = row.get("base_model_id", "")
 
-    # Products
+    # Products — dynamic INSERT from config/sqlite_schema.json products_columns
+    assert _PROD_COLUMNS, "sqlite_schema.json missing 'products_columns' — run generate_all.py"
+    _PROD_DEFAULTS = {"product_name": "UNKNOWN", "agv_type": "", "active": "true"}
+    prod_sql = (
+        f"INSERT OR REPLACE INTO products ({','.join(_PROD_COLUMNS)}) "
+        f"VALUES ({','.join('?' * len(_PROD_COLUMNS))})"
+    )
     prods = csv_rows(products_csv)
     for row in prods:
         # Resolve linked-record IDs → UUIDs
@@ -343,26 +343,13 @@ def import_to_sqlite(
         raw_bm  = row.get("base_model_id", "")
         co_uuid = at_id_to_co_uuid.get(raw_co) or raw_co or None
         bm_uuid = at_id_to_bm_uuid.get(raw_bm) or raw_bm or None
-
-        cur.execute(
-            "INSERT OR REPLACE INTO products VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (
-                row.get("product_id") or None,
-                co_uuid,
-                bm_uuid,
-                row.get("product_name") or "UNKNOWN",
-                row.get("agv_type") or "",
-                row.get("product_description") or None,
-                _coerce("reference_count", row.get("reference_count", "")),
-                _coerce("min_project_value_eur", row.get("min_project_value_eur", "")),
-                _coerce("max_project_value_eur", row.get("max_project_value_eur", "")),
-                _coerce("lead_time_weeks", row.get("lead_time_weeks", "")),
-                row.get("distribution_model") or None,
-                _coerce("is_oem_product", row.get("is_oem_product", "")),
-                row.get("service_coverage") or None,
-                _coerce("active", row.get("active", "true")),
-            ),
-        )
+        _fk = {"company_id": co_uuid, "base_model_id": bm_uuid}
+        vals = [
+            _fk[col] if col in _fk
+            else _coerce(col, row.get(col, _PROD_DEFAULTS.get(col, "")))
+            for col in _PROD_COLUMNS
+        ]
+        cur.execute(prod_sql, vals)
     print(f"  SQLite products: {len(prods)} rows")
 
     # Extensions

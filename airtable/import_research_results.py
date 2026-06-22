@@ -12,8 +12,8 @@ Prerequisites:
   - airtable/airtable_schema_ids.json (table IDs)
 
 Run:
-  python3 airtable/import_research_results.py --json src/research_results_2026-06-10.json --dry-run
-  python3 airtable/import_research_results.py --json src/research_results_2026-06-10.json
+  python3 airtable/import_research_results.py --json offline_supplier_research/research_results_2026-06-10.json --dry-run
+  python3 airtable/import_research_results.py --json offline_supplier_research/research_results_2026-06-10.json
 """
 
 import os, sys, json, time, uuid, argparse

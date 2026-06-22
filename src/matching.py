@@ -64,6 +64,7 @@ def _load_vehicle_types() -> dict:
 
 _field_levels = _load_field_levels()
 _SCORING_BUCKET_MAP: dict = _load_vehicle_types().get("scoring_bucket_map", {})
+_RESULT_CARD_FIELDS: tuple = tuple(k for k, v in _field_levels.items() if v.get("result_card"))
 
 
 def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
@@ -155,22 +156,25 @@ def _op_bool_required(tender, supplier) -> tuple[bool, str]:
     """K.O. if tender=required and supplier is explicitly False.
     NULL is not excluded (LL-06: absence of data ≠ absence of capability).
     For bidirectional exclusion (e.g. vna_capable) use KO_BOOL_EXCLUSIVE instead.
+    SQLite returns integers (0/1), so compare with == not `is`.
     """
-    if str(tender).lower() == "required" and supplier is False:
+    if str(tender).lower() == "required" and supplier is not None and not bool(supplier):
         return True, "required but supplier does not support it"
     return False, ""
 
 
 def _op_bool_exclusive(tender, supplier) -> tuple[bool, str]:
     """Bidirectional boolean K.O. (e.g. vna_capable).
-    - tender=required  → supplier MUST be True  (else K.O.)
-    - tender=not_required → supplier must NOT be True (else K.O.)
+    - tender=required  → supplier MUST be truthy (else K.O.; None=False per LL-10)
+    - tender=not_required → supplier must NOT be truthy (else K.O.)
     - tender=None / preferred → no K.O.
+    SQLite stores booleans as integers (0/1); use bool() to normalise before comparing.
     """
     t = str(tender).lower() if tender is not None else None
-    if t == "required" and supplier is not True:
+    s = bool(supplier)  # normalises int 1→True, int 0/None→False (LL-10: None=False when required)
+    if t == "required" and not s:
         return True, f"required but not confirmed (value: {supplier})"
-    if t == "not_required" and supplier is True:
+    if t == "not_required" and s:
         return True, "not required — VNA equipment unsuitable for standard-aisle tender"
     return False, ""
 
@@ -324,17 +328,12 @@ class MatchResult:
             "website":         prod.website if hasattr(prod, "website") and prod.website else "",
             "origin":          prod.country or "",
             "description":     prod.product_description or "",
-            "navigation":      " | ".join(ext.navigation_type) if ext.navigation_type else "",
-            "max_payload_kg":  ext.max_payload_kg,
-            "lifting_height_mm": ext.lifting_height_mm,
-            "min_aisle_width_mm": ext.min_aisle_width_mm,
-            "max_speed_ms":    ext.max_speed_ms,
-            "vda5050":         ext.vda5050_compatible,
-            "battery_runtime_h": ext.battery_runtime_h,
-            "autonomous_charging": ext.autonomous_charging,
-            "reference_count": prod.reference_count,
-            "lead_time_weeks": prod.lead_time_weeks,
-            "service_coverage": prod.service_coverage,
+            **{
+                field: (
+                    " | ".join(v) if isinstance(v := _supplier_val(ext, prod, field), list) else v
+                )
+                for field in _RESULT_CARD_FIELDS
+            },
         }
 
 

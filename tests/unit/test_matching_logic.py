@@ -182,6 +182,16 @@ def test_U_M_21_vna_null_vna_supplier_not_excluded():
     r = _match_one({}, vna_capable=True)
     assert not r.disqualified
 
+# SQLite stores booleans as integers (0/1); `1 is True` is False in Python.
+# These two tests use int literals to catch identity-check regressions.
+def test_U_M_19b_vna_not_required_vna_supplier_int1_excluded():
+    r = _match_one({"required_vna": "not_required"}, vna_capable=1)
+    assert r.disqualified, "SQLite int 1 must trigger VNA K.O. (not just Python True)"
+
+def test_U_M_20b_vna_required_vna_supplier_int1_passes():
+    r = _match_one({"required_vna": "required"}, vna_capable=1)
+    assert not r.disqualified, "SQLite int 1 must be treated as True in VNA check"
+
 
 # ── OI-18: special_fork_option COND_KO (KO_SUBSET) ───────────────────────────
 

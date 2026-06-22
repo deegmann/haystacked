@@ -1,0 +1,172 @@
+/* ============================================================================
+   haystacked — Design Tokens (CSS custom properties)
+   Single source of truth. Import this once, before base.css and components.css.
+
+   "Industriell kühl, ein Akzent." Teal carries the identity, Ink/Graphite build
+   structure, Orchid is the needle — the single warm accent, used sparingly.
+   Mix ratio target: ~62% Sand/Neutral · ~22% Ink/Graphite · ~11% Teal · ~5% Orchid.
+   ============================================================================ */
+
+:root {
+  /* ---------------------------------------------------------------- COLOR -- */
+  /* Core / structure */
+  --hs-ink:        #0B1418;  /* wordmark, body text, darkest surface */
+  --hs-graphite:   #1F2D35;  /* dark panels, cards, footer */
+  --hs-graphite-2: #26343D;  /* raised dark surface */
+  --hs-steel:      #5C6B73;  /* muted text, captions */
+
+  /* Teal — primary identity */
+  --hs-teal:       #005B69;  /* primary, buttons, bar (middle) */
+  --hs-teal-hi:    #00788A;  /* teal on dark, lifted */
+  --hs-teal-deep:  #003942;  /* hover, bar base, depth */
+  --hs-teal-pale:  #7FB0B8;  /* bars on dark, secondary accent */
+  --hs-teal-tint:  #F0F4F5;  /* faint teal wash / selected surface */
+
+  /* Orchid — the needle (accent, used sparingly) */
+  --hs-orchid:      #B49AD6;  /* accent, bar tip, highlight */
+  --hs-orchid-lt:   #C9B6D8;  /* orchid on teal */
+  --hs-orchid-deep: #6E55A0;  /* accent text on light, the "§" device */
+  --hs-orchid-ink:  #46356E;  /* deepest orchid */
+  --hs-orchid-soft: #ECE3F6;  /* marked background, tint */
+
+  /* Neutral — the canvas */
+  --hs-paper:  #FFFFFF;  /* wordmark on dark, pure surface */
+  --hs-sand:   #F5F7F8;  /* default background / canvas */
+  --hs-sand-2: #EAEDEF;  /* alt background, hatching */
+  --hs-mist:   #C9D0D6;  /* secondary text on dark, lines */
+  --hs-mist-2: #D8DDE1;  /* faint lines on dark */
+
+  /* Signal — functional only, very sparing */
+  --hs-verify: #2F855A;  /* confirmed, success */
+  --hs-warn:   #B7791F;  /* caution */
+  --hs-signal: #C0392B;  /* error, "do not" */
+
+  /* Hairlines (Ink at low alpha) */
+  --hs-line:         rgba(11,20,24,0.10);  /* standard hairline */
+  --hs-line-strong:  rgba(11,20,24,0.14);  /* emphasised hairline */
+  --hs-line-soft:    rgba(11,20,24,0.06);  /* faintest divider */
+  --hs-line-on-dark: rgba(255,255,255,0.12);
+
+  /* Semantic aliases — reference these in app code, not raw hues */
+  --text-strong:        var(--hs-ink);
+  --text-body:          var(--hs-graphite);
+  --text-muted:         var(--hs-steel);
+  --text-accent:        var(--hs-orchid-deep);
+  --text-on-dark:       var(--hs-paper);
+  --text-on-dark-muted: var(--hs-mist);
+
+  --surface-page:    var(--hs-sand);
+  --surface-card:    var(--hs-paper);
+  --surface-alt:     var(--hs-sand-2);
+  --surface-dark:    var(--hs-graphite);
+  --surface-darkest: var(--hs-ink);
+  --surface-teal:    var(--hs-teal);
+  --surface-tint:    var(--hs-orchid-soft);
+
+  --border-default: var(--hs-line);
+  --border-strong:  var(--hs-line-strong);
+  --border-on-dark: var(--hs-line-on-dark);
+
+  --accent:        var(--hs-orchid);
+  --accent-ink:    var(--hs-orchid-deep);
+  --primary:       var(--hs-teal);
+  --primary-hover: var(--hs-teal-deep);
+
+  --selection-bg: var(--hs-orchid);
+  --selection-fg: var(--hs-ink);
+
+  /* --------------------------------------------------------- TYPOGRAPHY -- */
+  /* Families — Hanken Grotesk (visible) + JetBrains Mono (technical voice) */
+  --font-sans:    'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: var(--font-sans);
+
+  /* Weights */
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-extrabold: 800;
+  --fw-black:     900;
+
+  /* Type scale */
+  --fs-display-xl: clamp(40px, 7vw, 86px);   /* hero claims */
+  --fs-display:    clamp(34px, 5vw, 60px);   /* display */
+  --fs-h1:         clamp(30px, 4.4vw, 52px); /* section heads */
+  --fs-h2:         34px;
+  --fs-h3:         24px;
+  --fs-h4:         19px;
+  --fs-lede:       clamp(17px, 1.9vw, 21px); /* intro paragraph */
+  --fs-body:       16px;
+  --fs-body-sm:    14px;
+  --fs-caption:    13px;
+  --fs-eyebrow:    11px;
+  --fs-mono:       11px;
+  --fs-label:      10px;
+
+  /* Line heights */
+  --lh-display: 0.92;
+  --lh-tight:   0.96;
+  --lh-snug:    1.15;
+  --lh-body:    1.55;
+
+  /* Letter spacing */
+  --ls-display: -0.045em; /* hero / display */
+  --ls-head:    -0.04em;  /* section heads */
+  --ls-subhead: -0.03em;  /* subheads */
+  --ls-body:    0;
+  --ls-mono:    0.14em;   /* mono labels */
+  --ls-eyebrow: 0.16em;   /* eyebrows */
+  --ls-label:   0.10em;   /* small labels / data */
+
+  /* Role aliases */
+  --type-display-family: var(--font-display);
+  --type-display-weight: var(--fw-black);
+  --type-mono-family:    var(--font-mono);
+  --type-mono-weight:    var(--fw-medium);
+
+  /* ----------------------------------------------- SPACING / RADIUS / etc -- */
+  /* Spacing scale — 4px base (8/16/24/40/64 rhythm) */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  40px;
+  --space-8:  56px;
+  --space-9:  64px;
+  --space-10: 84px;   /* section padding */
+  --space-11: 120px;
+
+  /* Radius — minimal, near-square */
+  --radius-0:    0;
+  --radius-sm:   2px;     /* cards, panels (max for surfaces) */
+  --radius-md:   4px;     /* inputs, buttons */
+  --radius-pill: 999px;   /* tags / chips only */
+  --radius-bar:  0.166em; /* the bar motif corner */
+
+  /* Shadows — used very rarely; structure comes from hairlines */
+  --shadow-none: none;
+  --shadow-sm:   0 1px 2px rgba(11,20,24,0.05);
+  --shadow-pop:  0 12px 32px rgba(11,20,24,0.14); /* dialogs / menus only */
+
+  /* Layout */
+  --maxw:      1120px;  /* content max width */
+  --maxw-wide: 1320px;
+  --gutter:    32px;    /* outer margin (desktop) */
+  --gutter-sm: 20px;    /* outer margin (mobile) */
+  --section-y: 84px;    /* vertical section rhythm (>=72px) */
+
+  /* Motion — restrained, no bounce */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* Industrial cross-hatch — depth on DARK surfaces only, never light */
+  --hatch: repeating-linear-gradient(45deg, rgba(255,255,255,.025) 0 1px, transparent 1px 5px),
+           repeating-linear-gradient(-45deg, rgba(0,0,0,.10) 0 1px, transparent 1px 5px);
+}

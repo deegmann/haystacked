@@ -54,9 +54,8 @@ if errorlevel 1 (echo [FEHLT]  Python-Paket: pdfplumber) else (echo [OK]     pdf
 python -c "import httpx" > nul 2>&1
 if errorlevel 1 (echo [FEHLT]  Python-Paket: httpx) else (echo [OK]     httpx)
 
-:: Datendateien
-if exist "data\supplier_db.csv" (echo [OK]     data\supplier_db.csv) else (echo [FEHLT]  data\supplier_db.csv)
-if exist "data\nace_weighting.csv" (echo [OK]     data\nace_weighting.csv) else (echo [FEHLT]  data\nace_weighting.csv)
+:: Datenbankdatei
+if exist "data\haystacked.db" (echo [OK]     data\haystacked.db) else (echo [FEHLT]  data\haystacked.db  -^>  sync_airtable.py ausfuehren)
 
 echo.
 echo Wenn alle Eintrage [OK] zeigen -^> start.bat ausfuehren.

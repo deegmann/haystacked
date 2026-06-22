@@ -10,8 +10,8 @@ Design invariants (each maps to a past failure mode that this avoids):
     loops that can "complete" early. Every wait is a blocking call.
   - This process is the SOLE owner of port 8000. It kills any stale listener
     before each server start and never runs two servers concurrently.
-  - Model constants in app.py / src/llm_client.py are edited ONLY while no
-    server is running. uvicorn is launched WITHOUT --reload so an edit can
+  - The OLLAMA_MODEL constant in app.py is edited ONLY while no server is
+    running. uvicorn is launched WITHOUT --reload so an edit can
     never hot-restart a live worker mid-benchmark. A try/finally guarantees the
     original constant lines are restored on any exit (success, error, Ctrl-C).
   - Both models are verified present up front (`ollama show`). The script
@@ -38,7 +38,6 @@ import httpx
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_PY = ROOT / "app.py"
-LLM_PY = ROOT / "src" / "llm_client.py"
 RESULTS_DIR = ROOT / "tests" / "benchmark_results"
 SYNOLOGY_DIR = Path.home() / "SynologyDrive" / "homeDrive" / "Haystacked" / "benchmark_results"
 
@@ -66,8 +65,7 @@ MODELS = [
     "qwen2.5:14b",
 ]
 
-# The exact constant line both files share. We rewrite the whole line so we are
-# never sensitive to which model is currently set.
+# Rewrites the OLLAMA_MODEL constant in app.py between benchmark runs.
 MODEL_LINE_RE = re.compile(r'^OLLAMA_MODEL\s*=\s*"[^"]*"\s*$', re.MULTILINE)
 
 
@@ -103,30 +101,28 @@ def read_text(p: Path) -> str:
 
 
 def snapshot_constants() -> dict:
-    """Capture the original full text of both files for guaranteed revert."""
-    snap = {APP_PY: read_text(APP_PY), LLM_PY: read_text(LLM_PY)}
-    for p in (APP_PY, LLM_PY):
-        if not MODEL_LINE_RE.search(snap[p]):
-            sys.exit(f"FATAL: could not find OLLAMA_MODEL line in {p}")
+    """Capture the original full text of app.py for guaranteed revert."""
+    snap = {APP_PY: read_text(APP_PY)}
+    if not MODEL_LINE_RE.search(snap[APP_PY]):
+        sys.exit(f"FATAL: could not find OLLAMA_MODEL line in {APP_PY}")
     return snap
 
 
 def set_model_constant(model: str) -> None:
-    """Rewrite the OLLAMA_MODEL line in both files. Server MUST be stopped."""
+    """Rewrite the OLLAMA_MODEL line in app.py. Server MUST be stopped."""
     new_line = f'OLLAMA_MODEL = "{model}"'
-    for p in (APP_PY, LLM_PY):
-        txt = read_text(p)
-        new_txt, n = MODEL_LINE_RE.subn(new_line, txt)
-        if n != 1:
-            sys.exit(f"FATAL: expected exactly 1 OLLAMA_MODEL line in {p}, found {n}")
-        p.write_text(new_txt, encoding="utf-8")
-    log(f"set OLLAMA_MODEL = {model} in app.py + src/llm_client.py")
+    txt = read_text(APP_PY)
+    new_txt, n = MODEL_LINE_RE.subn(new_line, txt)
+    if n != 1:
+        sys.exit(f"FATAL: expected exactly 1 OLLAMA_MODEL line in {APP_PY}, found {n}")
+    APP_PY.write_text(new_txt, encoding="utf-8")
+    log(f"set OLLAMA_MODEL = {model} in app.py")
 
 
 def restore_constants(snap: dict) -> None:
     for p, txt in snap.items():
         p.write_text(txt, encoding="utf-8")
-    log("reverted app.py + src/llm_client.py to original constants")
+    log("reverted app.py to original constants")
 
 
 # ───────────────────────── server lifecycle ─────────────────────────
