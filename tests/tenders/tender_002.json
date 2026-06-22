@@ -13,6 +13,17 @@
     "operating_temp_max_c": 30,
     "multi_load_compatibility": "not_required"
   },
+  "golden_extraction": {
+    "required_weight_capacity_kg": 2000,
+    "required_max_lift_height_m": null,
+    "required_min_aisle_width_m": null,
+    "required_temp_min_c": 10,
+    "required_temp_max_c": 30,
+    "required_humidity_max_pct": null,
+    "required_max_gradient_pct": null,
+    "required_max_vehicle_height_mm": null
+  },
+  "golden_run_file": "golden_run_tender_mama.json",
   "expected_ko_exclusions": [],
   "expected_top_3": [],
   "notes": "Greenfield F&B production. 10 filling lines, 2 warehouses, 1 staging area. Packaging supply + finished goods transport. All stations floor-level (floor delivery/picking). Required lift height ~200-400mm only (Boden-Boden). 3 pallet sizes: 800x1200, 1000x1200, 1200x1200. Max load 2000kg. 24/7 operation. Preferred suppliers: Jungheinrich (1st), Linde (2nd) -> Counterbalanced Forklift, NOT Mobile AMR. MES via OPC UA."

@@ -156,63 +156,69 @@ For matching the *commercial* counterpart, `distribution_model` and the company 
 
 ## 15. Reading tender context to derive the required AGV type
 
-Tenders rarely state the AGV type explicitly. Derive it from the *operational environment and task description*, not from isolated keywords. This section maps the most common tender contexts to the correct required_vehicle_type.
+Tenders rarely state the AGV type explicitly. Derive it from the *operational environment and task description*, not from isolated keywords.
 
-### Production / manufacturing environments — use payload and lift height, not environment alone
-
-**Critical rule:** The environment alone (filling line, production hall, assembly) does NOT determine the AGV type. A 2,000 kg pallet on a production floor needs a Counterbalanced Forklift AGV, not a Mobile AMR. Use these discriminators:
-
-**Payload is the primary discriminator:**
-- **≤ 1,500 kg + flexible routing + SLAM navigation** → Mobile AMR
-- **≥ 1,500 kg OR heavy pallets OR multiple pallet sizes** → Forklift AGV (Counterbalanced or Reach Truck)
-- **Towing train, milk-run loop, multiple stops in sequence** → Tugger AGV
-
-**Lift height is the secondary discriminator:**
-- **Floor-only (lift ~200–400 mm, all stations "floor delivery")** → Counterbalanced Forklift (low-lift transport)
-- **Racking / height > 2 m** → Reach Truck or VNA (see high-bay section below)
-- **No lift at all (roller tops, belt tops)** → Mobile AMR with top module
-
-**Critical: normal pallets on the floor require forks — AMRs cannot pick them up.**
-Standard EUR pallets (800×1200, 1000×1200, 1200×1200) and IBCs sitting directly on the floor need a fork interface to be lifted and transported. An underride AMR (e.g. iw.hub, MiR, arculee) can only handle loads placed on special elevated docking stations — it cannot pick up a pallet from the floor. If the tender says "Floor delivery" for standard pallet stations with **no mention of special docking infrastructure**, the vehicle must have forks → Forklift AGV (Counterbalanced for floor-level, Reach Truck or VNA for racking). The only AMRs that can handle floor-level standard pallets are dedicated pallet-jack AMRs (e.g. MiR1350 Pallet Jack, AGILOX OCF with free-lift) — check whether these are relevant given the payload requirement.
-
-**The "filling line" trap:** A filling line supply tender transporting heavy pallets floor-to-floor is a **Counterbalanced Forklift AGV** task. Do not classify as Mobile AMR just because the environment is production. Check: (1) payload, (2) all stations floor-level with standard pallets, (3) no special docking infrastructure mentioned, (4) buyer names forklift suppliers as preferred.
-
-**Worked example — Forklift in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → required_vehicle_type = "Counterbalanced" (heavy load, floor-to-floor, forklift suppliers named).
-
-**Worked example — AMR in production:** "Autonomous mobile robots for transporting empty containers between assembly workstations, max 300 kg, SLAM navigation, MES dispatching" → required_vehicle_type = "Mobile AMR" (light load, flexible routing, no fixed stations).
+**There are exactly three valid values for `required_vehicle_type`: `Forklift AGV`, `Tugger AGV`, `Mobile AMR`.** Sub-variants (Counterbalanced, Reach Truck, VNA) are properties within the Forklift AGV category — they do not change the type value. Never output a sub-variant as the vehicle type.
 
 ---
 
-### High-bay warehouse with racking → Forklift AGV (check for VNA)
+### Step 1 — Tugger AGV (check first, it is the most distinctive)
 
-**Signals:** high-bay racking (Hochregallager), pallet racking (Palettenregal), rack positions (Stellplätze), storage and retrieval (Ein-/Auslagerung), picking lanes (Kommissioniergassen), VNA, narrow aisle (Schmalgang), warehouse management system (WMS).
+If the task is towing a **train of trailers or carts along a fixed loop** (milk-run, Routenzug, multiple sequential stops) → `required_vehicle_type = "Tugger AGV"`.
 
-**VNA check:** if aisle width < 2 m OR the words "VNA", "Schmalgang", or "turret truck" appear → required_vehicle_type = "VNA", required_vna = true, required_drive_type = "VNA Turret".
-
-**Reach truck:** if aisle 2–3 m, lift > 4 m, racking → "Reach Truck".
-
-**Counterbalanced:** only if aisle ≥ 3 m AND no racking involved (floor-level pallet transport, goods-in/out staging areas, flat warehouses). Counterbalanced forklifts do NOT operate in racking aisles.
+Tugger AGVs do not carry loads directly; they tow. If the tender mentions a tractor unit pulling trailers / dollies, that is a Tugger — regardless of payload or environment.
 
 ---
 
-### Wide-aisle transport / cross-docking → Counterbalanced Forklift or Tugger
+### Step 2 — Mobile AMR (only when all three conditions are met)
 
-**Signals:** transfer stations, dock loading (Verladung), flat warehouse, pallet buffer, goods-in/goods-out (Warenein-/ausgang), no racking mentioned, aisle ≥ 3 m.
+`required_vehicle_type = "Mobile AMR"` **only if all of the following are true:**
 
-**Counterbalanced:** if individual pallet transport between fixed floor-level stations → "Counterbalanced".
-**Tugger:** if multiple loads are moved in a train along a fixed route → "Tugger AGV".
+1. **Light payload:** ≤ 1,500 kg
+2. **Flexible routing / free navigation:** SLAM, Natural Feature, contour navigation — no fixed track or reflectors required
+3. **No standard floor-level pallet pickup:** loads are on roller tops, belt conveyors, elevated docking stations, or carts — NOT standard EUR pallets sitting on the floor
+
+**Critical: standard pallets on the floor require forks — AMRs cannot pick them up.**
+Standard EUR pallets (800×1200, 1000×1200, 1200×1200) and IBCs sitting directly on the floor need a fork interface. An underride AMR (e.g. iw.hub, MiR, arculee) can only handle loads on special elevated docking stations. If the tender says "floor delivery" for pallet stations with **no mention of special docking infrastructure**, condition 3 is NOT met → classify as Forklift AGV. The only exceptions are dedicated pallet-jack AMRs (e.g. MiR1350 Pallet Jack, AGILOX OCF with free-lift).
+
+**The "filling line" trap:** A filling line tender transporting heavy pallets floor-to-floor fails condition 1 AND condition 3 → `Forklift AGV`, not Mobile AMR. Do not let the production environment override the payload and load interface check. Check: (1) payload, (2) all stations floor-level with standard pallets, (3) no special docking infrastructure mentioned, (4) buyer names forklift suppliers as preferred.
+
+**Worked example — Mobile AMR:** "Autonomous mobile robots for transporting empty containers between assembly workstations, max 300 kg, SLAM navigation, MES dispatching" → `required_vehicle_type = "Mobile AMR"` (light load, flexible routing, containers on elevated stations).
 
 ---
 
-### Summary table (use as a checklist before setting required_vehicle_type)
+### Step 3 — Forklift AGV (everything else)
 
-| Environment signal | First candidate | Check for |
+If neither Tugger nor Mobile AMR applies → `required_vehicle_type = "Forklift AGV"`.
+
+This covers all tasks where a fork interface is needed: standard pallet pickup from the floor, racking storage/retrieval, heavy payloads, dock loading. The specific sub-variant (Counterbalanced, Reach Truck, VNA) is a property of the application — it does **not** change the `required_vehicle_type` value.
+
+**Worked example — Forklift AGV in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → `required_vehicle_type = "Forklift AGV"` (heavy load, floor-to-floor pallet pickup with forks).
+
+**Worked example — Forklift AGV in high-bay warehouse:** "Automated storage and retrieval in pallet racking, aisle width 2.5 m, lift height 6 m" → `required_vehicle_type = "Forklift AGV"`.
+
+---
+
+### VNA flag — additional check for Forklift AGV tenders only
+
+After setting `required_vehicle_type = "Forklift AGV"`, check whether the application requires Very Narrow Aisle capability:
+
+If **aisle width < 2 m** OR the keywords "VNA", "Schmalgang", "Schmalgangstapler", or "turret truck" appear → also set `required_vna = true`.
+
+`required_vna` is a separate Boolean flag — it narrows the Forklift AGV pool to VNA-capable suppliers. It does not create a fourth vehicle type.
+
+---
+
+### Summary table
+
+| Situation | required_vehicle_type | Additional flag |
 |---|---|---|
-| Filling line / production hall / assembly | Mobile AMR | Tugger if milk-run |
-| High-bay racking + aisle < 2 m | VNA (Forklift AGV) | required_vna = true |
-| High-bay racking + aisle 2–3 m | Reach Truck (Forklift AGV) | Lift height |
-| Wide-aisle warehouse, no racking | Counterbalanced | Tugger if train route |
-| Trailer/dock loading | Counterbalanced or Tugger | auto_hitch |
+| Towing train / milk-run / Routenzug | Tugger AGV | — |
+| Light load (≤1,500 kg) + SLAM + no floor pallet pickup | Mobile AMR | grid_required if G2P |
+| Standard pallet on floor, any payload | Forklift AGV | — |
+| Racking / storage–retrieval, any aisle width | Forklift AGV | required_vna = true if aisle < 2 m |
+| Dock loading / cross-docking, individual pallets | Forklift AGV | — |
+| Dock loading / cross-docking, train route | Tugger AGV | auto_hitch |
 | Goods-to-Person picking | Mobile AMR | grid_required = true |
 
 ---

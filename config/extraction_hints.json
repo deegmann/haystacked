@@ -1,0 +1,198 @@
+{
+  "required_navigation": {
+    "hint": "Navigation technology used by the AGV. Output from allowed values only, comma-separated. Mapping rules: 'SLAM' / 'natural feature' / 'free navigation' / 'marker-free' / 'environment mapping' / 'contour-based' → 'Natural Feature (SLAM)'; 'laser reflector' / 'reflector marker' / 'laser scanner with reflectors' → 'Laser Reflector'; 'magnetic tape' / 'magnetic stripe' → 'Magnetic Tape'; 'QR code' / 'barcode' / 'data matrix' → 'QR/DM Code'; 'inductive loop' / 'wire guidance' → 'Inductive Loop'; 'vision' / 'camera-based' → 'Vision'. If multiple navigation types are required, list all. null = not stated in the document.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_infrastructure": {
+    "hint": "Specifies what physical navigation infrastructure must be permanently installed on-site for the AGV to operate (e.g. reflectors for laser navigation, magnetic tape or inductive loops embedded in the floor). Cond. K.O.: scored by default; hard filter only when buyer cannot accept infrastructure modifications. NULL RULE: null unless the document explicitly names a required infrastructure type — do NOT infer from AGV category, navigation technology, or industry context.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_outdoor": {
+    "hint": "Outdoor operation required. Output true or false (boolean) — never 'yes'/'no'. null = not stated.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_weight_capacity_kg": {
+    "hint": "Maximum payload the AGV must carry per trip, in kg. This value may appear as prose (e.g. 'a maximum of X kg', 'loads up to X kg', 'pallets weigh up to X kg') OR as a table column (labelled 'Max Loaded weight' / 'gross weight'). Read BOTH prose sentences and table cells — do not restrict search to tables only. In tables, use the loaded/gross weight — IGNORE 'tare weight' / 'empty pallet weight'. If a range or several load types are given, report the heaviest stated number. NULL RULE: Output null only if no maximum load weight is stated anywhere in the document text. CONSERVATIVE EXTRACTION: if multiple values are stated, extract the MAXIMUM — the supplier must meet or exceed this threshold.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_load_types": {
+    "hint": "Load carriers handled. Output ONLY from allowed values — do NOT describe the process (e.g. 'floor delivery'). null = not determinable from document.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_multi_load": {
+    "hint": "Handles several carrier types/sizes in ONE workflow without manual reconfiguration. Source: 'auto fork adjust / mixed loads'. Cond. K.O.: hard filter only if the buyer runs mixed loads.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_temp_min_c": {
+    "hint": "Lowest rated operating temperature the vehicle must sustain, in °C. NULL RULE — READ FIRST: this field is null by default. Only fill it if the tender document explicitly states an operating/working temperature value (with a °C or K unit) in an environment or technical-specification section. If the document does not state an operating temperature, output null. Do NOT supply any default, typical, or example value. Do NOT copy numbers from this field description, from matching-rule notes, or from domain guidance — those are explanatory text, never document evidence. Do NOT confuse temperatures with dates, year/revision numbers, quantities, or project metadata. Source: a 'working temperature' / 'operating temperature' figure in the document's environment or operating-conditions section.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_temp_max_c": {
+    "hint": "Highest rated operating temperature the vehicle must sustain, in °C. NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states an operating/working temperature value (with a °C or K unit). If not stated, output null. Do NOT supply a default, typical, or example value, and do NOT copy numbers from this description or from rule notes. Do NOT confuse with dates, year numbers, or version codes. Source: a 'working temperature' / 'operating temperature' figure in the environment or operating-conditions section.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_humidity_max_pct": {
+    "hint": "Maximum rated relative humidity the vehicle must tolerate, as a percentage. NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a relative-humidity value as a % figure in an environment or technical-specification section. If no humidity percentage is stated, output null. Do NOT supply a default, typical, or example value, and do NOT copy numbers from this description or from rule/domain notes. Do NOT infer humidity from warehouse type, food/beverage context, washdown wording, or cold-storage environment. Source: an explicit relative-humidity % figure in the environment specification.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_ip_rating": {
+    "hint": "IP code for dust/water resistance. Source: spec 'IP rating' — must be explicitly printed (e.g. 'IP54', 'IP65'). Cond. K.O.: IP52+ binds for dust/moisture/washdown (F&B, beverage); standard AMRs ≈ IP20. 'None' = no rating stated. NULL RULE: null if no IP code is explicitly stated. Warehouse type, AGV type, and storage environment do NOT imply an IP rating — a VNA high-bay warehouse is NOT necessarily IP65.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_clean_room": {
+    "hint": "Cleanroom certification, if any. Source: 'cleanroom version'. Cond. K.O.: binds only for pharma/semiconductor/sterile F&B. 'None' = no cleanroom rating. NULL RULE: output 'None' or null unless the document explicitly states a cleanroom ISO class (e.g. 'ISO 7', 'cleanroom version'). Do NOT infer from words like 'clean', 'hygiene', or 'food-grade'.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_max_gradient_pct": {
+    "hint": "Max ramp gradient the loaded unit handles. Source: spec 'gradeability' — must appear as an explicit % value. The value represents the steepest ramp gradient (%) the loaded vehicle must climb: 10 % ≈ 5.7° incline; most flat indoor warehouse floors have 0 % gradient and this field should be null. Cond. K.O.: binds only where the site has ramps/dock inclines. NULL RULE: null unless a slope or gradient percentage is explicitly stated in the document. Do NOT apply typical industry values (e.g. '5%') when the document is silent on gradients.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_floor_flatness": {
+    "hint": "Floor flatness the system requires for safe operation/high-lift. Source: install requirements — must name a standard or value. Cond. K.O.: binds when the site floor is below spec → costly grinding. NULL RULE: null unless a floor quality standard (DIN 15185, FM number, FF number, etc.) or explicit flatness value is named. Do NOT infer from VNA or high-bay context.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_fleet_management": {
+    "hint": "Architecture of the fleet controller. Source: 'fleet manager / software'. Implies lock-in vs. interoperability. NULL RULE: output null unless the tender explicitly names a required fleet-controller architecture (one of the allowed values). Do NOT infer from the mere presence of a WMS, fleet software, or VDA 5050 mention — those are separate fields.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_vda5050": {
+    "hint": "Supports VDA 5050 (open AGV↔master-control interface standard). Source: 'VDA 5050 ready' or 'VDA-5050'. Cond. K.O.: trending to a hard requirement for large EU multi-vendor tenders. NULL RULE: null unless the document literally contains 'VDA 5050' or 'VDA-5050'. Do NOT infer from fleet management, MES/WMS integration, or system openness requirements.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_integration": {
+    "hint": "System integrations required by the tender. Extract all mentioned: SAP, WMS, ERP, MES, REST API, MQTT, OPC-UA, Modbus, etc. List comma-separated. null if none mentioned.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_station_types": {
+    "hint": "Pick/drop station types the AGV must serve. Extract all mentioned: Floor, Conveyor, Machine cell, Gravity rack, Pushback rack, Drive-in rack. If any conveyor station mentioned → include 'Conveyor'. List comma-separated.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_service_coverage": {
+    "hint": "Geographic service & support reach. Source: 'locations / service network'. Cond. K.O.: hard filter when the buyer needs fast on-site SLA in a specific region. 'None' = no own network stated. NULL RULE: output null unless the tender explicitly demands a service/support region. Do NOT infer coverage from the document language or buyer location.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_vehicle_type": {
+    "hint": "AGV/AMR category. Output exactly one of the allowed values. Hard K.O.: Forklift AGV never matches Tugger or AMR.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_country": {
+    "hint": "HQ country of the selling company. Used as Cond. K.O. when buyer requires domestic or regional supplier. NULL RULE: output null unless the tender explicitly requires a domestic or specific-country supplier. Do NOT infer from buyer address or document language.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_languages": {
+    "hint": "Support languages required. Output 2-letter ISO 639-1 codes only (DE, EN, FR, ES, ZH), comma-separated. null = not stated.",
+    "sheet": "SHARED – All AGV Types"
+  },
+  "required_max_lift_height_m": {
+    "hint": "AGV fork lift height in METERS — the height the forks travel, NOT building height, rack height or storage height. Source: 'Hubhöhe / lift height / fork height' in the AGV specification. If only building or rack height is stated → null. NULL RULE: null unless the document explicitly states a required AGV lift height as a technical specification with its own value and unit. Do NOT confuse with transfer station height, conveyor height, rack height, or building height — these are site dimensions, not AGV specifications. Do NOT compute, derive, or estimate the lift height from any other stated quantity — pallet height, stack height, number of storage levels, or rack capacity are design inputs, not AGV lift specifications. A lift height obtained by calculation rather than read directly from an AGV specification has no source sentence and must be output as null.",
+    "sheet": "Forklift AGV"
+  },
+  "required_max_vehicle_height_mm": {
+    "hint": "Lowest overall vehicle height (mast collapsed). Source: dimensions. Cond. K.O.: binds where doors/sprinklers/mezzanines limit clearance.",
+    "sheet": "Forklift AGV"
+  },
+  "required_special_fork_option": {
+    "hint": "Non-standard fork or attachment type required by the tender. NULL RULE — READ FIRST: null by default. Only output a value if the tender document EXPLICITLY names a non-standard attachment type — i.e. 'telescopic forks', 'side-shift', or 'clamp'. Standard forks are the default for all forklifts and must NOT be extracted as a requirement. Rotating forks are the default for VNA/narrow-aisle turret trucks and are resolved from the vehicle classification, not from this field. If the document does not explicitly name Telescopic, Side-Shift, or Clamp — output null. A null value never disqualifies any supplier; a wrong value eliminates qualified suppliers.",
+    "sheet": "Forklift AGV"
+  },
+  "required_fork_spread_mm": {
+    "hint": "Can fork width adjust to different pallet widths, and how? Source: 'fork adjustment / auto fork width'. Cond. K.O.: 'Auto' becomes required only when the buyer runs mixed pallet widths.",
+    "sheet": "Forklift AGV"
+  },
+  "required_min_aisle_width_m": {
+    "hint": "Minimum working aisle width available in the facility, in METERS. ONLY extract if the document explicitly states an aisle, corridor, or rack-to-rack width. Source terms: 'Gangbreite', 'aisle width', 'working aisle', 'corridor width'. If no explicit width is stated anywhere in the document → output null. Do NOT infer or estimate a width from the warehouse type, the forklift category, or any typical or standard value — absence of a stated width means null, never a guess. If the figure is given in mm, divide by 1000. Do NOT confuse aisle width with lift height, rack height, vehicle height, or transfer-station height.",
+    "sheet": "Forklift AGV"
+  },
+  "required_vna": {
+    "hint": "VNA / very narrow aisle operation required. true/false. Source: 'VNA', aisle < 2 m with high-bay racking. If true, required_drive_type must be 'VNA Turret'.",
+    "sheet": "Forklift AGV"
+  },
+  "required_drive_type": {
+    "hint": "Forklift drive category — describes the physical build of the forklift mechanism. There are five types:\n- Counterbalanced (Gegengewichtsstapler): rear counterweight, no front support legs, forks fully exposed. Can pick pallets directly from the floor and mate with closed conveyors. Wide aisles (≥3 m).\n- Reach Truck (Schubmaststapler): forks extend forward between two front legs. Handles racking in medium aisles (2–3 m), lifts up to ~8 m.\n- Straddle Stacker (Spreizenstapler): load sits between the front legs. Narrower aisles and higher lift than a reach truck.\n- Pallet Mover (Niederhubwagen): low-profile, floor-to-floor transport only, no high-lift to racking.\n- VNA Turret (Schmalgangstapler): only the turret rotates, not the chassis. Ultra-narrow aisles (<2 m), high-bay racking up to 17 m. Always wire- or rail-guided in the aisle.\nEXTRACTION RULE: if required_vna=true → always output 'VNA Turret'. Otherwise: ONLY output if the buyer explicitly names a drive type or forklift category in the document (e.g. 'Gegengewichtsstapler', 'counterbalanced forklift', 'Schubmaststapler', 'reach truck required'). DO NOT infer from the task — floor-level pallet transport does NOT imply Counterbalanced. Output null if the buyer does not specify a drive type.",
+    "sheet": "Forklift AGV"
+  },
+  "required_free_floating_forks": {
+    "hint": "Single forks with NO support legs/structure under the load (true counterbalance free-lift). Source: drive_type=Counterbalanced + 'free lift'. Required to pick closed-bottom pallets on the floor and mate with closed conveyors — straddle/reach trucks fail here. Cond. K.O.: decisive only when the buyer has closed pallets/conveyors.",
+    "sheet": "Forklift AGV"
+  },
+  "required_stacking": {
+    "hint": "Can stack & de-stack pallets (vertical), vs. floor-to-floor transport only. Source: 'stacking'. Filter for storage vs. pure transport tenders.",
+    "sheet": "Forklift AGV"
+  },
+  "required_barcode_readers": {
+    "hint": "Reads barcodes/DataMatrix and acts on the data (confirm SKU/location). Source: 'barcode / scanning'. Cond. K.O.: hard requirement when the buyer explicitly demands barcode verification; otherwise scores as an enhancement. (template case for Cond. K.O.)",
+    "sheet": "Forklift AGV"
+  },
+  "required_trailer_loading": {
+    "hint": "Autonomously LOADS trailers/trucks at the dock. Source: 'automatic truck loading'. Cond. K.O.: decisive only for dock-automation tenders.",
+    "sheet": "Forklift AGV"
+  },
+  "required_trailer_unloading": {
+    "hint": "Autonomously UNLOADS trailers/trucks. Source: same. Cond. K.O.: decisive only for dock-automation tenders.",
+    "sheet": "Forklift AGV"
+  },
+  "required_guidance_type": {
+    "hint": "Physical guidance for rail/wire-guided VNA trucks (distinct from free-nav AGVs). Source: VNA spec. 'None' for free-roaming units.",
+    "sheet": "Forklift AGV"
+  },
+  "required_towing_capacity_kg": {
+    "hint": "Total towed load in kg. [TUGGER ONLY] — output null unless required_vehicle_type is Tugger AGV. Source: 'Schleppkraft / towing capacity'.",
+    "sheet": "Tugger AGV"
+  },
+  "required_min_trailers": {
+    "hint": "Number of trailers per train. [TUGGER ONLY] null for other vehicle types.",
+    "sheet": "Tugger AGV"
+  },
+  "required_coupling_type": {
+    "hint": "Trailer attachment method. Output from allowed values only, comma-separated if multiple. null = not stated. NULL RULE: output null unless the tender explicitly names a coupling method. Do NOT default to 'Automatic' or infer from 'auto_hitch'.",
+    "sheet": "Tugger AGV"
+  },
+  "required_auto_hitch": {
+    "hint": "Automatic trailer coupling without manual intervention. true/false. [TUGGER ONLY] null for other vehicle types.",
+    "sheet": "Tugger AGV"
+  },
+  "required_route_type": {
+    "hint": "Routing mode. Output exactly one allowed value. Fixed Route = predefined milk-run loop; Flexible Route = semi-dynamic; Fully Dynamic = on-demand point-to-point.",
+    "sheet": "Tugger AGV"
+  },
+  "required_max_turning_radius_mm": {
+    "hint": "Tugger turning radius (tractor alone). Source: spec 'turning radius' (e.g. Vecna ATG ≈ 2,900 mm / 9'6\"). Hard filter for tight bends & dock turns.",
+    "sheet": "Tugger AGV"
+  },
+  "required_workflow_type": {
+    "hint": "AMR workflow function. [AMR ONLY] null for other types. Output from allowed values, comma-separated. NULL RULE: output null unless the tender explicitly specifies the AMR workflow (Transport, Goods-to-Person, Picking support). Do NOT infer from general automation context.",
+    "sheet": "Mobile AMR"
+  },
+  "required_grid_infrastructure": {
+    "hint": "Requires fixed storage grid. [AMR ONLY] true/false. null for other types. NULL RULE: output null unless the tender explicitly requires a fixed storage grid (e.g. AutoStore-style). Do NOT infer from 'racking' or 'shelving'.",
+    "sheet": "Mobile AMR"
+  },
+  "required_picking_mechanism": {
+    "hint": "Picking method. [AMR ONLY] null for other types. Output from allowed values. NULL RULE: output null unless the tender explicitly names a picking method. Do NOT infer from generic 'picking' mentions.",
+    "sheet": "Mobile AMR"
+  },
+  "required_lift_height_mm": {
+    "hint": "Lift stroke to raise the cart/rack/pod off the floor. Source: spec 'lifting height/stroke'. Implies whether it clears the carrier underside; filter vs. carrier leg height. (0 for non-lifting transport tops.)",
+    "sheet": "Mobile AMR"
+  },
+  "required_ground_clearance_mm": {
+    "hint": "Robot height / clearance needed to drive UNDER the carrier (undercarriage workflows). Source: vehicle height spec. Must be less than the carrier's underside gap — classic undercarriage K.O.",
+    "sheet": "Mobile AMR"
+  },
+  "required_rack_pin": {
+    "hint": "Engages standard rack/shelf pin systems (Geek+/Quicktron style). Source: 'shelf/rack compatibility'. Cond. K.O.: binds when the buyer reuses existing movable shelving.",
+    "sheet": "Mobile AMR"
+  },
+  "required_free_lift": {
+    "hint": "Handles BOTH open and closed-bottom pallets (e.g. AGILOX OCF free-lift). Source: 'open/closed pallet'. Cond. K.O.: mirrors the forklift closed-pallet case; binds only when the buyer has closed pallets.",
+    "sheet": "Mobile AMR"
+  },
+  "required_shelf_height_mm": {
+    "hint": "Max shelf/rack/pod height handled (Geek+ ~2.8 m; RoboShuttle ~11 m). Source: spec. Cond. K.O.: binds for G2P vs. building height; density driver.",
+    "sheet": "Mobile AMR"
+  },
+  "required_shelf_footprint": {
+    "hint": "Pod/shelf footprint the robot drives under (e.g. 880×880, 1020×1020). Source: spec 'shelf size'. Cond. K.O.: binds when matching existing shelving dimensions.",
+    "sheet": "Mobile AMR"
+  }
+}

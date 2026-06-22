@@ -3,6 +3,8 @@
   "description": "OeA-199-25 (CompanyX) -- Website redesign TU Berlin -- OUT OF SCOPE",
   "source_file": "OeA-199-25 Leistungsbeschreibung.pdf",
   "in_scope": false,
+  "golden_run_file": "golden_run_tender_oea19925.json",
+  "expected_out_of_scope": true,
   "requirements": {},
   "expected_ko_exclusions": [],
   "expected_top_3": [],

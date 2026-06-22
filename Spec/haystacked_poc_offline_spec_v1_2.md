@@ -711,7 +711,8 @@ SYSTEM CONTEXT -- haystacked Matching Engine
 - `scripts/extract_ap0_descriptions.py`
 - `config/field_descriptions.json`
 - `src/context_builder.py`
-- `src/llm_client.py` (Ollama-Wrapper mit num_ctx, Retry, repair_and_parse)
+- `src/llm_client.py` (Ollama-Wrapper mit num_ctx, Retry)
+- `src/json_repair.py` (kanonische repair_and_parse — genutzt von app.py, llm_client, Tests)
 - `tests/unit/test_context_builder.py`
 
 ---

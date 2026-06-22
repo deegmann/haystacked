@@ -38,6 +38,14 @@ env/
 .DS_Store
 **/.DS_Store
 
-# ── Excel lock files ──────────────────────────────────────────────────────────
+# ── Excel lock files & backups ────────────────────────────────────────────────
 ~$*.xlsx
 ~$*.xls
+*.xlsx.bak_*
+
+# ── Local research snapshots (DB is canonical) ────────────────────────────────
+offline_supplier_research/
+offline_supplier_research.zip
+
+# ── Local design files ────────────────────────────────────────────────────────
+design/

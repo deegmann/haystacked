@@ -1,0 +1,3092 @@
+{
+  "source_file": "Beispielausschreibung_AGV_Nordlicht.pdf",
+  "vehicle_type": "Forklift AGV",
+  "agv_criteria": {
+    "required_navigation": "Natural Feature (SLAM)",
+    "required_infrastructure": null,
+    "required_outdoor": false,
+    "required_weight_capacity_kg": 1200,
+    "required_weight_capacity_kg_source": "Maximale Traglast ≥ 1.200 kg",
+    "required_load_types": null,
+    "required_multi_load": null,
+    "required_temp_min_c": null,
+    "required_temp_min_c_source": null,
+    "required_temp_max_c": null,
+    "required_temp_max_c_source": null,
+    "required_humidity_max_pct": null,
+    "required_humidity_max_pct_source": null,
+    "required_ip_rating": null,
+    "required_clean_room": null,
+    "required_max_gradient_pct": null,
+    "required_max_gradient_pct_source": null,
+    "required_floor_flatness": null,
+    "required_fleet_management": null,
+    "required_vda5050": true,
+    "required_integration": null,
+    "required_station_types": "Floor, Conveyor",
+    "required_service_coverage": null,
+    "required_country": null,
+    "required_languages": "DE",
+    "required_max_lift_height_m": 10,
+    "required_max_lift_height_m_source": "Lagerhöhe 10 m",
+    "required_max_vehicle_height_mm": null,
+    "required_max_vehicle_height_mm_source": null,
+    "required_special_fork_option": null,
+    "required_fork_spread_mm": null,
+    "required_min_aisle_width_m": 3.4,
+    "required_min_aisle_width_m_source": "Regalbreite (Gassenbreite) 3,4 m",
+    "required_drive_type": "Counterbalanced",
+    "required_free_floating_forks": false,
+    "required_stacking": null,
+    "required_barcode_readers": null,
+    "required_trailer_loading": null,
+    "required_trailer_unloading": null,
+    "required_guidance_type": null,
+    "required_vehicle_type": "Forklift AGV",
+    "required_vna": false,
+    "_validation_warnings": [],
+    "required_vehicle_type_canonical": "Forklift AGV",
+    "_vna_subtype": false
+  },
+  "match_results": [
+    {
+      "product": "REACHY",
+      "company": "Balyo",
+      "score": -4,
+      "max_score": 104,
+      "rank": 1,
+      "disqualified": false,
+      "disqualified_by": [],
+      "score_details": [
+        {
+          "field": "tugger_min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "autonomous_charging",
+          "points": 6,
+          "value": true
+        },
+        {
+          "field": "safety_standard",
+          "points": 5,
+          "value": [
+            "ISO 3691-4 (verify)"
+          ]
+        }
+      ],
+      "agv_type": "Forklift AGV",
+      "reasons": [
+        "autonomous_charging: +6 pts",
+        "safety_standard: +5 pts"
+      ],
+      "knockouts": [],
+      "website": "",
+      "origin": "FR",
+      "description": "Autonomous reach truck (Linde base); 11m lift; 1.6t; aisles from 2.9m",
+      "navigation": "Natural Feature (SLAM) | Vision",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 11000,
+      "min_aisle_width_mm": 2900,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "K55A Pallet Stacker",
+      "company": "KIVNON Logística S.L.",
+      "score": -43,
+      "max_score": 155,
+      "rank": 2,
+      "disqualified": false,
+      "disqualified_by": [],
+      "score_details": [
+        {
+          "field": "max_payload_kg_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "lifting_height_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "tugger_min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "autonomous_charging",
+          "points": 6,
+          "value": true
+        },
+        {
+          "field": "safety_standard",
+          "points": 5,
+          "value": [
+            "None (CE/TÜV marks only)"
+          ]
+        },
+        {
+          "field": "vda5050_compatible",
+          "points": 6,
+          "value": true
+        }
+      ],
+      "agv_type": "Forklift AGV",
+      "reasons": [
+        "autonomous_charging: +6 pts",
+        "safety_standard: +5 pts",
+        "vda5050_compatible: +6 pts"
+      ],
+      "knockouts": [],
+      "website": "",
+      "origin": "ES",
+      "description": "AGV pallet stacker (lifting); open-bottom + American pallets; stacking + intralogistics; robotic process automation; VDA5050",
+      "navigation": "Natural Feature (SLAM) | Magnetic Tape",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "EXV iGo",
+      "company": "STILL GmbH",
+      "score": -49,
+      "max_score": 149,
+      "rank": 3,
+      "disqualified": false,
+      "disqualified_by": [],
+      "score_details": [
+        {
+          "field": "max_payload_kg_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "lifting_height_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "tugger_min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "autonomous_charging",
+          "points": 6,
+          "value": true
+        },
+        {
+          "field": "safety_standard",
+          "points": 5,
+          "value": [
+            "ISO 3691-4"
+          ]
+        }
+      ],
+      "agv_type": "Forklift AGV",
+      "reasons": [
+        "autonomous_charging: +6 pts",
+        "safety_standard: +5 pts"
+      ],
+      "knockouts": [],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated high-lift pallet truck; production logistics + pre-storage; IFOY 2024 winner",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Omron LD-60",
+      "company": "Omron Mobile Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 4,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 60.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 60.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "US",
+      "description": "Compact transport AMR, 60kg payload. Natural Feature SLAM, no facility modifications required. PLd safety per ISO 13849-1; UL3100 and ISO 3691-4 certified. Battery LiFePO4 72Ah, 12h runtime at full payload, 130-min charge (20-80%). Cleanroom ISO 5 / Class 100 rated. Stop accuracy ±25mm standard target; ±8mm with CAPS/HAPS precision docking. Max slope 8.3% at ≤60kg payload. Fleet FLOW Core max 100 robots; multi-vendor Unified Fleet License supported. LD-60/90 share the same 698×500mm platform.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 60.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.8,
+      "vda5050": null,
+      "battery_runtime_h": 12.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "ek robotics COMPACT MOVE CB 25",
+      "company": "ek robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 5,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 5500 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 5500 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Counterbalanced forklift AGV. Maximum payload 2500 kg (CB 25), lifting height 5500mm. Hybrid navigation: 'precise laser navigation' (Laser Reflector primary) + 3D camera system for pallet placement at up to 5.5m without errors (load detection). Also available in CB 10 (1000/1200kg) and CB 16 (1600kg) variants. 4-fork configuration available for double-pallet handling. Safety scanner coverage in lateral/front zones. Fleet: Transport Manager (centralized). Battery type not confirmed. forks_free_floating=TRUE (counterbalanced rule). load_detection=Camera/Vision (3D camera for remote pallet placement).",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 2500.0,
+      "lifting_height_mm": 5500,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    }
+  ],
+  "matches_all": [
+    {
+      "product": "REACHY",
+      "company": "Balyo",
+      "score": -4,
+      "max_score": 104,
+      "rank": 1,
+      "disqualified": false,
+      "disqualified_by": [],
+      "score_details": [
+        {
+          "field": "tugger_min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "autonomous_charging",
+          "points": 6,
+          "value": true
+        },
+        {
+          "field": "safety_standard",
+          "points": 5,
+          "value": [
+            "ISO 3691-4 (verify)"
+          ]
+        }
+      ],
+      "agv_type": "Forklift AGV",
+      "reasons": [
+        "autonomous_charging: +6 pts",
+        "safety_standard: +5 pts"
+      ],
+      "knockouts": [],
+      "website": "",
+      "origin": "FR",
+      "description": "Autonomous reach truck (Linde base); 11m lift; 1.6t; aisles from 2.9m",
+      "navigation": "Natural Feature (SLAM) | Vision",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 11000,
+      "min_aisle_width_mm": 2900,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "K55A Pallet Stacker",
+      "company": "KIVNON Logística S.L.",
+      "score": -43,
+      "max_score": 155,
+      "rank": 2,
+      "disqualified": false,
+      "disqualified_by": [],
+      "score_details": [
+        {
+          "field": "max_payload_kg_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "lifting_height_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "tugger_min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "autonomous_charging",
+          "points": 6,
+          "value": true
+        },
+        {
+          "field": "safety_standard",
+          "points": 5,
+          "value": [
+            "None (CE/TÜV marks only)"
+          ]
+        },
+        {
+          "field": "vda5050_compatible",
+          "points": 6,
+          "value": true
+        }
+      ],
+      "agv_type": "Forklift AGV",
+      "reasons": [
+        "autonomous_charging: +6 pts",
+        "safety_standard: +5 pts",
+        "vda5050_compatible: +6 pts"
+      ],
+      "knockouts": [],
+      "website": "",
+      "origin": "ES",
+      "description": "AGV pallet stacker (lifting); open-bottom + American pallets; stacking + intralogistics; robotic process automation; VDA5050",
+      "navigation": "Natural Feature (SLAM) | Magnetic Tape",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "EXV iGo",
+      "company": "STILL GmbH",
+      "score": -49,
+      "max_score": 149,
+      "rank": 3,
+      "disqualified": false,
+      "disqualified_by": [],
+      "score_details": [
+        {
+          "field": "max_payload_kg_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "lifting_height_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "tugger_min_aisle_width_mm_null_penalty",
+          "points": -15,
+          "value": null
+        },
+        {
+          "field": "autonomous_charging",
+          "points": 6,
+          "value": true
+        },
+        {
+          "field": "safety_standard",
+          "points": 5,
+          "value": [
+            "ISO 3691-4"
+          ]
+        }
+      ],
+      "agv_type": "Forklift AGV",
+      "reasons": [
+        "autonomous_charging: +6 pts",
+        "safety_standard: +5 pts"
+      ],
+      "knockouts": [],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated high-lift pallet truck; production logistics + pre-storage; IFOY 2024 winner",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Omron LD-60",
+      "company": "Omron Mobile Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 4,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 60.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 60.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "US",
+      "description": "Compact transport AMR, 60kg payload. Natural Feature SLAM, no facility modifications required. PLd safety per ISO 13849-1; UL3100 and ISO 3691-4 certified. Battery LiFePO4 72Ah, 12h runtime at full payload, 130-min charge (20-80%). Cleanroom ISO 5 / Class 100 rated. Stop accuracy ±25mm standard target; ±8mm with CAPS/HAPS precision docking. Max slope 8.3% at ≤60kg payload. Fleet FLOW Core max 100 robots; multi-vendor Unified Fleet License supported. LD-60/90 share the same 698×500mm platform.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 60.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.8,
+      "vda5050": null,
+      "battery_runtime_h": 12.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "ek robotics COMPACT MOVE CB 25",
+      "company": "ek robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 5,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 5500 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 5500 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Counterbalanced forklift AGV. Maximum payload 2500 kg (CB 25), lifting height 5500mm. Hybrid navigation: 'precise laser navigation' (Laser Reflector primary) + 3D camera system for pallet placement at up to 5.5m without errors (load detection). Also available in CB 10 (1000/1200kg) and CB 16 (1600kg) variants. 4-fork configuration available for double-pallet handling. Safety scanner coverage in lateral/front zones. Fleet: Transport Manager (centralized). Battery type not confirmed. forks_free_floating=TRUE (counterbalanced rule). load_detection=Camera/Vision (3D camera for remote pallet placement).",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 2500.0,
+      "lifting_height_mm": 5500,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "MiR250 Hook / Top modules",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 6,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DK",
+      "description": "MiR250 with Hook/Shelf-Lift/Pallet-Lift/Top-Roller modules; cart towing via April Tags; modular platform",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 250.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Toyota Staxio SAE160 Autopilot",
+      "company": "Toyota Material Handling Europe",
+      "score": 0,
+      "max_score": 0,
+      "rank": 7,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 4700 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 4700 < required 10000"
+      ],
+      "website": "",
+      "origin": "SE",
+      "description": "Walkie stacker — Straddle Stacker type (support arms/legs straddle the load). Specs from official Toyota datasheet (TP-746908-040, v13, 2019-03-05). Two mast configs: SAE160 Duplex Tele (h23 lift 2350mm) and Triplex Hi-Lo (h23 lift 4700mm, free lift 1592mm) — entry uses the Triplex Hi-Lo (max-lift) variant. Overall width 930mm; overall length 2261mm (DX Tele, 1200 fork, large battery compartment). Travel speed auto mode 8.0 km/h drive direction (2.22 m/s); 1.1 km/h fork direction (4.3 km/h with optional fork-direction scanner). Max gradeability 6% laden / 10% unladen. Battery 24V/500Ah lead-acid standard (345-403 kg); auto-charging Li-Ion optional. Sideway battery change → battery_swap_capable=1. 'Laser precision navigation' — Toyota Autopilot range supports reflector OR natural OR dual; navigation_type set to dual, infrastructure_required left null (config-dependent). Min aisle width (auto mode, rotate-on-point, PPS muted, 800×1200 short-side, DX Tele) = 2686mm per datasheet (AU product page's 3200mm figure superseded). Load detection & fork-tip sensors (Mechanical/Tactile). Manual handling supported (Automatic/Pedestrian operator type). Onboard information display. Laser class 1 (IEC 60825-1); sound <70 dB(A) per EN 12053. Safety: CAT3 PLd. Op temp 0–40°C.",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 4700,
+      "min_aisle_width_mm": 2686,
+      "max_speed_ms": 2.22,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Geek+ RoboShuttle (Tote/Bin-to-Person)",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 8,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "Bin/tote-to-person; extended-depth bin-to-person (C200M); narrow-aisle; up to ~11m reach; high density",
+      "navigation": "QR/DM Code | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Grenzebach FF1200S",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 9,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 1200 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 1200 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Straddle stacker forklift AGV for euro pallets. Support legs straddle the pallet sides. Lifting height 1200mm (racking level 1), max payload 1200kg (1500kg on request). Speed 2.0 m/s. Newer product page specs used (contour navigation, dimensions ~1725×800mm, turning radius 1450mm, aisle 2800mm). 2021 PDF datasheet showed older version: 3000mm lift, inductive track guidance, 1.5 m/s — those specs are for legacy model. forks_free_floating=FALSE (Straddle Stacker rule). Env conditions from 2021 PDF (5-40°C, 70% humidity max). Fleet: Fleet Manager (VDA5050-compatible software, vehicle VDA5050 not confirmed).",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": 1200,
+      "min_aisle_width_mm": 2800,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Hikrobot F4-1000C",
+      "company": "Hikrobot",
+      "score": 0,
+      "max_score": 0,
+      "rank": 10,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "FMR straddle stacker forklift AGV. IFOY 2024 nominee. Payload 1000kg at 1.3m, 600kg at 3m. Lifting height ~2031mm (data sheet); can reach ~3000mm at reduced 600kg capacity. Speed 1.8 m/s (unloaded), 1.2 m/s (loaded). Chassis 400mm body-length, 1600mm total with forks, 800mm wide. Pallet detection: identifies up to 10° misalignment. Accuracy ±5mm. Battery 48V/70Ah Li-Ion, 8h runtime, 2h charge. Aisle: 2050mm minimum. drive_type=Straddle Stacker; forks_free_floating=FALSE. Fleet RCS 2000 (centralized). CE marked. Pallet size: DIN 1200×1000mm confirmed; EUR pallet compatibility inferred. SLAM navigation — no infrastructure required.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": 2031,
+      "min_aisle_width_mm": 2050,
+      "max_speed_ms": 1.8,
+      "vda5050": null,
+      "battery_runtime_h": 8.0,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "K10P One-Way",
+      "company": "KIVNON Logística S.L.",
+      "score": 0,
+      "max_score": 0,
+      "rank": 11,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "ES",
+      "description": "AGV tugger one-way (lighter); up to 1,800kg towing; retractable pin",
+      "navigation": "Magnetic Tape | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.0,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "MiR1350",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 12,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DK",
+      "description": "Heaviest MiR; 1,350kg; up to 2.7m/s; heavy load transport; ISO 3691-4",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1350.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.7,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "arculee S",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 13,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Underload AMR; 1,000kg; 2.3m/s; 800x750x290mm; built-in lift; 3D SLAM+QR+reflectors; VDA5050; 360° safety; ref Prodrive NL (14 units)",
+      "navigation": "Natural Feature (SLAM) | QR/DM Code | Laser Reflector",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.3,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "ek robotics VARIO MOVE CB",
+      "company": "ek robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 14,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 5000 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 5000 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Modular high-lift counterbalanced forklift AGV. Payload up to 1600 kg (CB variant with cantilever forks), max lifting height 5000mm. Max speed 2.0 m/s. Battery: Li-Ion with opportunity charging (10 min top-up from 60% to 80%) enabling autonomous continuous operation. VARIO MOVE platform has 5 variants: L (high-lift reach), CB (counterbalanced), AS (straddle), CT (conveyor), CTO (omnidirectional conveyor). Navigation: platform supports all major nav technologies — specific type not fixed (configurable per project). Red Dot Award winner. forks_free_floating=TRUE (counterbalanced variant). Fleet Transport Manager. multi_load_compatibility: CB has graduated load modules for different payloads.",
+      "navigation": "",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 5000,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "E80 Clamp/Reel LGV (Elephant/Unicorn)",
+      "company": "E80 Group S.p.A. (Elettric80)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 15,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 9000 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 9000 < required 10000"
+      ],
+      "website": "",
+      "origin": "IT",
+      "description": "Specialised reel/clamp LGV for tissue/paper; Unicorn lifts reels up to 5t, stacks 3 high (9m); Elephant clamp variant",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 5000.0,
+      "lifting_height_mm": 9000,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "AGILOX ONE",
+      "company": "AGILOX Services GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 16,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Omnidirectional all-rounder AMR w/ scissor lift; open pallets (EUR/half/industrial); 1,300mm aisle; X-SWARM; 3min charge=1h",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": 1300,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "VEENY",
+      "company": "Balyo",
+      "score": 0,
+      "max_score": 0,
+      "rank": 17,
+      "disqualified": true,
+      "disqualified_by": [
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "website": "",
+      "origin": "FR",
+      "description": "Autonomous VNA turret truck (Linde base); 17m lift; 1.5t; aisles from 1.8m; geo-navigation, no infrastructure",
+      "navigation": "Natural Feature (SLAM) | Vision",
+      "max_payload_kg": 1500.0,
+      "lifting_height_mm": 17000,
+      "min_aisle_width_mm": 1800,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Omron HD-1500",
+      "company": "Omron Mobile Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 18,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "US",
+      "description": "Heavy-duty transport AMR, 1500kg payload. Natural Feature SLAM with safety-rated laser. PLd/SIL3 certified safety controller (both ratings claimed in brochure). Onboard Omron NX1 controller: EtherNet/IP, Safety over EtherCAT, OPC-UA, IO-Link. 9h runtime at full payload; very fast 24-min charge (20-80%). Max slope 5° = 8.75%. Standards: EN 1525 (legacy), ANSI B56.5, ISO 13849. Battery type not explicitly stated in brochure (battery_type=null). Overall dimensions not published. Target industries: Automotive, Semiconductor, Medical, Consumer products.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1500.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.8,
+      "vda5050": null,
+      "battery_runtime_h": 9.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "MiR600",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 19,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 600.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 600.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DK",
+      "description": "Transport AMR; 600kg; 2.0m/s; 1350x920mm; IP52 (F&B-capable); ISO 3691-4",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 600.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": 8.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "iw.hub + Pallet Dock",
+      "company": "idealworks GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 20,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "iw.hub with stationary pallet-dock transfer station; pallet-level automation, no forklift; announced Sep 2025",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.2,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "OSCAR",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 21,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Contour', 'Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Contour', 'Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Omnidirectional area-mobile underride AMR; 1,000kg; 1.6m/s; 320mm frame height; contour laser+opt.magnetic; VDA5050; rotates at standstill",
+      "navigation": "Contour | Magnetic Tape",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.6,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "ek robotics X MOVE 600",
+      "company": "ek robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 22,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 600.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 600.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Transport AMR platform, 600 kg payload. Navigation: contour (SLAM) + reflector — ek robotics calls it 'ek hybrid navigation'. VDA5050 explicitly confirmed for the X MOVE platform (300/600/1200 variants announced with VDA5050 at launch). Fleet: Transport Manager (centralized, on-premise, OPC-UA/WMS/ERP/MES). Configurable top modules: roller conveyor, lifting column, lifting beam. Company formerly E&K Automation, rebranded to ek robotics under NEURA Mobile Robots GmbH. Founded 1963, HQ Hamburg. battery_type set to Li-Ion based on ek robotics' uniform LI-ION high-power energy platform (range-wide standard; exact Ah/runtime not published). Safety standard certifications not published; ek platform standard is PLd 360° protective field.",
+      "navigation": "Natural Feature (SLAM) | Laser Reflector",
+      "max_payload_kg": 600.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.7,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "K32 Tractor",
+      "company": "KIVNON Logística S.L.",
+      "score": 0,
+      "max_score": 0,
+      "rank": 23,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "ES",
+      "description": "Tugger tractor convoy mode; up to 2,000kg towing; MANUAL rear-pin coupling (no auto-hitch); magnetic nav; 1170x480x1040mm; VDA5050 adaptable",
+      "navigation": "Magnetic Tape",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.0,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "ERC 213a",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 24,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 4400 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 4400 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Compact automated pallet transporter/stacker; laser nav (reflectors+environment)",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": 1300.0,
+      "lifting_height_mm": 4400,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "LTX 50 iGo",
+      "company": "STILL GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 25,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated electric tractor; up to 5,000kg train towing; up to 14 km/h; Li-Ion; LiftRunner B/C/E frames; SUPERSEDES plain LTX 50",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 3.9,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "AGILOX OFL",
+      "company": "AGILOX Services GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 26,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 800.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 800.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "NEW (LogiMAT 2025); omnidirectional free-lift AMR; 800kg; up to 1,200mm station height; 1655x800x1988mm; X-SWARM",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 800.0,
+      "lifting_height_mm": 1200,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Geek+ M-Series (Transport)",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 27,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "Transport AMR underride; up to 1,000-1,200kg; SLAM+QR; rotation false; grid false; modular",
+      "navigation": "Natural Feature (SLAM) | QR/DM Code",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Movu ifollow iL 600",
+      "company": "Movu Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 28,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 600.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 600.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "BE",
+      "description": "Underride AMR. Technology originally from iFollow (France, founded 2017), acquired by stow Group 2022, rebranded as Movu Robotics 2023. HQ: Lokeren (near Antwerp), Belgium. Payload variants: iL 300 (300kg), iL 600 (600kg), iL 1000 (1000kg), iL 1200 (1200kg) — all share identical 1340×760×170mm frame. Navigation: LiDAR + stereoscopic camera SLAM, fully autonomous, no reflectors/tapes/QR codes required. Operating temperature -25°C to +40°C (cold storage capable with battery thermal protection). Fleet: up to 200 robots. WMS integration via 'plugs into all known WMS'. Fleet control: proprietary Movu WES (Warehouse Execution System) web interface. NOTE: atlas (ASRS pallet shuttle) and escala (ASRS climbing robot) products are EXCLUDED per 'ASRS: machen wir nicht' rule. Battery type not explicitly confirmed; -25°C capability implies specialty Li-Ion with thermal management.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 600.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": 10.0,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "FM-X iGo",
+      "company": "STILL GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 29,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 9800 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 9800 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated reach truck; 2,500kg; 9.8m storage height; 3,000mm aisle; Li-Ion; IFOY 2025 winner",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": 2500.0,
+      "lifting_height_mm": 9800,
+      "min_aisle_width_mm": 3000,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Geek+ SkyCube",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 30,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "Multilevel G2P system; P+X-series; full-pallet+tote+pick to ground stations; 5-8x density; ~550 picks/hr ref",
+      "navigation": "QR/DM Code | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Alstef Loadstar",
+      "company": "BA Systèmes",
+      "score": 0,
+      "max_score": 0,
+      "rank": 31,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "FR",
+      "description": "Compact 'turtle' platform AMR for unitary pallet transport. Replaces traditional conveyor systems. Payload 1400kg, dimensions 1420×790×425mm (LxWxH with platform retracted), 80mm lift stroke for pallet pick-up. Described as saving up to 20% floor space. Li-Ion battery. Navigation: environment geometry scanning (SLAM/natural feature), no infrastructure modifications required. Fleet: OPAL (Alstef proprietary). BA Systèmes SAS / Alstef Mobile Robotics, founded ~1973, HQ near Rennes, France. Max speed not confirmed in public specs — left null. NOTE: 'SHERPA family' not applicable to BA Systèmes products; SHERPA Mobile Robotics is a separate company.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1400.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "K05 (Underride)",
+      "company": "KIVNON Logística S.L.",
+      "score": 0,
+      "max_score": 0,
+      "rank": 32,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 500.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 500.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "ES",
+      "description": "Compact underride AGV; 500kg; 800x800 square chassis; 360° rotational; push-from-beneath; CE+TÜV",
+      "navigation": "Natural Feature (SLAM) | Magnetic Tape | QR/DM Code",
+      "max_payload_kg": 500.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.0,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "arculee XS",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 33,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Compact platform AMR; 250kg; 505x540x400mm; 3D SLAM+QR+reflectors; VDA5050; auto intermediate charging; by arculus (JH subsidiary)",
+      "navigation": "Natural Feature (SLAM) | QR/DM Code | Laser Reflector",
+      "max_payload_kg": 250.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "LUCY",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 34,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Contour', 'Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "max_payload_kg: 500.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Contour', 'Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "max_payload_kg: 500.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Compact wheel-arm forklift AGV; 500kg; modular load handling; pallets/roll containers/floor rollers/custom; tight spaces; VDA5050",
+      "navigation": "Contour | Laser Reflector",
+      "max_payload_kg": 500.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "MiR1200 Pallet Jack",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 35,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DK",
+      "description": "Autonomous pallet jack; 1,200kg; 1.5m/s; AI pallet detection; auto pick/place EUR pallets",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "EZS 350a",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 36,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated tow tractor; ~5t towing; laser nav; dual-mode auto+manual",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Omron LD-250",
+      "company": "Omron Mobile Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 37,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "US",
+      "description": "Heavy transport AMR, 250kg payload. Larger 969×720mm platform vs LD-60/90. Natural Feature SLAM. PLd safety. Max gradient reduced to 3.0% vs 8.3% for LD-60/90. Battery LiFePO4 72Ah, 10h runtime at full payload, 130-min charge (20-80%). Cleanroom ISO 5 / Class 100 rated. Stop accuracy ±25mm standard target. Fleet FLOW Core max 100 robots; multi-vendor Unified Fleet License. top_module_type=Custom (configurable for different cargo).",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 250.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.2,
+      "vda5050": null,
+      "battery_runtime_h": 10.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Hikrobot F3-1500",
+      "company": "Hikrobot",
+      "score": 0,
+      "max_score": 0,
+      "rank": 38,
+      "disqualified": true,
+      "disqualified_by": [
+        "languages_spoken: ['ZH', 'EN', '+local'] does not include any of ['DE']",
+        "lifting_height_mm: 200 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "languages_spoken: ['ZH', 'EN', '+local'] does not include any of ['DE']",
+        "lifting_height_mm: 200 < required 10000"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "FMR (Forklift Mobile Robot) pallet mover. 200mm lifting height = floor-level pallet transport only (not stacking). 1500kg payload, max 2.1 m/s, large footprint 1632×870×1943mm. Laser SLAM navigation, ±10mm accuracy. drive_type=Pallet Mover; forks_free_floating=FALSE (Pallet Mover rule); stacking_capability=FALSE (200mm lift insufficient for rack stacking). Fleet: RCS 2000 (centralized). CE marked. battery_type set to Li-Ion per Hikrobot FMR-range standard (Q7 LMR confirmed LiFePO4, F4 confirmed Li-Ion); F3-1500-specific capacity/charge time not published.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1500.0,
+      "lifting_height_mm": 200,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.1,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Toyota Autopilot SAI125CB",
+      "company": "Toyota Material Handling Europe",
+      "score": 0,
+      "max_score": 0,
+      "rank": 39,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 5400 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 5400 < required 10000"
+      ],
+      "website": "",
+      "origin": "SE",
+      "description": "Swarm Automation Transport flagship. Dual navigation (reflector OR natural SLAM, or combined). Min aisle width from product page ('3m rack aisle'). Forks free-floating confirmed: 'counterweight and free-hanging forks, eliminating the need for support arms'. Handles open EU pallets AND closed double-deck pallets in same workflow. Auto-charging Li-Ion 300Ah standard.",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": 1250.0,
+      "lifting_height_mm": 5400,
+      "min_aisle_width_mm": 3000,
+      "max_speed_ms": 2.22,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Hikrobot Q7-1500D",
+      "company": "Hikrobot",
+      "score": 0,
+      "max_score": 0,
+      "rank": 40,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "LMR (Latent Mobile Robot) — underride shelf/carrier transport AMR. Goes under racks or carriers using built-in lifting mechanism. Navigation: Laser SLAM (natural) + optional QR code floor markers (dual mode; 'Q7-1500-D 2D Code' is the QR variant). Entry set to Natural Feature SLAM / infrastructure_required=0 for the natural nav variant. Payload 1500kg, speed 1.5 m/s, 1180×860×265mm, 8h runtime, ≤2h charge. Accuracy ±10mm. Fleet: RCS 2000 (proprietary fleet management, centralized, mixed-fleet capable). iWMS integrates with WMS. VDA5050 confirmed for Q3-600 model in same LMR family; not yet confirmed for Q7-1500D. Hikrobot is a HIKVISION subsidiary. CE marked.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1500.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": 8.0,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Linde P-MATIC",
+      "company": "Linde Material Handling",
+      "score": 0,
+      "max_score": 0,
+      "rank": 41,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated tow tractor (tugger AGV). Specs cross-checked with official Linde/KION North America datasheet (P-MATIC, 11,000 lb). Towing capacity 3000-5000 kg (6,600-11,000 lb). Overall size 70×32-36 in = 1778mm × 813-914mm (width config-dependent; entry uses 914mm max). Travel speed 8 km/h (2.22 m/s) unloaded; 4.4 mph (≈2.0 m/s) loaded. Navigation: 'Laser Hybrid Navigation' = natural feature SLAM (no reflectors/floor tracks) + laser/3D-camera obstacle detection; laser scan height 98 in. Pulls 2-6 carts/trailers (max_trailers=6). Battery: NA datasheet 24V/270Ah sealed lead-acid (PbS); EU config up to ~500Ah — battery_type Lead-Acid (gel/sealed). Automated + manual auxiliary operation. Touchscreen user interface. Auto-charging optional. Compliance: ISO 3691-4, ANSI B56.5 Part III, Machinery Directive (CE), NFPA-70. Turning radius 1485mm. Maintenance-free three-phase drive. Fleet MATIC:move. VDA5050 not confirmed.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.22,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "AGILOX ODM 600/800",
+      "company": "AGILOX Services GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 42,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 300.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 300.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Smallest AGILOX; up to 300kg; omnidirectional dolly/small-cart mover; X-SWARM",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 300.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "AGILOX OPS",
+      "company": "AGILOX Services GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 43,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Platform vehicle for heavy loads in narrow aisles; standardised interface for custom load handling devices; X-SWARM",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "AXL iGo",
+      "company": "STILL GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 44,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 125 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 125 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Autonomous low-lift pallet truck; automated truck loading/unloading; no external dock infrastructure needed",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1500.0,
+      "lifting_height_mm": 125,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "MiR250",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 45,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DK",
+      "description": "Transport AMR; 250kg; 2.0m/s; 580x800mm; IP21; opp-charge 1:16; optional cleanroom class 4; ISO 3691-4",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 250.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": 13.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "E80 Tugger Train LGV",
+      "company": "E80 Group S.p.A. (Elettric80)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 46,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "IT",
+      "description": "Automated LGV tugger; production-line supply; Flash Battery induction charging",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Toyota Reflex RAE250 Autopilot",
+      "company": "Toyota Material Handling Europe",
+      "score": 0,
+      "max_score": 0,
+      "rank": 47,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
+      ],
+      "website": "",
+      "origin": "SE",
+      "description": "Reach truck AGV (BT Reflex Autopilot RAE160/RAE250 family). Specs from CURRENT official Toyota datasheet (TMHI Version 3.2, 2024-04-23; RAE200 dropped from current range). RAE250 = 2500kg rated (2300kg in auto mode at 650mm load centre); wheelbase 1575mm; service weight 4830kg. Overall length l1 = 2755mm; overall width 1270mm (900mm support-arm spread) / 1470mm (1100mm). Max lift height h23 = 12,000mm with Triplex Hi-Lo D mast (h3 lift 11,945mm; mast extended h4 = 12,546mm); Triplex Hi-Lo C mast tops at 9,000mm. Travel speed (auto mode) 2.5 m/s drive direction, 1.9 m/s fork direction. Max gradeability 7%. Battery 48V/420Ah; auto-charging Lithium-Ion standard (lead-acid also orderable across range). Turning radius (rotate on point) 1903mm. Min aisle Ast (auto mode, rotate on point, PPS muted, 800×1200 short-side, Triplex-C 419) = 3071mm (Triplex-D = 3123mm). Fork 45/125/1250mm, carriage ISO 2328 class 2A. Features: automatic load/unload, vertical + deep stacking, RS150 handling; load presence & push detection (standard); advanced vision-aided load handling / multi-load detection / barcode scanner (optional); auto charging Li-Ion; information display. forks_free_floating=TRUE (reach truck rule). Navigation: 'Laser precision navigation' (reflector-based for high-bay precision); range also supports natural/dual. Safety: CAT3 PLd, laser class 1 (IEC 60825-1), sound 62 dB(A). Op temp 0–40°C. NOTE: earlier v7 (2021) datasheet listed only up to 10,000mm lift and 2.0 m/s — both superseded by this v3.2 sheet.",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 2500.0,
+      "lifting_height_mm": 12000,
+      "min_aisle_width_mm": 3071,
+      "max_speed_ms": 2.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "K41 Platform",
+      "company": "KIVNON Logística S.L.",
+      "score": 0,
+      "max_score": 0,
+      "rank": 48,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 250.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "ES",
+      "description": "Open-platform AMR; 250kg on-board; 1550x800x220mm; VDA5050; 2D SLAM+magnetic+reflectors+QR; CE+TÜV; custom top modules",
+      "navigation": "Natural Feature (SLAM) | Magnetic Tape | QR/DM Code | Laser Reflector",
+      "max_payload_kg": 250.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.0,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "arculee M",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 49,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Heavy underload AMR; 1,200kg; 1200x750x290mm; 3D SLAM+QR+reflectors; VDA5050; incl. pallet stacking (EPAL 800x1200 at Prodrive)",
+      "navigation": "Natural Feature (SLAM) | QR/DM Code | Laser Reflector",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "EKX 516a / 516ka",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 50,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector', 'QR/DM Code', 'Inductive Loop'] does not include any of ['Natural Feature (SLAM)']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector', 'QR/DM Code', 'Inductive Loop'] does not include any of ['Natural Feature (SLAM)']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated tri-lateral VNA stacker; 1600kg; up to 13m lift; wire+transponder guidance",
+      "navigation": "Laser Reflector | QR/DM Code | Inductive Loop",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 13000,
+      "min_aisle_width_mm": 1727,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "K10HP One-Way",
+      "company": "KIVNON Logística S.L.",
+      "score": 0,
+      "max_score": 0,
+      "rank": 51,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "ES",
+      "description": "AGV tugger one-way; retractable-pin auto-hitch; up to 5,000kg towing; magnetic/SLAM; VDA5050 adaptable",
+      "navigation": "Magnetic Tape | Natural Feature (SLAM) | QR/DM Code",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.0,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Movu ifollow iL 1200",
+      "company": "Movu Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 52,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "BE",
+      "description": "Underride AMR — heavy-payload variant. Same platform as iL 600 (1340×760×170mm). Payload variants: iL 1000 (1000kg), iL 1200 (1200kg). Navigation: LiDAR + stereoscopic camera SLAM, no infrastructure. Cold-chain capable (-25°C to +40°C). Fleet up to 200 robots. Movu WES (Warehouse Execution System) fleet software. iFollow origin: France 2017, stow Group acquisition 2022, Movu rebrand 2023. Turns on own footprint (rotation_capable=1). Load types: pallets, trolleys/roll containers, cases.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": 10.0,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "SALLY",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 53,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 100.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 100.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Smallest DS AGV; 100kg; flexible mini-AMR; various superstructures; industrial + healthcare last-mile; sterile variant available; VDA5050",
+      "navigation": "Contour | Natural Feature (SLAM)",
+      "max_payload_kg": 100.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Geek+ F-Series (F20MT Smart Forklift)",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 54,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 3244 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 3244 < required 10000"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "Autonomous smart forklift; up to 2,000kg; laser SLAM+QR; stacking + heavy pallet handling; F20MT variant; E-com/3PL/pharma",
+      "navigation": "Natural Feature (SLAM) | QR/DM Code",
+      "max_payload_kg": 2000.0,
+      "lifting_height_mm": 3244,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Omron LD-90",
+      "company": "Omron Mobile Robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 55,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 90.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 90.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "US",
+      "description": "Standard transport AMR, 90kg payload. Same 698×500mm platform as LD-60 but higher payload and lower top speed (1.35 m/s). Natural Feature SLAM. PLd safety. Battery LiFePO4 72Ah, 12h runtime at full payload, 130-min charge (20-80%). Cleanroom ISO 5 / Class 100 rated. Max slope 8.3% at ≤90kg payload. Fleet FLOW Core max 100 robots.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 90.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.35,
+      "vda5050": null,
+      "battery_runtime_h": 12.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "AMADEUS Tugger",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 56,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector', 'Contour'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector', 'Contour'] does not include any of ['Natural Feature (SLAM)']",
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Automated tugger tractor; up to 4.5t towing; contour/laser; VDA5050",
+      "navigation": "Laser Reflector | Contour",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "ek robotics X MOVE 1200",
+      "company": "ek robotics",
+      "score": 0,
+      "max_score": 0,
+      "rank": 57,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Heavy transport AMR platform, 1200 kg payload. Same ek hybrid navigation (SLAM + reflector) as X MOVE 600. VDA5050 confirmed for the full X MOVE platform (all three original variants 300/600/1200). Safety fields dynamically adapt to speed and steering angle. Configurable top modules (roller conveyor, lifting column, lifting beam). Fleet Transport Manager (centralized). battery_type set to Li-Ion based on ek robotics' uniform LI-ION energy platform (exact Ah/runtime not published).",
+      "navigation": "Natural Feature (SLAM) | Laser Reflector",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "ARNY",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 58,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 8500 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 8500 < required 10000"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Counterbalanced high-lift; up to 8.5m lift; up to 2.5t; contour nav; VDA5050",
+      "navigation": "Natural Feature (SLAM) | Contour",
+      "max_payload_kg": 2500.0,
+      "lifting_height_mm": 8500,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "iw.hub",
+      "company": "idealworks GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 59,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Underride AMR; 1,000kg (platform pull 500kg+trailer); 2.2m/s; SLAM; CE; VDA5050 native; AnyFleet; 641x1440mm; 22cm clearance",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.2,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Linde C-MATIC HP",
+      "company": "Linde Material Handling",
+      "score": 0,
+      "max_score": 0,
+      "rank": 60,
+      "disqualified": true,
+      "disqualified_by": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "max_payload_kg: 1000.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Underride platform transport AMR. Payload 1000kg, load footprint 1260×860mm (euro pallet sized), vehicle height 222mm (lowered). Max speed 8 km/h = 2.22 m/s. Laser natural feature SLAM (no permanent infrastructure). Li-Ion battery, ~90 min full charge, self-charging capability. Fleet: AnyFleet (cloud-based control software). NOTE: AnyFleet is known as a Quicktron platform — likely OEM from Quicktron as mentioned in the user's supplier description ('Quicktron OEM-rebadge pattern'). load_type includes pallets and rolling racks. autonomous_obstacle_bypass inferred from laser obstacle avoidance. VDA5050 not confirmed.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1000.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.22,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "E80 Trilateral LGV",
+      "company": "E80 Group S.p.A. (Elettric80)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 61,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "website": "",
+      "origin": "IT",
+      "description": "Automated trilateral VNA stacker; 1,600kg; 1.5m/s; high-density storage",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "AMADEUS Counter",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 62,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 2800 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 2800 < required 10000"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Driverless counterbalanced; 1.2t; up to 2.8m lift; SLAM; VDA5050",
+      "navigation": "Natural Feature (SLAM) | Contour",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": 2800,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "MX-X iGo",
+      "company": "STILL GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 63,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector', 'Wire'] does not include any of ['Natural Feature (SLAM)']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector', 'Wire'] does not include any of ['Natural Feature (SLAM)']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated VNA narrow-aisle forklift; high space utilisation; error-free high-bay handling",
+      "navigation": "Laser Reflector | Wire",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Linde R-MATIC k (R-MATIC 17 k)",
+      "company": "Linde Material Handling",
+      "score": 0,
+      "max_score": 0,
+      "rank": 64,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated reach truck, Series 5190. Three variants: R-MATIC 12 k (1070kg), R-MATIC 17 k (1550kg), R-MATIC 25 k (2330kg). Entry based on R-MATIC 17 k as representative. Navigation: Laser Reflector ('Reflector-based navigation for precise storage and retrieval position') — infrastructure_required=TRUE. Max lift h3: 10274mm (largest triplex mast option for R-MATIC 17 k); standard config h3: 6874mm. Aisle width 3075mm (800×1200 pallet lengthways). Dual mode: manual operation possible. Fleet: MATIC:move / MATIC:move+ (proprietary Linde software). Autonomous charging contact optional. Battery: Lead-Acid 465Ah or Li-ION 48/35kWh options. 2D pallet positioning system for misaligned pallets. drive_type=Reach Truck; forks_free_floating=TRUE. Safety: 360° scanner standard.",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 1550.0,
+      "lifting_height_mm": 10274,
+      "min_aisle_width_mm": 3075,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "AMADEUS Classic",
+      "company": "DS Automotion GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 65,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 2800 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 2800 < required 10000"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Driverless high-lift stacker; up to 2t; up to 2,800mm lift; laser+SLAM; VDA5050",
+      "navigation": "Laser Reflector | Natural Feature (SLAM) | Contour",
+      "max_payload_kg": 2000.0,
+      "lifting_height_mm": 2800,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.8,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "BT Levio LAE250 Autopilot",
+      "company": "Toyota Material Handling Europe",
+      "score": 0,
+      "max_score": 0,
+      "rank": 66,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 120 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "lifting_height_mm: 120 < required 10000"
+      ],
+      "website": "",
+      "origin": "SE",
+      "description": "Specs from official Toyota datasheet (TP-746906-040, v12, 2019-03-12). Pallet Mover (lowlifter) — lift only 120mm off floor, no stacking. Standard config: lead-acid 24V/500Ah; Li-Ion auto-charge optional. Min aisle width (auto mode, FL1200, large battery, short-side): 2660mm. Width 930mm, overall length 2227mm (FL1200 large battery). Max gradient 6% loaded. Battery swap: sideway change possible. forks_free_floating=FALSE per taxonomy (fork support wheels present).",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 2500.0,
+      "lifting_height_mm": 120,
+      "min_aisle_width_mm": 2660,
+      "max_speed_ms": 2.22,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Geek+ P-Series (Shelf-to-Person)",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 67,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "CN",
+      "description": "G2P shelf-to-person; up to 1,200kg shelf; up to 4.5m/s; SLAM+QR; rotation_capable; grid; 99.99% accuracy",
+      "navigation": "Natural Feature (SLAM) | QR/DM Code",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 4.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Grenzebach L1200S",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 68,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Underride transport AMR. Goes under tables, trolleys, racks, shelves (requires carrier leg clearance ≥ 330mm). 60mm electrical lift to pick up load carrier. Max speed 2.0 m/s (newer generation; older L1200S-Li from 2021 datasheet had 1.0 m/s). Battery/charge data from 2021 datasheet (LiFePO4, 30 min 15-80% charge, 6h runtime at 1000kg). Contour navigation = Natural Feature SLAM, no infrastructure modifications required. Fleet Manager VDA5050-compatible but L1200S vehicle VDA5050 not explicitly confirmed. top_module_type=Lift (60mm lift to engage carrier). Dimensions from current product page.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.0,
+      "vda5050": null,
+      "battery_runtime_h": 6.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Alstef GT16",
+      "company": "BA Systèmes",
+      "score": 0,
+      "max_score": 0,
+      "rank": 69,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "languages_spoken: ['FR', 'EN', '+local'] does not include any of ['DE']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "languages_spoken: ['FR', 'EN', '+local'] does not include any of ['DE']",
+        "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
+      ],
+      "website": "",
+      "origin": "FR",
+      "description": "VNA (Very Narrow Aisle) turret forklift AGV. BA Systèmes SAS is the legal entity; operating as 'Alstef Mobile Robotics' since June 2023 within Alstef Group. Founded ~1973, HQ: 9 route de Chavagne, 35310 Mordelles (near Rennes), France. Navigation: 'mixed laser navigation: free + targets' — SLAM for general movement, laser reflectors for precise VNA storage/retrieval positioning → infrastructure_required=1. Trilateral head for lateral load pick/deposit in VNA racking. Max lift 12m (12,000mm). Suitable for freezing environments. Fleet: OPAL (Alstef proprietary fleet management). NOTE: The user's supplier description referenced a 'SHERPA family' — this is NOT a BA Systèmes product line. SHERPA Mobile Robotics (Haguenau, France) is a SEPARATE company with unrelated SHERPA-B/P/D/F AMRs. No tugger product found in current Alstef AGV lineup.",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": 12000,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "EKS 215a",
+      "company": "Jungheinrich AG",
+      "score": 0,
+      "max_score": 0,
+      "rank": 70,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "max_payload_kg: 700.0 < required 1200.0"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
+        "max_payload_kg: 700.0 < required 1200.0"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Automated self-supported stacker; 700kg; up to 6m lift; 24V Li-Ion; laser; warehouseNAVIGATION",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 700.0,
+      "lifting_height_mm": 6000,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "AGILOX OCF",
+      "company": "AGILOX Services GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 71,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 1600 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 1600 < required 10000"
+      ],
+      "website": "",
+      "origin": "AT",
+      "description": "Omnidirectional counterbalanced AMR; 750 or 1,500kg; up to 1,600mm lift; open+closed pallets; auto fork width; X-SWARM",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1500.0,
+      "lifting_height_mm": 1600,
+      "min_aisle_width_mm": 1300,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Toyota Movit TAE500 Autopilot",
+      "company": "Toyota Material Handling Europe",
+      "score": 0,
+      "max_score": 0,
+      "rank": 72,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "SE",
+      "description": "Tugger AGV (Movit / Tracto), 5t (5000kg) towing capacity, pulls up to 4 load carriers (max_trailers=4). Coupling options: Universal, Tow Ball, or Automated Pin → mapped to Manual + Automatic. auto_hitch=TRUE (auto hook/unhook at predefined workstations). Speed: 8 km/h (2.22 m/s) unloaded, 6 km/h (1.67 m/s) with trailer. Navigation: Toyota Autopilot range supports reflector OR natural OR dual → set to dual; infrastructure_required config-dependent (null). Battery: lead-acid standard, auto-charging Li-Ion optional. Safety: CAT3 PLd, 360° coverage with automated tow pin (2D scanners). Op temp 0–40°C. WMS/ERP integration via T-ONE. Dimensions, turning radius not published on product page; no public VDI datasheet located.",
+      "navigation": "Laser Reflector | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 2.22,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "LOWY / LOWY HD",
+      "company": "Balyo",
+      "score": 0,
+      "max_score": 0,
+      "rank": 73,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 3000 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 3000 < required 10000"
+      ],
+      "website": "",
+      "origin": "FR",
+      "description": "Autonomous stacker; 3m lift; 1.2t (HD: 1.6t); open pallets from conveyors/machines/inbound",
+      "navigation": "Natural Feature (SLAM) | Vision",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 3000,
+      "min_aisle_width_mm": 2700,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "K11 Two-Way",
+      "company": "KIVNON Logística S.L.",
+      "score": 0,
+      "max_score": 0,
+      "rank": 74,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "ES",
+      "description": "Bidirectional AGV tugger; up to 5,000kg towing; magnetic or SLAM; CE+TÜV; VDA5050",
+      "navigation": "Magnetic Tape | Natural Feature (SLAM)",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "TUGGY",
+      "company": "Balyo",
+      "score": 0,
+      "max_score": 0,
+      "rank": 75,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Tugger AGV",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Tugger AGV ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "FR",
+      "description": "Autonomous tow tractor (Linde base); tows carts up to 7t; return collection",
+      "navigation": "Natural Feature (SLAM) | Vision",
+      "max_payload_kg": null,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "LOWY CB",
+      "company": "Balyo",
+      "score": 0,
+      "max_score": 0,
+      "rank": 76,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 4000 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 4000 < required 10000"
+      ],
+      "website": "",
+      "origin": "FR",
+      "description": "Autonomous counterbalanced stacker; 4m lift; 1.6t; open AND closed pallets; conveyor/machine interaction",
+      "navigation": "Natural Feature (SLAM) | Vision",
+      "max_payload_kg": 1600.0,
+      "lifting_height_mm": 4000,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": null,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    },
+    {
+      "product": "Grenzebach FL1200S",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 77,
+      "disqualified": true,
+      "disqualified_by": [
+        "lifting_height_mm: 60 < required 10000"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "lifting_height_mm: 60 < required 10000"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Pallet mover AGV for euro pallets at floor level. 60mm electrical lift (pallet pickup only, not stacking). Slides under euro pallets (1200×800mm). Contour navigation = Natural Feature SLAM. Specs from official 2021 datasheet: 1336×693×533mm, LiFePO4, 30 min charge (15-80%), 6h runtime at 1000kg load, IP32, 10-40°C, 80% humidity. forks_free_floating=FALSE (Pallet Mover rule). stacking_capability=FALSE (floor-level transport only). load_detection not mentioned. Battery: fixed contact autonomous charging.",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": 60,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.0,
+      "vda5050": null,
+      "battery_runtime_h": 6.0,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "Grenzebach OL1200S",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "score": 0,
+      "max_score": 0,
+      "rank": 78,
+      "disqualified": true,
+      "disqualified_by": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "score_details": [],
+      "agv_type": "Mobile AMR",
+      "reasons": [],
+      "knockouts": [
+        "agv_type: Mobile AMR ≠ required Forklift AGV"
+      ],
+      "website": "",
+      "origin": "DE",
+      "description": "Omnidirectional underride transport AMR. Awarded LogiMAT 'Best Product'. Payload 1200-1500kg, max speed 1.66 m/s (6 km/h), dimensions 1450×760×330mm. Contour navigation (SLAM). omnidirectional_movement=TRUE (can move sideways, rotate in place). VDA5050 confirmed — 'Both the Grenzebach Fleet Manager and the new OL1200S are VDA 5050-compatible' (press release). Designed for transporting long goods carriers in demanding industrial environments. Battery and charging specs not published on product page. multi_fleet_capable=TRUE (VDA5050 enables multi-vendor fleet management). battery_type set to LiFePO4 matching confirmed L1200S/FL1200S/FF1200S siblings on the same Grenzebach S-series platform (OL1200S-specific Ah not published).",
+      "navigation": "Natural Feature (SLAM)",
+      "max_payload_kg": 1200.0,
+      "lifting_height_mm": null,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.66,
+      "vda5050": true,
+      "battery_runtime_h": null,
+      "autonomous_charging": null,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU"
+      ]
+    },
+    {
+      "product": "E80 Reach LGV",
+      "company": "E80 Group S.p.A. (Elettric80)",
+      "score": 0,
+      "max_score": 0,
+      "rank": 79,
+      "disqualified": true,
+      "disqualified_by": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
+      ],
+      "score_details": [],
+      "agv_type": "Forklift AGV",
+      "reasons": [],
+      "knockouts": [
+        "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
+      ],
+      "website": "",
+      "origin": "IT",
+      "description": "Laser-guided reach truck; 3t; 12m lift; 3.5m turning radius; 1.5m/s; F&B/beverage/tissue",
+      "navigation": "Laser Reflector",
+      "max_payload_kg": 3000.0,
+      "lifting_height_mm": 12000,
+      "min_aisle_width_mm": null,
+      "max_speed_ms": 1.5,
+      "vda5050": null,
+      "battery_runtime_h": null,
+      "autonomous_charging": true,
+      "reference_count": null,
+      "lead_time_weeks": null,
+      "service_coverage": [
+        "EU",
+        "Global"
+      ]
+    }
+  ],
+  "captured_at": "2026-06-17T21:15:09",
+  "duration_s": 341.3
+}

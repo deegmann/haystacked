@@ -1,0 +1,126 @@
+/* ============================================================================
+   haystacked — Base / global layer
+   Element defaults, a light reset, brand utilities, and typographic helpers.
+   Load order:  fonts (Google) -> tokens.css -> base.css -> components.css
+   Tokens MUST be loaded before this file.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------- reset -- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-strong);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+ul, ol { margin: 0; padding: 0; }
+
+::selection { background: var(--selection-bg); color: var(--selection-fg); }
+
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--primary); }
+
+:focus-visible {
+  outline: 2px solid var(--hs-teal);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------- typography -- */
+/* Headings default to the display treatment; tune per-use with utilities. */
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--ls-head);
+  line-height: var(--lh-tight);
+}
+h1 { font-size: var(--fs-h1); letter-spacing: var(--ls-head); }
+h2 { font-size: var(--fs-h2); letter-spacing: var(--ls-subhead); }
+h3 { font-size: var(--fs-h3); font-weight: var(--fw-extrabold); letter-spacing: var(--ls-subhead); }
+h4 { font-size: var(--fs-h4); font-weight: var(--fw-bold); letter-spacing: var(--ls-subhead); }
+p  { margin: 0; }
+
+/* Type-role utilities ------------------------------------------------------ */
+.hs-display    { font-family: var(--font-display); font-weight: var(--fw-black); letter-spacing: var(--ls-display); line-height: var(--lh-display); }
+.hs-display-xl { font-size: var(--fs-display-xl); }
+.hs-lede       { font-size: var(--fs-lede); line-height: 1.45; color: var(--text-body); }
+.hs-body       { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text-body); }
+.hs-body-sm    { font-size: var(--fs-body-sm); line-height: 1.5; color: var(--text-body); }
+.hs-caption    { font-size: var(--fs-caption); color: var(--text-muted); }
+.hs-balance    { text-wrap: balance; }
+.hs-pretty     { text-wrap: pretty; }
+
+/* Brand utility: eyebrow (mono, the "§" device) --------------------------- */
+.hs-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--hs-teal);
+}
+.hs-eyebrow::before { content: '§ '; color: var(--hs-orchid-deep); }
+.hs-eyebrow.on-dark { color: var(--hs-teal-pale); }
+.hs-eyebrow.on-dark::before { color: var(--hs-orchid); }
+
+/* Brand utility: mono label / data ---------------------------------------- */
+.hs-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.hs-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+}
+
+/* Brand utility: hairline divider ----------------------------------------- */
+.hs-hair { border: none; border-top: 1px solid var(--border-strong); margin: 0; }
+.hs-hair-soft { border: none; border-top: 1px solid var(--border-default); margin: 0; }
+
+/* Brand utility: industrial cross-hatch (DARK surfaces only) -------------- */
+.hs-hatch { background-image: var(--hatch); }
+
+/* Layout helpers ---------------------------------------------------------- */
+.hs-container { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+@media (max-width: 640px) { .hs-container { padding-inline: var(--gutter-sm); } }
+
+.hs-stack   { display: flex; flex-direction: column; }
+.hs-row     { display: flex; align-items: center; }
+.hs-between { display: flex; align-items: center; justify-content: space-between; }
+.hs-wrap    { flex-wrap: wrap; }
+.hs-gap-1 { gap: var(--space-1); } .hs-gap-2 { gap: var(--space-2); }
+.hs-gap-3 { gap: var(--space-3); } .hs-gap-4 { gap: var(--space-4); }
+.hs-gap-5 { gap: var(--space-5); } .hs-gap-6 { gap: var(--space-6); }
+
+/* Color helpers ----------------------------------------------------------- */
+.hs-text-accent { color: var(--text-accent); }
+.hs-text-teal   { color: var(--hs-teal); }
+.hs-text-muted  { color: var(--text-muted); }
+.hs-on-dark     { color: var(--text-on-dark); }
+
+/* Respect reduced motion -------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
