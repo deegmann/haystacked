@@ -663,7 +663,14 @@ function _aggregateByCompany(allResults) {
       companies[key].best = r;
     }
   }
-  return Object.values(companies).sort((a, b) => {
+  const result = Object.values(companies);
+  for (const c of result) {
+    c.qualified_products = c.products
+      .filter(p => !p.disqualified)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+  }
+  return result.sort((a, b) => {
     if (a.best.disqualified !== b.best.disqualified) return a.best.disqualified ? 1 : -1;
     return b.best.score - a.best.score;
   });
@@ -689,6 +696,14 @@ function renderSupplierCards(allResults) {
     const label = pct >= 70 ? 'Top Match' : pct >= 40 ? 'Good Match' : 'Partial Match';
     const cls   = pct >= 70 ? 'match-great' : pct >= 40 ? 'match-good' : 'match-partial';
     const chips = _koChips(m);
+    const productRows = c.qualified_products.map((p, pi) => {
+      const ppct = maxScore > 0 ? Math.max(0, Math.round(p.score / maxScore * 100)) : 0;
+      return `<div class="sc-product-row${pi > 0 ? ' sc-product-secondary' : ''}">
+        <span class="type-pill">${p.agv_type || '–'}</span>
+        <span class="sc-product-name">${p.product}</span>
+        <span class="sc-score-pct">${ppct}%</span>
+      </div>`;
+    }).join('');
     const card = document.createElement('div');
     card.className = 'sc-card';
     card.innerHTML = `
@@ -699,10 +714,7 @@ function renderSupplierCards(allResults) {
           <span class="sc-label ${cls}">${label}</span>
         </div>
         <div class="sc-bar-wrap"><div class="sc-bar" style="width:${pct}%" data-pct="${pct}"></div></div>
-        <div class="sc-product">
-          <span class="type-pill">${m.agv_type || '–'}</span>
-          <span class="sc-product-name">${m.product}</span>
-        </div>
+        <div class="sc-product-list">${productRows}</div>
         ${chips.length ? `<div class="sc-chips">${chips.map(ch => `<span class="sc-chip">${ch}</span>`).join('')}</div>` : ''}
       </div>`;
     container.appendChild(card);

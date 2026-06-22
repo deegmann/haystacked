@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>haystacked – Supplier DB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/haystacked/haystacked.css">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .db-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--hs-line); }
+    .db-table { border-collapse: separate; border-spacing: 0; font-size: 12px; white-space: nowrap; }
+    .db-table th, .db-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--hs-line-soft);
+      border-right: 1px solid var(--hs-line-soft);
+      background: var(--hs-paper); vertical-align: middle;
+    }
+    .db-table th:last-child, .db-table td:last-child { border-right: none; }
+    .db-table tr:last-child td { border-bottom: none; }
+
+    /* Two-row sticky header: group row at top:0, field row at top:26px */
+    .db-table thead th {
+      font-family: var(--font-mono); font-size: 9px;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--hs-steel); font-weight: 500;
+      background: var(--hs-sand-2); position: sticky; z-index: 3;
+    }
+    #dbGroupHead th { top: 0; height: 26px; padding: 0 12px; }
+    #dbHead th     { top: 26px; }
+
+    /* Sticky identity columns: #, Company, Product
+       Widths are explicit and offsets must match exactly:
+       sc-0 = 40px, sc-1 starts at 40px with 200px width, sc-2 starts at 240px */
+    .sc-0 { position: sticky; left: 0px;  z-index: 4 !important; width: 40px;  min-width: 40px;  max-width: 40px; }
+    .sc-1 { position: sticky; left: 40px; z-index: 4 !important; width: 200px; min-width: 200px; max-width: 200px;
+             overflow: hidden; text-overflow: ellipsis; }
+    .sc-2 { position: sticky; left: 240px;z-index: 4 !important; width: 180px; min-width: 180px; max-width: 180px;
+             overflow: hidden; text-overflow: ellipsis;
+             box-shadow: 3px 0 6px -3px rgba(11,20,24,0.12); }
+    /* Sticky identity headers must be above group and field rows */
+    thead th.sc-0, thead th.sc-1, thead th.sc-2 { z-index: 6 !important; }
+
+    .db-table tr:hover td { background: rgba(0,91,105,0.03); }
+    /* Sticky cells always have opaque background */
+    .db-table td.sc-0,
+    .db-table td.sc-1,
+    .db-table td.sc-2 { background: var(--hs-paper) !important; }
+    .db-table tr:hover td.sc-0,
+    .db-table tr:hover td.sc-1,
+    .db-table tr:hover td.sc-2 { background: var(--hs-teal-tint) !important; }
+
+    /* Group header row styling */
+    .group-hd {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.09em;
+      text-align: center; text-transform: uppercase;
+    }
+    /* Non-sticky group headers have colored bottom border and tinted bg (set via inline style vars) */
+    #dbGroupHead th:not(.sc-0):not(.sc-1):not(.sc-2) {
+      border-bottom: 2px solid var(--gc, var(--mist));
+      background: var(--gbg, var(--sand2)) !important;
+      color: var(--gc, var(--steel));
+    }
+    /* Field headers inherit a thin top accent strip via inline border-top */
+    #dbHead th { background: var(--sand2) !important; }
+
+    /* VT-not-applicable cell: distinct from "missing data" */
+    .cell-na-vt {
+      color: var(--hs-mist); font-family: var(--font-mono);
+      font-size: 9px; letter-spacing: 0.04em;
+    }
+
+    .db-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+    .db-search {
+      flex:1; min-width:200px; max-width:320px;
+      background:var(--hs-paper); border:1px solid var(--hs-line-strong);
+      border-radius:var(--radius-md); padding:7px 12px;
+      font-size:13px; font-family:inherit; color:var(--hs-ink);
+    }
+    .db-search:focus { outline:none; border-color:var(--hs-teal); }
+    .db-search::placeholder { color:var(--hs-mist); }
+    .db-filter {
+      background:var(--hs-paper); border:1px solid var(--hs-line-strong);
+      border-radius:var(--radius-md); padding:7px 10px;
+      font-size:13px; font-family:inherit; color:var(--hs-ink); cursor:pointer;
+    }
+    .db-filter:focus { outline:none; border-color:var(--hs-teal); }
+    .db-count {
+      font-family:var(--font-mono); font-size:10px;
+      color:var(--hs-steel); text-transform:uppercase; letter-spacing:0.08em; margin-left:auto;
+    }
+    .country-badge {
+      font-family:var(--font-mono); font-size:9px; color:var(--hs-steel);
+      background:var(--hs-sand-2); border-radius:var(--radius-pill); padding:1px 5px;
+      text-transform:uppercase; letter-spacing:0.06em;
+    }
+    .bool-yes { color:var(--hs-verify); font-weight:700; }
+    .bool-no  { color:var(--hs-mist); }
+    .cell-na  { color:var(--hs-mist); }
+    .db-empty { text-align:center; padding:60px 0; color:var(--hs-steel); font-size:14px; }
+
+    /* VT legend chips in toolbar */
+    .vt-legend { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .vt-chip {
+      font-family:var(--font-mono); font-size:8px; letter-spacing:0.07em;
+      text-transform:uppercase; padding:3px 7px; border-radius:var(--radius-sm);
+      border-left:3px solid var(--gc); background:var(--gbg); color:var(--gc);
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="hs-logo" href="/">
+      <svg class="hs-mark" viewBox="0 0 100 54.67" aria-hidden="true">
+        <rect x="0" y="0"     width="60"  height="13.33" rx="2.22" fill="#B49AD6"/>
+        <rect x="0" y="20.67" width="80"  height="13.33" rx="2.22" fill="#005B69"/>
+        <rect x="0" y="41.33" width="100" height="13.33" rx="2.22" fill="#003942"/>
+      </svg>
+      <span class="hs-wordmark">haystacked</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span class="topbar-tagline">Supplier DB Browser</span>
+      <button class="btn-reset" style="font-size:12px;padding:5px 12px" onclick="window.close()">← Close</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="loadingState" style="text-align:center;padding:80px 0;color:var(--hs-steel)">
+    <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase">Loading supplier database…</p>
+  </div>
+
+  <div id="dbContent" class="hidden">
+    <div class="result-header" style="margin-bottom:20px">
+      <h2>Supplier Database</h2>
+    </div>
+
+    <div class="db-toolbar">
+      <input type="search" id="searchInput" class="db-search" placeholder="Search company or product…">
+      <select id="typeFilter" class="db-filter"><option value="">All AGV types</option></select>
+      <select id="countryFilter" class="db-filter"><option value="">All countries</option></select>
+      <div id="vtLegend" class="vt-legend"></div>
+      <span class="db-count" id="dbCount"></span>
+    </div>
+
+    <div class="db-wrap">
+      <table class="db-table" id="dbTable">
+        <thead>
+          <tr id="dbGroupHead"></tr>
+          <tr id="dbHead"></tr>
+        </thead>
+        <tbody id="dbBody"></tbody>
+      </table>
+      <div id="dbEmpty" class="db-empty hidden">No results found.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── VT color palette (UI constants — VT names themselves come from the API) ───
+const _VT_PALETTE = [
+  { color: '#6E55A0', bg: 'rgba(110,85,160,0.06)' },  // orchiddeep – Forklift
+  { color: '#B45309', bg: 'rgba(180,83,9,0.06)'    },  // amber      – Tugger
+  { color: '#2F855A', bg: 'rgba(47,133,90,0.06)'   },  // green      – AMR
+  { color: '#1A6FAA', bg: 'rgba(26,111,170,0.06)'  },  // blue       – extra
+];
+const _SHARED_STYLE  = { color: '#005B69', bg: 'rgba(0,91,105,0.06)'   };
+const _CONTEXT_STYLE = { color: '#5C6B73', bg: 'rgba(92,107,115,0.04)' };
+
+let _sharedSheet = '';
+let _vtNames     = [];   // ordered list of canonical VT names from AP0
+
+function _sheetStyle(sheet) {
+  if (!sheet)             return _CONTEXT_STYLE;
+  if (sheet===_sharedSheet) return _SHARED_STYLE;
+  const i = _vtNames.indexOf(sheet);
+  return i >= 0 ? _VT_PALETTE[i % _VT_PALETTE.length] : _CONTEXT_STYLE;
+}
+
+// ── Column layout constants (UI decisions, not domain) ────────────────────────
+const SKIP_COLS   = new Set(['product_id', 'description']);
+const STICKY_KEYS = ['company_name', 'product_name'];
+const STICKY_LABELS = { company_name: 'Company', product_name: 'Product' };
+
+let _allSuppliers = [];
+let _fieldMeta    = {};
+let _columns      = [];   // [{key, label, sheet, stickyClass}]
+
+// Sheet rank for column sort: sticky=-1, shared=0, VT1=1, VT2=2…, context=last
+function _sheetRank(sheet) {
+  if (!sheet)               return _vtNames.length + 1;
+  if (sheet===_sharedSheet) return 0;
+  const i = _vtNames.indexOf(sheet);
+  return i >= 0 ? i + 1 : _vtNames.length + 2;
+}
+
+// Filter columns based on active VT type (hide other-VT-specific columns)
+function _activeCols(activeType) {
+  if (!activeType) return _columns;
+  return _columns.filter(c => {
+    if (c.stickyClass)                    return true;  // always show identity
+    if (!c.sheet || c.sheet===_sharedSheet) return true;  // shared / context
+    return c.sheet === activeType;
+  });
+}
+
+// ── Cell renderer ─────────────────────────────────────────────────────────────
+function renderCell(key, val) {
+  if (val===null||val===undefined||val==='') return '<span class="cell-na">–</span>';
+  if (typeof val==='boolean') return val ? '<span class="bool-yes">✓</span>' : '<span class="bool-no">✗</span>';
+  if (Array.isArray(val)) return val.length ? val.join(', ') : '<span class="cell-na">–</span>';
+  if (key==='country')   return `<span class="country-badge">${val}</span>`;
+  if (key==='agv_type')  return `<span class="type-pill type-pill-sm">${val}</span>`;
+  if (key.endsWith('_eur') && typeof val==='number') return '€'+val.toLocaleString();
+  return val;
+}
+
+// Auto-label for fields not in AP0 field-meta
+const _UNIT_SUFF = {_kg:'kg',_mm:'mm',_pct:'%',_h:'h',_ms:'m/s',_c:'°C',_eur:'EUR',_min:'min',_m:'m'};
+function autoLabel(key) {
+  let k=key, unit=null;
+  for (const [s,u] of Object.entries(_UNIT_SUFF)) {
+    if (k.endsWith(s)) { k=k.slice(0,-s.length); unit=u; break; }
+  }
+  const label = k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  return unit ? `${label} (${unit})` : label;
+}
+
+// ── Header rendering ──────────────────────────────────────────────────────────
+function renderHead(cols) {
+  const nonSticky = cols.filter(c => !c.stickyClass);
+
+  // Build consecutive groups of non-sticky columns by sheet
+  const groups = [];
+  let i = 0;
+  while (i < nonSticky.length) {
+    const sheet = nonSticky[i].sheet;
+    let n = 0;
+    while (i < nonSticky.length && nonSticky[i].sheet===sheet) { n++; i++; }
+    groups.push({ sheet, n });
+  }
+
+  // Row 1: sticky identity (rowspan=2) + group span headers
+  const stickyHds = STICKY_KEYS
+    .filter(k => cols.some(c => c.key===k))
+    .map((k,si) => {
+      const sc  = `sc-${si+1}`;
+      const lbl = STICKY_LABELS[k] || autoLabel(k);
+      return `<th class="group-hd ${sc}" rowspan="2">${lbl}</th>`;
+    }).join('');
+
+  const groupHds = groups.map(g => {
+    const s   = _sheetStyle(g.sheet);
+    const lbl = g.sheet || 'General';
+    return `<th colspan="${g.n}" class="group-hd" style="--gc:${s.color};--gbg:${s.bg}">${lbl}</th>`;
+  }).join('');
+
+  document.getElementById('dbGroupHead').innerHTML =
+    `<th class="group-hd sc-0" rowspan="2">#</th>${stickyHds}${groupHds}`;
+
+  // Row 2: individual field headers (non-sticky only; sticky cells span row 1+2)
+  document.getElementById('dbHead').innerHTML = nonSticky.map(c => {
+    const s = _sheetStyle(c.sheet);
+    return `<th style="border-top:2px solid ${s.color}">${c.label}</th>`;
+  }).join('');
+}
+
+// ── Row rendering ─────────────────────────────────────────────────────────────
+function renderRows(data) {
+  const activeType = document.getElementById('typeFilter').value;
+  const cols = _activeCols(activeType);
+  renderHead(cols);
+
+  const tbody = document.getElementById('dbBody');
+  const empty = document.getElementById('dbEmpty');
+  document.getElementById('dbCount').textContent = `${data.length} products`;
+  tbody.innerHTML = '';
+  if (!data.length) { empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+
+  data.forEach((r, idx) => {
+    const rowType = r.agv_type;
+    let cells = `<td class="sc-0" style="color:var(--steel);text-align:center;font-size:11px">${idx+1}</td>`;
+
+    for (const c of cols) {
+      if (c.stickyClass) {
+        cells += `<td class="${c.stickyClass}" style="font-weight:600">${renderCell(c.key, r[c.key])}</td>`;
+        continue;
+      }
+      // A column is "not applicable" for this row when it belongs to a different VT's sheet
+      const isOtherVt = c.sheet && c.sheet!==_sharedSheet && rowType && c.sheet!==rowType;
+      const bgStyle   = isOtherVt ? 'background:rgba(0,0,0,0.025);' : '';
+      const isEmpty   = r[c.key]===null || r[c.key]===undefined || r[c.key]==='';
+      const content   = isOtherVt && isEmpty
+        ? '<span class="cell-na-vt">n/a</span>'
+        : renderCell(c.key, r[c.key]);
+      cells += `<td style="${bgStyle}">${content}</td>`;
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Filter ────────────────────────────────────────────────────────────────────
+function filterRows() {
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const typ = document.getElementById('typeFilter').value;
+  const cty = document.getElementById('countryFilter').value;
+  // Reset horizontal scroll so narrower column sets don't leave the table off-screen
+  document.querySelector('.db-wrap').scrollLeft = 0;
+  renderRows(_allSuppliers.filter(r => {
+    if (typ && r.agv_type  !== typ) return false;
+    if (cty && r.country   !== cty) return false;
+    if (q && !(String(r.company_name||'')+' '+String(r.product_name||'')).toLowerCase().includes(q)) return false;
+    return true;
+  }));
+}
+
+// ── Build VT legend chips ─────────────────────────────────────────────────────
+function buildLegend() {
+  const el = document.getElementById('vtLegend');
+  const entries = [
+    { label: _sharedSheet || 'Shared', style: _SHARED_STYLE },
+    ..._vtNames.map((vt,i) => ({ label: vt, style: _VT_PALETTE[i%_VT_PALETTE.length] })),
+    { label: 'General', style: _CONTEXT_STYLE },
+  ];
+  el.innerHTML = entries.map(e =>
+    `<span class="vt-chip" style="--gc:${e.style.color};--gbg:${e.style.bg}">${e.label}</span>`
+  ).join('');
+}
+
+// ── Build table ───────────────────────────────────────────────────────────────
+function buildTable(suppliers, meta) {
+  _allSuppliers = suppliers;
+  _fieldMeta    = meta;
+
+  const vtCfg  = meta['__vt_config__'] || {};
+  _sharedSheet = vtCfg.shared_sheet_name || '';
+  _vtNames     = vtCfg.vehicle_types || [];
+
+  if (!suppliers.length) return;
+
+  const allKeys = Object.keys(suppliers[0]).filter(k => !SKIP_COLS.has(k));
+
+  // Build column descriptors and sort by sheet group
+  _columns = allKeys
+    .map(key => {
+      const m        = meta[key] || {};
+      const stickyIdx = STICKY_KEYS.indexOf(key);
+      return {
+        key,
+        label:       m.label || autoLabel(key),
+        sheet:       m.sheet || null,
+        stickyClass: stickyIdx >= 0 ? `sc-${stickyIdx+1}` : '',
+        _rank:       stickyIdx >= 0 ? -1 : _sheetRank(m.sheet || null),
+        _origIdx:    allKeys.indexOf(key),
+      };
+    })
+    .sort((a, b) => {
+      if (a.stickyClass && b.stickyClass) return STICKY_KEYS.indexOf(a.key) - STICKY_KEYS.indexOf(b.key);
+      if (a.stickyClass) return -1;
+      if (b.stickyClass) return  1;
+      if (a._rank !== b._rank) return a._rank - b._rank;
+      return a._origIdx - b._origIdx;  // stable within group
+    });
+
+  // Populate AGV type filter
+  const types = [...new Set(suppliers.map(r => r.agv_type).filter(Boolean))].sort();
+  const typeEl = document.getElementById('typeFilter');
+  types.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; typeEl.appendChild(o); });
+
+  // Populate country filter
+  const countries = [...new Set(suppliers.map(r => r.country).filter(Boolean))].sort();
+  const ctyEl = document.getElementById('countryFilter');
+  countries.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; ctyEl.appendChild(o); });
+
+  buildLegend();
+  renderRows(suppliers);
+
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('dbContent').classList.remove('hidden');
+}
+
+// ── Fetch both APIs in parallel ───────────────────────────────────────────────
+Promise.all([
+  fetch('/api/field-meta').then(r => r.ok ? r.json() : {}),
+  fetch('/api/suppliers').then(r => { if (!r.ok) throw new Error(); return r.json(); }),
+])
+.then(([meta, suppliers]) => buildTable(suppliers, meta))
+.catch(() => {
+  document.getElementById('loadingState').innerHTML =
+    '<p style="color:var(--signal);font-size:14px">Database unavailable — run sync_airtable.py first.</p>';
+});
+
+document.getElementById('searchInput').addEventListener('input', filterRows);
+document.getElementById('typeFilter').addEventListener('change', filterRows);
+document.getElementById('countryFilter').addEventListener('change', filterRows);
+</script>
+</body>
+</html>

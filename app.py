@@ -865,6 +865,7 @@ async def analyze(file: UploadFile = File(...)):
                 "not_required" if canonical_agv_type in _VNA_APPLICABLE else
                 None
             )
+            agv_criteria["required_vna"] = new_req["required_vna"]
             matches, matches_all = match_suppliers_new(new_req, _SUPPLIERS, top_n=5)
             log.info("Matching: Top-Match %s (Score %d)", matches[0]["product"] if matches else "–",
                      matches[0]["score"] if matches else 0)

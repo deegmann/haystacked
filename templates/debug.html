@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>haystacked – Vollständige Analyse</title>
+  <link rel="stylesheet" href="/static/haystacked/haystacked.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="hs-logo" href="/">
+      <svg class="hs-mark" viewBox="0 0 100 54.67" aria-hidden="true">
+        <rect x="0" y="0"     width="60"  height="13.33" rx="2.22" fill="#B49AD6"/>
+        <rect x="0" y="20.67" width="80"  height="13.33" rx="2.22" fill="#005B69"/>
+        <rect x="0" y="41.33" width="100" height="13.33" rx="2.22" fill="#003942"/>
+      </svg>
+      <span class="hs-wordmark">haystacked</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span class="topbar-tagline">Vollständige Analyse · Debug</span>
+      <a href="/db" target="_blank" class="topbar-link">DB Browser</a>
+      <button class="btn-reset" style="font-size:12px;padding:5px 12px" onclick="window.close()">← Schließen</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="loadingState" style="text-align:center;padding:80px 0;color:var(--steel)">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase">Lade Analyse-Ergebnis…</p>
+  </div>
+
+  <div id="noResult" class="hidden" style="text-align:center;padding:80px 0">
+    <p style="color:var(--steel);font-size:15px;margin-bottom:16px">Noch kein Analyse-Ergebnis verfügbar.</p>
+    <a href="/" class="btn-rematch" style="display:inline-block;text-decoration:none">Zur Analyse →</a>
+  </div>
+
+  <div id="debugContent" class="hidden">
+    <div class="result-header" style="margin-bottom:24px">
+      <h2 id="dbg-filename" style="font-size:18px;font-weight:800;letter-spacing:-0.03em"></h2>
+      <span id="dbg-meta" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:0.06em"></span>
+    </div>
+
+    <!-- Extraction Details -->
+    <div class="card card-full" style="margin-bottom:12px">
+      <h3>Extrahierte Felder — vollständig</h3>
+      <div id="dbg-ext-meta" style="font-size:11px;color:var(--steel);margin-bottom:10px"></div>
+      <div id="dbg-ext-body" class="extraction-details-grid"></div>
+    </div>
+
+    <!-- Full Product Ranking -->
+    <div class="card card-full" style="margin-bottom:12px">
+      <h3>Produkt-Ranking — alle Ergebnisse <span id="dbg-rank-meta" class="debug-meta"></span></h3>
+      <div class="table-wrap" style="margin-top:12px">
+        <table id="dbg-rank-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Produkt</th>
+              <th>Unternehmen</th>
+              <th>AGV-Typ</th>
+              <th>Score</th>
+              <th>Payload</th>
+              <th>Hub</th>
+              <th>Gang</th>
+              <th>Status / K.O.</th>
+            </tr>
+          </thead>
+          <tbody id="dbg-rank-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- K.O. Exclusions -->
+    <div class="card card-full hidden" id="dbg-ko-card" style="margin-bottom:12px">
+      <h3>K.O. Ausschlüsse</h3>
+      <div id="dbg-ko-list" class="ko-panel-list" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Raw JSON -->
+    <div class="card card-full">
+      <details>
+        <summary class="debug-summary">Rohdaten — extrahierte Anforderungen (JSON)</summary>
+        <pre id="dbg-raw-req" class="debug-raw" style="margin-top:12px"></pre>
+      </details>
+    </div>
+  </div>
+</div>
+
+<script>
+let _fieldMeta = {};
+
+fetch('/api/field-meta')
+  .then(r => r.json())
+  .then(d => { _fieldMeta = d; })
+  .catch(() => {});
+
+function _fieldLabel(key) {
+  if (_fieldMeta[key]?.label) return _fieldMeta[key].label;
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
+
+fetch('/api/last-result')
+  .then(r => {
+    if (!r.ok) throw new Error('no result');
+    return r.json();
+  })
+  .then(d => {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('debugContent').classList.remove('hidden');
+    renderDebugPage(d);
+  })
+  .catch(() => {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('noResult').classList.remove('hidden');
+  });
+
+function renderDebugPage(d) {
+  document.getElementById('dbg-filename').textContent = d.filename || 'Analyse';
+  document.getElementById('dbg-meta').textContent =
+    [d.duration_s ? d.duration_s + 's' : null,
+     d.text_length ? d.text_length.toLocaleString() + ' Zeichen' : null,
+     d.parse_method ? 'Parse: ' + d.parse_method : null]
+    .filter(Boolean).join(' · ');
+
+  renderExtDetails(d.agv_criteria || {});
+  renderRankTable(d.matches_all || d.matches || []);
+  renderKoList(d.matches_all || d.matches || []);
+  document.getElementById('dbg-raw-req').textContent =
+    JSON.stringify(d.agv_criteria, null, 2);
+}
+
+function renderExtDetails(crit) {
+  const body = document.getElementById('dbg-ext-body');
+  const metaEl = document.getElementById('dbg-ext-meta');
+  body.innerHTML = '';
+  const skipKeys = new Set(['_validation_warnings','_parse_method','_vna_subtype',
+    'required_vehicle_type_canonical','is_agv_amr','text_length','in_scope',
+    'nace_tender','nace_buyer','nace_confidence','nace_explanation']);
+
+  const ap0Keys = [];
+  const seen = new Set();
+  for (const info of Object.values(_fieldMeta)) {
+    const tk = info.tender_key;
+    if (tk && !seen.has(tk)) { seen.add(tk); ap0Keys.push(tk); }
+  }
+  const extraKeys = Object.keys(crit).filter(k => !seen.has(k) && !skipKeys.has(k) && !k.endsWith('_source'));
+  const allKeys = [...ap0Keys, ...extraKeys];
+  let filled = 0;
+
+  for (const key of allKeys) {
+    if (skipKeys.has(key)) continue;
+    const val = crit[key];
+    const isFilled = val != null && val !== '';
+    if (isFilled) filled++;
+    const level = _fieldLevel(key);
+    const card = document.createElement('div');
+    card.className = 'ext-field' + (isFilled ? '' : ' ext-field-empty');
+    const badge = level ? `<span class="level-badge level-${level}">${level.replace('_',' ')}</span>` : '';
+    let valHtml;
+    if (!isFilled) valHtml = `<span class="ext-field-null">—</span>`;
+    else if (Array.isArray(val)) valHtml = `<span class="ext-field-value">${val.join(', ')}</span>`;
+    else valHtml = `<span class="ext-field-value">${val}</span>`;
+    card.innerHTML = `<div class="ext-field-header"><span class="ext-field-label">${_fieldLabel(key)}</span>${badge}</div>${valHtml}`;
+    body.appendChild(card);
+  }
+  metaEl.textContent = `${filled} von ${allKeys.filter(k => !skipKeys.has(k)).length} Feldern extrahiert`;
+}
+
+function renderRankTable(all) {
+  const tbody = document.getElementById('dbg-rank-body');
+  tbody.innerHTML = '';
+  if (!all.length) return;
+  const maxScore = all[0]?.max_score || 100;
+  const nQ = all.filter(r => !r.disqualified).length;
+  const nD = all.filter(r =>  r.disqualified).length;
+  document.getElementById('dbg-rank-meta').textContent =
+    `${all.length} Produkte · ${nQ} qualifiziert · ${nD} ausgeschlossen`;
+
+  all.forEach(r => {
+    const pct = maxScore > 0 ? Math.round(r.score / maxScore * 100) : 0;
+    const cls = r.disqualified ? 'dq' : pct >= 60 ? 'green' : pct >= 30 ? 'yellow' : 'red';
+    const lift    = r.lifting_height_mm  != null ? (r.lifting_height_mm/1000).toFixed(1)+'m' : '–';
+    const aisle   = r.min_aisle_width_mm != null ? (r.min_aisle_width_mm/1000).toFixed(2)+'m' : '–';
+    const payload = r.max_payload_kg     != null ? r.max_payload_kg+'kg' : '–';
+    const ko = (r.disqualified_by || r.knockouts || []).map(x => `<span class="ko-tag sm">✗ ${x}</span>`).join(' ');
+    const tr = document.createElement('tr');
+    if (r.disqualified) tr.classList.add('row-disqualified');
+    tr.innerHTML = `
+      <td class="debug-rank">${r.rank||''}</td>
+      <td><strong>${r.product}</strong></td>
+      <td>${r.company}</td>
+      <td><span class="type-pill type-pill-sm">${r.agv_type||'–'}</span></td>
+      <td><span class="score-pill score-${cls}">${pct}%<span class="score-max"> ${r.score}/${maxScore}</span></span></td>
+      <td>${payload}</td><td>${lift}</td><td>${aisle}</td>
+      <td class="debug-reasons">${ko || (r.disqualified ? '' : '<span class="no-match">scored</span>')}</td>`;
+    tbody.appendChild(tr);
+
+    // Score breakdown detail row
+    const details = r.score_details || [];
+    if (details.length) {
+      const det = document.createElement('tr');
+      det.className = 'detail-row';
+      det.innerHTML = `<td colspan="9"><div class="detail-inner">
+        <div class="detail-label">Score Breakdown</div>
+        <div class="sb-table">
+          ${details.map(d => `<div class="sb-row"><span class="sb-field">${d.field}</span><span class="sb-val">${d.value??'–'}</span><span class="sb-pts">+${d.points} pts</span></div>`).join('')}
+          <div class="sb-row sb-total"><span class="sb-field">Total</span><span class="sb-val"></span><span class="sb-pts">${r.score}/${maxScore}</span></div>
+        </div>
+      </div></td>`;
+      tbody.appendChild(det);
+    }
+  });
+}
+
+function renderKoList(all) {
+  const dq = all.filter(r => r.disqualified);
+  const card = document.getElementById('dbg-ko-card');
+  const list = document.getElementById('dbg-ko-list');
+  if (!dq.length) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  list.innerHTML = '';
+  dq.forEach(r => {
+    const reasons = r.disqualified_by || r.knockouts || [];
+    const div = document.createElement('div');
+    div.className = 'ko-entry';
+    div.innerHTML = `
+      <div class="ko-entry-header">
+        <span class="ko-product">${r.product}</span>
+        <span class="ko-company">${r.company}</span>
+      </div>
+      <div class="ko-reasons">
+        ${reasons.map(x => `<div class="ko-reason-line"><span class="ko-x">✗</span> ${x}</div>`).join('')}
+      </div>`;
+    list.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
