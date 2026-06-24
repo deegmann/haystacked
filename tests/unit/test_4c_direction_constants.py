@@ -3,7 +3,7 @@
 Tests that _4C_EXTRACTION_DIRECTION, _NUMERIC_KO_FIELD_HINTS, and _SHARED_SHEET
 are non-empty, correctly typed, and internally consistent.
 
-These constants are built at app startup from field_levels.json. An empty or
+These constants are built at app startup from fields.json via field_spec.py. An empty or
 mismatched constant means the source-span guard and Pass 4c are silently inactive.
 """
 import sys
@@ -24,66 +24,66 @@ from app import (
 # ---------------------------------------------------------------------------
 
 def test_U_C_01_4c_direction_non_empty():
-    """_4C_EXTRACTION_DIRECTION must be non-empty after loading field_levels.json.
+    """_4C_EXTRACTION_DIRECTION must be non-empty after loading fields.json.
 
     An empty dict means Pass 4c has no extraction direction for any field,
     which would make all 4c prompts directionless.
     """
     assert len(_4C_EXTRACTION_DIRECTION) > 0, (
-        "_4C_EXTRACTION_DIRECTION is empty — field_levels.json may be stale. "
+        "_4C_EXTRACTION_DIRECTION is empty — fields.json may be stale. "
         "Run generate_all.py."
     )
 
 
 # ---------------------------------------------------------------------------
-# U-C-02: required_weight_capacity_kg maps to MAXIMUM direction
+# U-C-02: required_max_payload_kg maps to MAXIMUM direction
 # ---------------------------------------------------------------------------
 
 def test_U_C_02_weight_capacity_direction_maximum():
-    """required_weight_capacity_kg (KO_IF_LT) must map to MAXIMUM direction.
+    """required_max_payload_kg (KO_IF_LT) must map to MAXIMUM direction.
 
     KO_IF_LT: supplier must meet or exceed the tender threshold. To find the
     correct threshold in documents with multiple weight values, 4c must extract
     the MAXIMUM (the heaviest weight the AGV must carry).
     """
-    direction = _4C_EXTRACTION_DIRECTION.get("required_weight_capacity_kg", "")
+    direction = _4C_EXTRACTION_DIRECTION.get("required_max_payload_kg", "")
     assert "MAXIMUM" in direction, (
-        f"required_weight_capacity_kg direction must contain 'MAXIMUM' (KO_IF_LT). "
+        f"required_max_payload_kg direction must contain 'MAXIMUM' (KO_IF_LT). "
         f"Got: {direction!r}"
     )
 
 
 # ---------------------------------------------------------------------------
-# U-C-03: required_min_aisle_width_m maps to MINIMUM direction
+# U-C-03: required_min_aisle_width_mm maps to MINIMUM direction
 # ---------------------------------------------------------------------------
 
 def test_U_C_03_aisle_width_direction_minimum():
-    """required_min_aisle_width_m (KO_IF_GT) must map to MINIMUM direction.
+    """required_min_aisle_width_mm (KO_IF_GT) must map to MINIMUM direction.
 
     KO_IF_GT: supplier must not exceed the available aisle width. When a document
     states both rack-to-rack and pallet-to-pallet widths, 4c must extract the
     MINIMUM (the tightest constraint the AGV must fit through).
     """
-    direction = _4C_EXTRACTION_DIRECTION.get("required_min_aisle_width_m", "")
+    direction = _4C_EXTRACTION_DIRECTION.get("required_min_aisle_width_mm", "")
     assert "MINIMUM" in direction, (
-        f"required_min_aisle_width_m direction must contain 'MINIMUM' (KO_IF_GT). "
+        f"required_min_aisle_width_mm direction must contain 'MINIMUM' (KO_IF_GT). "
         f"Got: {direction!r}"
     )
 
 
 # ---------------------------------------------------------------------------
-# U-C-04: required_max_lift_height_m maps to MAXIMUM direction
+# U-C-04: required_lifting_height_mm maps to MAXIMUM direction
 # ---------------------------------------------------------------------------
 
 def test_U_C_04_lift_height_direction_maximum():
-    """required_max_lift_height_m (KO_IF_LT) must map to MAXIMUM direction.
+    """required_lifting_height_mm (KO_IF_LT) must map to MAXIMUM direction.
 
     KO_IF_LT: supplier's lift height must meet or exceed the maximum racking height
     required. 4c must extract the MAXIMUM (highest storage level the AGV must reach).
     """
-    direction = _4C_EXTRACTION_DIRECTION.get("required_max_lift_height_m", "")
+    direction = _4C_EXTRACTION_DIRECTION.get("required_lifting_height_mm", "")
     assert "MAXIMUM" in direction, (
-        f"required_max_lift_height_m direction must contain 'MAXIMUM' (KO_IF_LT). "
+        f"required_lifting_height_mm direction must contain 'MAXIMUM' (KO_IF_LT). "
         f"Got: {direction!r}"
     )
 
@@ -106,7 +106,7 @@ def test_U_C_05_hints_keys_have_direction():
     assert not missing, (
         f"Fields in _NUMERIC_KO_FIELD_HINTS without a 4c direction: {missing}. "
         f"These fields will get directionless 4c prompts. "
-        f"Check field_levels.json for their operator values."
+        f"Check fields.json for their operator values."
     )
 
 

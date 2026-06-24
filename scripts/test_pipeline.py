@@ -17,7 +17,7 @@ import pdfplumber
 import io
 
 from src.data_loader import load_suppliers
-from src.matching import match_suppliers_new, _field_levels
+from src.matching import match_suppliers_new
 from src.context_builder import agv_type_keyword_fallback, build_system_context
 
 ROOT = Path(__file__).parent.parent
@@ -134,7 +134,7 @@ async def run_one(pdf_path: Path) -> dict:
             print(f"  ⚠ {w}")
 
     # 3. Normalize + build req dict
-    raw_vt = crit.get("required_vehicle_type") or ""
+    raw_vt = crit.get("required_agv_type") or ""
     if isinstance(raw_vt, list):
         raw_vt = next(
             (item for item in raw_vt if _VT_MAP.get(str(item).lower().strip())),
@@ -160,22 +160,18 @@ async def run_one(pdf_path: Path) -> dict:
             crit[_key] = _val
             print(f"  Field-text-fallback: {_key} = {_val}")
 
-    raw_nav = crit.get("required_navigation") or ""
+    raw_nav = crit.get("required_navigation_type") or ""
     nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
 
     new_req = dict(crit)
-    new_req["required_vehicle_type"]     = canonical
-    new_req["required_navigation"]       = nav_list
-    raw_lift = crit.get("required_max_lift_height_m")
-    new_req["required_max_lift_height_m"] = int(float(raw_lift) * 1000) if raw_lift else None
-    raw_aisle = crit.get("required_min_aisle_width_m")
-    new_req["required_min_aisle_width_m"] = int(float(raw_aisle) * 1000) if raw_aisle else None
-    raw_outdoor = crit.get("required_outdoor")
+    new_req["required_agv_type"]          = canonical
+    new_req["required_navigation_type"]   = nav_list
+    raw_outdoor = crit.get("required_outdoor_capable")
     if raw_outdoor is not None:
-        new_req["required_outdoor"] = (
+        new_req["required_outdoor_capable"] = (
             "required" if str(raw_outdoor).lower() in ("yes", "true", "required") else "not_required"
         )
-    new_req["required_vna"] = (
+    new_req["required_vna_capable"] = (
         "required"     if is_vna else
         "not_required" if canonical in _VNA_APPLICABLE else
         None
@@ -226,7 +222,7 @@ def print_result(res: dict):
 async def main():
     print("haystacked Pipeline-Test — alle drei Ausschreibungen")
     print(f"Supplier geladen: {len(SUPPLIERS)}")
-    print(f"field_levels: {len(_field_levels)} Felder")
+
 
     results = []
     for pdf in PDFS:

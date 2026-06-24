@@ -11,8 +11,6 @@ BASE_DIR   = Path(__file__).parent.parent
 _README_LOCAL  = BASE_DIR / "config" / "industry_readme.md"
 _README_REMOTE = BASE_DIR.parent.parent.parent / "Library" / "CloudStorage" / "SynologyDrive-homeDrive" / "Haystacked" / "Specs" / "haystacked_industry_readme.md"
 README         = _README_LOCAL if _README_LOCAL.exists() else _README_REMOTE
-FIELD_DESC     = BASE_DIR / "config" / "field_descriptions.json"
-FIELD_LVL      = BASE_DIR / "config" / "field_levels.json"
 VEHICLE_TYPES  = BASE_DIR / "config" / "vehicle_types.json"
 
 _FALLBACK_README = """
@@ -35,34 +33,27 @@ def _load_readme() -> str:
     return _FALLBACK_README
 
 
-def _load_field_descriptions() -> dict:
-    if FIELD_DESC.exists():
-        with open(FIELD_DESC) as f:
-            return json.load(f)
-    return {}
-
-
-def _load_field_levels() -> dict:
-    if FIELD_LVL.exists():
-        with open(FIELD_LVL) as f:
-            return json.load(f)
-    return {}
-
-
 def build_system_context() -> str:
-    readme     = _load_readme()
-    field_desc = _load_field_descriptions()
-    levels     = _load_field_levels()
-
-    ko_fields   = {k: v for k, v in levels.items() if isinstance(v, dict) and v.get("level") == "KO"}
-    cond_fields = {k: v for k, v in levels.items() if isinstance(v, dict) and v.get("level") == "COND_KO"}
+    readme = _load_readme()
+    from src.field_spec import load_fields
+    _seen: set = set()
+    ko_fields:   dict = {}
+    cond_fields: dict = {}
+    for _spec in load_fields().values():
+        if _spec.field_name in _seen:
+            continue
+        _seen.add(_spec.field_name)
+        if _spec.level == "KO":
+            ko_fields[_spec.field_name] = _spec
+        elif _spec.level == "COND_KO":
+            cond_fields[_spec.field_name] = _spec
 
     field_section = ""
-    if field_desc or ko_fields:
+    if ko_fields:
         lines = []
-        for field, meta in list(ko_fields.items()) + list(cond_fields.items()):
-            desc = field_desc.get(field, "")
-            level = meta.get("level", "") if isinstance(meta, dict) else ""
+        for field, spec in list(ko_fields.items()) + list(cond_fields.items()):
+            desc  = spec.user_description or ""
+            level = spec.level or ""
             lines.append(f"  {field} [{level}]: {desc}" if desc else f"  {field} [{level}]")
         field_section = "## Field-level descriptions (K.O. and Cond. K.O.)\n" + "\n".join(lines)
 

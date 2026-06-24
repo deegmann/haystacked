@@ -1,4 +1,4 @@
-"""AP0 → UI consistency tests (T-CON-01 … T-CON-07, T-UI-01 … T-UI-03).
+"""AP0 → UI consistency tests (T-CON-01 … T-CON-07, T-UI-01 … T-UI-03, T-FV-01 … T-FV-02).
 
 These tests verify the full chain from AP0 xlsx → generated config files →
 Python models → data_loader wiring → /api/suppliers output → /api/field-meta.
@@ -11,22 +11,7 @@ Design intent
 The bug that prompted this suite: /api/suppliers had a ~55-field hardcoded
 whitelist, causing all Mobile AMR-specific fields to be silently absent from
 the API response.  These tests catch any recurrence of that class of bug:
-missing dataclass field, missing data_loader wiring, or missing API exposure.
-
-Known open items (C1/H1 fix pending)
-──────────────────────────────────────
-T-CON-01 and T-CON-03 will produce xfail entries for six Extension-dataclass
-gaps that are not yet resolved:
-  - installation_process   (Extension field missing)
-  - modification_process   (Extension field missing)
-  - min_fleet_size         (Extension field missing)
-  - typical_project_value_eur (Extension field missing)
-  - multi_language_display (Extension field missing)
-  - gamification           (Extension field missing)
-
-T-CON-02 (H1) flags the type mismatch: throughput_picks_per_hour is declared
-Optional[int] in Extension but TEXT in sqlite_schema.json — a non-numeric TEXT
-value would be silently coerced to None by _parse_int().
+missing data_loader wiring or missing API exposure.
 """
 
 from __future__ import annotations
@@ -48,322 +33,113 @@ def _load(name: str) -> dict:
     return json.loads((CONFIG_DIR / name).read_text())
 
 
-# Columns that are internal join keys never meant to surface as Extension attrs.
+# Columns that are internal join keys never meant to surface as field values.
 _EXT_INTERNAL = frozenset({"extension_id", "base_model_id", "extra_fields"})
 
-# Fields with a confirmed Product-table fallback in /api/suppliers.
-# These are missing from Extension but present on Product; the suppliers API
-# resolves them via getattr(p, col, None) so they are NOT a runtime gap.
-_PRODUCT_FALLBACK = frozenset({
-    "reference_count",
-    "lead_time_weeks",
-    "service_coverage",
-    "distribution_model",
-    "country",
-    "certifications_generic",
-    "languages_spoken",
-})
-
-# Pure gaps: not in Extension AND not in Product.  These return None silently
-# from /api/suppliers today.  Marked xfail until the C1 fix lands.
-_PURE_C1_GAPS = frozenset({
-    "installation_process",
-    "modification_process",
-    "min_fleet_size",
-    "typical_project_value_eur",
-    "multi_language_display",
-    "gamification",
-})
-
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-CON-01 — All extensions_columns in Extension dataclass
+# T-CON-01 — Every FieldSpec UUID present as key in _build_field_values output
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_CON_01_all_extensions_columns_in_Extension_dataclass():
-    """Every non-internal column in sqlite_schema.json extensions_columns must
-    appear as a field on the Extension dataclass.
-
-    This is an xfail when the six C1 pure-gap fields are still missing.
-    If all gaps are fixed the test becomes a passing green test.
-    """
+def test_T_CON_01_all_field_uuids_in_build_field_values():
+    """Every FieldSpec UUID in load_fields() must be present as a key in the
+    dict returned by _build_field_values().  If a UUID is absent, that field
+    will never surface in matching or /api/suppliers."""
     import sys
     sys.path.insert(0, str(BASE_DIR))
-    from src.models import Extension
+    from src.field_spec import load_fields
+    from src.data_loader import _build_field_values
+    from src.models import FieldValue
 
-    schema      = _load("sqlite_schema.json")
-    ext_cols    = schema["extensions_columns"]
-    ext_fields  = {f.name for f in dataclasses.fields(Extension)}
+    specs = load_fields()
+    # Build a synthetic flat row with sentinel values for every known field_name
+    row = {spec.field_name: "SENTINEL" for spec in specs.values()}
+    result = _build_field_values(row_ext=row, row_prod=row, row_company=row, specs=specs)
 
-    missing = [
-        col for col in ext_cols
-        if col not in _EXT_INTERNAL
-        and col not in ext_fields
-        # Product-fallback fields are expected to be absent from Extension
-        and col not in _PRODUCT_FALLBACK
-    ]
-
-    if missing:
-        # Separate known C1 gaps from unexpected new gaps
-        known   = [m for m in missing if m in _PURE_C1_GAPS]
-        unknown = [m for m in missing if m not in _PURE_C1_GAPS]
-
-        if unknown:
-            # New gap — fail hard so the developer is alerted immediately
-            pytest.fail(
-                f"NEW Extension dataclass gaps detected (not in C1 backlog): {unknown}\n"
-                f"All missing (including known C1): {missing}"
-            )
-        else:
-            # Only known C1 gaps — mark as xfail
-            pytest.xfail(
-                f"C1/H1 fix pending — Extension missing {known}"
-            )
-
-
-def test_T_CON_01b_product_fallback_fields_present_in_Product():
-    """Fields in _PRODUCT_FALLBACK must actually exist on the Product dataclass
-    so that /api/suppliers getattr(p, col, None) resolves them correctly."""
-    import sys
-    sys.path.insert(0, str(BASE_DIR))
-    from src.models import Product
-
-    prod_fields = {f.name for f in dataclasses.fields(Product)}
-    missing = [f for f in _PRODUCT_FALLBACK if f not in prod_fields]
+    missing = [uid for uid in specs if uid not in result]
     assert not missing, (
-        f"Fields expected on Product for API fallback are missing from Product dataclass: {missing}"
+        f"These UUIDs are missing from _build_field_values output: {missing}"
     )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-CON-02 — All Extension fields wired in data_loader (mock-row test)
+# T-CON-02 — Entity routing correctness
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_CON_02_extension_fields_wired_in_data_loader():
-    """Each field on the Extension dataclass must be populated by data_loader
-    when a non-null value exists in the SQLite row.
+def test_T_CON_02_entity_routing_correct():
+    """_build_field_values must resolve each spec from the correct source row.
 
-    Approach: build a synthetic dict row, call load_suppliers() logic inline
-    by constructing Extension the same way data_loader does, then assert each
-    field received a non-default value.
-
-    Excludes:
-    - Identity fields (extension_id, base_model_id, agv_type) — required str args
-    - extra_fields — opaque JSON blob, not individually wired
-    - List fields (multiselect) get [] from a None row value — tested separately
-    - Fields that live on Product (join-through) — not Extension constructor args
+    A Company-entity field must read from row_company, not row_ext.
+    A Product-entity field must read from row_prod, not row_ext.
+    A Base-Model-entity field must read from row_ext.
     """
     import sys
     sys.path.insert(0, str(BASE_DIR))
-    from src.models import Extension
-    from src.data_loader import (
-        _parse_bool, _parse_float, _parse_int, _parse_multiselect
+    from src.field_spec import load_fields
+    from src.data_loader import _build_field_values
+
+    specs = load_fields()
+
+    # Build separate rows with unique sentinel values per entity
+    row_ext     = {spec.field_name: f"EXT_{spec.field_name}"     for spec in specs.values()}
+    row_prod    = {spec.field_name: f"PROD_{spec.field_name}"    for spec in specs.values()}
+    row_company = {spec.field_name: f"COMPANY_{spec.field_name}" for spec in specs.values()}
+
+    result = _build_field_values(
+        row_ext=row_ext, row_prod=row_prod, row_company=row_company, specs=specs
     )
 
-    schema = _load("sqlite_schema.json")
-    bool_fields  = set(schema.get("bool_fields", []))
-    int_fields   = set(schema.get("int_fields", []))
-    float_fields = set(schema.get("float_fields", []))
-
-    # Sentinel values used to detect successful wiring
-    SENTINEL_BOOL  = 1       # will become True via _parse_bool
-    SENTINEL_INT   = 42
-    SENTINEL_FLOAT = 9.9
-    SENTINEL_STR   = "TEST_VALUE"
-    SENTINEL_MULTI = "A|B"   # will become ["A", "B"] via _parse_multiselect
-
-    ext_fields = dataclasses.fields(Extension)
-
-    # Fields that are identity/skip
-    SKIP = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
-    # Fields with a list default — multiselect
-    SKIP_LIST_FIELDS = {
-        f.name for f in ext_fields
-        if f.default_factory is not dataclasses.MISSING  # type: ignore[arg-type]
-    }
-    # Product join-through fields present on Extension as company context
-    # These are populated in data_loader from d["employee_count_range"] etc., not from
-    # the bme.* columns. Test them separately.
-    COMPANY_CONTEXT = {"employee_count_range", "hq_city", "founding_year",
-                       "industries_served"}
-
-    # Build a mock row where every field has a sentinel value
-    mock_row: dict = {}
-    for f in ext_fields:
-        if f.name in SKIP or f.name in SKIP_LIST_FIELDS or f.name in COMPANY_CONTEXT:
+    errors = []
+    for uid, spec in specs.items():
+        fv = result.get(uid)
+        if fv is None:
+            errors.append(f"{spec.field_name}: FieldValue missing")
             continue
-        if f.name in bool_fields:
-            mock_row[f.name] = SENTINEL_BOOL
-        elif f.name in int_fields:
-            mock_row[f.name] = SENTINEL_INT
-        elif f.name in float_fields:
-            mock_row[f.name] = SENTINEL_FLOAT
+        if spec.entity == "Company":
+            expected = f"COMPANY_{spec.field_name}"
+        elif spec.entity == "Product":
+            expected = f"PROD_{spec.field_name}"
         else:
-            mock_row[f.name] = SENTINEL_STR
+            expected = f"EXT_{spec.field_name}"
+        # _coerce_by_type will transform the sentinel; for Text/Dropdown it passes through
+        # Only check passthrough types (data_type not Bool/Int/Float/Multi-Select)
+        if spec.data_type not in ("Boolean", "Integer", "Float", "Multi-Select"):
+            if fv.value != expected:
+                errors.append(
+                    f"{spec.field_name} (entity={spec.entity}): "
+                    f"expected {expected!r}, got {fv.value!r}"
+                )
 
-    # Also provide list (multiselect) fields with sentinel pipe-string
-    for f in ext_fields:
-        if f.name in SKIP_LIST_FIELDS and f.name not in SKIP:
-            mock_row[f.name] = SENTINEL_MULTI
-
-    # Provide company-context fields
-    mock_row["employee_count_range"] = SENTINEL_STR
-    mock_row["hq_city"]              = SENTINEL_STR
-    mock_row["founding_year"]        = SENTINEL_INT
-    mock_row["industries_served"]    = SENTINEL_MULTI
-
-    # Replicate the data_loader Extension() constructor call using the same parse helpers.
-    # This is NOT a copy of data_loader — it is a re-execution of the same logic
-    # to verify every field maps through correctly.
-    def _build_ext(d: dict) -> Extension:
-        kwargs: dict = {
-            "extension_id":               d.get("extension_id", "TEST-ID"),
-            "base_model_id":              d.get("base_model_id", "BM-TEST"),
-            "agv_type":                   d.get("agv_type", "Forklift AGV"),
-        }
-        for f in ext_fields:
-            n = f.name
-            if n in ("extension_id", "base_model_id", "agv_type"):
-                continue
-            if n == "extra_fields":
-                kwargs[n] = d.get(n)
-                continue
-            if f.default_factory is not dataclasses.MISSING:  # type: ignore[arg-type]
-                kwargs[n] = _parse_multiselect(d.get(n))
-            elif n in bool_fields:
-                kwargs[n] = _parse_bool(d.get(n))
-            elif n in int_fields:
-                kwargs[n] = _parse_int(d.get(n))
-            elif n in float_fields:
-                kwargs[n] = _parse_float(d.get(n))
-            elif n in COMPANY_CONTEXT:
-                raw = d.get(n)
-                if n == "founding_year":
-                    kwargs[n] = _parse_int(raw)
-                elif n == "industries_served":
-                    kwargs[n] = _parse_multiselect(raw)
-                else:
-                    kwargs[n] = raw
-            else:
-                kwargs[n] = d.get(n)
-        return Extension(**kwargs)
-
-    ext = _build_ext(mock_row)
-
-    # Verify every wired field received the sentinel (not the default)
-    not_wired = []
-    for f in ext_fields:
-        n = f.name
-        if n in SKIP:
-            continue
-        val = getattr(ext, n)
-        if f.default_factory is not dataclasses.MISSING:  # type: ignore[arg-type]
-            # Multiselect: sentinel "A|B" should parse to ["A", "B"]
-            if val == []:
-                not_wired.append(n)
-        else:
-            default_val = f.default if f.default is not dataclasses.MISSING else None
-            if val == default_val:
-                not_wired.append(n)
-
-    assert not not_wired, (
-        f"These Extension fields received their default (not wired or parse failed): {not_wired}"
-    )
-
-
-def test_T_CON_02_H1_throughput_type_mismatch():
-    """H1 gap: throughput_picks_per_hour is TEXT in sqlite_schema but Optional[int]
-    in Extension.  A non-numeric TEXT value (e.g. '100-200') is silently coerced
-    to None by _parse_int(), causing data loss without any error.
-
-    This test is xfail until models.py changes throughput_picks_per_hour to
-    Optional[str] to match the schema declaration.
-    """
-    import sys
-    sys.path.insert(0, str(BASE_DIR))
-    from src.models import Extension
-    from src.data_loader import _parse_int
-
-    schema = _load("sqlite_schema.json")
-    # Find throughput_picks_per_hour in the schema
-    # It should NOT be in int_fields if it is declared TEXT
-    int_fields = set(schema.get("int_fields", []))
-    bool_fields = set(schema.get("bool_fields", []))
-    float_fields = set(schema.get("float_fields", []))
-    ext_cols = schema.get("extensions_columns", [])
-
-    assert "throughput_picks_per_hour" in ext_cols, (
-        "throughput_picks_per_hour must be in extensions_columns"
-    )
-
-    is_numeric_schema_type = (
-        "throughput_picks_per_hour" in int_fields
-        or "throughput_picks_per_hour" in float_fields
-    )
-
-    # Find the Extension field type
-    for f in dataclasses.fields(Extension):
-        if f.name == "throughput_picks_per_hour":
-            ext_type_hint = f.type
-            break
-    else:
-        pytest.fail("throughput_picks_per_hour not found in Extension dataclass")
-
-    # If schema says TEXT but Extension says int, we have a mismatch
-    if not is_numeric_schema_type and "int" in str(ext_type_hint).lower():
-        pytest.xfail(
-            "H1 fix pending: throughput_picks_per_hour is TEXT in sqlite_schema.json "
-            f"but declared as {ext_type_hint} in Extension. "
-            "Non-numeric TEXT values will be silently coerced to None by _parse_int()."
-        )
+    assert not errors, "Entity routing errors:\n" + "\n".join(errors)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-CON-03 — /api/suppliers logic exposes all extensions_columns
+# T-CON-03 — /api/suppliers exposes all AP0 fields via values dict
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_CON_03_suppliers_api_exposes_all_extensions_columns():
+def test_T_CON_03_suppliers_api_exposes_all_ap0_fields():
     """The /api/suppliers logic must produce a key for every non-internal
-    extensions_columns entry.  Tests the column iteration logic directly
-    (no running server required).
-
-    Pure C1 gaps (6 fields with no Extension AND no Product attribute) are
-    xfail — they silently return None today.
-    """
+    field_name present in fields.json.  Tests via the values dict — every
+    FieldSpec field_name not in _EXT_INTERNAL must appear in the row output."""
     import sys
     sys.path.insert(0, str(BASE_DIR))
-    from src.models import Extension, Product
+    from src.field_spec import load_fields
+    from src.data_loader import _build_field_values
 
-    schema      = _load("sqlite_schema.json")
-    ext_cols    = schema["extensions_columns"]
-    EXT_INTERNAL = {"extension_id", "base_model_id", "extra_fields"}
+    specs = load_fields()
+    row = {spec.field_name: "SENTINEL" for spec in specs.values()}
+    result = _build_field_values(row_ext=row, row_prod=row, row_company=row, specs=specs)
 
-    ext_fields  = {f.name for f in dataclasses.fields(Extension)}
-    prod_fields = {f.name for f in dataclasses.fields(Product)}
-
-    # Simulate what /api/suppliers does per column:
-    #   val = getattr(e, col, None)
-    #   if val is None: val = getattr(p, col, None)
-    # A column "passes" if at least one of Extension or Product has it.
-    missing_from_api = []
-    for col in ext_cols:
-        if col in EXT_INTERNAL:
-            continue
-        if col not in ext_fields and col not in prod_fields:
-            missing_from_api.append(col)
-
-    if missing_from_api:
-        known   = [m for m in missing_from_api if m in _PURE_C1_GAPS]
-        unknown = [m for m in missing_from_api if m not in _PURE_C1_GAPS]
-        if unknown:
-            pytest.fail(
-                f"NEW /api/suppliers gaps (not in C1 backlog): {unknown}\n"
-                f"All missing: {missing_from_api}"
-            )
-        else:
-            pytest.xfail(
-                f"C1 fix pending — these columns silently return None from /api/suppliers: {known}"
-            )
+    # Simulate /api/suppliers: iterate sr.values.items() → collect field_names
+    exposed_names = {fv.spec.field_name for fv in result.values()}
+    expected_names = {
+        spec.field_name for spec in specs.values()
+        if spec.field_name not in _EXT_INTERNAL
+    }
+    missing = expected_names - exposed_names
+    assert not missing, (
+        f"These AP0 field_names are not reachable via values dict: {missing}"
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -371,24 +147,26 @@ def test_T_CON_03_suppliers_api_exposes_all_extensions_columns():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_CON_04_field_meta_sheet_for_all_KO_fields():
-    """Every KO and COND_KO field with a tender_key must have a sheet mapping
-    in extraction_hints.json.  A missing sheet means the UI cannot group that
-    field under the correct vehicle-type column group."""
-    fl    = _load("field_levels.json")
-    hints = _load("extraction_hints.json")
+    """Every KO and COND_KO field with a tender_key must have a non-null sheet in
+    fields.json.  A missing sheet means the UI cannot group that field under the
+    correct vehicle-type column group."""
+    fields = _load("fields.json")
 
     missing_sheet: list[str] = []
-    for db_key, info in fl.items():
+    for info in fields.values():
         level = info.get("level", "")
         if level not in ("KO", "COND_KO"):
             continue
-        tk = info.get("tender_key", db_key)
-        sheet = hints.get(tk, {}).get("sheet")
+        if not info.get("tender_key"):
+            continue
+        sheet = info.get("sheet")
         if not sheet:
-            missing_sheet.append(f"{db_key} (tender_key={tk}, level={level})")
+            missing_sheet.append(
+                f"{info.get('field_name')} (tender_key={info.get('tender_key')}, level={level})"
+            )
 
     assert not missing_sheet, (
-        f"KO/COND_KO fields without sheet in extraction_hints.json:\n"
+        f"KO/COND_KO fields without sheet in fields.json:\n"
         + "\n".join(f"  {m}" for m in missing_sheet)
     )
 
@@ -430,84 +208,42 @@ def test_T_CON_05b_shared_sheet_name_consistent():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-CON-06 — Each VT has at least one extraction_hints entry with its sheet
+# T-CON-06 — Each VT has at least one fields.json entry with a hint and its sheet
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_CON_06_each_vt_has_at_least_one_hint():
     """Each VT name from scoring_bucket_map must appear as the sheet value of
-    at least one entry in extraction_hints.json.  A VT with zero hints cannot
-    provide LLM extraction prompts for its fields."""
+    at least one field in fields.json that has a hint.  A VT with zero hints
+    cannot provide LLM extraction prompts for its fields."""
     vt_cfg = _load("vehicle_types.json")
-    hints  = _load("extraction_hints.json")
+    fields = _load("fields.json")
 
     vt_names = list(vt_cfg.get("scoring_bucket_map", {}).keys())
     empty_vts: list[str] = []
     for vt in vt_names:
-        hits = [k for k, v in hints.items() if v.get("sheet") == vt]
+        hits = [v for v in fields.values() if v.get("sheet") == vt and v.get("hint")]
         if not hits:
             empty_vts.append(vt)
 
     assert not empty_vts, (
-        f"These VT types have zero extraction_hints entries: {empty_vts}"
+        f"These VT types have zero fields with hints in fields.json: {empty_vts}"
     )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-CON-07 — _check_extension_gaps() warns only for true gaps, not for
-#             Product-fallback fields (smoke test)
+# T-CON-07 — Startup entity-assertion passes (no unknown entity values)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_CON_07_extension_gaps_smoke():
-    """Smoke test: _check_extension_gaps() logic must produce no gap warnings
-    AFTER all C1 gaps are resolved (i.e., when Extension dataclass is complete).
-
-    While C1/H1 are still open, this test is xfail for the pure gaps.
-
-    The function warns for ALL fields in extensions_columns that are absent from
-    the Extension dataclass.  It does NOT distinguish Product-fallback fields
-    from true gaps — that is an accepted limitation (false-positive warnings at
-    startup).  This test tracks only whether true gaps (no Extension AND no Product
-    attribute) exist, because those are the ones that silently return None.
-
-    What _check_extension_gaps() actually does today (by design):
-    - It warns about _PRODUCT_FALLBACK fields too — those fields are intentionally
-      absent from Extension but work via Product fallback in /api/suppliers.
-      These are known benign false-positive startup warnings.
-    - It warns about _PURE_C1_GAPS fields — those are real gaps (C1 backlog).
-    The test below validates only the real-gap case.
-    """
+def test_T_CON_07_startup_entity_assertion():
+    """All entity values in fields.json must be one of: Base Model, Product, Company.
+    This mirrors the startup assertion in data_loader.load_suppliers()."""
     import sys
     sys.path.insert(0, str(BASE_DIR))
-    from src.models import Extension
+    from src.field_spec import load_fields
 
-    schema   = _load("sqlite_schema.json")
-    ext_cols = schema["extensions_columns"]
-    EXT_INTERNAL = {"extension_id", "base_model_id", "extra_fields"}
-
-    ext_fields = {f.name for f in dataclasses.fields(Extension)}
-
-    # Replicate _check_extension_gaps() gap detection logic
-    all_gaps = [
-        col for col in ext_cols
-        if col not in EXT_INTERNAL and col not in ext_fields
-    ]
-
-    # Separate real runtime gaps from benign Product-fallback gaps
-    real_gaps = [g for g in all_gaps if g not in _PRODUCT_FALLBACK]
-
-    if real_gaps:
-        known   = [g for g in real_gaps if g in _PURE_C1_GAPS]
-        unknown = [g for g in real_gaps if g not in _PURE_C1_GAPS]
-        if unknown:
-            pytest.fail(
-                f"_check_extension_gaps detected NEW unexpected runtime gaps (not in C1 backlog): {unknown}\n"
-                f"These fields will silently return None from /api/suppliers.\n"
-                f"Full gap list: {real_gaps}"
-            )
-        else:
-            pytest.xfail(
-                f"C1 fix pending — these fields silently return None from /api/suppliers: {known}"
-            )
+    _KNOWN_ENTITIES = {"Base Model", "Product", "Company"}
+    unknown = {s.entity for s in load_fields().values()} - _KNOWN_ENTITIES
+    assert not unknown, f"Unknown entity values in fields.json: {unknown}"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -550,30 +286,24 @@ def test_T_UI_01_field_meta_vt_config_complete():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_UI_02_all_KO_fields_have_sheet_in_field_meta():
-    """Every KO-level field with a tender_key must resolve to a non-null sheet
-    in the /api/field-meta response.  Without a sheet the frontend cannot assign
-    the field to a VT column group and it becomes invisible in the DB browser.
-
-    Equivalent to T-CON-04 but exercises the field-meta endpoint logic path
-    (including the tender_key → sheet lookup chain) rather than raw config files.
-    """
-    fl    = _load("field_levels.json")
-    hints = _load("extraction_hints.json")
+    """Every KO-level field with a tender_key must have a non-null sheet in
+    fields.json.  Without a sheet the frontend cannot assign the field to a
+    VT column group and it becomes invisible in the DB browser."""
+    fields = _load("fields.json")
 
     missing_sheet: list[str] = []
-    for db_key, info in fl.items():
+    for info in fields.values():
         if info.get("level") != "KO":
             continue
         tender_key = info.get("tender_key")
         if not tender_key:
             continue
-        # Replicate field-meta sheet lookup (app.py line 952)
-        sheet = hints.get(tender_key, {}).get("sheet")
+        sheet = info.get("sheet")
         if not sheet:
-            missing_sheet.append(f"{db_key} → tender_key={tender_key}")
+            missing_sheet.append(f"{info.get('field_name')} → tender_key={tender_key}")
 
     assert not missing_sheet, (
-        "KO fields missing sheet in /api/field-meta (cannot be grouped in DB browser UI):\n"
+        "KO fields missing sheet in fields.json (cannot be grouped in DB browser UI):\n"
         + "\n".join(f"  {m}" for m in missing_sheet)
     )
 
@@ -593,42 +323,64 @@ def test_T_UI_03_agv_type_field_present_in_extensions_columns():
 
 
 def test_T_UI_03b_agv_type_allowed_values_match_vt_names():
-    """The allowed_values for agv_type in field_levels.json must be identical to
+    """The allowed_values for agv_type in fields.json must be identical to
     scoring_bucket_map.keys() in vehicle_types.json.  If they diverge, the UI
     VT filter will hide rows it should show (or show rows it should hide)."""
-    fl     = _load("field_levels.json")
+    fields = _load("fields.json")
     vt_cfg = _load("vehicle_types.json")
 
-    fl_allowed   = set(fl.get("agv_type", {}).get("allowed_values", []))
+    agv_type_spec = next(
+        (v for v in fields.values() if v.get("field_name") == "agv_type"), None
+    )
+    assert agv_type_spec, "agv_type field not found in fields.json"
+
+    fs_allowed   = set(agv_type_spec.get("allowed_values") or [])
     vt_canonical = set(vt_cfg.get("scoring_bucket_map", {}).keys())
 
-    assert fl_allowed, "agv_type allowed_values must not be empty in field_levels.json"
+    assert fs_allowed,   "agv_type allowed_values must not be empty in fields.json"
     assert vt_canonical, "scoring_bucket_map must not be empty in vehicle_types.json"
 
-    diff = fl_allowed.symmetric_difference(vt_canonical)
+    diff = fs_allowed.symmetric_difference(vt_canonical)
     assert not diff, (
         f"agv_type allowed_values and scoring_bucket_map.keys() must be identical.\n"
-        f"In field_levels but not scoring_bucket_map: {fl_allowed - vt_canonical}\n"
-        f"In scoring_bucket_map but not field_levels: {vt_canonical - fl_allowed}"
+        f"In fields.json but not scoring_bucket_map: {fs_allowed - vt_canonical}\n"
+        f"In scoring_bucket_map but not fields.json: {vt_canonical - fs_allowed}"
     )
 
 
-def test_T_UI_03c_agv_type_is_Extension_field():
-    """agv_type must be a field on the Extension dataclass so that
-    /api/suppliers can expose it via getattr(e, 'agv_type')."""
-    import sys
-    sys.path.insert(0, str(BASE_DIR))
-    from src.models import Extension
-
-    ext_fields = {f.name for f in dataclasses.fields(Extension)}
-    assert "agv_type" in ext_fields, (
-        "agv_type must be a field on Extension — /api/suppliers reads it via getattr(e, col)"
+def test_T_UI_03c_agv_type_in_fields_json():
+    """agv_type must be a field in fields.json so that /api/suppliers can
+    expose it via the values dict."""
+    fields = _load("fields.json")
+    agv_type_spec = next((v for v in fields.values() if v.get("field_name") == "agv_type"), None)
+    assert agv_type_spec is not None, (
+        "agv_type must be present in fields.json — /api/suppliers reads it via values dict"
     )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # T-CON-08 — extensions_columns list is non-empty and internally consistent
 # ─────────────────────────────────────────────────────────────────────────────
+
+def test_T_CON_10_fields_json_numeric_ko_hints_complete():
+    """Every numeric KO field in fields.json (KO_IF_LT / KO_IF_GT, Float/Integer)
+    must have both a non-empty hint and a non-empty sheet.  These are the fields
+    used by Pass 4c — a missing hint breaks per-field extraction."""
+    fields = _load("fields.json")
+
+    issues: list[str] = [
+        v.get("field_name", "?")
+        for v in fields.values()
+        if v.get("operator") in ("KO_IF_LT", "KO_IF_GT")
+        and v.get("data_type") in ("Float", "Integer")
+        and (not v.get("hint") or not v.get("sheet"))
+    ]
+
+    assert not issues, (
+        f"fields.json numeric KO fields missing hint or sheet (needed for Pass 4c): {issues}\n"
+        "Fill in AP0 Description cells and re-run generate_all.py."
+    )
+
 
 def test_T_CON_08_extensions_columns_non_empty_and_no_duplicates():
     """extensions_columns must be non-empty and contain no duplicate entries.
@@ -651,47 +403,264 @@ def test_T_CON_08_extensions_columns_non_empty_and_no_duplicates():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-CON-09 — All field_levels.json keys exist in sqlite_schema extensions_columns
+# T-CON-09 — All fields.json field_names with operators exist in sqlite_schema
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_CON_09_field_levels_keys_in_schema():
-    """Every db_key in field_levels.json (non-tender_key entries) must appear as
-    a column in extensions_columns OR in one of the other schema tables.
+def test_T_CON_09_fields_json_keys_in_schema():
+    """Every field_name in fields.json that has a matching operator must appear as
+    a column in sqlite_schema.
 
-    Guards against AP0 adding a matching rule for a field that has no DB column,
+    Guards against AP0 adding a matching rule for a field with no DB column,
     which would silently never fire because getattr(ext, field) would raise
-    AttributeError (or return None via default) for every supplier.
+    AttributeError (or return None) for every supplier.
     """
+    import re as _re
     schema   = _load("sqlite_schema.json")
-    fl       = _load("field_levels.json")
+    fields   = _load("fields.json")
     ext_cols = set(schema.get("extensions_columns", []))
 
-    # Build the full set of all known schema columns across all tables
     all_schema_cols: set[str] = set()
     for table_sql in schema.values():
         if not isinstance(table_sql, str):
             continue
-        # Extract column names from CREATE TABLE SQL (simple heuristic)
-        import re
-        cols = re.findall(r"^\s{4}(\w+)\s+\w+", table_sql, re.MULTILINE)
+        cols = _re.findall(r"^\s{4}(\w+)\s+\w+", table_sql, _re.MULTILINE)
         all_schema_cols.update(cols)
     all_schema_cols.update(ext_cols)
 
-    # Exclude fields that are tender_keys (they don't correspond to db columns)
-    tender_keys = {
-        info.get("tender_key", key)
-        for key, info in fl.items()
-        if info.get("tender_key")
-    }
-
+    # Check each unique field_name that has an active operator
+    seen: set[str] = set()
     missing: list[str] = []
-    for db_key in fl:
-        if db_key in tender_keys:
-            continue  # this is a tender key alias, not a db column
-        if db_key not in all_schema_cols:
-            missing.append(db_key)
+    for info in fields.values():
+        fn = info.get("field_name", "")
+        if not info.get("operator"):
+            continue  # no matching rule — not a DB-backed field
+        if fn in seen:
+            continue
+        seen.add(fn)
+        if fn not in all_schema_cols:
+            missing.append(fn)
 
     assert not missing, (
-        f"field_levels.json keys with no corresponding DB column in any schema table:\n"
+        f"fields.json field_names with operator but no corresponding DB column:\n"
         + "\n".join(f"  {m}" for m in missing)
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T-CON-11 — _build_field_values entity routing: Product reads row_prod not row_ext
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_build_field_values_routes_product_entity_from_row_prod_not_row_ext():
+    """Verify entity routing: Product-entity field must read from row_prod, not row_ext.
+
+    Regression test for the bme.* column shadowing bug: base_model_extensions has
+    columns like reference_count that shadow the products.reference_count in dict(row).
+    The fix builds row_first (first-occurrence dict) and passes it as row_prod.
+    """
+    import sys
+    sys.path.insert(0, str(BASE_DIR))
+    from src.data_loader import _build_field_values
+    from src.field_spec import load_fields
+
+    specs = load_fields()
+    ref_count_spec = next(
+        (s for s in specs.values() if s.field_name == "reference_count" and s.entity == "Product"),
+        None,
+    )
+    assert ref_count_spec is not None, "reference_count (entity=Product) must exist in fields.json"
+
+    null_row = {s.field_name: None for s in specs.values()}
+    row_ext = dict(null_row)           # bme: reference_count = None (simulates shadow)
+    row_prod = dict(null_row)
+    row_prod["reference_count"] = 42   # real value from products table
+    row_company = dict(null_row)
+
+    values = _build_field_values(row_ext, row_prod, row_company, specs)
+    assert values[ref_count_spec.uuid].value == 42, (
+        "reference_count must read from row_prod (products table), not row_ext (bme)"
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T-CON-08 / T-CON-09 / T-CON-10 — display_mode AP0 chain tests
+# ─────────────────────────────────────────────────────────────────────────────
+
+import sys as _sys
+_sys.path.insert(0, str(BASE_DIR))
+from fastapi.testclient import TestClient as _TestClient
+from app import app as _app
+client = _TestClient(_app)
+
+
+def test_T_DM_01_fields_json_has_display_mode_for_pipeline_fields():
+    """fields.json must have display_mode='display' for agv_type and vna_capable.
+    These are pipeline-derived fields set by VT classification and VNA detection,
+    not user-editable criteria. Verifies AP0 → generate_all.py → fields.json chain."""
+    fields = _load("fields.json")
+
+    agv_type_spec  = next((v for v in fields.values() if v.get("field_name") == "agv_type"),  {})
+    vna_cap_spec   = next((v for v in fields.values() if v.get("field_name") == "vna_capable"), {})
+
+    assert agv_type_spec.get("display_mode") == "display", \
+        "agv_type must have display_mode='display' in fields.json"
+    assert vna_cap_spec.get("display_mode") == "display", \
+        "vna_capable must have display_mode='display' in fields.json"
+
+
+def test_T_DM_02_field_meta_display_mode_for_pipeline_tender_keys():
+    """/api/field-meta must return display_mode='display' for both
+    the db_key (agv_type) and the tender_key clone (required_agv_type).
+    The clone propagates display_mode via {**entry} in the endpoint."""
+    response = client.get("/api/field-meta")
+    assert response.status_code == 200
+    meta = response.json()
+
+    # db_key entry
+    assert meta.get("agv_type", {}).get("display_mode") == "display", \
+        "agv_type must have display_mode='display' in /api/field-meta"
+    # tender_key clone — this is what the frontend keyed by
+    assert meta.get("required_agv_type", {}).get("display_mode") == "display", \
+        "required_agv_type clone must have display_mode='display'"
+    assert meta.get("required_vna_capable", {}).get("display_mode") == "display", \
+        "required_vna_capable clone must have display_mode='display'"
+
+
+def test_T_DM_03_field_meta_editable_default_for_ko_numeric_fields():
+    """/api/field-meta must return display_mode='editable' for standard KO fields.
+    Fields without a Display Mode cell in AP0 default to 'editable'."""
+    response = client.get("/api/field-meta")
+    assert response.status_code == 200
+    meta = response.json()
+
+    assert meta.get("max_payload_kg", {}).get("display_mode") == "editable", \
+        "max_payload_kg must have display_mode='editable' (AP0 default)"
+    assert meta.get("lifting_height_mm", {}).get("display_mode") == "editable", \
+        "lifting_height_mm must have display_mode='editable' (AP0 default)"
+
+
+def test_T_CON_08_fields_json_correctness():
+    """fields.json: spot-check that a known field has correct values from AP0."""
+    fields = _load("fields.json")
+    # Find lifting_height_mm (Forklift AGV) by field_name
+    match = [f for f in fields.values() if f.get("field_name") == "lifting_height_mm"]
+    assert match, "lifting_height_mm not found in fields.json"
+    f = match[0]
+    assert f["tender_key"] == "required_lifting_height_mm", (
+        f"Expected required_lifting_height_mm, got {f['tender_key']!r}"
+    )
+    assert f["operator"] == "KO_IF_LT", f"Expected KO_IF_LT, got {f['operator']!r}"
+    assert f["data_type"] == "Integer", f"Expected Integer, got {f['data_type']!r}"
+    assert f["sheet"] == "Forklift AGV", f"Expected Forklift AGV, got {f['sheet']!r}"
+    assert f.get("uuid"), "UUID must not be empty"
+
+
+def test_T_DM_04_field_meta_result_card_present_for_known_fields():
+    """/api/field-meta must return result_card=True for known result_card fields
+    and result_card=False for non-result_card fields.
+    result_card drives the clarification dialog field selection."""
+    response = client.get("/api/field-meta")
+    assert response.status_code == 200
+    meta = response.json()
+
+    # max_payload_kg is a result_card KO field (Forklift + Tugger + AMR)
+    assert meta.get("max_payload_kg", {}).get("result_card") is True, \
+        "max_payload_kg must have result_card=True in /api/field-meta"
+
+    # lifting_height_mm is a result_card KO field (Forklift AGV)
+    assert meta.get("lifting_height_mm", {}).get("result_card") is True, \
+        "lifting_height_mm must have result_card=True in /api/field-meta"
+
+    # load_type is KO (KO_SUBSET) but not marked result_card in AP0
+    load = meta.get("load_type", {})
+    assert load.get("result_card") is False or load.get("result_card") is None, \
+        "load_type must not have result_card=True (it is KO but not result_card in AP0)"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T-CON-09b — fields.json operator fields exist as SQLite schema columns
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_T_CON_09b_fields_json_operator_fields_in_schema():
+    """Every field in fields.json with an operator must exist as a column in the
+    SQLite schema (extensions_columns or products_columns).
+
+    Guards against AP0 adding a matching rule for a field that has no DB column,
+    which would silently never fire because getattr(ext, field) returns None for
+    every supplier.
+    """
+    fields = _load("fields.json")
+    schema = _load("sqlite_schema.json")
+    all_cols = set(schema.get("extensions_columns", [])) | set(schema.get("products_columns", []))
+
+    missing = [
+        v["field_name"] for v in fields.values()
+        if v.get("operator") and v["field_name"] not in all_cols
+    ]
+    assert not missing, (
+        f"Fields with an operator in fields.json but missing from SQLite schema: {missing}"
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T-FV-01 — Company-entity field resolves from company row, not None
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_T_FV_01_company_entity_field_resolves_from_company_row():
+    """A field with entity='Company' (e.g. country) must resolve its value
+    from row_company, not from row_ext.  If entity routing is wrong it returns
+    None even when the company row has a valid value."""
+    import sys
+    sys.path.insert(0, str(BASE_DIR))
+    from src.field_spec import load_fields
+    from src.data_loader import _build_field_values
+
+    specs = load_fields()
+
+    # Find a Company-entity field
+    company_specs = [s for s in specs.values() if s.entity == "Company"]
+    assert company_specs, "No Company-entity fields found in fields.json — check AP0 Entity column"
+
+    # Use the first Text/Dropdown company field (passthrough — no coerce distortion)
+    target = next(
+        (s for s in company_specs if s.data_type in ("Text", "Dropdown")),
+        company_specs[0],
+    )
+
+    row_ext     = {target.field_name: "FROM_EXT"}
+    row_prod    = {target.field_name: "FROM_PROD"}
+    row_company = {target.field_name: "FROM_COMPANY"}
+
+    result = _build_field_values(
+        row_ext=row_ext, row_prod=row_prod, row_company=row_company, specs=specs
+    )
+
+    fv = result.get(target.uuid)
+    assert fv is not None, f"UUID {target.uuid} missing from _build_field_values result"
+    assert fv.value == "FROM_COMPANY", (
+        f"Company-entity field {target.field_name!r} resolved {fv.value!r} "
+        f"instead of 'FROM_COMPANY' — entity routing is broken"
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T-FV-02 — _coerce_by_type roundtrip for all four non-passthrough data types
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_T_FV_02_coerce_by_type_roundtrip():
+    """_coerce_by_type must correctly coerce all four non-passthrough data types:
+    Boolean, Integer, Float, Multi-Select.  Passthrough (Text/Dropdown) is
+    covered implicitly by T-FV-01."""
+    import sys
+    sys.path.insert(0, str(BASE_DIR))
+    from src.data_loader import _coerce_by_type
+
+    assert _coerce_by_type("Boolean", "1")   is True,          "Boolean '1' must coerce to True"
+    assert _coerce_by_type("Boolean", "0")   is False,         "Boolean '0' must coerce to False"
+    assert _coerce_by_type("Boolean", None)  is None,          "Boolean None must coerce to None"
+    assert _coerce_by_type("Integer", "42")  == 42,            "Integer '42' must coerce to 42"
+    assert _coerce_by_type("Integer", None)  is None,          "Integer None must coerce to None"
+    assert _coerce_by_type("Float", "1.5")   == 1.5,           "Float '1.5' must coerce to 1.5"
+    assert _coerce_by_type("Float", None)    is None,          "Float None must coerce to None"
+    assert _coerce_by_type("Multi-Select", "A|B") == ["A", "B"], \
+        "Multi-Select 'A|B' must coerce to ['A', 'B']"
+    assert _coerce_by_type("Multi-Select", None) == [],        "Multi-Select None must coerce to []"

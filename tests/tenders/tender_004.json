@@ -5,28 +5,28 @@
   "in_scope": true,
   "requirements": {
     "agv_type": "Forklift AGV",
-    "required_weight_capacity_kg": 1200,
-    "required_max_lift_height_m": 10,
-    "required_min_aisle_width_m": 3.4,
-    "required_temp_min_c": 10,
-    "required_temp_max_c": 30,
-    "required_vna": "not_required"
+    "required_max_payload_kg": 1200,
+    "required_lifting_height_mm": 10,
+    "required_min_aisle_width_mm": 3.4,
+    "required_operating_temp_min_c": 10,
+    "required_operating_temp_max_c": 30,
+    "required_vna_capable": "not_required"
   },
   "golden_extraction": {
-    "required_weight_capacity_kg": 1200,
-    "required_max_lift_height_m": 10,
-    "required_min_aisle_width_m": 3.4,
-    "required_temp_min_c": null,
-    "required_temp_max_c": null,
-    "required_humidity_max_pct": null,
-    "required_max_gradient_pct": null,
-    "required_max_vehicle_height_mm": null
+    "required_max_payload_kg": 1200,
+    "required_lifting_height_mm": 10,
+    "required_min_aisle_width_mm": 3.4,
+    "required_operating_temp_min_c": 10,
+    "required_operating_temp_max_c": 30,
+    "required_operating_humidity_max_pct": null,
+    "required_max_gradient_pct": 1.5,
+    "required_min_total_height_mm": null
   },
   "golden_run_file": "golden_run_tender_nordlicht.json",
   "known_issues": [
     "RESOLVED 2026-06-16: German decimal comma '3,4' was suspected to fail source_confirms_value(3.4, ...), but direct re-test confirms _interpret_number_token() already normalizes DE commas correctly — aisle is not nulled by this path",
-    "4c false abstention on temp_min/max despite clear 'Umgebungstemperatur 10 – 30 °C'",
-    "required_integration: 'REST / OPC UA' rejected by AP0 (format mismatch)"
+    "RESOLVED 2026-06-24: temp_min/max now correctly extracted (10/30°C from 'Umgebungstemperatur 10 – 30 °C'). Previously failed with 4c abstention (OI-31). Gradient 1.5% also now extracted.",
+    "required_integration_capability: 'REST / OPC UA' rejected by AP0 (format mismatch)"
   ],
   "expected_ko_exclusions": [],
   "expected_top_3": []

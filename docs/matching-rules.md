@@ -159,13 +159,13 @@ This ranks fully-documented suppliers above undocumented ones without excluding 
 
 VNA (Very Narrow Aisle) uses `KO_BOOL_EXCLUSIVE`, which is bidirectional — it protects against mismatches in both directions.
 
-### A VNA tender (required_vna = "required")
+### A VNA tender (required_vna_capable = "required")
 
 - Suppliers with `vna_capable=True` → pass (proceed to scoring)
 - Suppliers with `vna_capable=False` → K.O. (standard forklift cannot operate in narrow aisles)
 - Suppliers with `vna_capable=None` → K.O. (by exception to the null rule — see above)
 
-### A standard-aisle tender (required_vna = "not_required")
+### A standard-aisle tender (required_vna_capable = "not_required")
 
 - Suppliers with `vna_capable=True` → K.O. (VNA turret trucks need guide rail infrastructure not present in a standard warehouse)
 - Suppliers with `vna_capable=False` or `None` → pass
@@ -185,7 +185,7 @@ VNA detection happens in two layers before matching:
    - `\bVNA\b` — the abbreviation anywhere in the document
    - `(?i)schmalgangstapler` — the German term (case-insensitive)
 
-   If either pattern matches, `is_vna_subtype=True` and `required_vna="required"` is forced, regardless of what the LLM returned for the vehicle type field.
+   If either pattern matches, `is_vna_subtype=True` and `required_vna_capable="required"` is forced, regardless of what the LLM returned for the vehicle type field.
 
 Text overrides exist because LLM vehicle type classification can be unreliable when the tender uses domain-specific terminology. The regex fallback is deterministic and does not depend on the LLM.
 
@@ -193,7 +193,7 @@ Text overrides exist because LLM vehicle type classification can be unreliable w
 
 ## Scoring rules
 
-Once a supplier has passed all K.O. and Cond. K.O. filters, scoring determines their rank. All weights and rules come from `config/scoring_weights.json`, which is generated from the AP0 xlsx.
+Once a supplier has passed all K.O. and Cond. K.O. filters, scoring determines their rank. All weights and rules come from `config/fields.json` (generated from the AP0 xlsx via `generate_all.py`).
 
 Scoring is separated into buckets by AGV type: `default` (applies to all), `forklift_specific`, `tugger_specific`, `amr_specific`. Each bucket can have different weights for the same field, or fields that only apply to that type.
 

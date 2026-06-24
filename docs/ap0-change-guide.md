@@ -18,9 +18,9 @@ And writes all of these:
 
 | Output file | What it controls | Who reads it |
 |---|---|---|
-| `config/field_levels.json` | Matching rules per field (level, operator, data type, tender_key, allowed_values) | `src/matching.py`, `app.py /api/field-meta` |
-| `config/vehicle_types.json` | vt_map, VNA subtypes, text_overrides, keyword fallback, scoring_bucket_map | `app.py`, `src/matching.py`, `src/context_builder.py` |
-| `config/scoring_weights.json` | Scoring weights and rules per field per AGV-type bucket | `src/matching.py` |
+| `config/fields.json` | All field defs UUID-keyed: operator, allowed_values, weight, score_function, hint, user_description, etc. | `src/field_spec.py`, `src/matching.py`, `app.py`, `/api/field-meta` |
+| `src/field_spec.py` | FieldSpec dataclass + load_fields(), fields_by_tender_key(), fields_by_field_name(), fields_by_sheet() | `app.py`, `src/matching.py`, `src/context_builder.py` |
+| `config/vehicle_types.json` | vt_map, VNA subtypes, text_overrides, keyword fallback, scoring_bucket_map | `app.py`, `src/context_builder.py` |
 | `config/nace_codes.json` | NACE Prio-1 list for LLM classification | `app.py` |
 | `config/plausibility.json` | Min/max ranges for LLM value validation | `app.py validate_agv_criteria()` |
 | `config/sqlite_schema.json` | CREATE TABLE SQL for all four tables | `sync_airtable.py` |
@@ -66,7 +66,7 @@ The app also auto-regenerates at startup if it detects a checksum mismatch — b
 - `K.O` (missing final period) → will not be recognized
 - Any level value not in the table above → field is silently skipped with no warning
 
-If generate_all.py prints `[WARN] 'your_field_name' has operator but no Tender JSON Key`, the field has an operator but no tender_key — check both columns. If a KO or COND_KO field silently disappears from `field_levels.json`, check the Level string first.
+If generate_all.py prints `[WARN] 'your_field_name' has operator but no Tender JSON Key`, the field has an operator but no tender_key — check both columns. If a KO or COND_KO field silently disappears from `config/fields.json`, check the Level string first.
 
 ---
 
@@ -83,7 +83,7 @@ If generate_all.py prints `[WARN] 'your_field_name' has operator but no Tender J
 5. Optionally update the **Matching Operator** column if the operator also needs to change
 6. Save the xlsx
 7. Run `python3 scripts/generate_all.py`
-8. Check the output — look for `[WARN]` lines and verify the field appears correctly in `config/field_levels.json`
+8. Check the output — look for `[WARN]` lines and verify the field appears correctly in `config/fields.json`
 9. Run the test suite: `pytest tests/`
 
 **Valid operators:**
@@ -141,7 +141,7 @@ The **Description** column in the SHARED, Forklift AGV, Tugger AGV, and Mobile A
 
 1. Open the AP0 xlsx, go to the relevant sheet
 2. Find the field (e.g. `max_payload_kg`)
-3. Edit the **Description — what it is · where to find it · what it implies** column
+3. Edit the **LLM Hint** column
 4. Save the xlsx
 5. Run `python3 scripts/generate_all.py`
 6. Check `config/prompts/extraction_template.txt` — your hint should appear under the relevant field name
@@ -178,14 +178,14 @@ Adding a new matchable field requires changes in two places: the AP0 xlsx (for m
 5. Set the **Matching Operator** column (for KO and Cond. K.O. fields)
 6. Set the **Tender JSON Key** column — the key the LLM will use in the extracted JSON (e.g. `required_my_new_field`)
 7. Set the **Allowed Values / Unit** column for Dropdown and Multi-Select fields (pipe-separated list)
-8. Set the **Description** column — the LLM extraction hint
+8. Set the **LLM Hint** column — the LLM extraction hint (separate from "Client Explanation" which is buyer-facing)
 9. Set the **Scoring Weight** and **Scoring Rule** columns if the field should score
 
 **After adding to AP0:**
 
 1. Run `python3 scripts/generate_all.py` — this updates all config files including the SQLite schema
 2. Run `python3 sync_airtable.py` — this creates the new column in SQLite (the `_migrate_table` function in `sync_airtable.py` adds new columns non-destructively) and pulls the latest Airtable data. If you do not have Airtable credentials, use `python3 sync_airtable.py --local` to rebuild from the committed CSVs instead.
-3. Verify the new field appears in `config/field_levels.json`
+3. Verify the new field appears in `config/fields.json`
 4. Verify the column exists in `data/haystacked.db` using a SQLite browser or the validate command
 
 **In Airtable:**
@@ -200,9 +200,9 @@ Add the new field to the `Extension` (or `Product`) dataclass with `Optional[...
 
 ## How to add a new scoring rule
 
-1. In the AP0 xlsx, set the **Scoring Weight**, **Scoring Rule**, **Threshold 1**, and **Threshold 2** columns for the field
+1. In the AP0 xlsx, set the **Scoring Weight**, **Score Function**, **Score Threshold A**, and **Score Threshold B** columns for the field
 2. Run `python3 scripts/generate_all.py`
-3. The new rule appears in `config/scoring_weights.json`
+3. The new rule appears in `config/fields.json` (weight + score_function + threshold_a/b fields on the FieldSpec)
 
 **Available scoring rules:** `bool`, `bool_cond`, `nonempty`, `proportional`, `threshold_upper`, `threshold_lower`, `tiered_lower`, `tiered_upper`. See `matching-rules.md` for descriptions of each.
 
@@ -225,13 +225,13 @@ Do not edit `config/industry_readme.md` directly — it will be overwritten.
 
 ## Common mistakes and how to avoid them
 
-**Typo in Level column:** `"Cond. K.O."` is the correct value. Any variation (`"COND_KO"`, `"Cond.K.O."`, `"Conditional K.O."`) will cause the field to be silently dropped from `field_levels.json`.
+**Typo in Level column:** `"Cond. K.O."` is the correct value. Any variation (`"COND_KO"`, `"Cond.K.O."`, `"Conditional K.O."`) will cause the field to be silently dropped from `config/fields.json`.
 
 **Wrong operator for data type:** Using `KO_IF_LT` on a Multi-Select field creates a dead operator (it never triggers). Use `KO_SUBSET` for Multi-Select fields.
 
 **Missing Tender JSON Key:** If a KO or COND_KO field has an operator but no Tender JSON Key, `generate_all.py` prints a warning and the field will never trigger (the matching engine cannot find the tender value). Always set the Tender JSON Key for matchable fields.
 
-**Editing generated files:** The most common mistake. Any change to `config/field_levels.json` or any file under `config/prompts/` is overwritten the next time `generate_all.py` runs. Always make changes in the AP0 xlsx.
+**Editing generated files:** The most common mistake. Any change to `config/fields.json`, `src/field_spec.py`, or any file under `config/prompts/` is overwritten the next time `generate_all.py` runs. Always make changes in the AP0 xlsx.
 
 **Running generate_all.py without re-syncing:** If you change the SQLite schema (add a new field), you must run `sync_airtable.py` after `generate_all.py` to actually add the new column to the database. The schema change in `config/sqlite_schema.json` does not automatically migrate the running database.
 

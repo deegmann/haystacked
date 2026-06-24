@@ -143,25 +143,23 @@
   <!-- ── Error ── -->
   <section id="errorSection" class="hidden">
     <div class="error-card">
-      <div class="error-card-symbol">✕</div>
+      <div class="error-card-symbol">&#10005;</div>
       <p id="errorText">Fehler</p>
       <pre id="errorRaw" class="error-raw hidden"></pre>
       <button class="btn-reset" onclick="reset()">Erneut versuchen</button>
     </div>
   </section>
 
-  <!-- ── Clarification ── -->
-  <section id="clarificationSection" class="hidden">
+  <!-- ── Field Query Dialog ── -->
+  <section id="fieldQueryDialog" class="hidden">
     <div class="card" style="margin-bottom:1.5rem">
-      <h3>Fehlende Angaben</h3>
-      <p style="font-size:13px;color:var(--steel);margin-bottom:20px;line-height:1.6">
-        Die folgenden Felder konnten aus der Ausschreibung nicht extrahiert werden.
-        Bitte ergänzen für präzises K.O.-Filtering, oder überspringen.
-      </p>
-      <div id="clarificationFields" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem"></div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button class="btn-rematch" id="clarifyConfirmBtn" onclick="confirmClarification()">Bestätigen &amp; Matching starten</button>
-        <button class="btn-reset" onclick="skipClarification()">Überspringen — ohne diese Filter</button>
+      <h3 id="dialogTitle"></h3>
+      <p id="dialogSubtitle" style="font-size:13px;color:var(--steel);margin-bottom:20px;line-height:1.6"></p>
+      <div id="dialogFields" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem"></div>
+      <div id="dialogPicker" class="hidden"></div>
+      <div style="display:flex;gap:0.75rem;margin-top:1rem">
+        <button id="dialogConfirmBtn" class="btn-primary" onclick="confirmDialog()"></button>
+        <button id="dialogDismissBtn" class="btn-secondary" onclick="dismissDialog()"></button>
       </div>
     </div>
   </section>
@@ -229,8 +227,14 @@
 
       <div class="grid">
         <div class="card card-full">
-          <h3>Extrahierte Anforderungen</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+            <h3 style="margin:0">Extrahierte Anforderungen</h3>
+            <div id="reqActions" style="display:flex;gap:8px;align-items:center">
+              <button id="btnEdit" class="btn-secondary-small" onclick="openEditDialog()">Bearbeiten</button>
+            </div>
+          </div>
           <div id="agvRequirements" class="agv-req-grid"></div>
+          <div id="addFieldPickerWrap" class="hidden" style="margin-top:12px"></div>
         </div>
       </div>
 
@@ -238,7 +242,7 @@
       <div class="supplier-shortlist">
         <div class="shortlist-header">
           <h3 class="shortlist-title">Supplier-Shortlist</h3>
-          <button class="btn-debug" id="debugBtn" onclick="openDebug()">Vollständige Analyse →</button>
+          <button class="btn-debug" id="debugBtn" onclick="openDebug()">Vollständige Analyse &rarr;</button>
         </div>
         <div id="supplierCards" class="supplier-cards"></div>
         <div id="supplierExcludedNote" class="excluded-note hidden"></div>
@@ -262,6 +266,17 @@
 let _lastResult = null;
 let _fieldMeta = {};        // AP0 field metadata loaded from /api/field-meta
 const DEBUG_MODE = new URLSearchParams(location.search).get('debug') === 'true';
+
+// ── Dialog state ──────────────────────────────────────────────────────────────
+let _currentAnalysisId = null;
+let _dialogData = null;  // { analysisId, baseCrit, _pendingData }
+
+// ── Operator hint map (AP0 operator names → buyer-facing hint text) ────────────
+// No field names hardcoded here.
+const _OPERATOR_HINTS = {
+  KO_IF_LT: 'Mindestanforderung des Tenders',
+  KO_IF_GT: 'Maximalwert des Tenders',
+};
 
 // ── Load AP0 field metadata at startup (no hardcoded labels anywhere) ─────────
 fetch('/api/field-meta')
@@ -394,7 +409,7 @@ async function handleFile(file) {
           const el = document.getElementById('step-' + id);
           if (el && el.classList.contains('step-running')) setStep(id, 'done', 'Done');
         });
-        maybeShowClarification(data); return;
+        openClarificationDialog(data); return;
       }
     }
   }
@@ -405,112 +420,10 @@ async function handleFile(file) {
   });
 }
 
-// ── Clarification Step (AP-C1) ────────────────────────────────────────────────
-// Fields that must be confirmed per AGV type when missing from the tender
-const CLARIFICATION_FIELDS = {
-  'Forklift AGV': [
-    { key: 'lifting_height_mm', label: 'Lifting Height', unit: 'mm', hint: 'VNA high-bay: typically 10,000–17,000 mm' },
-    { key: 'min_aisle_width_mm', label: 'Min. Aisle Width', unit: 'mm', hint: 'VNA: typically 1,600–2,000 mm' },
-    { key: 'max_payload_kg', label: 'Max. Payload', unit: 'kg', hint: 'e.g. 1,000–1,500 kg for EUR/UK pallets' },
-  ],
-  'Tugger AGV': [
-    { key: 'towing_capacity_kg', label: 'Towing Capacity', unit: 'kg', hint: 'Total train weight incl. trailers' },
-    { key: 'max_payload_kg', label: 'Payload per Cart', unit: 'kg', hint: 'e.g. 500–2,000 kg' },
-  ],
-  'Mobile AMR': [
-    { key: 'max_payload_kg', label: 'Max. Payload', unit: 'kg', hint: 'e.g. 250–1,500 kg' },
-  ],
-};
-
-let _pendingResultData = null;
-let _clarificationFields = [];
-
-function maybeShowClarification(data) {
-  const crit = data.agv_criteria || {};
-  const agvType = (crit.required_vehicle_type_canonical || data.matches?.[0]?.agv_type || '');
-  // Map vehicle type to canonical key
-  const typeKey = ['Forklift AGV','Tugger AGV','Mobile AMR'].find(t =>
-    agvType.toLowerCase().includes(t.toLowerCase().replace(' agv','').replace(' amr',''))
-  ) || agvType;
-
-  const fields = CLARIFICATION_FIELDS[typeKey] || [];
-
-  // Check which fields are missing (null/undefined in the resolved new_req)
-  // We check the extracted criteria using original field names
-  const fieldMapping = {
-    lifting_height_mm:  () => crit.required_max_lift_height_m,
-    min_aisle_width_mm: () => crit.required_min_aisle_width_m,
-    max_payload_kg:     () => crit.required_weight_capacity_kg,
-    towing_capacity_kg: () => crit.required_towing_capacity_kg,
-  };
-
-  // Determine whether the facility has any rack-type stations (floor/conveyor-only → no aisles)
-  const stationTypes = (crit.required_station_types || '').toLowerCase();
-  const hasRackStations = stationTypes === '' || /rack/.test(stationTypes);
-
-  const missing = fields.filter(f => {
-    if (f.key === 'min_aisle_width_mm' && !hasRackStations) return false;
-    const val = fieldMapping[f.key] ? fieldMapping[f.key]() : null;
-    return val === null || val === undefined || val === '';
-  });
-
-  if (missing.length === 0) { showResult(data); return; }
-
-  _pendingResultData = data;
-  _clarificationFields = missing;
-
-  const container = document.getElementById('clarificationFields');
-  container.innerHTML = '';
-  missing.forEach(f => {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:grid;grid-template-columns:180px 1fr;align-items:center;gap:0.75rem';
-    row.innerHTML = `
-      <label style="font-size:0.85rem;font-weight:600">${f.label} <span style="color:var(--steel);font-weight:400">(${f.unit})</span></label>
-      <div>
-        <input type="number" id="clarify-${f.key}" placeholder="${f.hint}"
-          style="width:100%;max-width:260px">
-      </div>`;
-    container.appendChild(row);
-  });
-
-  hide('progressSection');
-  show('clarificationSection');
-}
-
-function confirmClarification() {
-  if (!_pendingResultData) return;
-  const overrides = {};
-  _clarificationFields.forEach(f => {
-    const el = document.getElementById('clarify-' + f.key);
-    const val = el ? parseFloat(el.value) : NaN;
-    if (!isNaN(val) && val > 0) overrides[f.key] = val;
-  });
-
-  if (Object.keys(overrides).length === 0) { skipClarification(); return; }
-
-  hide('clarificationSection');
-  document.getElementById('clarifyConfirmBtn').disabled = true;
-
-  fetch('/rematch', { method: 'POST', headers: {'Content-Type':'application/json'},
-                      body: JSON.stringify({ overrides }) })
-    .then(r => r.json())
-    .then(result => {
-      _pendingResultData.matches     = result.top  || [];
-      _pendingResultData.matches_all = result.all  || [];
-      _lastResult = _pendingResultData;
-      showResult(_pendingResultData);
-    })
-    .catch(e => showError('Rematch fehlgeschlagen: ' + e.message));
-}
-
-function skipClarification() {
-  hide('clarificationSection');
-  if (_pendingResultData) showResult(_pendingResultData);
-}
-
 // ── Result rendering ──────────────────────────────────────────────────────────
 function showResult(d) {
   _lastResult = d;
+  _currentAnalysisId = d.analysis_id || null;
   hide('progressSection');
   show('resultSection');
 
@@ -562,25 +475,29 @@ function _fieldLabel(key) {
 }
 function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
 
-// Summary panel: show all tender_key fields that have a non-null extracted value
+// Summary panel: read-only chip display of all non-null tender fields.
 function renderAgvRequirements(crit) {
   const container = document.getElementById('agvRequirements');
   container.innerHTML = '';
-  const shown = new Set();
-  const SUMMARY_EXTRAS = ['agv_notes','required_quantity','required_process',
-    'required_wms_integration','required_conveyor_integration'];
+  const shownKeys = new Set();
   const allKeys = [];
   for (const [dbKey, info] of Object.entries(_fieldMeta)) {
     const tKey = info.tender_key || dbKey;
-    if (!shown.has(tKey)) { shown.add(tKey); allKeys.push(tKey); }
+    if (!shownKeys.has(tKey)) { shownKeys.add(tKey); allKeys.push(tKey); }
   }
-  for (const key of SUMMARY_EXTRAS) {
-    if (!shown.has(key)) { shown.add(key); allKeys.push(key); }
+  for (const key of Object.keys(crit)) {
+    if (!shownKeys.has(key) && !key.startsWith('_') && !key.endsWith('_source') && !['display','internal'].includes(_fieldMeta[key]?.display_mode)) {
+      shownKeys.add(key);
+      allKeys.push(key);
+    }
   }
+
   let count = 0;
   for (const key of allKeys) {
+    if (key.endsWith('_source') || ['display','internal'].includes(_fieldMeta[key]?.display_mode)) continue;
     const val = crit[key];
     if (val == null || val === '') continue;
+
     const display = Array.isArray(val) ? val.join(', ') : String(val);
     const div = document.createElement('div');
     div.className = 'req-chip';
@@ -588,17 +505,151 @@ function renderAgvRequirements(crit) {
     container.appendChild(div);
     count++;
   }
+
   if (!count) {
     container.innerHTML = '<span style="color:var(--steel);font-size:13px">Keine AGV-Anforderungen extrahiert.</span>';
   }
+
+  // Picker wrap always hidden in read-only mode
+  const pickerWrap = document.getElementById('addFieldPickerWrap');
+  if (pickerWrap) {
+    pickerWrap.classList.add('hidden');
+    pickerWrap.innerHTML = '';
+  }
+
   const warnings = crit._validation_warnings || [];
   if (warnings.length) {
     const warn = document.createElement('div');
     warn.className = 'validation-warnings';
     warn.style.gridColumn = '1/-1';
-    warn.innerHTML = warnings.map(w => `<div class="warn-item">⚠ ${w}</div>`).join('');
+    warn.innerHTML = warnings.map(w => `<div class="warn-item">&#9888; ${w}</div>`).join('');
     container.appendChild(warn);
   }
+}
+
+// Build a type-appropriate edit control for a single field
+function _buildEditControl(key, meta, curVal) {
+  const dt = meta.data_type || 'String';
+  let ctrl;
+  if (dt === 'Float' || dt === 'Integer') {
+    ctrl = document.createElement('input');
+    ctrl.type = 'number';
+    ctrl.step = 'any';
+    ctrl.id = `req-edit-${key}`;
+    ctrl.className = 'req-edit-input';
+    if (curVal != null) ctrl.value = curVal;
+  } else if (dt === 'Boolean') {
+    ctrl = document.createElement('select');
+    ctrl.id = `req-edit-${key}`;
+    ctrl.className = 'req-edit-select';
+    ctrl.innerHTML = `<option value="">– Unbekannt</option>
+      <option value="required">Ja / Required</option>
+      <option value="not_required">Nein / Not Required</option>`;
+    if (curVal != null) ctrl.value = String(curVal);
+  } else if (dt === 'Dropdown') {
+    ctrl = document.createElement('select');
+    ctrl.id = `req-edit-${key}`;
+    ctrl.className = 'req-edit-select';
+    ctrl.innerHTML = `<option value="">– Unbekannt</option>`;
+    for (const av of (meta.allowed_values || [])) {
+      const opt = document.createElement('option');
+      opt.value = av;
+      opt.textContent = av;
+      ctrl.appendChild(opt);
+    }
+    if (curVal != null) ctrl.value = String(curVal);
+  } else if (dt === 'Multi-Select') {
+    ctrl = document.createElement('select');
+    ctrl.id = `req-edit-${key}`;
+    ctrl.className = 'req-edit-select';
+    ctrl.multiple = true;
+    for (const av of (meta.allowed_values || [])) {
+      const opt = document.createElement('option');
+      opt.value = av;
+      opt.textContent = av;
+      if (Array.isArray(curVal) && curVal.includes(av)) opt.selected = true;
+      else if (typeof curVal === 'string' && curVal.split('|').map(s=>s.trim()).includes(av)) opt.selected = true;
+      ctrl.appendChild(opt);
+    }
+  } else {
+    ctrl = document.createElement('input');
+    ctrl.type = 'text';
+    ctrl.id = `req-edit-${key}`;
+    ctrl.className = 'req-edit-input';
+    if (curVal != null) ctrl.value = String(curVal);
+  }
+  return ctrl;
+}
+
+// ── Shared field row builder ──────────────────────────────────────────────────
+function _buildFieldRow(key, info, val) {
+  const hint = info.user_description || _OPERATOR_HINTS[info.operator] || '';
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid;grid-template-columns:200px 1fr;align-items:start;gap:0.75rem';
+  const label = document.createElement('div');
+  label.style.cssText = 'font-size:0.85rem;font-weight:600;padding-top:6px';
+  label.textContent = _fieldLabel(key);
+  if (hint) {
+    const sub = document.createElement('div');
+    sub.style.cssText = 'font-size:0.75rem;color:var(--steel);font-weight:400;margin-top:2px';
+    sub.textContent = hint;
+    label.appendChild(sub);
+  }
+  row.appendChild(label);
+  row.appendChild(_buildEditControl(key, info, val));
+  return row;
+}
+
+// Build "Feld hinzufügen" picker — shows VT-relevant fields not already displayed
+function buildAddFieldPicker(crit, renderedKeys) {
+  const sharedSheet = _fieldMeta.__vt_config__?.shared_sheet_name;
+  const currentVt = _lastResult?.vehicle_type_canonical;
+  const pickerSeen = new Set();
+  const candidates = Object.entries(_fieldMeta)
+    .filter(([k, v]) =>
+      k !== '__vt_config__' &&
+      (k !== v.tender_key || v.sheet === sharedSheet) &&
+      !renderedKeys.has(v.tender_key) &&
+      (v.sheet === currentVt || v.sheet === sharedSheet) &&
+      !pickerSeen.has(v.tender_key) && pickerSeen.add(v.tender_key)
+    )
+    .map(([, v]) => ({ key: v.tender_key, label: v.label || _fieldLabel(v.tender_key) }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:4px';
+  const label = document.createElement('span');
+  label.style.cssText = 'font-size:12px;color:var(--steel)';
+  label.textContent = 'Feld hinzufügen:';
+  wrap.appendChild(label);
+
+  if (!candidates.length) {
+    const note = document.createElement('span');
+    note.style.cssText = 'font-size:12px;color:var(--steel)';
+    note.textContent = 'Keine weiteren Felder verfügbar.';
+    wrap.appendChild(note);
+    return wrap;
+  }
+
+  const sel = document.createElement('select');
+  sel.className = 'req-edit-select';
+  sel.innerHTML = `<option value="">Feld wählen…</option>`;
+  for (const c of candidates) {
+    const opt = document.createElement('option');
+    opt.value = c.key;
+    opt.textContent = c.label;
+    sel.appendChild(opt);
+  }
+  sel.addEventListener('change', () => {
+    if (!sel.value) return;
+    const key = sel.value;
+    const info = _fieldMeta[key] || {};
+    const row = _buildFieldRow(key, info, null);
+    document.getElementById('dialogFields').appendChild(row);
+    sel.value = '';  // reset picker
+  });
+  wrap.appendChild(sel);
+  return wrap;
 }
 
 let _debugWindow = null;
@@ -616,7 +667,7 @@ function openDebug() {
         'box-shadow:0 4px 16px rgba(0,0,0,.18);';
       note.innerHTML = 'Popup blockiert.<br>' +
         '<a href="/debug-page" target="_blank" rel="noopener" ' +
-        'style="color:#fff;text-decoration:underline;font-weight:600;">→ Vollständige Analyse öffnen</a>';
+        'style="color:#fff;text-decoration:underline;font-weight:600;">&#8594; Vollständige Analyse öffnen</a>';
       document.body.appendChild(note);
       setTimeout(() => note.remove(), 10000);
     }
@@ -730,6 +781,200 @@ function renderSupplierCards(allResults) {
   }
 }
 
+// ── Unified Field Query Dialog ────────────────────────────────────────────────
+
+// buildClarificationFields: selects fields to show in the post-extraction dialog.
+// INVARIANT: all field selection driven by _fieldMeta (AP0-sourced).
+// No hardcoded field names or vehicle type strings.
+function buildClarificationFields(crit, currentVt) {
+  const sharedSheet = _fieldMeta.__vt_config__?.shared_sheet_name;
+  const seen = new Set();
+  return Object.entries(_fieldMeta)
+    .filter(([key, info]) =>
+      (key !== info.tender_key || info.sheet === sharedSheet) &&
+      (info.level === 'KO' || info.level === 'COND_KO') &&
+      (info.sheet === currentVt || info.sheet === sharedSheet) &&
+      info.display_mode !== 'display' &&
+      (crit[info.tender_key] == null || crit[info.tender_key] === '' || (Array.isArray(crit[info.tender_key]) && crit[info.tender_key].length === 0))
+    )
+    .filter(([, info]) => {
+      const tKey = info.tender_key;
+      if (seen.has(tKey)) return false;
+      seen.add(tKey);
+      return true;
+    })
+    .map(([, info]) => ({ key: info.tender_key, info }));
+}
+
+// buildEditFields: selects fields to show in the post-matching edit dialog.
+function buildEditFields(crit, currentVt) {
+  const sharedSheet = _fieldMeta.__vt_config__?.shared_sheet_name;
+  const seen = new Set();
+  return Object.entries(_fieldMeta)
+    .filter(([key, info]) =>
+      (key !== info.tender_key || info.sheet === sharedSheet) &&
+      (info.entity === 'Base Model' || info.entity === 'Product') &&
+      (info.level === 'KO' || info.level === 'COND_KO') &&
+      (info.sheet === currentVt || info.sheet === sharedSheet) &&
+      info.display_mode !== 'display' &&
+      !key.endsWith('_source') &&
+      crit[info.tender_key] != null && crit[info.tender_key] !== ''
+    )
+    .filter(([, info]) => {
+      if (seen.has(info.tender_key)) return false;
+      seen.add(info.tender_key);
+      return true;
+    })
+    .map(([, info]) => ({ key: info.tender_key, info }));
+}
+
+// openFieldDialog: shared dialog entry point for both clarification and edit paths.
+function openFieldDialog({ title, subtitle, confirmLabel, dismissLabel, fields, crit, analysisId, showPicker }) {
+  _dialogData = { analysisId, baseCrit: crit };
+
+  document.getElementById('dialogTitle').textContent = title;
+  document.getElementById('dialogSubtitle').textContent = subtitle || '';
+  const _confirmBtn = document.getElementById('dialogConfirmBtn');
+  _confirmBtn.textContent = confirmLabel;
+  _confirmBtn.disabled = false;
+  document.getElementById('dialogDismissBtn').textContent = dismissLabel || 'Abbrechen';
+
+  const container = document.getElementById('dialogFields');
+  container.innerHTML = '';
+  for (const { key, info } of fields) {
+    const val = crit[key] ?? null;
+    container.appendChild(_buildFieldRow(key, info, val));
+  }
+
+  const pickerWrap = document.getElementById('dialogPicker');
+  if (showPicker) {
+    pickerWrap.classList.remove('hidden');
+    const renderedKeys = new Set(fields.map(f => f.key));
+    pickerWrap.innerHTML = '';
+    pickerWrap.appendChild(buildAddFieldPicker(crit, renderedKeys));
+  } else {
+    pickerWrap.classList.add('hidden');
+    pickerWrap.innerHTML = '';
+  }
+
+  hide('progressSection');
+  hide('resultSection');
+  show('fieldQueryDialog');
+}
+
+// openClarificationDialog: entry point from SSE result event.
+function openClarificationDialog(data) {
+  _currentAnalysisId = data.analysis_id;
+  const currentVt = data.vehicle_type_canonical || '';
+  const fields = buildClarificationFields(data.agv_criteria || {}, currentVt);
+  if (fields.length === 0) { showResult(data); return; }
+  openFieldDialog({
+    title: 'Fehlende Angaben',
+    subtitle: 'Diese Werte wurden im Tender nicht gefunden. Bitte ergänzen für präzises Matching.',
+    confirmLabel: 'Weiter zum Ergebnis',
+    dismissLabel: 'Überspringen',
+    fields,
+    crit: data.agv_criteria || {},
+    analysisId: data.analysis_id,
+    showPicker: false,
+  });
+  // Store pending data for the clarification confirm path
+  _dialogData._pendingData = data;
+}
+
+// openEditDialog: entry point from "Bearbeiten" button.
+function openEditDialog() {
+  if (!_lastResult) return;
+  const currentVt = _lastResult.vehicle_type_canonical || '';
+  const fields = buildEditFields(_lastResult.agv_criteria || {}, currentVt);
+  openFieldDialog({
+    title: 'Anforderungen bearbeiten',
+    subtitle: '',
+    confirmLabel: 'Neu berechnen',
+    dismissLabel: 'Abbrechen',
+    fields,
+    crit: _lastResult.agv_criteria || {},
+    analysisId: _currentAnalysisId,
+    showPicker: true,
+  });
+}
+
+// collectDialogOverrides: reads all edit controls from the dialog and picker.
+function collectDialogOverrides() {
+  const overrides = {};
+  for (const ctrl of document.querySelectorAll('#dialogFields [id^="req-edit-"], #dialogPicker [id^="req-edit-"]')) {
+    const key = ctrl.id.replace(/^req-edit-/, '');
+    const info = _fieldMeta[key] || {};
+    const dt = info.data_type || 'String';
+    if (dt === 'Float' || dt === 'Integer') {
+      const v = parseFloat(String(ctrl.value).replace(',', '.'));
+      if (!isNaN(v)) overrides[key] = v;
+    } else if (dt === 'Boolean') {
+      if (ctrl.value !== '') overrides[key] = ctrl.value;
+    } else if (dt === 'Multi-Select') {
+      const selected = Array.from(ctrl.selectedOptions || []).map(o => o.value);
+      if (selected.length) overrides[key] = selected;
+    } else {
+      if (ctrl.value.trim()) overrides[key] = ctrl.value.trim();
+    }
+  }
+  return overrides;
+}
+
+// confirmDialog: shared confirm handler for both clarification and edit paths.
+function confirmDialog() {
+  if (!_dialogData) return;
+  const overrides = collectDialogOverrides();
+  const btn = document.getElementById('dialogConfirmBtn');
+  if (btn) btn.disabled = true;
+
+  const pendingData = _dialogData._pendingData;  // set only in clarification path
+  const analysisId = _dialogData.analysisId;
+
+  fetch('/rematch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ analysis_id: analysisId, overrides }),
+  })
+    .then(r => {
+      if (!r.ok) return r.text().then(t => { throw new Error(`Server ${r.status}: ${t}`); });
+      return r.json();
+    })
+    .then(result => {
+      hide('fieldQueryDialog');
+      try {
+        if (pendingData) {
+          pendingData.matches     = result.top  || [];
+          pendingData.matches_all = result.all  || [];
+          pendingData.agv_criteria = result.agv_criteria || pendingData.agv_criteria;
+          showResult(pendingData);
+        } else {
+          _lastResult.matches     = result.top  || [];
+          _lastResult.matches_all = result.all  || [];
+          _lastResult.agv_criteria = result.agv_criteria || _lastResult.agv_criteria;
+          show('resultSection');
+          renderAgvRequirements(_lastResult.agv_criteria);
+          renderSupplierCards(_lastResult.matches_all || _lastResult.matches || []);
+        }
+      } catch (renderErr) {
+        showError('Darstellung fehlgeschlagen: ' + renderErr.message);
+      }
+      _dialogData = null;
+    })
+    .catch(e => {
+      if (btn) btn.disabled = false;
+      showError('Rematch fehlgeschlagen: ' + e.message);
+    });
+}
+
+// dismissDialog: skip clarification → show result as-is; skip edit → close dialog.
+function dismissDialog() {
+  const pendingData = _dialogData?._pendingData;
+  hide('fieldQueryDialog');
+  _dialogData = null;
+  if (pendingData) showResult(pendingData);  // clarification skip → show result as-is
+  else show('resultSection');               // edit cancel → restore result view
+}
 
 // ── Error / reset ─────────────────────────────────────────────────────────────
 function showError(msg, raw) {
@@ -742,8 +987,10 @@ function showError(msg, raw) {
 
 function reset() {
   hide('resultSection'); hide('errorSection'); hide('progressSection');
+  hide('fieldQueryDialog');
   show('uploadSection');
   fileInput.value = ''; _lastResult = null; _debugWindow = null;
+  _currentAnalysisId = null; _dialogData = null;
   // Reset all ring progress indicators
   ['upload','extract','llm','parse','agv'].forEach(id => {
     const ring = document.getElementById('ring-fill-' + id);

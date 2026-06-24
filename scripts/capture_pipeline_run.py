@@ -134,10 +134,10 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
     match_results = result.get("matches") or []
     matches_all   = result.get("matches_all") or []
 
-    # Extract vehicle type from agv_criteria (set by app.py during analysis)
+    # Extract vehicle type: top-level result key (set by app.py after Pass 4a)
     vehicle_type = (
-        agv_criteria.get("required_vehicle_type_canonical")
-        or agv_criteria.get("required_vehicle_type")
+        result.get("vehicle_type_canonical")
+        or agv_criteria.get("required_agv_type")
         or "unknown"
     )
 

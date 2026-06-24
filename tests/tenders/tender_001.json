@@ -17,18 +17,19 @@
     "forks_free_floating": "preferred"
   },
   "golden_extraction": {
-    "required_weight_capacity_kg": 1000,
-    "required_max_lift_height_m": null,
-    "required_temp_min_c": null,
-    "required_temp_max_c": null,
-    "required_humidity_max_pct": null,
+    "required_max_payload_kg": null,
+    "required_lifting_height_mm": null,
+    "required_operating_temp_min_c": null,
+    "required_operating_temp_max_c": null,
+    "required_operating_humidity_max_pct": null,
     "required_max_gradient_pct": null,
-    "required_max_vehicle_height_mm": null
+    "required_min_total_height_mm": null
   },
   "golden_run_file": "golden_run_tender_dragonfly.json",
   "known_issues": [
     "requirements block predates direct PDF verification; the real document states 'Max Loaded weight (KG) (Footprint) 1000' (not max_payload_kg=1500) — see golden_extraction for the hand-verified value, left here unchanged rather than silently rewritten",
-    "required_min_aisle_width_m intentionally omitted from golden_extraction: the real document text is 'Aisle width is 2000 mm rack-to-rack, with a minimum of 1900 mm pallet-to-pallet' (not min_aisle_width_mm=1800 from the requirements block either). field_levels.json defines this field as KO_IF_GT, which by the documented conservative-minimum convention (see git history of test_extraction_nulls.py) should extract the narrowest value, 1.9 m -- but the captured pipeline run currently extracts the nominal value, 2.0 m. Both numbers are grounded in the same sentence, so source_is_grounded() cannot distinguish them; this is an extraction-direction question, not a hallucination, and is left unasserted here pending a decision rather than silently picking a side."
+    "required_max_payload_kg: Pass 4c extracted 29.0 kg (likely pallet weight from table row, not AGV payload). Plausibility check correctly rejected it (<100 kg floor) but also nulled the correct 4b value (1000 kg). Result: None. The document value is 1000 kg. This is a 4c extraction quality issue — the prompt cannot distinguish 'Max Loaded weight 1000 kg' from nearby smaller numbers. Regression introduced 2026-06-24. See guardian review for resolution path.",
+    "required_min_aisle_width_mm intentionally omitted from golden_extraction: the real document text is 'Aisle width is 2000 mm rack-to-rack, with a minimum of 1900 mm pallet-to-pallet'. Both numbers are grounded in the same sentence so source_is_grounded() cannot distinguish them; this is an extraction-direction question, not a hallucination, and is left unasserted here pending a decision rather than silently picking a side."
   ],
   "expected_ko_exclusions": [],
   "expected_top_3": [],

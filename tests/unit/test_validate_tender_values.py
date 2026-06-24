@@ -24,8 +24,8 @@ def test_U_V_01_opc_ua_space_rejected():
     AP0 allows 'OPC-UA' (hyphen). A space variant is a known LLM fragility
     (Mama and Nordlicht tenders). Must be set to None with a warning.
     """
-    result, warnings = validate_tender_values({"required_integration": "OPC UA"})
-    assert result.get("required_integration") is None, (
+    result, warnings = validate_tender_values({"required_integration_capability": "OPC UA"})
+    assert result.get("required_integration_capability") is None, (
         "'OPC UA' (space) must be rejected — AP0 requires 'OPC-UA' (hyphen)"
     )
     assert any("OPC UA" in w for w in warnings), (
@@ -39,8 +39,8 @@ def test_U_V_01_opc_ua_space_rejected():
 
 def test_U_V_02_opc_ua_hyphen_accepted():
     """'OPC-UA' (with hyphen) is the canonical AP0 value and must pass through."""
-    result, warnings = validate_tender_values({"required_integration": "OPC-UA"})
-    assert result.get("required_integration") == "OPC-UA", (
+    result, warnings = validate_tender_values({"required_integration_capability": "OPC-UA"})
+    assert result.get("required_integration_capability") == "OPC-UA", (
         "'OPC-UA' (hyphen) is a valid AP0 value and must not be filtered out"
     )
     assert not warnings, f"Unexpected warnings for valid value: {warnings}"
@@ -57,8 +57,8 @@ def test_U_V_03_rest_opc_ua_compound_rejected():
     nor its parts match an AP0 entry ('REST API' and 'OPC-UA' are separate allowed
     values, but the compound string fails substring containment from the wrong direction).
     """
-    result, warnings = validate_tender_values({"required_integration": "REST / OPC UA"})
-    assert result.get("required_integration") is None, (
+    result, warnings = validate_tender_values({"required_integration_capability": "REST / OPC UA"})
+    assert result.get("required_integration_capability") is None, (
         "'REST / OPC UA' compound must be rejected by AP0 filter"
     )
     assert any("REST / OPC UA" in w or "REST" in w for w in warnings)
@@ -75,16 +75,16 @@ def test_U_V_04_vda5050_german_string_rejected():
     from tender documents. Must be rejected with a warning.
     """
     result, warnings = validate_tender_values(
-        {"required_fleet_management": "VDA 5050-kompatibel"}
+        {"required_fleet_management_system": "VDA 5050-kompatibel"}
     )
-    assert result.get("required_fleet_management") is None, (
+    assert result.get("required_fleet_management_system") is None, (
         "German 'VDA 5050-kompatibel' must be rejected — AP0 uses 'VDA 5050 compatible'"
     )
     assert warnings, "Expected a warning for 'VDA 5050-kompatibel'"
 
 
 # ---------------------------------------------------------------------------
-# U-V-05: 'Floor delivery & picking' for required_load_types is rejected
+# U-V-05: 'Floor delivery & picking' for required_load_type is rejected
 # ---------------------------------------------------------------------------
 
 def test_U_V_05_floor_delivery_picking_rejected():
@@ -94,9 +94,9 @@ def test_U_V_05_floor_delivery_picking_rejected():
     The LLM sometimes returns 'Floor delivery & picking' from tender documents.
     """
     result, warnings = validate_tender_values(
-        {"required_load_types": "Floor delivery & picking"}
+        {"required_load_type": "Floor delivery & picking"}
     )
-    assert result.get("required_load_types") is None, (
+    assert result.get("required_load_type") is None, (
         "'Floor delivery & picking' must be rejected by AP0 load_types filter"
     )
     assert warnings
@@ -108,8 +108,8 @@ def test_U_V_05_floor_delivery_picking_rejected():
 
 def test_U_V_06_pallet_eur_accepted():
     """'Pallet EUR' is a canonical AP0 load_types value and must be accepted."""
-    result, warnings = validate_tender_values({"required_load_types": "Pallet EUR"})
-    assert result.get("required_load_types") == "Pallet EUR", (
+    result, warnings = validate_tender_values({"required_load_type": "Pallet EUR"})
+    assert result.get("required_load_type") == "Pallet EUR", (
         "'Pallet EUR' is a valid AP0 value and must pass through"
     )
     assert not warnings, f"Unexpected warnings: {warnings}"
@@ -126,13 +126,13 @@ def test_U_V_07_none_passthrough():
     transformed or generate warnings — only non-null invalid values are reported.
     """
     result, warnings = validate_tender_values({
-        "required_integration": None,
-        "required_fleet_management": None,
-        "required_load_types": None,
+        "required_integration_capability": None,
+        "required_fleet_management_system": None,
+        "required_load_type": None,
     })
-    assert result.get("required_integration") is None
-    assert result.get("required_fleet_management") is None
-    assert result.get("required_load_types") is None
+    assert result.get("required_integration_capability") is None
+    assert result.get("required_fleet_management_system") is None
+    assert result.get("required_load_type") is None
     assert not warnings, f"None values must not generate warnings, got: {warnings}"
 
 
@@ -150,8 +150,8 @@ def test_U_V_08_substring_match_pallet():
     Note: 'Pallet' survives the AP0 filter but does NOT match supplier load_types
     exactly in the KO_SUBSET operator — it may still cause mismatches downstream.
     """
-    result, warnings = validate_tender_values({"required_load_types": "Pallet"})
-    assert result.get("required_load_types") == "Pallet", (
+    result, warnings = validate_tender_values({"required_load_type": "Pallet"})
+    assert result.get("required_load_type") == "Pallet", (
         "'Pallet' is accepted because 'pallet' is a substring of AP0 value 'pallet eur'. "
         "Substring containment is bidirectional: `vl in al or al in vl`."
     )

@@ -27,13 +27,12 @@ AP0 xlsx (Spec/)
     ▼
 generate_all.py ──────────────────────────────────────────────┐
     │                                                          │
-    ├─► config/field_levels.json   (matching rules)           │
+    ├─► config/fields.json         (all field defs, UUID-keyed)│
+    ├─► src/field_spec.py          (FieldSpec dataclass + helpers)│
     ├─► config/vehicle_types.json  (type map, VNA logic)      │
-    ├─► config/scoring_weights.json                           │
     ├─► config/nace_codes.json                                │
     ├─► config/plausibility.json   (LLM value ranges)         │
     ├─► config/sqlite_schema.json  (CREATE TABLE SQL)         │
-    ├─► config/extraction_hints.json (tender_key → hint+sheet)│
     └─► config/prompts/*.txt       (all LLM prompts)          │
                                                               │
 Airtable ──► sync_airtable.py ──► data/raw/*.csv ──► data/haystacked.db ◄──┘
@@ -106,9 +105,9 @@ The file `Spec/haystacked_AP0_field_spec_v0_10.xlsx` is the authoritative source
 | Scoring (inline) | Scoring Weight, Scoring Rule, Threshold 1, Threshold 2 columns in each data sheet |
 | Field Fallbacks | Regex-driven field overrides: if text matches regex, force a given tender_key value |
 
-**The AP0 Description column is especially important.** It is the source for LLM extraction hints in `config/extraction_hints.json` and in the generated prompt templates. When you edit a Description cell in the AP0 xlsx, you directly change what the LLM is told about that field. Keep description text factual and pattern-focused. Never include numeric example values — a 7B model will copy them as hallucinations.
+**The AP0 "LLM Hint" column is especially important.** It is the source for LLM extraction hints in `config/fields.json` and in the generated prompt templates. When you edit a cell in the LLM Hint column, you directly change what the LLM is told about that field. Keep hint text factual and pattern-focused. Never include numeric example values — a 7B model will copy them as hallucinations.
 
-**The golden rule: never edit generated files.** Any change to `config/field_levels.json`, `config/vehicle_types.json`, `config/scoring_weights.json`, `config/extraction_hints.json`, or any file under `config/prompts/` will be silently overwritten the next time `generate_all.py` runs or the app starts and detects a checksum mismatch.
+**The golden rule: never edit generated files.** Any change to `config/fields.json`, `src/field_spec.py`, `config/vehicle_types.json`, or any file under `config/prompts/` will be silently overwritten the next time `generate_all.py` runs or the app starts and detects a checksum mismatch.
 
 ### Auto-regeneration at startup
 
@@ -179,8 +178,8 @@ If `is_agv_amr=false`, processing stops here (no AGV passes). Total: 2–3 LLM c
 **Pass 4a — vehicle type classification** (only if is_agv_amr=true)
 - System: `AGV_SYSTEM` (built by `context_builder.build_system_context()`)
 - Template: `vehicle_type_template.txt`, filled with `{text}`
-- Extracts: required_vehicle_type (exactly one of: Forklift AGV / Tugger AGV / Mobile AMR) and required_vna (boolean)
-- AP0 validation on required_vehicle_type: up to 2 correction retries if the LLM returns an invalid value
+- Extracts: required_agv_type (exactly one of: Forklift AGV / Tugger AGV / Mobile AMR) and required_vna_capable (boolean)
+- AP0 validation on required_agv_type: up to 2 correction retries if the LLM returns an invalid value
 - After parsing: vehicle type is normalized through vt_map; VNA flag is set; text_overrides run against full document
 
 **Pass 4b — batch field extraction** (only if is_agv_amr=true)
@@ -241,7 +240,7 @@ Layer 0 checks document grounding: a citation that is absent from the real docum
 ### 6. Post-LLM validation
 
 **`validate_tender_values()` (src/matching.py)**
-Checks every Dropdown and Multi-Select field against its `allowed_values` list from `field_levels.json`. Values not in the allowed list are set to `None`. Case-insensitive substring matching.
+Checks every Dropdown and Multi-Select field against its `allowed_values` list from `fields.json`. Values not in the allowed list are set to `None`. Case-insensitive substring matching.
 
 **`validate_agv_criteria()` (app.py)**
 Checks numeric fields against plausibility ranges from `config/plausibility.json`. Auto-converts mm→m for dimensional fields (aisle width, lift height) when the value appears to be in millimetres (value > 10 and in-range after conversion). Out-of-range values are set to `None`.
@@ -262,20 +261,20 @@ Regex patterns from `vehicle_types.json` are checked against the full document t
 ### 8. VNA logic
 
 After vehicle type normalization:
-- If `is_vna_subtype=True` (LLM returned "vna"/"very narrow aisle" OR a text override fired): `required_vna = "required"`
-- If canonical type is in `vna_applicable_types` (only `"Forklift AGV"`) but VNA not detected: `required_vna = "not_required"`
-- For Tugger AGV or Mobile AMR: `required_vna = None` — no VNA gate applies
+- If `is_vna_subtype=True` (LLM returned "vna"/"very narrow aisle" OR a text override fired): `required_vna_capable = "required"`
+- If canonical type is in `vna_applicable_types` (only `"Forklift AGV"`) but VNA not detected: `required_vna_capable = "not_required"`
+- For Tugger AGV or Mobile AMR: `required_vna_capable = None` — no VNA gate applies
 
-The `required_vna` field maps to the `vna_capable` supplier field with operator `KO_BOOL_EXCLUSIVE`:
-- `required_vna = "required"` → supplier must have `vna_capable=True`; otherwise K.O.
-- `required_vna = "not_required"` → supplier must NOT have `vna_capable=True`; otherwise K.O.
-- `required_vna = None` → no constraint
+The `required_vna_capable` field maps to the `vna_capable` supplier field with operator `KO_BOOL_EXCLUSIVE`:
+- `required_vna_capable = "required"` → supplier must have `vna_capable=True`; otherwise K.O.
+- `required_vna_capable = "not_required"` → supplier must NOT have `vna_capable=True`; otherwise K.O.
+- `required_vna_capable = None` → no constraint
 
 `drive_type` is CONTEXT level and carries no matching operator. The VNA gate is enforced entirely through `vna_capable`.
 
 ### 9. Matching engine
 
-`match_suppliers_new()` in `src/matching.py` runs the rule engine against all loaded `SupplierRecord` objects. Rules come exclusively from `config/field_levels.json`. There is no domain knowledge in `matching.py` itself.
+`match_suppliers_new()` in `src/matching.py` runs the rule engine against all loaded `SupplierRecord` objects. Rules come exclusively from `config/fields.json` via `src/field_spec.py`. There is no domain knowledge in `matching.py` itself.
 
 For each supplier:
 1. Hard K.O. rules (`level="KO"`) are checked. The first failure immediately disqualifies the supplier and stops evaluation.
@@ -301,11 +300,11 @@ These constants are built at startup from the generated config files and are the
 
 | Constant | Type | Built from | Purpose |
 |---|---|---|---|
-| `_NUMERIC_KO_TENDER_KEYS` | `frozenset[str]` | `field_levels.json` | All tender keys with KO_IF_LT or KO_IF_GT operator and Float/Integer data type. Non-empty is asserted at startup. |
-| `_NUMERIC_KO_FIELD_HINTS` | `dict` | `extraction_hints.json` filtered by `_NUMERIC_KO_TENDER_KEYS` | Maps tender_key → {hint, sheet} for numeric KO fields that have a hint and a sheet assignment. Used to build Pass 4c prompts. |
-| `_4C_EXTRACTION_DIRECTION` | `dict` | `field_levels.json` operators | Maps tender_key → extraction direction string. KO_IF_LT → "extract MAXIMUM". KO_IF_GT → "extract MINIMUM". |
+| `_NUMERIC_KO_TENDER_KEYS` | `frozenset[str]` | `fields.json` via `field_spec.py` | All tender keys with KO_IF_LT or KO_IF_GT operator and Float/Integer data type. Non-empty is asserted at startup. |
+| `_NUMERIC_KO_FIELD_HINTS` | `dict` | `fields.json` filtered by `_NUMERIC_KO_TENDER_KEYS` | Maps tender_key → {hint, sheet} for numeric KO fields that have a hint and a sheet assignment. Used to build Pass 4c prompts. |
+| `_4C_EXTRACTION_DIRECTION` | `dict` | `fields.json` operators | Maps tender_key → extraction direction string. KO_IF_LT → "extract MAXIMUM". KO_IF_GT → "extract MINIMUM". |
 | `_SHARED_SHEET` | `str` | `vehicle_types.json` key `shared_sheet_name` | The name of the AP0 shared sheet. Used to scope Pass 4c to the right fields per vehicle type. Never hardcoded. |
-| `_AP0_CONSTRAINED_FIELDS` | `dict` | `field_levels.json` | Maps tender_key → {allowed set, allowed list} for all Dropdown/Multi-Select fields with allowed_values. Used in _find_invalid_ap0_fields(). |
+| `_AP0_CONSTRAINED_FIELDS` | `dict` | `fields.json` | Maps tender_key → {allowed set, allowed list} for all Dropdown/Multi-Select fields with allowed_values. Used in _find_invalid_ap0_fields(). |
 
 ---
 
@@ -320,12 +319,11 @@ These constants are built at startup from the generated config files and are the
 | `src/context_builder.py` | Builds AGV extraction system prompt (AGV_SYSTEM); keyword fallback |
 | `scripts/generate_all.py` | Config pipeline: reads AP0 xlsx → writes all config/ files |
 | `sync_airtable.py` | Airtable API pull → CSV → SQLite import. `--local` flag skips API |
-| `config/field_levels.json` | Generated. Matching rules per field (level, operator, tender_key, allowed_values, data_type) |
+| `config/fields.json` | Generated. All field definitions keyed by UUID — operator, data_type, allowed_values, weight, hint, user_description, etc. Single source consumed by matching.py, app.py, context_builder.py |
+| `src/field_spec.py` | Generated. FieldSpec dataclass + load_fields(), fields_by_tender_key(), fields_by_field_name(), fields_by_sheet() helpers |
 | `config/vehicle_types.json` | Generated. vt_map, VNA subtypes, text_overrides, keyword_map, scoring_bucket_map, shared_sheet_name |
-| `config/scoring_weights.json` | Generated. Scoring weights and rules per field per AGV-type bucket |
 | `config/plausibility.json` | Generated. Plausibility ranges for LLM value validation |
 | `config/sqlite_schema.json` | Generated. CREATE TABLE SQL and field type lists for sync_airtable.py |
-| `config/extraction_hints.json` | Generated. Maps tender_key → {hint, sheet} for all 51 extraction fields. Powers Pass 4c. |
 | `config/prompts/basic_*.txt` | Generated. Pass 1 system and template |
 | `config/prompts/contact_*.txt` | Generated. Pass 2 system and template |
 | `config/prompts/nace_*.txt` | Generated. Pass 3 system and template |

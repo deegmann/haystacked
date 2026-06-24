@@ -440,9 +440,9 @@ def main():
             rc = _mod.generate(_xlsx, DB_PATH, dry_run=False)
             if rc != 0:
                 print("  ACTION REQUIRED: AP0 xlsx and SQLite schema are not fully consistent.")
-                print("  See warnings above. field_levels.json was written from xlsx regardless.")
+                print("  See warnings above. config/fields.json was regenerated from xlsx regardless.")
         else:
-            print(f"  [SKIP] AP0 xlsx not found at {_xlsx} — field_levels.json not updated")
+            print(f"  [SKIP] AP0 xlsx not found at {_xlsx} — config/fields.json not updated")
     except Exception as e:
         print(f"  [WARN] Could not run field level validation: {e}")
 

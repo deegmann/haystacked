@@ -3,7 +3,7 @@ generate_all.py — Single Source of Truth pipeline
 
 Reads TWO xlsx files and generates ALL runtime config:
   AP0_[industry].xlsx        — industry-specific (fields, operators, scoring weights
-                                inline, vehicle types, extraction hints in description col)
+                                inline, vehicle types, extraction hints in LLM Hint col)
   platform_config.xlsx       — cross-industry (NACE codes, basic extraction schema,
                                 platform scope definition)
 
@@ -18,29 +18,28 @@ Usage:
     python3 scripts/generate_all.py [--xlsx PATH] [--platform PATH] [--db PATH] [--dry-run]
 
 Generated files:
-    config/field_levels.json       — KO/COND_KO/Scoring/Context + operators
+    config/fields.json             — all field definitions keyed by UUID (AP0 SSoT)
     config/vehicle_types.json      — _VT_MAP, VNA detection, keyword fallback
-    config/scoring_weights.json    — scoring weights (inline from AP0 field sheets)
     config/nace_codes.json         — NACE Prio-1 list + platform scope
     config/sqlite_schema.json      — CREATE TABLE SQL generated from AP0 Entity Model
     config/plausibility.json       — LLM value plausibility ranges per extraction field
     config/prompts/*.txt           — all LLM prompt files (generated, never edit manually)
     config/ap0_checksum.txt        — MD5 for startup auto-regen
 
-All extraction fields come from AP0 xlsx via the "Tender JSON Key" column.
-    No extraction-only fields remain — all are anchored in AP0:
-      required_vehicle_type  ← agv_type (SHARED, K.O.)
-      required_navigation    ← navigation_type (SHARED, Cond. K.O.)
-      required_weight_capacity_kg ← max_payload_kg (SHARED, K.O.)
-      required_max_lift_height_m  ← lifting_height_mm (Forklift, K.O.)
-      required_min_aisle_width_m  ← min_aisle_width_mm (Forklift, K.O.)
-      required_outdoor       ← outdoor_capable (SHARED, Cond. K.O.)
-      required_temp_min_c    ← operating_temp_min_c (SHARED, Cond. K.O.)
-      required_clean_room    ← cleanroom_class (SHARED, Cond. K.O.)
-      required_load_types    ← load_type (SHARED, K.O.)
+tender_key is derived as "required_" + field_name (no separate "Tender JSON Key" column).
+    All extraction fields are anchored in AP0 via field_name:
+      required_agv_type          ← agv_type (SHARED, K.O.)
+      required_navigation_type   ← navigation_type (SHARED, Cond. K.O.)
+      required_max_payload_kg    ← max_payload_kg (SHARED, K.O.)
+      required_lifting_height_mm ← lifting_height_mm (Forklift, K.O.)
+      required_min_aisle_width_mm ← min_aisle_width_mm (Forklift, K.O.)
+      required_outdoor_capable   ← outdoor_capable (SHARED, Cond. K.O.)
+      required_operating_temp_min_c ← operating_temp_min_c (SHARED, Cond. K.O.)
+      required_cleanroom_class   ← cleanroom_class (SHARED, Cond. K.O.)
+      required_load_type         ← load_type (SHARED, K.O.)
       required_towing_capacity_kg ← towing_capacity_kg (Tugger, K.O.)
-      required_integration   ← integration_capability (SHARED, Scoring)
-      required_station_types ← station_applications (SHARED, Cond. K.O.)
+      required_integration_capability ← integration_capability (SHARED, Scoring)
+      required_station_applications ← station_applications (SHARED, Cond. K.O.)
 """
 
 import argparse
@@ -112,10 +111,11 @@ def read_field_levels(wb) -> dict:
             continue
         col_level       = cols.get("Level")
         col_op          = cols.get("Matching Operator")
-        col_tkey        = cols.get("Tender JSON Key")
         col_dtype       = cols.get("Data Type")
-        col_allowed     = cols.get("Allowed Values / Unit")
+        col_allowed     = cols.get("Allowed Values")
+        col_unit        = cols.get("Unit")
         col_result_card = cols.get("result_card")
+        col_display_mode = cols.get("Display Mode")
         for row in rows[hi+1:]:
             fname = row[0]
             if not fname or str(fname).startswith("──"):
@@ -134,8 +134,8 @@ def read_field_levels(wb) -> dict:
                     entry["operator"] = op
                 else:
                     print(f"  [WARN] Unknown operator '{op}' for '{fname}'")
-            if col_tkey is not None and col_tkey < len(row) and row[col_tkey]:
-                entry["tender_key"] = str(row[col_tkey]).strip()
+            # Derive tender_key from field_name — no separate column needed
+            entry["tender_key"] = "required_" + str(fname).strip()
             # Store allowed values for Dropdown/Multi-Select fields as a validation list
             if raw_dtype in ("Dropdown", "Multi-Select") and col_allowed is not None and col_allowed < len(row) and row[col_allowed]:
                 raw_av = str(row[col_allowed]).strip()
@@ -145,10 +145,10 @@ def read_field_levels(wb) -> dict:
                     entry["allowed_values"] = av_list
             if col_result_card is not None and col_result_card < len(row) and row[col_result_card]:
                 entry["result_card"] = True
+            if col_display_mode is not None and col_display_mode < len(row) and row[col_display_mode]:
+                entry["display_mode"] = str(row[col_display_mode]).strip()
             if level in ("KO","COND_KO") and "operator" not in entry:
                 print(f"  [WARN] '{fname}' is {level} but has no operator")
-            if level in ("KO","COND_KO") and "operator" in entry and "tender_key" not in entry:
-                print(f"  [WARN] '{fname}' has operator but no Tender JSON Key")
             if fname not in fields:
                 fields[str(fname)] = entry
     return fields
@@ -239,7 +239,7 @@ def read_field_text_fallbacks(wb) -> list:
 def read_scoring_weights(wb) -> dict:
     """Read scoring weights + rules from AP0 xlsx.
 
-    Reads: Scoring Weight, Scoring Rule, Threshold 1, Threshold 2.
+    Reads: Scoring Weight, Score Function, Score Threshold A, Score Threshold B.
     Output format per field: {"weight": int, "rule": str, "t1": num|None, "t2": num|None}
     """
     result = {"default": {}, "forklift_specific": {}, "tugger_specific": {}, "amr_specific": {}}
@@ -266,9 +266,9 @@ def read_scoring_weights(wb) -> dict:
         if hi is None: continue
         c_field  = cols.get("Field Name", 0)
         c_weight = cols.get("Scoring Weight")
-        c_rule   = cols.get("Scoring Rule")
-        c_t1     = cols.get("Threshold 1")
-        c_t2     = cols.get("Threshold 2")
+        c_rule   = cols.get("Score Function")
+        c_t1     = cols.get("Score Threshold A")
+        c_t2     = cols.get("Score Threshold B")
         if c_weight is None: continue
         for row in rows[hi+1:]:
             if not row or not row[c_field]: continue
@@ -288,12 +288,10 @@ def read_scoring_weights(wb) -> dict:
 
 
 def read_extraction_schema(wb) -> list:
-    """Build extraction schema from AP0 field sheets:
-    - 'Tender JSON Key' column gives the JSON key
-    - 'Description' column gives the LLM extraction hint
-    - 'Mand.' column indicates if mandatory
-    Supplemented by hardcoded extraction-only fields (process, wms, etc.)
-    that have no DB counterpart.
+    """Build extraction schema from AP0 field sheets.
+
+    tender_key is derived as "required_" + field_name.
+    LLM extraction hint comes from the "LLM Hint" column.
     """
     schema = []
     seen = set()
@@ -304,42 +302,19 @@ def read_extraction_schema(wb) -> list:
         hi, cols = _find_header(rows)
         if hi is None: continue
         c_field = cols.get("Field Name", 0)
-        c_jk    = cols.get("Tender JSON Key")
-        c_desc  = cols.get("Description — what it is · where to find it · what it implies")
-        c_mand  = cols.get("Mand.")
-        if c_jk is None: continue
+        c_hint  = cols.get("LLM Hint")
 
         for row in rows[hi+1:]:
             if not row or not row[c_field]: continue
             fname = str(row[c_field]).strip()
             if fname.startswith("──"): continue
-            jk = str(row[c_jk]).strip() if c_jk < len(row) and row[c_jk] else ""
-            if not jk or jk in seen: continue
+            jk = "required_" + fname
+            if jk in seen: continue
+            hint = str(row[c_hint]).strip() if c_hint is not None and c_hint < len(row) and row[c_hint] else ""
+            if not hint:
+                continue  # fields without LLM Hint are not extracted by the LLM
             seen.add(jk)
-            hint = str(row[c_desc]).strip() if c_desc is not None and c_desc < len(row) and row[c_desc] else ""
-            mand = bool(row[c_mand]) if c_mand is not None and c_mand < len(row) else False
-            schema.append({"key": jk, "db_field": fname, "mandatory": mand, "hint": hint, "sheet": sheet})
-
-    # All extraction fields now come from AP0 xlsx via the Tender JSON Key column:
-    #   required_vehicle_type  ← agv_type         (SHARED, K.O.)
-    #   required_navigation    ← navigation_type   (SHARED, Cond. K.O.)
-    #   required_weight_capacity_kg ← max_payload_kg (SHARED, K.O.)
-    #   required_max_lift_height_m  ← lifting_height_mm (Forklift, K.O.)
-    #   required_min_aisle_width_m  ← min_aisle_width_mm (Forklift, K.O.)
-    #   required_outdoor       ← outdoor_capable   (SHARED, Cond. K.O.)
-    #   required_temp_min_c    ← operating_temp_min_c (SHARED, Cond. K.O.)
-    #   required_clean_room    ← cleanroom_class   (SHARED, Cond. K.O.)
-    #   required_load_types    ← load_type         (SHARED, K.O.)
-    #   required_towing_capacity_kg ← towing_capacity_kg (Tugger, K.O.)
-    #   required_integration   ← integration_capability (SHARED, Scoring)
-    #   required_station_types ← station_applications  (SHARED, Cond. K.O.)
-    #
-    # Dropped (Option B — not matchable, covered by basic extraction summary):
-    #   required_process            — informational only, no supplier field
-    #   required_wms_integration    — replaced by required_integration (richer)
-    #   required_conveyor_integration — replaced by required_station_types (richer)
-    #   required_quantity           — rarely stated, no supplier field
-    #   agv_notes                   — covered by summary from basic extraction
+            schema.append({"key": jk, "db_field": fname, "mandatory": False, "hint": hint, "sheet": sheet})
 
     return schema
 
@@ -477,7 +452,6 @@ def read_sqlite_schema(wb) -> dict:
         if hi is None:
             continue
         c_dt   = cols.get("Data Type")
-        c_mand = cols.get("Mand.")
         if c_dt is None:
             continue
         for row in rows[hi + 1:]:
@@ -566,12 +540,11 @@ def read_plausibility(wb) -> dict:
         if hi is None:
             continue
 
-        col_tkey  = cols.get("Tender JSON Key")
         col_pmin  = cols.get("Plausibility Min")
         col_pmax  = cols.get("Plausibility Max")
-        col_unit  = cols.get("Tender Unit")
+        col_unit  = cols.get("Unit")
 
-        if None in (col_tkey, col_pmin, col_pmax, col_unit):
+        if None in (col_pmin, col_pmax, col_unit):
             print(f"  [WARN] Plausibility columns missing in {sheet_name} — run generate_all.py after adding them to xlsx")
             continue
 
@@ -579,12 +552,12 @@ def read_plausibility(wb) -> dict:
             fname = row[0]
             if not fname or str(fname).startswith("──"):
                 continue
-            tkey = row[col_tkey] if col_tkey < len(row) else None
+            tkey = "required_" + str(fname).strip()
             pmin = row[col_pmin] if col_pmin < len(row) else None
             pmax = row[col_pmax] if col_pmax < len(row) else None
             unit = row[col_unit] if col_unit < len(row) else None
 
-            if tkey and pmin is not None and pmax is not None:
+            if pmin is not None and pmax is not None:
                 if tkey not in plausibility:  # first occurrence wins (SHARED before type-specific)
                     plausibility[tkey] = {
                         "min":   float(pmin),
@@ -620,7 +593,7 @@ def read_unit_conversions(wb_platform) -> dict:
 def build_plausibility_config(plausibility: dict, unit_conversions: dict) -> dict:
     """Combine plausibility ranges with unit conversion rules into config/plausibility.json format.
 
-    Conversion block is added when the field's Tender Unit has a matching rule in the
+    Conversion block is added when the field's Unit has a matching rule in the
     Unit Conversions sheet — no field-specific flags, no hardcoded factors.
     """
     result = {}
@@ -720,28 +693,28 @@ def build_vehicle_type_template(vehicle_types: dict) -> str:
         lines.append("  THINK STEP BY STEP:")
         lines.append("  IMPORTANT: Only three values are valid: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
         lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-        lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_vehicle_type='Tugger AGV'.")
-        lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_vehicle_type='Mobile AMR'.")
-        lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_vehicle_type='Forklift AGV'.")
+        lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+        lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+        lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
         lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-        lines.append("      If VNA / very narrow aisle / aisle<2m → required_vehicle_type='Forklift AGV' AND required_vna=true.")
+        lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
         lines.append("")
     lines += [
         "Fields:",
-        "- required_vehicle_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
-        "- required_vna: true if VNA / Schmalgang / very narrow aisle / aisle<2m with high-bay racking. Only applicable when required_vehicle_type='Forklift AGV'. false otherwise.",
+        "- required_agv_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
+        "- required_vna_capable: true if VNA / Schmalgang / very narrow aisle / aisle<2m with high-bay racking. Only applicable when required_agv_type='Forklift AGV'. false otherwise.",
         "",
         "DOCUMENT:",
         "{text}",
         "",
         "JSON:",
-        '{"required_vehicle_type":null,"required_vna":null}',
+        '{"required_agv_type":null,"required_vna_capable":null}',
     ]
     return "\n".join(lines)
 
 
 # Fields determined in Pass 4a — excluded from Pass 4b templates
-_4A_FIELDS = {"required_vehicle_type", "required_vna"}
+_4A_FIELDS = {"required_agv_type", "required_vna_capable"}
 
 
 _OPERATOR_DIRECTION = {
@@ -781,7 +754,7 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
                  ""]
         guide = vehicle_types.get("llm_guide", [])
         if guide:
-            lines += ["Vehicle type classification guide (for required_vehicle_type):"]
+            lines += ["Vehicle type classification guide (for required_agv_type):"]
             seen_names = set()
             for vt in guide:
                 if vt["name"] in seen_names: continue
@@ -793,14 +766,14 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
             lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
             lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
             lines.append("")
-            lines.append("  THINK STEP BY STEP when classifying required_vehicle_type:")
-            lines.append("  IMPORTANT: Only three values are valid for required_vehicle_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+            lines.append("  THINK STEP BY STEP when classifying required_agv_type:")
+            lines.append("  IMPORTANT: Only three values are valid for required_agv_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
             lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-            lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_vehicle_type='Tugger AGV'.")
-            lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_vehicle_type='Mobile AMR'.")
-            lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_vehicle_type='Forklift AGV'.")
+            lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+            lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_agv_type='Forklift AGV'.")
             lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_vehicle_type='Forklift AGV' AND required_vna=true.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
             lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
             lines.append("")
 
@@ -865,7 +838,7 @@ def build_retry_template(extraction_schema: list) -> str:
         "",
         "Key interpretation rules:",
         "- If a handling point table lists \"Conveyor belt picking/delivery\" as the handling method, set required_conveyor_integration to \"yes\".",
-        "- Tugger AGVs tow trailer trains and CANNOT interface with conveyor belts without manual reloading — if conveyors are present, required_vehicle_type should NOT be Tugger.",
+        "- Tugger AGVs tow trailer trains and CANNOT interface with conveyor belts without manual reloading — if conveyors are present, required_agv_type should NOT be Tugger.",
         "- If most stations use floor delivery but at least one uses conveyor belt, the system needs BOTH floor transport AND conveyor integration.",
         "",
         "DOCUMENT:",
@@ -947,52 +920,199 @@ def validate_vs_sqlite(field_levels: dict, db_path: Path) -> list:
     return warnings
 
 
-# ── Generated models ──────────────────────────────────────────────────────────
 
-def generate_models_py(sqlite_schema: dict) -> str:
-    """Return Python source for src/generated_models.py — Extension dataclass."""
-    bool_f = set(sqlite_schema["bool_fields"])
-    int_f  = set(sqlite_schema["int_fields"])
-    float_f = set(sqlite_schema["float_fields"])
-    ms_f   = set(sqlite_schema["multiselect_fields"])
-    shared = set(sqlite_schema["shared_in_product_columns"])
-    structural = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
 
-    lines = [
-        "# AUTO-GENERATED by scripts/generate_all.py — DO NOT EDIT MANUALLY.",
-        "# To update: edit the AP0 xlsx, then run: python3 scripts/generate_all.py",
-        "import sys",
-        "if __name__ == '__main__':",
-        "    sys.exit('Run generate_all.py to regenerate this file.')",
-        "from dataclasses import dataclass, field",
-        "from typing import Optional",
-        "",
-        "",
-        "@dataclass",
-        "class Extension:",
-        "    # Structural identity fields (always present)",
-        "    extension_id:  str = ''",
-        "    base_model_id: str = ''",
-        "    agv_type:      str = ''",
-    ]
+# ── Fields JSON + field_spec.py ───────────────────────────────────────────────
 
-    for col in sqlite_schema["extensions_columns"]:
-        if col in structural or col in shared:
+def emit_fields_json(wb) -> None:
+    """Read all 4 DATA_SHEETS and write config/fields.json + src/field_spec.py.
+
+    fields.json is keyed by UUID. field_spec.py is a generated Python module with
+    FieldSpec dataclass and helper accessors.
+    """
+    def _nullable_float(v):
+        if v is None or v == "":
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    def _nullable_int(v):
+        if v is None or v == "":
+            return None
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return None
+
+    fields_by_uuid: dict = {}
+
+    for sheet in DATA_SHEETS:
+        if sheet not in wb.sheetnames:
+            print(f"  [WARN] Sheet missing for emit_fields_json: {sheet}")
             continue
-        if col in bool_f:
-            lines.append(f"    {col}: Optional[bool] = None")
-        elif col in int_f:
-            lines.append(f"    {col}: Optional[int] = None")
-        elif col in float_f:
-            lines.append(f"    {col}: Optional[float] = None")
-        elif col in ms_f:
-            lines.append(f"    {col}: list[str] = field(default_factory=list)")
-        else:
-            lines.append(f"    {col}: Optional[str] = None")
+        rows = _rows(wb[sheet])
+        hi, cols = _find_header(rows)
+        if hi is None:
+            continue
 
-    lines.append("    extra_fields: Optional[str] = None")
-    lines.append("")
-    return "\n".join(lines)
+        col_uuid     = cols.get("UUID")
+        col_fname    = cols.get("Field Name", 0)
+        col_entity   = cols.get("Entity")
+        col_level    = cols.get("Level")
+        col_op       = cols.get("Matching Operator")
+        col_dtype    = cols.get("Data Type")
+        col_unit     = cols.get("Unit")
+        col_allowed  = cols.get("Allowed Values")
+        col_sfunc    = cols.get("Score Function")
+        col_ta       = cols.get("Score Threshold A")
+        col_tb       = cols.get("Score Threshold B")
+        col_weight   = cols.get("Scoring Weight")
+        col_hint     = cols.get("LLM Hint")
+        col_display  = cols.get("Display Mode")
+        col_client   = cols.get("UI Hint")
+        col_rc       = cols.get("result_card")
+
+        for row in rows[hi + 1:]:
+            fname = row[col_fname] if col_fname < len(row) else None
+            if not fname or str(fname).startswith("──"):
+                continue
+
+            uuid_val = row[col_uuid] if col_uuid is not None and col_uuid < len(row) else None
+            if not uuid_val:
+                sys.exit(
+                    f"[FEHLER] emit_fields_json: Feld '{fname}' in Sheet '{sheet}' hat keine UUID. "
+                    "Alle Felder müssen eine UUID haben."
+                )
+            uuid_str = str(uuid_val).strip()
+
+            if uuid_str in fields_by_uuid:
+                existing = fields_by_uuid[uuid_str]
+                sys.exit(
+                    f"[FEHLER] emit_fields_json: UUID-Kollision! '{uuid_str}' erscheint in "
+                    f"Sheet '{sheet}' (field='{fname}') UND in Sheet '{existing['sheet']}' "
+                    f"(field='{existing['field_name']}'). UUIDs müssen eindeutig sein."
+                )
+
+            tkey = "required_" + str(fname).strip()
+            entity = str(row[col_entity]).strip() if col_entity is not None and col_entity < len(row) and row[col_entity] else ""
+            raw_level = row[col_level] if col_level is not None and col_level < len(row) else None
+            level = LEVEL_MAP.get(str(raw_level).strip()) if raw_level else None
+            op = str(row[col_op]).strip() if col_op is not None and col_op < len(row) and row[col_op] else None
+            dtype = str(row[col_dtype]).strip() if col_dtype is not None and col_dtype < len(row) and row[col_dtype] else ""
+            unit = str(row[col_unit]).strip() if col_unit is not None and col_unit < len(row) and row[col_unit] else None
+            sfunc = str(row[col_sfunc]).strip() if col_sfunc is not None and col_sfunc < len(row) and row[col_sfunc] else None
+            ta = _nullable_float(row[col_ta] if col_ta is not None and col_ta < len(row) else None)
+            tb = _nullable_float(row[col_tb] if col_tb is not None and col_tb < len(row) else None)
+            weight = _nullable_int(row[col_weight] if col_weight is not None and col_weight < len(row) else None)
+            hint = str(row[col_hint]).strip() if col_hint is not None and col_hint < len(row) and row[col_hint] else None
+            display = str(row[col_display]).strip() if col_display is not None and col_display < len(row) and row[col_display] else None
+            client_exp = str(row[col_client]).strip() if col_client is not None and col_client < len(row) and row[col_client] else None
+
+            # Parse allowed_values only for Dropdown/Multi-Select — numeric fields
+            # store unit strings in this column which must not be treated as enums.
+            allowed = None
+            if dtype in ("Dropdown", "Multi-Select") and col_allowed is not None and col_allowed < len(row) and row[col_allowed]:
+                raw_av = str(row[col_allowed]).strip()
+                av_list = [v.strip() for v in raw_av.split("|") if v.strip() and v.strip() not in ("…", "")]
+                if av_list:
+                    allowed = av_list
+
+            fields_by_uuid[uuid_str] = {
+                "uuid":             uuid_str,
+                "field_name":       str(fname).strip(),
+                "tender_key":       tkey,
+                "entity":           entity,
+                "sheet":            sheet,
+                "level":            level,
+                "operator":         op,
+                "data_type":        dtype,
+                "unit":             unit,
+                "allowed_values":   allowed,
+                "score_function":   sfunc,
+                "threshold_a":      ta,
+                "threshold_b":      tb,
+                "weight":           weight,
+                "hint":             hint,
+                "user_description": client_exp,
+                "display_mode":     display,
+                "result_card":      bool(col_rc is not None and col_rc < len(row) and row[col_rc]),
+            }
+
+    print(f"  Fields JSON: {len(fields_by_uuid)} entries across {len(DATA_SHEETS)} sheets")
+
+    # Write config/fields.json
+    (CONFIG_DIR / "fields.json").write_text(
+        json.dumps(fields_by_uuid, indent=2, ensure_ascii=False) + "\n"
+    )
+
+    # Write src/field_spec.py as a string template
+    field_spec_src = '''\
+# src/field_spec.py  — GENERATED by scripts/generate_all.py — do not edit manually
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Optional
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).parent.parent
+_FIELDS_JSON = ROOT / "config" / "fields.json"
+
+
+@dataclass
+class FieldSpec:
+    uuid: str
+    field_name: str
+    tender_key: Optional[str]
+    entity: str
+    sheet: str
+    level: Optional[str]
+    operator: Optional[str]
+    data_type: str
+    unit: Optional[str]
+    allowed_values: Optional[list]
+    score_function: Optional[str]
+    threshold_a: Optional[float]
+    threshold_b: Optional[float]
+    weight: Optional[int]
+    hint: Optional[str]
+    user_description: Optional[str]
+    display_mode: Optional[str]
+    result_card: bool = False
+
+
+def load_fields() -> dict[str, FieldSpec]:
+    """Returns all fields keyed by UUID. Asserts UUID uniqueness."""
+    data = json.loads(_FIELDS_JSON.read_text())
+    result = {k: FieldSpec(**v) for k, v in data.items()}
+    assert len(result) == len(data), "Duplicate UUIDs in fields.json"
+    return result
+
+
+def fields_by_tender_key() -> dict[str, list[FieldSpec]]:
+    """Returns fields grouped by tender_key. One key can map to multiple VT-scoped fields.
+    Only includes fields where tender_key is not None."""
+    result: dict[str, list[FieldSpec]] = {}
+    for f in load_fields().values():
+        if f.tender_key:
+            result.setdefault(f.tender_key, []).append(f)
+    return result
+
+
+def fields_by_field_name() -> dict[str, list[FieldSpec]]:
+    """Returns fields grouped by field_name. One name can appear in multiple VT sheets."""
+    result: dict[str, list[FieldSpec]] = {}
+    for f in load_fields().values():
+        result.setdefault(f.field_name, []).append(f)
+    return result
+
+
+def fields_by_sheet(sheet: str) -> list[FieldSpec]:
+    """Returns all fields for a specific sheet (VT-Filter)."""
+    return [f for f in load_fields().values() if f.sheet == sheet]
+'''
+    (ROOT / "src" / "field_spec.py").write_text(field_spec_src, encoding="utf-8")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -1024,12 +1144,11 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         for meta in field_levels.values()
         if meta.get("operator") in ("KO_IF_LT", "KO_IF_GT")
         and meta.get("data_type") in ("Float", "Integer")
-        and "tender_key" in meta
     }
     _missing = _numeric_ko_keys - set(plausibility_raw)
     assert not _missing, (
         f"[FEHLER] Numeric KO-Felder ohne Plausibility-Daten in AP0 xlsx: {_missing}. "
-        "Plausibility Min / Plausibility Max / Tender Unit in der AP0-Tabelle ergänzen."
+        "Plausibility Min / Plausibility Max / Unit in der AP0-Tabelle ergänzen."
     )
 
     platform          = read_platform(wb_platform, platform_path)
@@ -1038,7 +1157,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     # Additional runtime fields derived from AP0 — written to vehicle_types.json so
     # Python code never contains canonical type names or AGV-domain keywords.
 
-    # C-2: canonical type → scoring_weights.json bucket name
+    # C-2: canonical type → vehicle_types.json scoring_bucket_map bucket name
     vehicle_types["scoring_bucket_map"] = {
         canon: bucket
         for canon, bucket in [("Forklift AGV", "forklift_specific"),
@@ -1111,27 +1230,20 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
 
     if dry_run:
         print("\n[DRY RUN] Would write:")
-        print("  config/field_levels.json, vehicle_types.json, scoring_weights.json, nace_codes.json")
-        print("  config/sqlite_schema.json, config/plausibility.json, config/extraction_hints.json")
-        print("  src/generated_models.py")
+        print("  config/vehicle_types.json, nace_codes.json")
+        print("  config/sqlite_schema.json, config/plausibility.json")
         print("  config/prompts/extraction_template.txt (and others)")
         print(f"\nExtraction template preview (first 400 chars):\n{extraction_template[:400]}")
         print(f"\nSQLite companies preview:\n{sqlite_schema['companies'][:400]}")
     else:
         PROMPTS_DIR.mkdir(parents=True, exist_ok=True)
 
-        (CONFIG_DIR / "field_levels.json").write_text(
-            json.dumps(field_levels, indent=2, ensure_ascii=False) + "\n")
         (CONFIG_DIR / "vehicle_types.json").write_text(
             json.dumps(vehicle_types, indent=2, ensure_ascii=False) + "\n")
-        (CONFIG_DIR / "scoring_weights.json").write_text(
-            json.dumps(scoring_weights, indent=2, ensure_ascii=False) + "\n")
         (CONFIG_DIR / "nace_codes.json").write_text(
             json.dumps(nace, indent=2, ensure_ascii=False) + "\n")
         (CONFIG_DIR / "sqlite_schema.json").write_text(
             json.dumps(sqlite_schema, indent=2, ensure_ascii=False) + "\n")
-        (ROOT / "src" / "generated_models.py").write_text(
-            generate_models_py(sqlite_schema), encoding="utf-8")
         (CONFIG_DIR / "plausibility.json").write_text(
             json.dumps(plausibility, indent=2, ensure_ascii=False) + "\n")
 
@@ -1174,17 +1286,6 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             "You are an industrial classification specialist. Pick the single best NACE code from the provided list. Output ONLY valid JSON with exactly the field names shown.")
         (PROMPTS_DIR / "nace_template.txt").write_text(nace_template)
 
-        # extraction_hints.json — maps tender_key → {hint, sheet} for all extraction fields.
-        # Consumed by Pass 4c per-field extraction in app.py.
-        extraction_hints = {
-            f["key"]: {"hint": f["hint"], "sheet": f["sheet"]}
-            for f in extraction_schema
-            if f.get("hint") and f.get("key") and f.get("sheet")
-        }
-        (CONFIG_DIR / "extraction_hints.json").write_text(
-            json.dumps(extraction_hints, indent=2, ensure_ascii=False) + "\n"
-        )
-
         # Sync README from Spec/ (single source of truth within repo) → config/
         # config/industry_readme.md is the runtime copy loaded by context_builder.py.
         readme_spec  = ROOT / "Spec" / "haystacked_industry_readme.md"
@@ -1195,6 +1296,8 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
                 print("  Industry README synced from Spec/")
 
         (CONFIG_DIR / "ap0_checksum.txt").write_text(xlsx_md5)
+
+        emit_fields_json(wb)
 
         print(f"\nWrote all config files. AP0 checksum: {xlsx_md5[:8]}…")
 

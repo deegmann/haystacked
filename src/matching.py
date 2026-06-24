@@ -1,7 +1,7 @@
 """
 AP-D1 — Data-Driven Matching Engine.
 
-Matching operators are defined in config/field_levels.json, which is generated
+Matching operators are defined in config/fields.json, which is generated
 from the AP0 xlsx (single source of truth). This file contains NO domain
 knowledge — it is a pure rule engine interpreter.
 
@@ -30,29 +30,14 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from src.models import Extension, Product, SupplierRecord
+from src.models import FieldValue, Product, SupplierRecord
+from src.field_spec import FieldSpec, load_fields, fields_by_sheet, fields_by_field_name
 
 CONFIG_DIR = Path(__file__).parent.parent / "config"
 NULL_KO_PENALTY = 15
 
 
 # ── Config loading ────────────────────────────────────────────────────────────
-
-def _load_field_levels() -> dict:
-    p = CONFIG_DIR / "field_levels.json"
-    if p.exists():
-        with open(p) as f:
-            return json.load(f)
-    return {}
-
-
-def _load_weights() -> dict:
-    p = CONFIG_DIR / "scoring_weights.json"
-    if p.exists():
-        with open(p) as f:
-            return json.load(f)
-    return {}
-
 
 def _load_vehicle_types() -> dict:
     p = CONFIG_DIR / "vehicle_types.json"
@@ -62,16 +47,24 @@ def _load_vehicle_types() -> dict:
     return {}
 
 
-_field_levels = _load_field_levels()
-_SCORING_BUCKET_MAP: dict = _load_vehicle_types().get("scoring_bucket_map", {})
-_RESULT_CARD_FIELDS: tuple = tuple(k for k, v in _field_levels.items() if v.get("result_card"))
+_fields = load_fields()  # dict[str, FieldSpec], keyed by UUID
+_SHARED_SHEET: str = _load_vehicle_types().get("shared_sheet_name", "")
+assert _SHARED_SHEET, "vehicle_types.json missing 'shared_sheet_name' — run generate_all.py"
+_RESULT_CARD_FIELDS: tuple = tuple(f.field_name for f in _fields.values() if f.result_card)
+
+# Guardian S2: Startup-Assertion — every vt_map value must have a sheet in fields.json
+_vt_sheets = {f.sheet for f in _fields.values()}
+_vt_map_values = set(_load_vehicle_types().get("vt_map", {}).values())
+assert _vt_map_values <= _vt_sheets, (
+    f"vt_map values without a fields.json sheet: {_vt_map_values - _vt_sheets}"
+)
 
 
 def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
     """Validate LLM-extracted tender values against AP0 allowed_values.
 
     For Dropdown and Multi-Select fields that have an allowed_values list in
-    field_levels.json (generated from AP0), any extracted value not matching
+    fields.json (generated from AP0), any extracted value not matching
     an allowed entry is set to None.  This catches LLM hallucinations like
     'Floor delivery' where the AP0 requires 'Pallet EUR | Pallet ISO | …'.
 
@@ -84,12 +77,12 @@ def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
     warnings = []
 
     # Fields that are normalized by app.py after extraction — skip AP0 filter for them
-    _SKIP_FILTER = {"required_vehicle_type", "required_vna", "required_outdoor"}
+    _SKIP_FILTER = {"required_agv_type", "required_vna_capable", "required_outdoor_capable"}
 
-    for field, meta in _field_levels.items():
-        allowed = meta.get("allowed_values")
-        tender_key = meta.get("tender_key", field)
-        if not allowed or tender_key in _SKIP_FILTER:
+    for field_spec in _fields.values():
+        allowed = field_spec.allowed_values
+        tender_key = field_spec.tender_key
+        if not allowed or not tender_key or tender_key in _SKIP_FILTER:
             continue
         val = cleaned.get(tender_key)
         if val is None:
@@ -264,29 +257,44 @@ _COERCE = {
 
 
 class TenderRequirements:
-    """Requirements parsed from the LLM extraction step.
+    """Wraps a TenderRun for use by the matching engine.
+    Use from_dict() for ephemeral dict-based callers (/rematch, /match endpoints)."""
 
-    Data-driven: field → tender_key and data_type come from field_levels.json
-    (generated from AP0 xlsx). No domain knowledge is hardcoded here.
+    def __init__(self, run: "TenderRun"):
+        self._run = run
 
-    The rule engine calls req.get("navigation_type") and this class resolves
-    the AP0 tender_key ("required_navigation") against the raw dict, then
-    coerces to the correct type per AP0 data_type column.
-    """
+    @classmethod
+    def from_dict(cls, raw: dict) -> "TenderRequirements":
+        """Build from a UUID-keyed criteria dict (for /match and /rematch endpoints)."""
+        from src.models import TenderRun, ExtractionValue
+        values = {
+            k: ExtractionValue(spec=None, value=v, source=None)
+            for k, v in raw.items()
+            if not str(k).endswith("_source") and not str(k).startswith("_")
+        }
+        run = TenderRun(
+            run_id="ephemeral", source_file="", captured_at="",
+            vehicle_type=None, in_scope=True,
+            values=values, basic_info={},
+        )
+        return cls(run)
 
-    def __init__(self, raw: dict):
-        self.raw = raw
-
-    def get(self, field: str):
-        """Resolve AP0 field name → tender_key → raw value with type coercion."""
-        meta = _field_levels.get(field, {})
-        tender_key = meta.get("tender_key", field)
-        raw_val = self.raw.get(tender_key)
-        if raw_val is None:
-            raw_val = self.raw.get(field)
-        data_type = meta.get("data_type", "Text")
-        coerce = _COERCE.get(data_type, lambda v: v)
-        return coerce(raw_val)
+    def get(self, field_name: str):
+        """Return the tender value for a field by AP0 field_name.
+        Resolves field_name → uuid(s) via fields_by_field_name(), returns first non-None.
+        Falls back to direct key lookup for non-UUID-keyed from_dict callers."""
+        by_name = fields_by_field_name()
+        specs = by_name.get(field_name, [])
+        for spec in specs:
+            ev = self._run.values.get(spec.uuid)
+            if ev is not None and ev.value is not None:
+                return ev.value
+        # Fallback: direct key lookup (from_dict may store values under field_name or tender_key)
+        ev = self._run.values.get(field_name)
+        if ev is not None and ev.value is not None:
+            data_type = specs[0].data_type if specs else "Text"
+            return _COERCE.get(data_type, lambda v: v)(ev.value)
+        return None
 
 
 # ── Match result ──────────────────────────────────────────────────────────────
@@ -311,8 +319,8 @@ class MatchResult:
         return self.record.product.company_name or ""
 
     def to_dict(self) -> dict:
-        ext  = self.record.extension
-        prod = self.record.product
+        values = self.record.values
+        prod   = self.record.product
         return {
             "product":         self.product_name,
             "company":         self.company_name,
@@ -322,46 +330,36 @@ class MatchResult:
             "disqualified":    self.disqualified,
             "disqualified_by": self.disqualified_by,
             "score_details":   self.score_details,
-            "agv_type":        ext.agv_type,
+            "agv_type":        prod.agv_type,
             "reasons":         [f"{d['field']}: +{d['points']} pts" for d in self.score_details if d['points'] > 0],
             "knockouts":       self.disqualified_by,
             "website":         prod.website if hasattr(prod, "website") and prod.website else "",
             "origin":          prod.country or "",
             "description":     prod.product_description or "",
             **{
-                field: (
-                    " | ".join(v) if isinstance(v := _supplier_val(ext, prod, field), list) else v
+                field_spec.field_name: (
+                    " | ".join(v) if isinstance(v := _supplier_val(values, prod, field_spec), list) else v
                 )
-                for field in _RESULT_CARD_FIELDS
+                for field_spec in _fields.values() if field_spec.result_card
             },
         }
 
 
 # ── Supplier field accessor ───────────────────────────────────────────────────
 
-def _supplier_val(ext: Extension, prod: Product, field: str):
-    """Get field value from supplier record — checks Extension first, then Product."""
-    val = getattr(ext, field, None)
-    if val is None:
-        val = getattr(prod, field, None)
-    return val
+def _supplier_val(values: dict[str, FieldValue], prod: Product, spec: FieldSpec):
+    fv = values.get(spec.uuid)
+    if fv is not None:
+        return fv.value
+    # Fallback: product-level fields not yet in values dict
+    return getattr(prod, spec.field_name, None)
 
 
 # ── Main matcher ──────────────────────────────────────────────────────────────
 
 class Matcher:
     def __init__(self):
-        self.weights = _load_weights()
-
-    def _w(self, key: str, agv_type: str) -> int:
-        """Weight lookup — reads scoring_bucket_map from vehicle_types.json (C-2)."""
-        bucket   = _SCORING_BUCKET_MAP.get(agv_type, "")
-        default  = self.weights.get("default",  {}).get(key, {})
-        specific = self.weights.get(bucket,     {}).get(key, {})
-        entry = specific if specific else default
-        if isinstance(entry, dict):
-            return entry.get("weight", 0)
-        return int(entry) if entry else 0
+        pass
 
     def match(self, suppliers: list[SupplierRecord], req: TenderRequirements, top_n: int = 10) -> tuple[list[MatchResult], list[MatchResult]]:
         results = [self._score_one(rec, req) for rec in suppliers]
@@ -372,9 +370,9 @@ class Matcher:
         return (qualified + disqualified)[:top_n], qualified + disqualified
 
     def _score_one(self, rec: SupplierRecord, req: TenderRequirements) -> MatchResult:
-        r   = MatchResult(rec)
-        ext = rec.extension
-        prod= rec.product
+        r      = MatchResult(rec)
+        values = rec.values
+        prod   = rec.product
 
         def ko_fail(msg: str):
             r.disqualified = True
@@ -388,10 +386,14 @@ class Matcher:
         def add_max(pts: int):
             r.max_score += pts
 
-        # ── K.O. and Cond. K.O. rules (data-driven from field_levels.json) ───
-        for field, meta in _field_levels.items():
-            level    = meta.get("level")
-            operator = meta.get("operator")
+        # ── OI-47: only SHARED + VT-specific fields of the supplier ──────────
+        vt_sheet = prod.agv_type  # e.g. "Forklift AGV"
+        relevant = fields_by_sheet(_SHARED_SHEET) + fields_by_sheet(vt_sheet)
+
+        # ── K.O. and Cond. K.O. rules (data-driven from fields.json) ─────────
+        for field_spec in relevant:
+            level    = field_spec.level
+            operator = field_spec.operator
 
             if level not in ("KO", "COND_KO") or not operator:
                 continue
@@ -400,12 +402,12 @@ class Matcher:
             if not op_fn:
                 continue
 
-            tender_val   = req.get(field)
-            supplier_val = _supplier_val(ext, prod, field)
+            tender_val   = req.get(field_spec.field_name)
+            supplier_val = _supplier_val(values, prod, field_spec)
 
             failed, msg = op_fn(tender_val, supplier_val)
             if failed:
-                ko_fail(f"{field}: {msg}")
+                ko_fail(f"{field_spec.field_name}: {msg}")
                 if level == "KO":
                     return r  # hard K.O. — stop evaluating immediately
 
@@ -416,72 +418,66 @@ class Matcher:
         # Numeric KO fields where tender has a requirement but supplier has no data:
         # not excluded (LL-06), but penalised to rank confirmed suppliers higher.
         NUMERIC_OPS = {"KO_IF_LT", "KO_IF_GT"}
-        for field, meta in _field_levels.items():
-            if meta.get("level") != "KO" or meta.get("operator") not in NUMERIC_OPS:
+        for field_spec in relevant:
+            if field_spec.level != "KO" or field_spec.operator not in NUMERIC_OPS:
                 continue
-            if req.get(field) is not None and _supplier_val(ext, prod, field) is None:
-                add_score(-NULL_KO_PENALTY, f"{field}_null_penalty", None)
+            if req.get(field_spec.field_name) is not None and _supplier_val(values, prod, field_spec) is None:
+                add_score(-NULL_KO_PENALTY, f"{field_spec.field_name}_null_penalty", None)
 
-        # ── Scoring (data-driven from scoring_weights.json + vehicle_types.json) ─
+        # ── Scoring (data-driven from fields.json) ────────────────────────────
         # No hardcoded AGV type names or numeric thresholds — all from AP0 via config.
-        agv_t  = ext.agv_type
-        bucket = _SCORING_BUCKET_MAP.get(agv_t, "")
+        for field_spec in relevant:
+            if not field_spec.weight:
+                continue
+            pts  = field_spec.weight
+            rule = field_spec.score_function or "bool"
+            t1   = field_spec.threshold_a
+            t2   = field_spec.threshold_b
+            val  = _supplier_val(values, prod, field_spec)
 
-        for section in ("default", bucket):
-            for field, cfg in self.weights.get(section, {}).items():
-                if not isinstance(cfg, dict):
-                    continue
-                pts  = cfg.get("weight", 0)
-                rule = cfg.get("rule", "bool")
-                val  = _supplier_val(ext, prod, field)
-
-                if rule == "bool_cond":
-                    # Score full pts if tender requires this field, else deduct 2.
-                    add_max(pts)
-                    if val is True:
-                        cond_met = str(req.get(field) or "").lower() == "required"
-                        add_score(pts if cond_met else max(0, pts - 2), field, val)
-                elif rule == "proportional":
-                    add_max(pts)
-                    if val is not None and val > 0:
-                        max_count = cfg.get("t1", 20)
-                        add_score(
-                            min(pts, int(pts * min(val / max_count, 1.0))), field, val
-                        )
-                elif rule == "bool":
-                    add_max(pts)
-                    if val is True:
-                        add_score(pts, field, val)
-                elif rule == "nonempty":
-                    add_max(pts)
-                    if val:
-                        add_score(pts, field, val)
-                elif rule == "threshold_lower":
-                    add_max(pts)
-                    t1 = cfg.get("t1")
-                    if val is not None and t1 is not None and val <= t1:
-                        add_score(pts, field, val)
-                elif rule == "threshold_upper":
-                    add_max(pts)
-                    t1 = cfg.get("t1")
-                    if val is not None and t1 is not None:
-                        add_score(pts if val >= t1 else pts // 2, field, val)
-                elif rule == "tiered_lower":
-                    add_max(pts)
-                    t1, t2 = cfg.get("t1"), cfg.get("t2")
-                    if val is not None and t1 is not None and t2 is not None:
-                        add_score(
-                            pts if val <= t1 else (pts // 2 if val <= t2 else 0),
-                            field, val,
-                        )
-                elif rule == "tiered_upper":
-                    add_max(pts)
-                    t1, t2 = cfg.get("t1"), cfg.get("t2")
-                    if val is not None and t1 is not None and t2 is not None:
-                        add_score(
-                            pts if val >= t1 else (pts // 2 if val >= t2 else 0),
-                            field, val,
-                        )
+            if rule == "bool_cond":
+                # Score full pts if tender requires this field, else deduct 2.
+                add_max(pts)
+                if val is True:
+                    cond_met = str(req.get(field_spec.field_name) or "").lower() == "required"
+                    add_score(pts if cond_met else max(0, pts - 2), field_spec.field_name, val)
+            elif rule == "proportional":
+                add_max(pts)
+                if val is not None and val > 0:
+                    max_count = t1 if t1 is not None else 20
+                    add_score(
+                        min(pts, int(pts * min(val / max_count, 1.0))), field_spec.field_name, val
+                    )
+            elif rule == "bool":
+                add_max(pts)
+                if val is True:
+                    add_score(pts, field_spec.field_name, val)
+            elif rule == "nonempty":
+                add_max(pts)
+                if val:
+                    add_score(pts, field_spec.field_name, val)
+            elif rule == "threshold_lower":
+                add_max(pts)
+                if val is not None and t1 is not None and val <= t1:
+                    add_score(pts, field_spec.field_name, val)
+            elif rule == "threshold_upper":
+                add_max(pts)
+                if val is not None and t1 is not None:
+                    add_score(pts if val >= t1 else pts // 2, field_spec.field_name, val)
+            elif rule == "tiered_lower":
+                add_max(pts)
+                if val is not None and t1 is not None and t2 is not None:
+                    add_score(
+                        pts if val <= t1 else (pts // 2 if val <= t2 else 0),
+                        field_spec.field_name, val,
+                    )
+            elif rule == "tiered_upper":
+                add_max(pts)
+                if val is not None and t1 is not None and t2 is not None:
+                    add_score(
+                        pts if val >= t1 else (pts // 2 if val >= t2 else 0),
+                        field_spec.field_name, val,
+                    )
 
         return r
 
@@ -490,11 +486,10 @@ _matcher = Matcher()
 
 
 def match_suppliers_new(
-    req_dict: dict,
+    req: TenderRequirements,
     suppliers: list[SupplierRecord],
     top_n: int = 10,
-) -> tuple[list[dict], list[dict]]:
+) -> tuple[list[MatchResult], list[MatchResult]]:
     """Public API used by app.py."""
-    req = TenderRequirements(req_dict)
-    top, all_results = _matcher.match(suppliers, req, top_n=top_n)
-    return [r.to_dict() for r in top], [r.to_dict() for r in all_results]
+    matcher = Matcher()
+    return matcher.match(suppliers, req, top_n=top_n)

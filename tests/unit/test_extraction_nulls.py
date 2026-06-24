@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 def test_U_E_05_null_lift_height_survives_plausibility_filter():
     """
-    A null required_max_lift_height_m must pass through validate_agv_criteria
+    A null required_lifting_height_mm must pass through validate_agv_criteria
     unchanged — the plausibility filter must not coerce null to a default value.
 
     This verifies LL-06 (Blank ≠ Zero) is upheld in the post-LLM validation step.
@@ -29,14 +29,14 @@ def test_U_E_05_null_lift_height_survives_plausibility_filter():
     from app import validate_agv_criteria
 
     criteria = {
-        "required_vehicle_type": "Forklift AGV",
-        "required_max_lift_height_m": None,
-        "required_min_aisle_width_m": 1.9,
-        "required_weight_capacity_kg": 1000,
+        "required_agv_type": "Forklift AGV",
+        "required_lifting_height_mm": None,
+        "required_min_aisle_width_mm": 1.9,
+        "required_max_payload_kg": 1000,
     }
     validated, warnings = validate_agv_criteria(criteria)
-    assert validated.get("required_max_lift_height_m") is None, (
-        "validate_agv_criteria must not fill a null required_max_lift_height_m "
+    assert validated.get("required_lifting_height_mm") is None, (
+        "validate_agv_criteria must not fill a null required_lifting_height_mm "
         "with a default value (LL-06: Blank ≠ Zero)."
     )
 
@@ -79,21 +79,21 @@ def test_U_E_06_source_confirms_value():
 
 def test_U_E_07_numeric_ko_tender_keys_non_empty():
     """
-    _NUMERIC_KO_TENDER_KEYS must be non-empty after loading field_levels.json.
+    _NUMERIC_KO_TENDER_KEYS must be non-empty after loading fields.json.
 
     If empty, source-span enforcement and Pass 4c are silently inactive.
-    This test catches a missing or stale field_levels.json before a run.
+    This test catches a missing or stale fields.json before a run.
     """
     from app import _NUMERIC_KO_TENDER_KEYS
 
     assert len(_NUMERIC_KO_TENDER_KEYS) > 0, (
-        "_NUMERIC_KO_TENDER_KEYS is empty — field_levels.json may be missing or "
+        "_NUMERIC_KO_TENDER_KEYS is empty — fields.json may be missing or "
         "has no KO_IF_LT/KO_IF_GT Float/Integer fields. Run generate_all.py."
     )
-    assert "required_weight_capacity_kg" in _NUMERIC_KO_TENDER_KEYS, (
-        "required_weight_capacity_kg missing from _NUMERIC_KO_TENDER_KEYS — "
-        "check field_levels.json tender_key mapping for max_payload_kg."
+    assert "required_max_payload_kg" in _NUMERIC_KO_TENDER_KEYS, (
+        "required_max_payload_kg missing from _NUMERIC_KO_TENDER_KEYS — "
+        "check fields.json tender_key mapping for max_payload_kg."
     )
-    assert "required_max_lift_height_m" in _NUMERIC_KO_TENDER_KEYS, (
-        "required_max_lift_height_m missing from _NUMERIC_KO_TENDER_KEYS."
+    assert "required_lifting_height_mm" in _NUMERIC_KO_TENDER_KEYS, (
+        "required_lifting_height_mm missing from _NUMERIC_KO_TENDER_KEYS."
     )

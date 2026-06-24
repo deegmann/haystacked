@@ -1,14 +1,11 @@
 """
 Data models for the haystacked matching engine.
 All fields use None for unknown — never 0 or [] to represent missing data.
-
-Extension is generated from AP0 schema — see src/generated_models.py.
-To add/change Extension fields: edit the AP0 xlsx, run generate_all.py.
 """
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, Optional
 
-from src.generated_models import Extension  # noqa: F401 — re-exported for callers
+from src.field_spec import FieldSpec
 
 
 @dataclass
@@ -51,10 +48,36 @@ class Product:
 
 
 @dataclass
+class FieldValue:
+    """One supplier capability value, self-describing via its FieldSpec."""
+    spec: FieldSpec
+    value: Any  # coerced to correct Python type; None if unknown
+
+
+@dataclass
+class ExtractionValue:
+    """One LLM-extracted field value. spec is frozen at time of run."""
+    spec: Optional[FieldSpec]  # None only for orphaned UUIDs (AP0 field removed after run)
+    value: Any
+    source: Optional[str]
+
+@dataclass
+class TenderRun:
+    """Complete record of one tender analysis pipeline run."""
+    run_id: str
+    source_file: str
+    captured_at: str
+    vehicle_type: Optional[str]  # display label only — never use for config/AP0 lookup
+    in_scope: bool
+    values: dict[str, ExtractionValue]  # uuid → ExtractionValue
+    basic_info: dict                    # buyer, project_name, summary etc. (allowlisted keys)
+
+
+@dataclass
 class SupplierRecord:
-    """Fully joined view: product + company + extension."""
-    product:   Product
-    extension: Extension
+    """Fully joined view: product + company + all AP0 fields."""
+    product: Product
+    values: dict[str, FieldValue]  # uuid → FieldValue, covers ALL AP0 fields
 
     @property
     def display_name(self) -> str:

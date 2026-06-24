@@ -74,14 +74,12 @@ pytest tests/unit/test_matching_logic.py::test_U_M_01_ko_payload_too_low -v
 - LLM extraction hints (Description column → prompt text)
 
 **`scripts/generate_all.py`** reads both AP0 xlsx and `Spec/haystacked_platform_config.xlsx` (NACE codes, scope) and writes all files under `config/`. **Never edit generated files directly** — changes will be overwritten. Files that are always generated (never edit manually):
-- `config/field_levels.json` — operator rules consumed by `src/matching.py`
+- `config/fields.json` — all field definitions keyed by UUID; consumed by `src/field_spec.py` and all runtime consumers
+- `src/field_spec.py` — `FieldSpec` dataclass + `load_fields()`, `fields_by_tender_key()`, `fields_by_field_name()`, `fields_by_sheet()` helpers
 - `config/vehicle_types.json` — vehicle type map, VNA detection, keyword fallback
-- `config/scoring_weights.json`
 - `config/nace_codes.json`
 - `config/plausibility.json`
 - `config/sqlite_schema.json` — CREATE TABLE SQL + field type lists consumed by `sync_airtable.py` and `src/data_loader.py`
-- `src/generated_models.py` — `Extension` dataclass generated from AP0 Entity Model; imported by `src/models.py`
-- `config/extraction_hints.json` — tender_key → {hint, sheet} map consumed by Pass 4c in `app.py`
 - `config/prompts/*.txt` — all LLM prompt files, especially `extraction_template.txt`
 
 At startup, `app.py` checksums the AP0 xlsx and auto-regenerates all config if it changed.
@@ -128,13 +126,13 @@ PDF upload
 
 Module-level constants built from config at startup:
 - `_NUMERIC_KO_TENDER_KEYS` — frozenset of tender keys subject to source-span guard; asserted non-empty.
-- `_NUMERIC_KO_FIELD_HINTS` — subset of extraction_hints for Pass 4c prompt construction.
+- `_NUMERIC_KO_FIELD_HINTS` — subset of fields.json (numeric KO fields with hint+sheet) for Pass 4c prompt construction.
 - `_4C_EXTRACTION_DIRECTION` — maps tender_key → extraction direction string (from operator: KO_IF_LT → MAXIMUM, KO_IF_GT → MINIMUM).
 - `_SHARED_SHEET` — AP0 shared sheet name from `vehicle_types.json`; never hardcoded in Python.
 
 ### Matching Engine (`src/matching.py`)
 
-Pure rule engine — no domain knowledge hardcoded. Reads all rules from `config/field_levels.json`.
+Pure rule engine — no domain knowledge hardcoded. Reads all rules from `config/fields.json` via `src/field_spec.py`.
 
 **Operators:** `KO_IF_LT`, `KO_IF_GT`, `KO_IF_NEQ`, `KO_BOOL_REQUIRED`, `KO_BOOL_EXCLUSIVE`, `KO_SUBSET`
 
@@ -148,7 +146,7 @@ Pure rule engine — no domain knowledge hardcoded. Reads all rules from `config
 
 - **`data/haystacked.db`** — SQLite, populated by `sync_airtable.py`. Schema generated from AP0 Entity Model sheet.
 - **`src/data_loader.py`** — 3-way JOIN: `products ⋈ companies ⋈ base_model_extensions`, returns `list[SupplierRecord]`. Loads only `active=1` records.
-- **`src/models.py`** — Dataclasses: `Company`, `Product`, `Extension`, `SupplierRecord`. `None` (never `0` or `[]`) represents unknown values.
+- **`src/models.py`** — Dataclasses: `Company`, `Product`, `FieldValue`, `SupplierRecord`. `None` (never `0` or `[]`) represents unknown values.
 - Multi-select fields stored as pipe-separated strings in SQLite; `_parse_multiselect()` splits on `|`.
 
 ### Vehicle Type Logic
@@ -157,13 +155,13 @@ Vehicle types go through two normalization layers in `app.py`:
 1. LLM output string → canonical type via `vehicle_types.json` vt_map (e.g. `"vna"` → `"Forklift AGV"`)
 2. Text-override regexes from `vehicle_types.json` (e.g. pattern "schmalgangstapler" → force VNA)
 
-VNA detection sets `required_vna = "required"` which triggers `KO_BOOL_EXCLUSIVE` — VNA suppliers pass only VNA tenders, and non-VNA tenders exclude VNA suppliers.
+VNA detection sets `required_vna_capable = "required"` which triggers `KO_BOOL_EXCLUSIVE` — VNA suppliers pass only VNA tenders, and non-VNA tenders exclude VNA suppliers.
 
 ### Context Builder (`src/context_builder.py`)
 
 Builds the LLM system prompt for AGV extraction by concatenating:
 - `config/industry_readme.md` (domain knowledge — synced from `Spec/haystacked_industry_readme.md`)
-- K.O. field descriptions from `config/field_levels.json`
+- K.O. field names and levels from `config/fields.json` via `src/field_spec.py`
 - Critical matching rules
 
 The industry README is the primary domain knowledge source. Edit `Spec/haystacked_industry_readme.md`; `generate_all.py` syncs it to `config/`.
@@ -182,7 +180,7 @@ All prompts live in `config/prompts/*.txt`. The `_fill()` function in `app.py` r
 
 - **Blank ≠ Zero**: `None` means unknown, never absent capability. Never infer a supplier lacks a feature because the field is `None`.
 - **No industry logic in Python**: all field definitions, operators, scoring, vehicle types, extraction hints, and extraction directions come from AP0 xlsx via `generate_all.py`.
-- `extraction_template.txt` and `extraction_hints.json` are always generated — never manually edit them.
+- `extraction_template.txt` and `fields.json` are always generated — never manually edit them.
 - After any AP0 xlsx change: run `python3 scripts/generate_all.py` before testing.
 - **No numeric literals in AP0 Description cells**: a 7B model copies example numbers as hallucinations. Describe patterns verbally (e.g. "a maximum of X kg" not "a maximum of 1000 kg").
 - **`source_confirms_value()` is field-agnostic** (`src/json_repair.py`): it contains no field names, no AP0 allowed-value lists, no domain knowledge. Never add field-specific logic to it.
