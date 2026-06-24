@@ -22,422 +22,406 @@ UI_HINTS = {
 
     # K.O. fields
     "max_payload_kg": (
-        "Wie hoch ist die maximale Nutzlast pro Ladungsträger? "
-        "Das AGV muss mindestens dieses Gewicht tragen können (kg)."
+        "What is the maximum load weight per carrier? The AGV must be able to carry at least this weight."
     ),
     "load_type": (
-        "Welche Ladungsträgertypen werden transportiert? "
-        "(z. B. Europalette, Gitterbox, Behälter — alle zutreffenden auswählen)"
+        "What type of load carriers will be transported? (e.g. Euro pallet, wire mesh box, container)"
     ),
     "agv_type": (
-        "Welcher AGV-Typ ist erforderlich? (wird automatisch aus der Ausschreibung erkannt)"
+        "What AGV type is required? (automatically detected from the document)"
     ),
 
     # Cond. K.O. fields
     "navigation_type": (
-        "Welche Navigationsart ist vorgesehen oder erlaubt? "
-        "(z. B. Natural Feature/SLAM, Magnetband, QR-Code)"
+        "What navigation type is intended or allowed? (e.g. Natural Feature/SLAM, magnetic tape, QR code)"
     ),
     "infrastructure_required": (
-        "Ist die Installation von Infrastruktur akzeptabel? "
-        "(z. B. Leitdrähte, Reflektoren, QR-Codes)"
+        "Is installation of infrastructure (guide wires, reflectors, QR codes) acceptable or explicitly not desired?"
     ),
     "outdoor_capable": (
-        "Wird Außenbetrieb benötigt?"
+        "Is outdoor operation required?"
     ),
     "multi_load_compatibility": (
-        "Muss das AGV mehrere Ladungsträger gleichzeitig transportieren können?"
+        "Must the AGV be able to transport multiple load carriers simultaneously?"
     ),
     "operating_temp_min_c": (
-        "Wie kalt wird es am Betriebsort mindestens? (°C; z. B. –20 °C für Tiefkühlbereich)"
+        "What is the minimum temperature at the operating site? (°C; e.g. -20°C for cold storage)"
     ),
     "operating_temp_max_c": (
-        "Wie warm wird es am Betriebsort maximal? (°C; z. B. 30 °C für Produktionshalle)"
+        "What is the maximum temperature at the operating site? (°C; e.g. 30°C for production hall)"
     ),
     "operating_humidity_max_pct": (
-        "Wie hoch ist die maximale relative Luftfeuchtigkeit am Betriebsort? (%)"
+        "What is the maximum relative humidity at the operating site? (%)"
     ),
     "ingress_protection_rating": (
-        "Welche Schutzklasse (IP-Klasse) ist am Betriebsort erforderlich? "
-        "(z. B. IP54 für Spritzwasserschutz)"
+        "What ingress protection rating (IP class) is required at the operating site? (e.g. IP54 for splash water protection)"
     ),
     "cleanroom_class": (
-        "Gibt es Reinraumanforderungen am Betriebsort? "
-        "(ISO-Klasse; nur ausfüllen wenn Reinraum vorhanden)"
+        "Are there cleanroom requirements at the operating site? (ISO class; only fill in if cleanroom is present)"
     ),
     "max_gradient_pct": (
-        "Wie steil ist die steilste Fahrstrecke im Betriebsbereich? "
-        "(% Steigung; z. B. 1,5 für eine 1,5-%-Rampe)"
+        "How steep is the steepest driving route in the operating area? (% gradient; e.g. 1.5 for a 1.5% ramp)"
     ),
     "floor_flatness_req": (
-        "Gibt es besondere Anforderungen an die Bodenqualität oder -ebenheit?"
+        "Are there special requirements for floor quality or flatness?"
     ),
     "fleet_management_system": (
-        "Gibt es ein bestehendes Flottenleitsystem, das kompatibel sein muss?"
+        "Is there an existing fleet management system that must be compatible?"
     ),
     "vda5050_compatible": (
-        "Muss das AGV den VDA-5050-Standard für Schnittstellen unterstützen?"
+        "Must the AGV support the VDA 5050 interface standard?"
     ),
     "station_applications": (
-        "Welche speziellen Stationsanwendungen werden benötigt? "
-        "(z. B. Ladestation, Übergabestation)"
+        "What special station applications are required? (e.g. charging station, transfer station)"
     ),
     "service_coverage": (
-        "In welchen Ländern oder Regionen ist Service und Support erforderlich?"
+        "In which countries or regions is service and support required?"
     ),
     "country": (
-        "In welchem Land befindet sich der Betriebsort?"
+        "In which country is the operating site located?"
     ),
     "languages_spoken": (
-        "Welche Sprache(n) muss der Hersteller für Support und Dokumentation beherrschen?"
+        "Which language(s) must the manufacturer support for service and documentation?"
     ),
 
     # Scoring fields
     "autonomous_obstacle_bypass": (
-        "Kann das AGV Hindernissen eigenständig ausweichen ohne anzuhalten?"
+        "Can the AGV autonomously navigate around obstacles?"
     ),
     "omnidirectional_movement": (
-        "Muss das AGV in alle Richtungen ohne Wenden fahren können (omnidirektional)?"
+        "Must the AGV be able to move in all directions without turning (omnidirectional)?"
     ),
     "max_speed_ms": (
-        "Wie schnell soll das AGV maximal fahren? (m/s; z. B. 1,5 m/s)"
+        "What maximum speed should the AGV achieve? (m/s)"
     ),
     "stop_accuracy_mm": (
-        "Wie präzise muss das AGV an Übergabe- oder Aufnahmepunkten positionieren? "
-        "(mm zulässige Abweichung)"
+        "How precisely must the AGV position at transfer or pickup points? (mm deviation)"
     ),
     "battery_type": (
-        "Welcher Batterietyp ist bevorzugt oder erforderlich?"
+        "What battery type is preferred or required?"
     ),
     "battery_runtime_h": (
-        "Wie viele Stunden Betriebszeit pro Ladung werden mindestens benötigt? (h)"
+        "How many hours of operating time per charge are required as a minimum? (h)"
     ),
     "charge_time_min": (
-        "Wie lange darf ein vollständiger Ladevorgang maximal dauern? (min)"
+        "What is the maximum acceptable duration of a full charging cycle? (min)"
     ),
     "autonomous_charging": (
-        "Muss das AGV eigenständig zur Ladestation fahren und automatisch laden?"
+        "Must the AGV autonomously navigate to the charging station and charge itself?"
     ),
     "battery_swap_capable": (
-        "Ist ein schneller manueller Akkuwechsel statt Laden gewünscht?"
+        "Is fast manual battery swapping desired instead of charging?"
     ),
     "safety_standard": (
-        "Welche Sicherheitsnormen müssen erfüllt sein? (z. B. EN ISO 3691-4)"
+        "Which safety standards must be met? (e.g. EN ISO 3691-4)"
     ),
     "functional_safety_level": (
-        "Welches funktionale Sicherheitsniveau ist gefordert? (z. B. PLd, SIL2)"
+        "What functional safety level is required? (e.g. PLd, SIL2)"
     ),
     "safety_coverage": (
-        "Welche Bereiche rund um das Fahrzeug müssen durch Sicherheitssensorik abgedeckt werden?"
+        "Which areas must be covered by safety sensors?"
     ),
     "fleet_control_architecture": (
-        "Welche Steuerungsarchitektur ist für die Flotte vorgesehen? "
-        "(z. B. zentralisiert, dezentralisiert)"
+        "What control architecture is intended for the fleet? (centralised, decentralised)"
     ),
     "max_fleet_size": (
-        "Wie viele AGVs sollen gleichzeitig im Einsatz sein?"
+        "How many AGVs should be in simultaneous operation?"
     ),
     "multi_fleet_capable": (
-        "Müssen AGVs verschiedener Hersteller im selben Bereich kooperieren können?"
+        "Must AGVs from different manufacturers be able to coexist in the same area?"
     ),
     "integration_capability": (
-        "Mit welchen bestehenden Systemen muss das AGV integriert werden? (WMS, ERP, MES)"
+        "Which existing systems must the AGV integrate with? (WMS, ERP, MES)"
     ),
     "installation_process": (
-        "Gibt es besondere Anforderungen an den Installationsprozess des AGV-Systems?"
+        "Are there requirements for the installation process of the AGV system?"
     ),
     "modification_process": (
-        "Wie einfach müssen spätere Anpassungen oder Erweiterungen möglich sein?"
+        "How easy must later modifications or expansions be?"
     ),
     "reference_count": (
-        "Anzahl der Referenzprojekte des Anbieters (wird automatisch befüllt)"
+        "Number of reference projects from the supplier. (filled automatically)"
     ),
     "lead_time_weeks": (
-        "Wie viele Wochen Vorlaufzeit bis zur Inbetriebnahme sind akzeptabel?"
+        "How many weeks lead time until commissioning is acceptable?"
     ),
     "employee_count_range": (
-        "Mitarbeiteranzahl des Herstellers (wird automatisch befüllt)"
+        "Number of employees at the manufacturer. (filled automatically)"
     ),
     "certifications_generic": (
-        "Welche Zertifizierungen muss der Hersteller nachweisen? (z. B. ISO 9001)"
+        "Which certifications must the manufacturer hold? (e.g. ISO 9001)"
     ),
 
     # Context fields
     "length_mm": (
-        "Wie lang ist das Fahrzeug? (mm; nur zur Information)"
+        "Vehicle length. (mm; for reference only)"
     ),
     "width_mm": (
-        "Wie breit ist das Fahrzeug? (mm; nur zur Information)"
+        "Vehicle width. (mm; for reference only)"
     ),
     "min_fleet_size": (
-        "Wie viele AGVs werden mindestens benötigt?"
+        "How many AGVs are needed as a minimum?"
     ),
     "typical_project_value_eur": (
-        "Welches Budget steht für das AGV-Projekt zur Verfügung? (EUR)"
+        "What budget is available for the AGV project? (EUR)"
     ),
     "manual_usage": (
-        "Soll das Fahrzeug auch manuell bedienbar sein?"
+        "Should the vehicle also be manually operable?"
     ),
     "industries_served": (
-        "In welcher Branche wird das AGV eingesetzt?"
+        "In which industry will the AGV be used?"
     ),
     "distribution_model": (
-        "Wie wird das AGV vertrieben bzw. geliefert?"
+        "How is the AGV sold or delivered?"
     ),
     "hq_city": (
-        "Hauptsitz des Herstellers (wird automatisch befüllt)"
+        "Manufacturer headquarters. (filled automatically)"
     ),
     "founding_year": (
-        "Gründungsjahr des Herstellers (wird automatisch befüllt)"
+        "Manufacturer founding year. (filled automatically)"
     ),
 
     # ── Forklift AGV ────────────────────────────────────────────────────────
 
     # K.O. fields
     "lifting_height_mm": (
-        "Bis zu welcher Höhe muss das Gerät Lasten anheben? "
-        "Maximale Entnahmehöhe im Regal angeben (mm; z. B. 10.000 mm = 10 m für Hochregal)."
+        "How high must the device lift loads? Enter the maximum pick height in the rack. "
+        "(mm; e.g. 10,000 mm = 10 m for high-bay storage)"
     ),
     "min_aisle_width_mm": (
-        "Wie breit sind die schmalsten Fahrwege in Ihrer Anlage? "
-        "Das AGV muss in dieser Gangbreite fahren können (mm)."
+        "How wide are the narrowest aisles in your facility? The AGV must manoeuvre within this width. "
+        "(mm; e.g. 1,800 mm for narrow-aisle operation)"
     ),
 
     # Cond. K.O. fields
     "min_total_height_mm": (
-        "Wie hoch sind die niedrigsten Durchfahrten oder Türen im Betriebsbereich? (mm)"
+        "What is the height of the lowest doorways or passages in the operating area? (mm)"
     ),
     "special_fork_option": (
-        "Wird eine spezielle Gabelausführung benötigt? "
-        "(z. B. Seitenschieber, Klammergreifer)"
+        "Is a special fork attachment required? (e.g. side-shift, clamp)"
     ),
     "fork_spread": (
-        "Welcher Gabelabstand ist für die Ladungsträger erforderlich? (mm)"
+        "What fork spacing is required for the load carriers? (mm)"
     ),
     "vna_capable": (
-        "Ist VNA-Fähigkeit (Schmalgangbetrieb) erforderlich — oder explizit nicht gewünscht?"
+        "Is VNA (Very Narrow Aisle) capability required — or explicitly not desired?"
     ),
     "forks_free_floating": (
-        "Müssen die Gabeln seitenverschiebbar oder schwimmend gelagert sein?"
+        "Must the forks be laterally shiftable or free-floating?"
     ),
     "stacking_capability": (
-        "Muss das Gerät Lasten übereinander stapeln können?"
+        "Must the device be able to stack loads on top of each other?"
     ),
     "barcode_readers": (
-        "Sind integrierte Barcode-Scanner für die Lastidentifikation erforderlich?"
+        "Are integrated barcode scanners for load identification required?"
     ),
     "trailer_loading": (
-        "Muss das AGV Lasten in Lkw-Trailer einfahren und beladen können?"
+        "Must the AGV be able to enter and load truck trailers?"
     ),
     "trailer_unloading": (
-        "Muss das AGV Lasten aus Lkw-Trailern entnehmen können?"
+        "Must the AGV be able to unload from truck trailers?"
     ),
     "guidance": (
-        "Welches Führungskonzept soll das Regalfahrzeug im VNA-Bereich nutzen?"
+        "What guidance concept should the racking vehicle use in the VNA aisle?"
     ),
 
     # Scoring fields
     "drop_accuracy_lat_mm": (
-        "Wie präzise muss das AGV Lasten seitlich absetzen? (mm laterale Abweichung)"
+        "How precisely must the AGV deposit loads laterally? (mm lateral deviation)"
     ),
     "drop_accuracy_dep_mm": (
-        "Wie präzise muss das AGV Lasten in der Tiefe absetzen? (mm)"
+        "How precisely must the AGV deposit loads in depth? (mm)"
     ),
     "drop_accuracy_angle_deg": (
-        "Wie präzise muss das AGV Lasten winkelgenau absetzen? (Grad)"
+        "How precisely must the AGV deposit loads angularly? (degrees)"
     ),
     "pick_req_accuracy_lat_mm": (
-        "Welche seitliche Präzision ist bei der Lastaufnahme erforderlich? (mm)"
+        "What lateral precision is required when picking up loads? (mm)"
     ),
     "pick_req_accuracy_dep_mm": (
-        "Welche Tiefenpräzision ist bei der Lastaufnahme erforderlich? (mm)"
+        "What depth precision is required when picking up loads? (mm)"
     ),
     "pick_req_accuracy_angle_deg": (
-        "Welche Winkelpräzision ist bei der Lastaufnahme erforderlich? (Grad)"
+        "What angular precision is required when picking up loads? (degrees)"
     ),
     "stock_line_scanning": (
-        "Muss das AGV Bestände im Regal automatisch scannen können?"
+        "Must the AGV be able to automatically scan inventory in the racks?"
     ),
     "busbar_compatible": (
-        "Ist ein Stromversorgungssystem über Schienenschleifer (Busbar) vorgesehen?"
+        "Is a rail-based power supply system (busbar) planned?"
     ),
 
     # Context fields
     "mast_type": (
-        "Welcher Masttyp ist vorgesehen? (z. B. Duplex, Triplex, Vierstufig)"
+        "What mast type is intended? (e.g. duplex, triplex, quad)"
     ),
     "drive_type": (
-        "Welcher Antriebstyp ist vorgesehen? (z. B. Gegengewichtstapler, Schubmast, VNA)"
+        "What drive type is intended? (e.g. counterbalanced, reach truck, VNA)"
     ),
     "load_detection": (
-        "Wie soll die Lastaufnahme erkannt werden?"
+        "How should load pickup be detected?"
     ),
 
     # ── Tugger AGV ──────────────────────────────────────────────────────────
 
     # K.O. fields
     "towing_capacity_kg": (
-        "Wie hoch ist das maximale Gesamtgewicht des Anhängerzuges? "
-        "(kg; Summe aller Anhänger inkl. Ladung)"
+        "What is the maximum total weight of the train? "
+        "(kg; sum of all trailers including load; e.g. 5,000 kg)"
     ),
     "max_trailers": (
-        "Wie viele Anhänger müssen gleichzeitig gezogen werden können?"
+        "How many trailers must be able to be towed simultaneously?"
     ),
     "coupling_type": (
-        "Welche Kupplungsart verwenden die vorhandenen oder geplanten Anhänger?"
+        "What coupling type do the existing or planned trailers use?"
     ),
     "route_type": (
-        "Welche Art von Fahrstrecke ist geplant? (feste Route oder flexible Route)"
+        "What type of route is planned? (fixed route, flexible route)"
     ),
     "turning_radius_mm": (
-        "Wie viel Platz steht in Kurven zur Verfügung? "
-        "(mm; der Wenderadius des Fahrzeugs muss kleiner sein)"
+        "How much space is available for cornering? (mm; vehicle turning radius must be smaller)"
     ),
     "tugger_min_aisle_width_mm": (
-        "Wie breit sind die schmalsten Durchfahrten im gesamten Fahrtbereich "
-        "des Tuggers inkl. Anhänger? (mm)"
+        "How wide are the narrowest passages in the entire travel area including trailers? (mm)"
     ),
 
     # Cond. K.O. fields
     "auto_hitch": (
-        "Muss der Tugger Anhänger automatisch ankuppeln können?"
+        "Must the tugger be able to automatically couple trailers?"
     ),
 
     # Scoring fields
     "auto_hitch_position_tolerance_mm": (
-        "Welche Positioniertoleranz ist beim automatischen Ankuppeln akzeptabel? (mm)"
+        "What positioning tolerance is acceptable for automatic coupling? (mm)"
     ),
     "load_transfer": (
-        "Wie soll die Lastübergabe am Anhänger erfolgen?"
+        "How should the load handover at the trailer be performed?"
     ),
     "trailer_steering_technology": (
-        "Welche Lenktechnologie verwenden die Anhänger? "
-        "(z. B. passive Lenkung, aktive Lenkung)"
+        "What steering technology do the trailers use? (e.g. passive steering, active steering)"
     ),
     "route_programming": (
-        "Wie sollen Fahrrouten programmiert oder angepasst werden?"
+        "How should routes be programmed or adjusted?"
     ),
     "intersection_management": (
-        "Wie sollen Kreuzungssituationen zwischen mehreren AGVs gehandhabt werden?"
+        "How should intersection situations between multiple AGVs be handled?"
     ),
 
     # Context fields
     "train_configuration": (
-        "Welche Zuganordnung ist vorgesehen? (z. B. Anhänger in Reihe, Karussellanordnung)"
+        "What train configuration is intended? (e.g. trailers in line, carousel)"
     ),
     "trailer_compatibility": (
-        "Welche Anhängertypen sollen verwendet werden?"
+        "Which trailer types will be used?"
     ),
 
     # ── Mobile AMR ──────────────────────────────────────────────────────────
 
     # K.O. fields
     "lift_height_mm": (
-        "Bis zu welcher Höhe muss das AMR Lasten oder Regale anheben? (mm)"
+        "How high must the AMR lift loads or shelving units? (mm)"
     ),
     "min_ground_clearance_mm": (
-        "Wie viel Bodenfreiheit wird mindestens benötigt? "
-        "(mm; z. B. für Bodenunebenheiten oder Schwellen)"
+        "What minimum ground clearance is required? (mm; e.g. for floor unevenness)"
     ),
     "min_turning_radius_mm": (
-        "Wie viel Platz steht für Drehbewegungen zur Verfügung? "
-        "(mm; der Wendekreis des AMR muss kleiner sein)"
+        "How much space is available for turning movements? (mm; turning radius must be smaller)"
     ),
 
     # Cond. K.O. fields
     "workflow_capability": (
-        "Welche Arbeitsabläufe soll das AMR unterstützen?"
+        "What workflows should the AMR support?"
     ),
     "grid_required": (
-        "Ist ein physisches Gittersystem (z. B. Lagerroboter-Raster) Teil der Lösung?"
+        "Is a physical grid system (e.g. storage robot grid) part of the solution?"
     ),
     "picking_mechanism": (
-        "Welcher Mechanismus soll das AMR zum Greifen oder Kommissionieren verwenden?"
+        "What mechanism should the AMR use for picking or gripping?"
     ),
     "rack_pin_compatible": (
-        "Muss das AMR mit pin-kompatiblen Lagerregalen arbeiten können?"
+        "Must the AMR work with pin-compatible storage racks?"
     ),
     "free_lift_open_closed_pallet": (
-        "Muss das AMR Paletten ohne Gabelöffnungen (Vollpaletten) aufnehmen können?"
+        "Must the AMR be able to pick up pallets without fork openings?"
     ),
     "shelf_height_mm": (
-        "Wie hoch sind die Lagerregale, die das AMR bedienen soll? (mm)"
+        "How high are the storage racks the AMR should serve? (mm)"
     ),
     "shelf_footprint_mm": (
-        "Wie groß ist der Grundriss der Lagereinheiten? (mm)"
+        "What is the footprint of the storage units? (mm)"
     ),
 
     # Scoring fields
     "rotation_capable": (
-        "Muss das AMR Lasten während der Fahrt drehen können?"
+        "Must the AMR be able to rotate loads during travel?"
     ),
     "top_module_type": (
-        "Welches Aufbaumodul ist erforderlich? (z. B. Förderband, Hubtisch, Greifarme)"
+        "What top module is required? (e.g. conveyor belt, lifting table, robotic arms)"
     ),
     "cart_pickup_height_range_mm": (
-        "In welchem Höhenbereich muss das AMR Wagen oder Ladungsträger aufnehmen? (mm)"
+        "At what height range must the AMR pick up carts or carriers? (mm)"
     ),
     "pick_req_accuracy_dep_mm": (
-        "Welche Tiefenpräzision ist bei der Kommissionierung erforderlich? (mm)"
+        "What depth precision is required during order picking? (mm)"
     ),
     "pick_req_accuracy_angle_deg": (
-        "Welche Winkelpräzision ist bei der Kommissionierung erforderlich? (Grad)"
+        "What angular precision is required during order picking? (degrees)"
     ),
     "drop_accuracy_lat_mm": (
-        "Wie präzise muss das AMR Lasten seitlich absetzen? (mm laterale Abweichung)"
+        "How precisely must the AMR deposit loads laterally? (mm)"
     ),
     "drop_accuracy_dep_mm": (
-        "Wie präzise muss das AMR Lasten in der Tiefe absetzen? (mm)"
+        "How precisely must the AMR deposit loads in depth? (mm)"
     ),
     "drop_accuracy_angle_deg": (
-        "Wie präzise muss das AMR Lasten winkelgenau absetzen? (Grad)"
+        "How precisely must the AMR deposit loads angularly? (degrees)"
     ),
     "throughput_picks_per_hour": (
-        "Wie viele Kommissionierungen pro Stunde sind mindestens erforderlich?"
+        "How many picks per hour are required as a minimum?"
     ),
     "concurrent_robots_per_station": (
-        "Wie viele AMRs müssen gleichzeitig an einer Station arbeiten können?"
+        "How many AMRs must be able to work at one station simultaneously?"
     ),
     "order_lines_per_run": (
-        "Wie viele Auftragspositionen sollen pro Fahrt abgearbeitet werden?"
+        "How many order lines should be processed per trip?"
     ),
     "task_interleaving": (
-        "Sollen AMRs verschiedene Aufgabentypen im Wechsel abarbeiten können?"
+        "Should AMRs be able to alternate between different task types?"
     ),
     "storage_density_factor": (
-        "Wie wichtig ist eine hohe Lagerplatzdichte für Ihr System?"
+        "How important is high storage density for your system?"
     ),
     "ergonomic_height_adjustable": (
-        "Muss die Arbeitshöhe für Mitarbeiter ergonomisch anpassbar sein?"
+        "Must the working height be ergonomically adjustable for operators?"
     ),
     "onboard_ui": (
-        "Ist ein Display oder Bedienpanel am Fahrzeug erforderlich?"
+        "Is a display or control panel on the vehicle required?"
     ),
     "onboard_container_type": (
-        "Welcher Behältertyp soll auf dem AMR transportiert werden?"
+        "What container type should be transported on the AMR?"
     ),
     "onboard_container_count": (
-        "Wie viele Behälter soll das AMR gleichzeitig transportieren?"
+        "How many containers should the AMR transport simultaneously?"
     ),
     "wms_integration_native": (
-        "Ist eine direkte native Integration mit dem Warehouse-Management-System erforderlich?"
+        "Is a direct native integration with the Warehouse Management System required?"
     ),
 
     # Context fields
     "storage_system_type": (
-        "Welches Lagersystem soll das AMR bedienen?"
+        "What storage system should the AMR serve?"
     ),
     "min_grid_area_m2": (
-        "Wie groß ist die minimale Lagerfläche für das AMR-System? (m²)"
+        "What is the minimum storage area for the AMR system? (m²)"
     ),
     "throughput_basis": (
-        "Auf welcher Basis wird der Durchsatz gemessen?"
+        "On what basis is throughput measured?"
     ),
     "multi_language_display": (
-        "Muss die Anzeige am Fahrzeug mehrsprachig sein?"
+        "Must the display support multiple languages?"
     ),
     "gamification": (
-        "Sind spielerische Motivationselemente für Mitarbeiter gewünscht?"
+        "Are gamification elements for operator motivation desired?"
     ),
 }
 

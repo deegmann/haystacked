@@ -365,7 +365,7 @@ def validate_agv_criteria(crit: dict) -> tuple:
 
         if not (lo <= v <= hi):
             warnings.append(
-                f"{label}: Wert {v} {unit} außerhalb plausiblem Bereich [{lo}–{hi} {unit}] → ignoriert"
+                f"{label}: value {v} {unit} outside plausible range [{lo}–{hi} {unit}] → ignored"
             )
             log.warning("AGV-Plausibilität: %s", warnings[-1])
             cleaned[field] = None
@@ -427,30 +427,30 @@ async def analyze(file: UploadFile = File(...)):
         t0 = datetime.now()
         log.info("=== Neue Analyse: %s ===", filename)
 
-        yield sse("step", {"id": "upload", "status": "done", "message": f"'{filename}' empfangen"})
+        yield sse("step", {"id": "upload", "status": "done", "message": f"'{filename}' received"})
 
         if not filename.lower().endswith(".pdf"):
-            yield sse("error", {"message": "Nur PDF-Dateien werden unterstützt."}); return
+            yield sse("error", {"message": "Only PDF files are supported."}); return
 
         size_kb = len(pdf_bytes) // 1024
         log.info("PDF-Größe: %d KB", size_kb)
-        yield sse("log", {"message": f"PDF-Größe: {size_kb} KB"})
+        yield sse("log", {"message": f"PDF size: {size_kb} KB"})
 
         if len(pdf_bytes) > 20 * 1024 * 1024:
-            yield sse("error", {"message": "PDF zu groß (max. 20 MB)."}); return
+            yield sse("error", {"message": "PDF too large (max. 20 MB)."}); return
 
         # ── PDF extraction ────────────────────────────────────────────────────
-        yield sse("step", {"id": "extract", "status": "running", "message": "Text wird extrahiert…"})
+        yield sse("step", {"id": "extract", "status": "running", "message": "Extracting text…"})
         await asyncio.sleep(0)
 
         try:
             text, num_pages = extract_text_from_pdf(pdf_bytes)
         except Exception as e:
             log.exception("PDF-Extraktion fehlgeschlagen")
-            yield sse("error", {"message": f"PDF konnte nicht gelesen werden: {e}"}); return
+            yield sse("error", {"message": f"PDF could not be read: {e}"}); return
 
         if not text.strip():
-            yield sse("error", {"message": "Kein Text gefunden (gescanntes Dokument?)"}); return
+            yield sse("error", {"message": "No text found (scanned document?)"}); return
 
         # qwen2.5:7b has 128k token context; we activate 32k via num_ctx.
         # 50k chars ≈ 14k tokens — covers virtually all tender documents in full.
@@ -458,15 +458,15 @@ async def analyze(file: UploadFile = File(...)):
         truncated = len(text) > max_chars
         if truncated:
             log.info("Text gekürzt: %d → %d Z.", len(text), max_chars)
-            text = text[:max_chars] + "\n\n[... Dokument gekürzt ...]"
+            text = text[:max_chars] + "\n\n[... document truncated ...]"
 
         yield sse("step", {"id": "extract", "status": "done",
-                            "message": f"{num_pages} Seiten · {len(text):,} Zeichen" + (" · gekürzt" if truncated else "")})
+                            "message": f"{num_pages} pages · {len(text):,} characters" + (" · truncated" if truncated else "")})
         yield sse("log", {"message": f"Extrahiert: {num_pages} Seiten | {len(text):,} Z. | Gekürzt: {truncated}"})
 
         # ── LLM Step 1: Basic extraction ──────────────────────────────────────
         yield sse("step", {"id": "llm", "status": "running",
-                            "message": f"Grunddaten extrahieren ({OLLAMA_MODEL})…"})
+                            "message": f"Extracting basic data ({OLLAMA_MODEL})…"})
         await asyncio.sleep(0)
 
         # Use full available text for basic extraction so contact info
@@ -475,13 +475,13 @@ async def analyze(file: UploadFile = File(...)):
         try:
             raw_basic = await call_ollama(MAIN_SYSTEM, basic_user, "basic")
         except httpx.ConnectError:
-            yield sse("error", {"message": "Ollama nicht erreichbar — bitte './start.sh' nutzen."}); return
+            yield sse("error", {"message": "Ollama not reachable — please run './start.sh'."}); return
         except Exception as e:
             log.exception("LLM-Fehler (basic)")
-            yield sse("error", {"message": f"LLM-Fehler: {e}"}); return
+            yield sse("error", {"message": f"LLM error: {e}"}); return
 
         t1 = (datetime.now() - t0).total_seconds()
-        yield sse("step", {"id": "llm", "status": "done", "message": f"LLM-Analyse fertig ({t1:.1f}s)"})
+        yield sse("step", {"id": "llm", "status": "done", "message": f"LLM analysis done ({t1:.1f}s)"})
         yield sse("log", {"message": f"Grunddaten: {t1:.1f}s | {len(raw_basic)} Z."})
 
         yield sse("step", {"id": "parse", "status": "running", "message": "Antwort wird geparst…"})
@@ -554,7 +554,7 @@ async def analyze(file: UploadFile = File(...)):
             result["in_scope"] = True  # don't hide result on classification error
 
         t2 = (datetime.now() - t0).total_seconds()
-        scope_label = "" if result.get("in_scope", True) else " · außerhalb Scope"
+        scope_label = "" if result.get("in_scope", True) else " · out of scope"
         yield sse("step", {"id": "parse", "status": "done",
                             "message": f"Parsing OK ({parse_method}) | NACE: {result.get('nace_tender','–')}{scope_label}"})
         yield sse("log", {"message": f"Parse+NACE: {t2:.1f}s gesamt"})
@@ -616,17 +616,17 @@ async def analyze(file: UploadFile = File(...)):
 
                     _bad = list(_ap0_violations_4a.values())[0][0]
                     _allowed = list(_ap0_violations_4a.values())[0][1]
-                    _msg = (f"required_agv_type='{_bad}' ungültig "
-                            f"(erlaubt: {' / '.join(_allowed)}) — Versuch {_attempt + 1}/3")
+                    _msg = (f"required_agv_type='{_bad}' invalid "
+                            f"(allowed: {' / '.join(_allowed)}) — attempt {_attempt + 1}/3")
                     log.warning(_msg)
                     yield sse("log", {"message": f"⚠ {_msg}"})
                     if _attempt == 2:
                         yield sse("warning", {"field": "required_agv_type",
-                                              "message": f"{_msg} — Keyword-Fallback wird verwendet"})
+                                              "message": f"{_msg} — keyword fallback used"})
 
             except Exception as e:
                 log.exception("Pass 4a fehlgeschlagen")
-                yield sse("log", {"message": f"⚠ 4a Fehler: {e} — Keyword-Fallback"})
+                yield sse("log", {"message": f"⚠ 4a error: {e} — keyword fallback"})
 
             # Normalize vehicle type from 4a result
             raw_vt_str = vt_criteria.get("required_agv_type") or ""
@@ -668,11 +668,11 @@ async def analyze(file: UploadFile = File(...)):
             if _TOTAL_ESTIMATE > _OLLAMA_NUM_CTX:
                 yield sse("log", {
                     "message": (
-                        f"⚠ Dokument zu groß für zuverlässige Extraktion "
-                        f"(~{_TOTAL_ESTIMATE:,} Token geschätzt, Limit: {_OLLAMA_NUM_CTX:,}). "
-                        f"Bitte nur den technischen Spezifikationsteil hochladen "
-                        f"(typischerweise 5–15 Seiten) statt des vollständigen Ausschreibungsdokuments. "
-                        f"Ergebnisse können unvollständig sein."
+                        f"⚠ Document too large for reliable extraction "
+                        f"(~{_TOTAL_ESTIMATE:,} tokens estimated, limit: {_OLLAMA_NUM_CTX:,}). "
+                        f"Please upload only the technical specification section "
+                        f"(typically 5–15 pages) instead of the full tender document. "
+                        f"Results may be incomplete."
                     )
                 })
 
@@ -723,11 +723,11 @@ async def analyze(file: UploadFile = File(...)):
                         for tk, (bad, av) in _ap0_violations.items()
                     )
                     log.warning("4b AP0-Feldvalidierung Versuch %d/3: %s", _attempt + 1, _viol_summary)
-                    yield sse("log", {"message": f"AP0-Feldvalidierung Versuch {_attempt + 1}/3: {_viol_summary}"})
+                    yield sse("log", {"message": f"AP0 field validation attempt {_attempt + 1}/3: {_viol_summary}"})
                     if _attempt == 2:
                         _ap0_warnings = [
-                            f"{tk}: '{bad}' nach 3 Versuchen kein gültiger AP0-Wert "
-                            f"(erlaubt: {', '.join(av)}) — Feld wird ignoriert"
+                            f"{tk}: '{bad}' not a valid AP0 value after 3 attempts "
+                            f"(allowed: {', '.join(av)}) — field ignored"
                             for tk, (bad, av) in _ap0_violations.items()
                         ]
 
@@ -838,7 +838,7 @@ async def analyze(file: UploadFile = File(...)):
             agv_criteria, val_warnings = validate_agv_criteria(agv_criteria)
             if val_warnings:
                 for w in val_warnings:
-                    yield sse("log", {"message": f"⚠ Plausibilität: {w}"})
+                    yield sse("log", {"message": f"⚠ Plausibility: {w}"})
             agv_criteria["_validation_warnings"] = val_warnings
 
             log.info("AGV-Kriterien (validiert): %s", json.dumps(agv_criteria, ensure_ascii=False)[:300])

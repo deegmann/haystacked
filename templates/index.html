@@ -44,8 +44,8 @@
           <rect x="0" y="41.33" width="100" height="13.33" rx="2.22" fill="#003942"/>
         </svg>
       </div>
-      <p>Ausschreibungs-PDF hier ablegen oder</p>
-      <label class="btn-upload" for="fileInput">Datei auswählen</label>
+      <p>Drop tender PDF here or</p>
+      <label class="btn-upload" for="fileInput">Choose file</label>
       <input type="file" id="fileInput" accept=".pdf" hidden>
       <p class="hint">PDF only · max 20 MB</p>
     </div>
@@ -56,7 +56,7 @@
     <div class="progress-card">
       <div class="progress-animation">
         <!-- V2 Scan & Find — bars start muted, scanline sweeps, lock to brand colours -->
-        <svg class="hs-loading-mark" viewBox="0 0 100 54.67" style="overflow:visible" aria-label="Analyse läuft">
+        <svg class="hs-loading-mark" viewBox="0 0 100 54.67" style="overflow:visible" aria-label="Analysis running">
           <rect class="r1" x="0" y="0"     width="60"  height="13.33" rx="2.22"/>
           <rect class="r2" x="0" y="20.67" width="80"  height="13.33" rx="2.22"/>
           <rect class="r3" x="0" y="41.33" width="100" height="13.33" rx="2.22"/>
@@ -173,11 +173,11 @@
 
     <div class="grid">
       <div class="card">
-        <h3>Käufer</h3>
+        <h3>Buyer</h3>
         <div class="field-group">
-          <div class="field"><span class="label">Unternehmen</span><span id="r-buyer" class="value">–</span></div>
-          <div class="field"><span class="label">Branche</span><span id="r-buyer_industry" class="value">–</span></div>
-          <div class="field"><span class="label">NACE (Käufer)</span><span id="r-nace_buyer" class="value mono">–</span></div>
+          <div class="field"><span class="label">Company</span><span id="r-buyer" class="value">–</span></div>
+          <div class="field"><span class="label">Industry</span><span id="r-buyer_industry" class="value">–</span></div>
+          <div class="field"><span class="label">NACE (Buyer)</span><span id="r-nace_buyer" class="value mono">–</span></div>
         </div>
       </div>
 
@@ -242,7 +242,7 @@
       <div class="supplier-shortlist">
         <div class="shortlist-header">
           <h3 class="shortlist-title">Supplier-Shortlist</h3>
-          <button class="btn-debug" id="debugBtn" onclick="openDebug()">Vollständige Analyse &rarr;</button>
+          <button class="btn-debug" id="debugBtn" onclick="openDebug()">Full analysis &rarr;</button>
         </div>
         <div id="supplierCards" class="supplier-cards"></div>
         <div id="supplierExcludedNote" class="excluded-note hidden"></div>
@@ -620,20 +620,20 @@ function buildAddFieldPicker(crit, renderedKeys) {
   wrap.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:4px';
   const label = document.createElement('span');
   label.style.cssText = 'font-size:12px;color:var(--steel)';
-  label.textContent = 'Feld hinzufügen:';
+  label.textContent = 'Add field:';
   wrap.appendChild(label);
 
   if (!candidates.length) {
     const note = document.createElement('span');
     note.style.cssText = 'font-size:12px;color:var(--steel)';
-    note.textContent = 'Keine weiteren Felder verfügbar.';
+    note.textContent = 'No more fields available.';
     wrap.appendChild(note);
     return wrap;
   }
 
   const sel = document.createElement('select');
   sel.className = 'req-edit-select';
-  sel.innerHTML = `<option value="">Feld wählen…</option>`;
+  sel.innerHTML = `<option value="">Select field…</option>`;
   for (const c of candidates) {
     const opt = document.createElement('option');
     opt.value = c.key;
@@ -665,9 +665,9 @@ function openDebug() {
       note.style.cssText = 'position:fixed;top:68px;right:20px;background:var(--hs-teal);color:#fff;' +
         'padding:10px 14px;border-radius:4px;z-index:200;font-size:12px;line-height:1.5;' +
         'box-shadow:0 4px 16px rgba(0,0,0,.18);';
-      note.innerHTML = 'Popup blockiert.<br>' +
+      note.innerHTML = 'Popup blocked.<br>' +
         '<a href="/debug-page" target="_blank" rel="noopener" ' +
-        'style="color:#fff;text-decoration:underline;font-weight:600;">&#8594; Vollständige Analyse öffnen</a>';
+        'style="color:#fff;text-decoration:underline;font-weight:600;">&#8594; Open full analysis</a>';
       document.body.appendChild(note);
       setTimeout(() => note.remove(), 10000);
     }
@@ -772,12 +772,12 @@ function renderSupplierCards(allResults) {
   });
 
   if (!qualified.length) {
-    container.innerHTML = '<p class="sc-empty">Kein Supplier erfüllt alle K.O.-Kriterien. Vollständige Analyse öffnen für Details.</p>';
+    container.innerHTML = '<p class="sc-empty">No supplier meets all K.O. criteria. Open full analysis for details.</p>';
   }
 
   note.classList.toggle('hidden', !excluded.length);
   if (excluded.length) {
-    note.textContent = `${excluded.length} weitere Supplier nach K.O.-Kriterien ausgeschlossen — Details in der vollständigen Analyse.`;
+    note.textContent = `${excluded.length} more supplier(s) excluded by K.O. criteria — details in full analysis.`;
   }
 }
 
@@ -869,10 +869,10 @@ function openClarificationDialog(data) {
   const fields = buildClarificationFields(data.agv_criteria || {}, currentVt);
   if (fields.length === 0) { showResult(data); return; }
   openFieldDialog({
-    title: 'Fehlende Angaben',
-    subtitle: 'Diese Werte wurden im Tender nicht gefunden. Bitte ergänzen für präzises Matching.',
-    confirmLabel: 'Weiter zum Ergebnis',
-    dismissLabel: 'Überspringen',
+    title: 'Missing values',
+    subtitle: 'These values were not found in the tender. Please fill in for precise matching.',
+    confirmLabel: 'Continue to results',
+    dismissLabel: 'Skip',
     fields,
     crit: data.agv_criteria || {},
     analysisId: data.analysis_id,
