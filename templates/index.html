@@ -792,7 +792,7 @@ function buildClarificationFields(crit, currentVt) {
   return Object.entries(_fieldMeta)
     .filter(([key, info]) =>
       (key !== info.tender_key || info.sheet === sharedSheet) &&
-      (info.level === 'KO' || info.level === 'COND_KO') &&
+      info.level === 'KO' &&
       (info.sheet === currentVt || info.sheet === sharedSheet) &&
       info.display_mode !== 'display' &&
       (crit[info.tender_key] == null || crit[info.tender_key] === '' || (Array.isArray(crit[info.tender_key]) && crit[info.tender_key].length === 0))
