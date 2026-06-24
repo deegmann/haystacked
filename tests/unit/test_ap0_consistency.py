@@ -554,26 +554,45 @@ def test_T_CON_08_fields_json_correctness():
     assert f.get("uuid"), "UUID must not be empty"
 
 
-def test_T_DM_04_field_meta_result_card_present_for_known_fields():
-    """/api/field-meta must return result_card=True for known result_card fields
-    and result_card=False for non-result_card fields.
-    result_card drives the clarification dialog field selection."""
+def test_T_DM_04_field_meta_result_card_absent():
+    """/api/field-meta must NOT contain a result_card key on any entry.
+    result_card has been retired from the AP0 boundary; presence would be a regression."""
     response = client.get("/api/field-meta")
     assert response.status_code == 200
     meta = response.json()
 
-    # max_payload_kg is a result_card KO field (Forklift + Tugger + AMR)
-    assert meta.get("max_payload_kg", {}).get("result_card") is True, \
-        "max_payload_kg must have result_card=True in /api/field-meta"
+    entries_with_result_card = [
+        key for key, entry in meta.items()
+        if isinstance(entry, dict) and "result_card" in entry
+    ]
+    assert not entries_with_result_card, (
+        f"/api/field-meta entries must not contain result_card key. "
+        f"Found it on: {entries_with_result_card}"
+    )
 
-    # lifting_height_mm is a result_card KO field (Forklift AGV)
-    assert meta.get("lifting_height_mm", {}).get("result_card") is True, \
-        "lifting_height_mm must have result_card=True in /api/field-meta"
 
-    # load_type is KO (KO_SUBSET) but not marked result_card in AP0
-    load = meta.get("load_type", {})
-    assert load.get("result_card") is False or load.get("result_card") is None, \
-        "load_type must not have result_card=True (it is KO but not result_card in AP0)"
+def test_T_DM_05_to_dict_contains_debug_table_fields():
+    """to_dict() output must contain the three field names that debug.html reads by name."""
+    import sys
+    sys.path.insert(0, str(BASE_DIR))
+    from src.matching import MatchResult, _fields
+    from src.models import SupplierRecord, Product, FieldValue
+
+    specs = list(_fields.values())
+    product = Product(
+        product_id="test",
+        company_id="co",
+        base_model_id="bm",
+        product_name="Test",
+        agv_type="Forklift AGV",
+    )
+    values = {s.uuid: FieldValue(spec=s, value=None) for s in specs}
+    record = SupplierRecord(product=product, values=values)
+    mr = MatchResult(record=record)
+    result = mr.to_dict()
+    assert "lifting_height_mm" in result
+    assert "min_aisle_width_mm" in result
+    assert "max_payload_kg" in result
 
 
 # ─────────────────────────────────────────────────────────────────────────────

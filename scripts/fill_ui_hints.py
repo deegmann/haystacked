@@ -429,7 +429,7 @@ UI_HINTS = {
 # Col A=Field Name, B=Data Type, C=Allowed Values, D=Unit, E=Level, F=Entity,
 # G=LLM Hint, H=Matching Operator, I=Scoring Weight, J=Score Function,
 # K=Threshold A, L=Threshold B, M=Plaus Min, N=Plaus Max,
-# O=result_card, P=Display Mode, Q=UI Hint, R=UUID
+# O=(reserved — result_card column, cleared), P=Display Mode, Q=UI Hint, R=UUID
 
 COLUMN_WIDTHS = {
     "A": 30,   # Field Name
@@ -446,7 +446,7 @@ COLUMN_WIDTHS = {
     "L": 13,   # Score Threshold B
     "M": 13,   # Plausibility Min
     "N": 13,   # Plausibility Max
-    "O": 13,   # result_card
+    "O": 13,   # (reserved — result_card column cleared by OI-44)
     "P": 14,   # Display Mode
     "Q": 52,   # UI Hint — wrap
     "R": 12,   # UUID

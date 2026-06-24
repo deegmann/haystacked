@@ -28,7 +28,6 @@ class FieldSpec:
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
-    result_card: bool = False
 
 
 def load_fields() -> dict[str, FieldSpec]:

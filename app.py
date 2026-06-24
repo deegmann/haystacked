@@ -1079,7 +1079,6 @@ async def field_meta():
             "allowed_values": spec.allowed_values,
             "sheet":          spec.sheet,
             "display_mode":      spec.display_mode or "editable",
-            "result_card":       spec.result_card,
             "user_description":  spec.user_description,
         }
         meta[db_key] = entry

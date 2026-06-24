@@ -114,7 +114,6 @@ def read_field_levels(wb) -> dict:
         col_dtype       = cols.get("Data Type")
         col_allowed     = cols.get("Allowed Values")
         col_unit        = cols.get("Unit")
-        col_result_card = cols.get("result_card")
         col_display_mode = cols.get("Display Mode")
         for row in rows[hi+1:]:
             fname = row[0]
@@ -143,8 +142,6 @@ def read_field_levels(wb) -> dict:
                 av_list = [v.strip() for v in raw_av.split("|") if v.strip() and v.strip() not in ("…", "")]
                 if av_list:
                     entry["allowed_values"] = av_list
-            if col_result_card is not None and col_result_card < len(row) and row[col_result_card]:
-                entry["result_card"] = True
             if col_display_mode is not None and col_display_mode < len(row) and row[col_display_mode]:
                 entry["display_mode"] = str(row[col_display_mode]).strip()
             if level in ("KO","COND_KO") and "operator" not in entry:
@@ -972,7 +969,6 @@ def emit_fields_json(wb) -> None:
         col_hint     = cols.get("LLM Hint")
         col_display  = cols.get("Display Mode")
         col_client   = cols.get("UI Hint")
-        col_rc       = cols.get("result_card")
 
         for row in rows[hi + 1:]:
             fname = row[col_fname] if col_fname < len(row) else None
@@ -1037,7 +1033,6 @@ def emit_fields_json(wb) -> None:
                 "hint":             hint,
                 "user_description": client_exp,
                 "display_mode":     display,
-                "result_card":      bool(col_rc is not None and col_rc < len(row) and row[col_rc]),
             }
 
     print(f"  Fields JSON: {len(fields_by_uuid)} entries across {len(DATA_SHEETS)} sheets")
@@ -1079,7 +1074,6 @@ class FieldSpec:
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
-    result_card: bool = False
 
 
 def load_fields() -> dict[str, FieldSpec]:

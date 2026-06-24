@@ -50,7 +50,6 @@ def _load_vehicle_types() -> dict:
 _fields = load_fields()  # dict[str, FieldSpec], keyed by UUID
 _SHARED_SHEET: str = _load_vehicle_types().get("shared_sheet_name", "")
 assert _SHARED_SHEET, "vehicle_types.json missing 'shared_sheet_name' — run generate_all.py"
-_RESULT_CARD_FIELDS: tuple = tuple(f.field_name for f in _fields.values() if f.result_card)
 
 # Guardian S2: Startup-Assertion — every vt_map value must have a sheet in fields.json
 _vt_sheets = {f.sheet for f in _fields.values()}
@@ -340,7 +339,7 @@ class MatchResult:
                 field_spec.field_name: (
                     " | ".join(v) if isinstance(v := _supplier_val(values, prod, field_spec), list) else v
                 )
-                for field_spec in _fields.values() if field_spec.result_card
+                for field_spec in _fields.values() if field_spec.level != "CONTEXT"
             },
         }
 
