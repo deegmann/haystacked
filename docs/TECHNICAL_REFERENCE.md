@@ -1,608 +1,545 @@
 ---
 title: Haystacked Platform — Technical Reference
-version: auto-generated
-date: 2026-06-22
+version: UFR Sprint (Steps 1-6), AP0 v0.10
+date: 2026-07-10
 author: app-documentation-writer agent
 ---
 
 # Haystacked Platform — Technical Reference
 
-## 1. System Overview
-
-### 1.1 Purpose and business context
-
-Haystacked is a B2B matching platform for AGV (Automated Guided Vehicle) and AMR (Autonomous Mobile Robot) procurement tenders. A procurement team uploads a PDF tender document. The platform:
-
-1. Extracts plain text from the PDF
-2. Runs a sequence of LLM passes to identify what the buyer is asking for
-3. Validates the LLM output against the AP0 field specification and source-span citations
-4. Runs a pure rule-based matching engine against the supplier database
-5. Returns a ranked, scored list of qualified suppliers, streamed live to the browser
-
-The core value proposition: a buyer uploads a 30-page tender document and within ~330 seconds receives a ranked list of suppliers whose technical capabilities match the stated requirements, with explicit K.O. reasons for excluded suppliers.
-
-### 1.2 High-level architecture
-
-```
-AP0 xlsx (Spec/)
-    │
-    ▼
-generate_all.py ──────────────────────────────────────────────────────┐
-    ├─► config/fields.json           all field defs, UUID-keyed       │
-    ├─► src/field_spec.py            FieldSpec dataclass + helpers    │
-    ├─► config/vehicle_types.json    type map, VNA, keywords          │
-    ├─► config/nace_codes.json       NACE Prio-1 list                 │
-    ├─► config/plausibility.json     LLM value ranges                 │
-    ├─► config/sqlite_schema.json    CREATE TABLE SQL                 │
-    └─► config/prompts/*.txt         all LLM prompt files             │
-                                                                      │
-Airtable ──► sync_airtable.py ──► data/raw/*.csv ──► haystacked.db ◄─┘
-                │ (--local: skip API, rebuild from CSVs)
-                                          │
-                                    data_loader.py
-                                    (3-way JOIN, active=1)
-                                          │
-                                    list[SupplierRecord]
-
-PDF upload
-    │
-    ▼
-app.py (FastAPI + SSE streaming)
-    ├─► pdfplumber           text extraction
-    ├─► Pass 1: basic        buyer, project, is_agv_amr
-    ├─► Pass 2: contact      conditional — last 4,000 chars
-    ├─► Pass 3: nace         NACE code + in_scope
-    │
-    └── if is_agv_amr = true ─────────────────────────────
-        ├─► Pass 4a: vehicle_type   classify + VNA flag
-        ├─► Pass 4b: agv_batch      ~40 fields in one JSON
-        │     └─► correction1/2     AP0 allowed-values retry
-        ├─► Pass 4c: per_field      ~8 focused calls
-        ├─► Source-span guard  (enforce_source_spans() in src/json_repair.py)
-        │     ├─► Layer 1  source absent → null value
-        │     ├─► Layer 0  source not grounded in document → null value
-        │     └─► Layer 2  4c abstained + source digit mismatch → null
-        ├─► validate_tender_values()
-        ├─► validate_agv_criteria()
-        ├─► field_text_fallbacks
-        └─► match_suppliers_new() ──► SSE events → browser
-                                          │
-                                (clarification flow)
-                                          │
-                              POST /rematch ──► re-run matching
-                              with user-supplied overrides
-```
-
-### 1.3 Technology stack
-
-| Layer | Technology |
-|---|---|
-| API server | Python 3.11, FastAPI, Uvicorn |
-| LLM | Ollama (local), qwen2.5:7b, temperature=0.0, num_ctx=32768 |
-| PDF extraction | pdfplumber |
-| Supplier database | SQLite (`data/haystacked.db`) |
-| Supplier data source | Airtable REST API |
-| Config generation | openpyxl (reads AP0 xlsx) |
-| Frontend | Server-Sent Events, Jinja2 templates |
-| Testing | pytest (139 tests as of 2026-06-17) |
+> Reflects UFR Sprint (Steps 1–6). 226 tests. scope_registry architecture active.
+> For narrative architecture overview see `docs/architecture.md`.
 
 ---
 
-## 2. Repository Structure
+## 1. AP0 xlsx Tab Structure
 
-```
-/
-├── app.py                      FastAPI entry point; all LLM orchestration; source-span guard; SSE
-├── sync_airtable.py            Airtable → CSV → SQLite import; --local mode
-├── start.sh                    Start Ollama + Uvicorn; auto-pulls model if missing
-├── CLAUDE.md                   Architecture overview + Tech Lead/PM agent coordination protocol
-│
-├── Spec/
-│   ├── haystacked_AP0_field_spec_v0_10.xlsx   Single source of truth (ALL business logic)
-│   ├── haystacked_platform_config.xlsx         NACE codes, basic extraction schema, scope
-│   └── haystacked_industry_readme.md           Domain knowledge; synced → config/ by generate_all.py
-│
-├── scripts/
-│   ├── generate_all.py         Config pipeline: reads AP0 xlsx → writes config/
-│   ├── test_pipeline.py        Manual end-to-end test harness (requires Ollama)
-│   └── migrate_ap0_scoring_rules.py  One-time migration helper (historical)
-│
-├── src/
-│   ├── matching.py             Pure rule engine; all operators; TenderRequirements; Matcher
-│   ├── data_loader.py          SQLite 3-way JOIN → list[SupplierRecord]
-│   ├── models.py               Dataclasses: Company, Product, FieldValue, SupplierRecord, TenderRun, ExtractionValue
-│   ├── field_spec.py           FieldSpec dataclass + load_fields() helpers; generated by generate_all.py
-│   ├── tender_store.py         TenderRun persistence; init_db(), persist_tender_run(), load_tender_run()
-│   ├── context_builder.py      Builds AGV_SYSTEM prompt; keyword fallback
-│   └── json_repair.py          repair_and_parse; enforce_source_spans(); source_is_grounded(); source_confirms_value()
-│
-├── config/                     ALL generated — never edit manually
-│   ├── fields.json             All field defs UUID-keyed (operator, allowed_values, weight, hint, user_description…)
-│   ├── vehicle_types.json      vt_map, VNA, text_overrides, keywords, shared_sheet_name
-│   ├── nace_codes.json         NACE Prio-1 list + scope
-│   ├── plausibility.json       Plausibility ranges for LLM values
-│   ├── sqlite_schema.json      CREATE TABLE SQL + field type lists
-│   ├── industry_readme.md      Domain knowledge (synced from Spec/)
-│   ├── ap0_checksum.txt        MD5 of AP0 xlsx; triggers auto-regen if changed
-│   └── prompts/
-│       ├── basic_system.txt
-│       ├── basic_template.txt
-│       ├── contact_system.txt
-│       ├── contact_template.txt
-│       ├── nace_system.txt
-│       ├── nace_template.txt
-│       ├── vehicle_type_template.txt
-│       ├── extraction_template.txt               Full combined template (fallback)
-│       ├── extraction_template_forklift_agv.txt  Forklift-specific Pass 4b template
-│       ├── extraction_template_tugger_agv.txt    Tugger-specific Pass 4b template
-│       ├── extraction_template_mobile_amr.txt    AMR-specific Pass 4b template
-│       ├── extraction_retry_system.txt
-│       ├── extraction_retry_template.txt
-│       └── extraction_system.txt                 Dead code — static fallback only
-│
-├── data/
-│   ├── haystacked.db           SQLite supplier database
-│   └── raw/                    Committed CSVs (versioned with each release)
-│
-├── tests/
-│   ├── unit/
-│   │   ├── test_matching_logic.py           U-M-01–U-M-28
-│   │   ├── test_extraction_nulls.py         U-E-01–U-E-07
-│   │   ├── test_source_span_enforcement.py  U-SS-01–U-SS-11
-│   │   ├── test_source_is_grounded.py       U-SG-01–U-SG-12
-│   │   ├── test_source_confirms_value.py    source_confirms_value boundary cases
-│   │   ├── test_source_confirms_value_german.py  German locale / negative temperatures
-│   │   ├── test_4c_direction_constants.py   _4C_EXTRACTION_DIRECTION completeness
-│   │   ├── test_find_invalid_ap0_fields.py  _find_invalid_ap0_fields()
-│   │   ├── test_validate_tender_values.py   U-V-01–U-V-08
-│   │   ├── test_golden_extraction.py        U-GE-xx parametrized (≥5 tenders)
-│   │   ├── test_json_repair_parser.py       U-J-01–U-J-10
-│   │   ├── test_agv_keyword_fallback.py     U-K-01–U-K-08
-│   │   ├── test_data_loader.py              U-D-01–U-D-16
-│   │   └── test_ap0_consistency.py         T-CON-01–T-CON-07, T-UI-01–T-UI-03
-│   ├── integration/
-│   │   └── test_llm_preflight.py            I-S-01–I-S-02 (requires live Ollama)
-│   ├── tenders/                             Tender JSON fixtures + golden run files
-│   └── benchmark_results/                   timestamped benchmark JSON files
-│
-├── docs/
-│   ├── architecture.md         Detailed architecture reference
-│   ├── TECHNICAL_REFERENCE.md  This document
-│   ├── matching-rules.md       Operator reference for non-engineers
-│   ├── ap0-change-guide.md     How to make changes via the AP0 xlsx
-│   └── test-report-*.md        Timestamped test reports
-│
-├── .claude/
-│   ├── agents/
-│   │   ├── haystacked-developer.md      Focused implementer agent (Sonnet, no commits, AP0 invariants)
-│   │   ├── ap0-architecture-guardian.md AP0 boundary guardian
-│   │   ├── reference-integrity-guardian.md File-move/rename reference checker
-│   │   ├── app-documentation-writer.md  This agent
-│   │   ├── senior-architect.md          Escalation agent for architectural decisions
-│   │   ├── backend-llm-tester.md        E2E pipeline test runner
-│   │   └── agv-spec-researcher.md       AGV spec lookup agent
-│   └── agent-memory/                    Persistent memory per agent
-│
-├── airtable/
-│   ├── ap2_schema.py           Fetches Airtable table IDs → airtable_schema_ids.json
-│   └── ap2_import.py           Low-level Airtable import helpers
-│
-└── static/ templates/          Frontend assets and Jinja2 HTML templates
-                                 templates/index.html — main UI
-                                 templates/debug.html — full extraction debug view
-                                 templates/db.html    — supplier database browser
-```
+`Spec/haystacked_AP0_field_spec_v0_10.xlsx` is the single source of truth.
+
+### 1.1 Data Tabs (machine-readable by generate_all.py)
+
+Each data tab has a standard column header row starting with `Field Name`. Required columns:
+
+| Column | Purpose |
+|--------|---------|
+| `Field Name` | Primary key — field_name in fields.json; also used as column name in SQLite |
+| `UUID` | Globally unique identifier for this field; hard error if absent |
+| `Entity` | `Company`, `Product`, or `Base Model` — determines which SQLite table and source dict |
+| `Level` | `K.O.` / `Cond. K.O.` / `Scoring` / `Context` (maps to KO/COND_KO/SCORING/CONTEXT) |
+| `Matching Operator` | One of: KO_IF_LT, KO_IF_GT, KO_IF_NEQ, KO_BOOL_REQUIRED, KO_BOOL_EXCLUSIVE, KO_SUBSET |
+| `Data Type` | Boolean, Integer, Float, Dropdown, Multi-Select, Text, Long Text |
+| `Unit` | Physical unit string (mm, kg, °C, etc.) |
+| `Allowed Values` | Pipe-separated enum values for Dropdown/Multi-Select fields |
+| `Scoring Weight` | Integer; points awarded if scoring rule matches |
+| `Score Function` | bool, bool_cond, proportional, nonempty, threshold_lower, threshold_upper, tiered_lower, tiered_upper |
+| `Score Threshold A` | Primary threshold for scoring functions |
+| `Score Threshold B` | Secondary threshold (tiered functions) |
+| `LLM Hint` | Extraction hint for LLM; controls whether a field appears in extraction template |
+| `UI Hint` | User-facing description (`user_description` in fields.json) |
+| `Display Mode` | Optional display hint for frontend |
+| `Value if Null` | Closed-world assumption: value to use when supplier field is None |
+| `Plausibility Min` | Minimum plausible value for LLM validation |
+| `Plausibility Max` | Maximum plausible value for LLM validation |
+
+### 1.2 Tab List and Scopes
+
+| AP0 Tab | Scope ID assigned | Fields in scope |
+|---------|------------------|-----------------|
+| `Global` | `*` | Fields applicable to all industries |
+| `AGV_Shared` | `Logistics:AGV` | Fields shared across all AGV vehicle types |
+| `AGV_Forklift` | `Logistics:AGV:Forklift` | Forklift-specific fields |
+| `AGV_Tugger` | `Logistics:AGV:Tugger` | Tugger-specific fields |
+| `AGV_AMR` | `Logistics:AGV:AMR` | Mobile AMR-specific fields |
+
+### 1.3 Structural Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| `③ Scope Registry` | Defines scope hierarchy: columns scope_id, parent_scope, tab_name, active |
+| `② Structure` | SQLite structural columns per table: table, column, sqlite_type, role, references, nullable, notes |
+| `Vehicle Types` | LLM output -> canonical mapping, VNA detection, fallback keywords, text override regexes |
+| `Field Fallbacks` | Regex -> field value override rules |
+| `Entity Model` | Documentation only — NOT read by generate_all.py |
+
+### 1.4 AP0 Hygiene Asserts (run at generation time)
+
+**SA-22 (hard error):** CONTEXT-level fields must not have a Matching Operator. `generate_all.py` aborts with `[FEHLER]` if any CONTEXT field has an operator.
+
+**SA-25 (warning only):** SCORING-level fields with no Scoring Weight and no Score Function are inert — they contribute nothing to matching. generate_all.py prints a warning. Fix by assigning weights in AP0 or demoting to CONTEXT.
+
+**Numeric KO plausibility assertion:** All Float/Integer fields with KO_IF_LT or KO_IF_GT must have Plausibility Min and Plausibility Max defined. Hard error if missing.
 
 ---
 
-## 3. Single Source of Truth: AP0 xlsx
+## 2. config/fields.json
 
-### 3.1 What lives in the xlsx
+Generated by `scripts/generate_all.py`. Keyed by UUID. Never edit manually.
 
-The file `Spec/haystacked_AP0_field_spec_v0_10.xlsx` is the authoritative source for every matching rule, scoring weight, extraction hint, and vehicle type definition. No field name, operator, or threshold appears in Python code that does not trace back to this file.
+### 2.1 Field Schema
 
-**Sheets and their roles:**
+Every entry in fields.json:
 
-| Sheet | Content | Consumed by |
-|---|---|---|
-| SHARED – All AGV Types | Fields common to all vehicle types (payload, navigation, temperature, etc.) — UUID, Label, Level, Operator, Data Type, Allowed Values, LLM Hint, Client Explanation, Scoring Weight | generate_all.py → fields.json, src/field_spec.py, extraction_template.txt |
-| Forklift AGV | Forklift-specific fields (lift height, aisle width, VNA, drive type, fork options) | Same pipeline |
-| Tugger AGV | Tugger-specific fields (towing capacity, auto hitch, trailer count) | Same pipeline |
-| Mobile AMR | AMR-specific fields (workflow, grid, picking mechanism) | Same pipeline |
-| Vehicle Types | LLM output → canonical type map; VNA subtype flags; text override regexes; keyword lists; LLM classification guide | generate_all.py → vehicle_types.json, vehicle_type_template.txt |
-| Entity Model | Three-layer data model: Company (L1), Product (L2), Base Model + Extension (L3) | generate_all.py → sqlite_schema.json |
-| Field Fallbacks | Regex → forced tender_key value (only_if_null flag) | generate_all.py → vehicle_types.json → field_text_fallbacks |
+```json
+{
+  "<uuid>": {
+    "uuid":             "7ca18941-1522-4b3d-a34e-38fb11dad36b",
+    "field_name":       "service_coverage",
+    "tender_key":       "required_service_coverage",
+    "entity":           "Product",
+    "scope":            "Logistics:AGV",
+    "level":            "COND_KO",
+    "operator":         "KO_SUBSET",
+    "data_type":        "Multi-Select",
+    "unit":             null,
+    "allowed_values":   ["None", "DACH", "EU", "Global"],
+    "score_function":   null,
+    "threshold_a":      null,
+    "threshold_b":      null,
+    "scoring_weight":   null,
+    "hint":             "Geographic service & support reach. Source: 'locations / service network'. ...",
+    "user_description": "In which countries or regions is service and support required?",
+    "display_mode":     null,
+    "value_if_null":    null
+  }
+}
+```
 
-**The "LLM Hint" column is critical.** It is the source for LLM extraction hints in `fields.json` and all generated prompt templates. Every word in this column is injected into LLM prompts. Keep hints factual and pattern-focused. Never include numeric example values — a 7B model copies them as hallucinations ("prompt poisoning"). The separate "Client Explanation" column provides buyer-facing text (not injected into LLM prompts).
+### 2.2 Field Key Semantics
 
-### 3.2 generate_all.py pipeline
+| Key | Type | Source | Notes |
+|-----|------|--------|-------|
+| `uuid` | str | AP0 UUID column | Primary key; globally unique; hard error if absent |
+| `field_name` | str | AP0 Field Name column | SQLite column name and Python attribute name |
+| `tender_key` | str | Derived: `"required_" + field_name` | Key used in extracted tender criteria dict |
+| `entity` | str | AP0 Entity column | "Company", "Product", or "Base Model" |
+| `scope` | str | AP0 tab name -> scope_id via ③ Scope Registry | e.g. "Logistics:AGV:Forklift" |
+| `level` | str\|null | AP0 Level column | KO / COND_KO / SCORING / CONTEXT / null |
+| `operator` | str\|null | AP0 Matching Operator column | One of 6 operators; null for SCORING and CONTEXT |
+| `data_type` | str | AP0 Data Type column | Boolean, Integer, Float, Dropdown, Multi-Select, Text |
+| `unit` | str\|null | AP0 Unit column | Physical unit for display and KO_IF_LT zero-check |
+| `allowed_values` | list\|null | AP0 Allowed Values column (Dropdown/Multi-Select only) | Enum validation list |
+| `score_function` | str\|null | AP0 Score Function column | Scoring rule name |
+| `threshold_a` | float\|null | AP0 Score Threshold A | Primary threshold |
+| `threshold_b` | float\|null | AP0 Score Threshold B | Secondary threshold (tiered functions) |
+| `scoring_weight` | int\|null | AP0 Scoring Weight column | Points for this field |
+| `hint` | str\|null | AP0 LLM Hint column | LLM extraction instruction; absent = field not extracted |
+| `user_description` | str\|null | AP0 UI Hint column | Shown in frontend clarification dialog |
+| `display_mode` | str\|null | AP0 Display Mode column | Frontend display hint |
+| `value_if_null` | any\|null | AP0 Value if Null column | Closed-world assumption value; typed and validated at generation |
 
-`scripts/generate_all.py` reads both xlsx files and writes all runtime config. It is invoked:
-- Manually: `python3 scripts/generate_all.py`
-- Automatically: by `app.py` at startup when the AP0 xlsx MD5 checksum has changed
-- Dry-run: `python3 scripts/generate_all.py --dry-run` (prints what would be written)
+### 2.3 Multi-VT Fields
 
-**Pipeline sequence:**
+Some fields appear in multiple AP0 tabs with the same field_name but different UUIDs and scopes. Example: `min_aisle_width_mm` appears in both AGV_Shared and AGV_Forklift if the allowed values or plausibility ranges differ per VT.
 
-1. `read_vehicle_types(wb)` — builds vt_map, vna_subtypes, text_overrides, keyword_map, llm_guide from Vehicle Types sheet; adds computed keys: scoring_bucket_map, vna_applicable_types, shared_sheet_name, agv_detection_keywords
-2. `read_field_text_fallbacks(wb)` — reads Field Fallbacks sheet → list of {tender_key, regex, value, only_if_null}; merged into vehicle_types output
-3. `emit_fields_json(wb)` — iterates all four data sheets; reads UUID, Label, Entity, Sheet, Operator, Data Type, Unit, Allowed Values, Score Function, Threshold A/B, Weight, LLM Hint, Client Explanation; writes `config/fields.json` (keyed by UUID) and `src/field_spec.py` (FieldSpec dataclass + 4 helper functions)
-4. `read_extraction_schema(wb)` — builds list of {key, db_field, mandatory, hint, sheet} for all fields with a tender_key; this is the authoritative list of all extractable fields (now derived from fields.json)
-5. `read_sqlite_schema(wb)` — generates CREATE TABLE SQL from Entity Model sheet + AGV-type sheets; also extracts bool_fields, int_fields, float_fields, extensions_columns lists
-6. `build_plausibility_config()` — reads Plausibility Min/Max columns from AP0 xlsx + Unit Conversions from platform_config.xlsx → config dict with conversion blocks
-7. `read_platform(platform_path)` — reads platform_config.xlsx: NACE codes (Prio-1 only), scope strings, basic extraction schema
-8. `build_vehicle_type_template()` — generates Pass 4a user prompt from llm_guide entries
-9. `build_extraction_template()` — generates Pass 4b templates with source instrumentation:
-    - Called once with no `sheet_filter` → full combined template (backward compat)
-    - Called once per DATA_SHEET with `sheet_filter=<sheet>` → type-specific template (SHARED + type fields only, 4a fields excluded)
-    - For each numeric KO field (Float/Integer + KO_IF_LT/KO_IF_GT): adds `<field>_source` companion entry to field list AND JSON schema; appends operator-derived extraction direction to hint text
-10. Writes all config files; prunes stale `extraction_template_*.txt` files; syncs industry_readme.md; writes ap0_checksum.txt
-
-**fields.json** is the unified output: all field definitions (operator, allowed_values, hint, user_description, weight, score_function, etc.) keyed by UUID. Pass 4c reads hints and sheet assignments from this file via `_NUMERIC_KO_FIELD_HINTS`.
-
-### 3.3 Generated files and their consumers
-
-| File | Written by | Read by |
-|---|---|---|
-| `config/fields.json` | generate_all.py | src/field_spec.py (load_fields, helpers); src/matching.py (operators, allowed_values, weights); app.py (_NUMERIC_KO_TENDER_KEYS, _NUMERIC_KO_FIELD_HINTS, _4C_EXTRACTION_DIRECTION, _AP0_CONSTRAINED_FIELDS, /api/field-meta) |
-| `src/field_spec.py` | generate_all.py | app.py, src/matching.py, src/context_builder.py |
-| `config/vehicle_types.json` | generate_all.py | app.py (_VT_MAP_CFG, _VNA_CFG, _VT_OVERRIDES, _SHARED_SHEET, _FIELD_TEXT_FALLBACKS); src/context_builder.py (AGV_KEYWORDS) |
-| `config/nace_codes.json` | generate_all.py | app.py (CATEGORY_LIST for Pass 3 prompt) |
-| `config/plausibility.json` | generate_all.py | app.py (AGV_PLAUSIBILITY, conversion blocks for mm→m) |
-| `config/sqlite_schema.json` | generate_all.py | sync_airtable.py (CREATE TABLE SQL, _EXT_COLUMNS) |
-| `config/prompts/*.txt` | generate_all.py | app.py (_load_prompt) |
-| `config/industry_readme.md` | synced from Spec/ by generate_all.py | src/context_builder.py (build_system_context) |
-| `config/ap0_checksum.txt` | generate_all.py | app.py (_check_and_regen) |
-
-### 3.4 How to make a rule change (step-by-step)
-
-1. Open `Spec/haystacked_AP0_field_spec_v0_10.xlsx`
-2. Find the field row in the relevant sheet (SHARED if it applies to all vehicle types, otherwise type-specific)
-3. Change the Level, Matching Operator, Allowed Values, or Description cell as needed
-4. Save the xlsx
-5. Run: `python3 scripts/generate_all.py`
-6. Check the console output for CONSISTENCY WARNINGS
-7. Run: `pytest tests/` — all tests should pass
-8. Restart the app (or rely on startup auto-regen if already running)
-
-**No Python changes are needed for most rule changes.** Python changes are only needed when:
-- Adding a new operator type not yet in the OPERATORS dict in src/matching.py
-- Adding a new scoring rule type not yet in the Matcher scoring loop
-- Changing the plausibility ranges (still hardcoded in PLAUSIBILITY_RANGES in generate_all.py)
+`fields_by_tender_key()` returns `dict[tender_key -> list[FieldSpec]]` — a list because one tender_key can map to multiple scoped specs. A startup assertion verifies all specs for the same tender_key agree on `allowed_values`.
 
 ---
 
-## 4. Data Layer
+## 3. config/scope_registry.json
 
-### 4.1 Airtable → SQLite Sync (sync_airtable.py)
+Generated by `scripts/generate_all.py`. Read by `app.py` and `src/matching.py` at startup.
 
-**Tables synced:**
-
-| Airtable table | SQLite table | Notes |
-|---|---|---|
-| companies | companies | L1 — supplier companies |
-| products | products | L2 — individual AGV products |
-| base_models | base_models | L3 — OEM hardware models |
-| extensions | base_model_extensions | L3 — technical specs per model and AGV type |
-
-**Sync modes:**
-- Live mode (default): fetches from Airtable REST API with pagination and rate-limit retry (429 → wait 30s, 3 attempts). Requires `.env` with `AIRTABLE_TOKEN` and `AIRTABLE_BASE_ID`.
-- Local mode (`--local`): skips API, reads from `data/raw/*.csv`. No credentials needed.
-
-The sync is idempotent: tables are dropped and recreated from scratch on each run. Multi-select fields are stored as pipe-separated strings. Boolean fields are stored as 0/1 integers. The CREATE TABLE SQL comes from `config/sqlite_schema.json` — `sync_airtable.py` never hardcodes schemas.
-
-`_EXT_COLUMNS` (the ordered list of extension table column names) is also read from `sqlite_schema.json` (key `extensions_columns`). This means column order for INSERT statements is always in sync with the generated schema.
-
-**Frequency / trigger:** Manual. Run after any Airtable data change. Git-committed CSVs act as the dataset for contributors without Airtable access.
-
-**Error handling:** On connection error, retries 3 times. On 429, waits 30 seconds. On persistent failure, exits with an error message. On schema drift (AP0 field added but not yet in SQLite), `generate_all.py` logs a CONSISTENCY WARNING.
-
-### 4.2 SQLite Schema
-
-Four tables. Schema generated from AP0 Entity Model sheet.
-
-```
-companies             L1 — company_id (PK), company_name, country, certifications_generic, ...
-products              L2 — product_id (PK), company_id (FK), base_model_id (FK), agv_type, active, ...
-base_models           L3 — base_model_id (PK), oem_company_id (FK), ...
-base_model_extensions L3 — extension_id (PK), base_model_id (FK), agv_type, [all AP0 extension fields], extra_fields
+```json
+{
+  "scopes": {
+    "*":                      {"scope_id": "*",                    "parent": null, "tab_name": "Global"},
+    "Logistics:AGV":          {"scope_id": "Logistics:AGV",        "parent": "*",  "tab_name": "AGV_Shared"},
+    "Logistics:AGV:Forklift": {"scope_id": "Logistics:AGV:Forklift","parent": "Logistics:AGV","tab_name": "AGV_Forklift"},
+    "Logistics:AGV:Tugger":   {"scope_id": "Logistics:AGV:Tugger", "parent": "Logistics:AGV","tab_name": "AGV_Tugger"},
+    "Logistics:AGV:AMR":      {"scope_id": "Logistics:AGV:AMR",    "parent": "Logistics:AGV","tab_name": "AGV_AMR"}
+  },
+  "resolution_order": {
+    "Logistics:AGV:Forklift": ["*", "Logistics:AGV", "Logistics:AGV:Forklift"],
+    "Logistics:AGV:Tugger":   ["*", "Logistics:AGV", "Logistics:AGV:Tugger"],
+    "Logistics:AGV:AMR":      ["*", "Logistics:AGV", "Logistics:AGV:AMR"]
+  },
+  "legacy_map": {
+    "Forklift AGV": "Logistics:AGV:Forklift",
+    "Tugger AGV":   "Logistics:AGV:Tugger",
+    "Mobile AMR":   "Logistics:AGV:AMR"
+  }
+}
 ```
 
-The `base_model_extensions` table contains all technical specification fields from all four AP0 data sheets (SHARED + type-specific). Fields from the Forklift sheet live in the same wide table as Tugger and AMR fields — most are NULL for inapplicable vehicle types.
+**resolution_order** is the key mechanism for scope-aware field selection. For a given leaf scope, the list contains all ancestor scope_ids (root first, leaf last). A field is relevant to a supplier if `field.scope in resolution_order[supplier_leaf_scope]`.
 
-### 4.3 Data Loader (src/data_loader.py)
-
-`load_suppliers()` executes one SQL query:
-
-```sql
-SELECT p.product_id, p.company_id, p.base_model_id, p.product_name, p.agv_type,
-       p.product_description, p.reference_count, p.min_project_value_eur,
-       p.max_project_value_eur, p.lead_time_weeks, p.distribution_model,
-       p.is_oem_product, p.service_coverage, p.active,
-       c.company_name, c.country, c.languages_spoken, c.certifications_generic,
-       bme.*
-FROM products p
-JOIN companies c ON p.company_id = c.company_id
-JOIN base_model_extensions bme ON p.base_model_id = bme.base_model_id
-WHERE p.active = 1
-```
-
-Each row is parsed into `SupplierRecord(product=Product(...), extension=Extension(...))`. Parse helpers:
-- `_parse_multiselect(val)`: None or "" → []; otherwise splits on `|`
-- `_parse_bool(val)`: None → None; 0/"false"/"no" → False; 1/"true"/"yes" → True
-- `_parse_int(val)`: None or "" → None; float strings handled (int(float("1500.0")) = 1500)
-- `_parse_float(val)`: None or "" → None; NaN → None
-
-The `SupplierRecord` is the only representation of supplier data used by the matching engine. Company fields are denormalized into `Product` at load time (company_name, country, languages_spoken, certifications_generic).
-
-### 4.4 Key Invariants
-
-**None ≠ 0 and None ≠ []**
-
-`None` in any field means the value has not been entered in Airtable. It never means the supplier lacks that capability. The null rule (LL-06) in the matching engine enforces this: `None` on either side of a numeric or categorical K.O. comparison never triggers disqualification.
-
-Corollary: do not use `0` or `[]` to represent unknown values. A supplier with `reference_count=None` has unknown references — not zero references.
+**legacy_map** bridges canonical VT names (LLM output domain) to scope IDs (AP0 domain). Always use `legacy_map` to translate; never hardcode scope IDs in Python.
 
 ---
 
-## 5. PDF Ingestion & LLM Pipeline
+## 4. config/unit_semantics.json
 
-### 5.1 PDF Text Extraction
+**Manually maintained — NOT generated by generate_all.py.** Edit this file directly when new signed-domain units are needed.
 
-`extract_text_from_pdf(pdf_bytes)` uses `pdfplumber`:
-- Opens PDF from bytes (no temp file)
-- Extracts text page by page; skips pages with no text
-- Joins pages with double newline
-- Caps at 50,000 characters (~14,000 tokens); appends truncation marker if cut
-- Logs page count, character count, and pages-with-text count
-
-The 50,000-char cap fits comfortably within the 32,768-token context window (configured via `num_ctx=32768` in all Ollama calls).
-
-### 5.2 LLM Passes (in sequence)
-
-All calls go through `call_ollama(system, user, label)` which:
-- Posts to `http://localhost:11434/api/generate` via httpx (timeout=180s)
-- Sets `stream=False`, `temperature=0.0`, `num_predict=4096`, `num_ctx=32768`
-- Logs system size, prompt size, elapsed time, and response size
-- Returns raw string response
-
-#### Pass 1 — basic (always runs)
-
-| Element | Value |
-|---|---|
-| System | `config/prompts/basic_system.txt` |
-| Template | `config/prompts/basic_template.txt` |
-| Placeholder | `{text}` ← full PDF text |
-| Response schema | JSON object |
-| Key fields | buyer, project_name, project_location, tender_date, deadline, contact_name, contact_email, contact_phone, buyer_industry, tender_category, is_agv_amr (bool), summary, missing_info |
-
-After parsing, string "null" values are converted to Python None. Then keyword fallback: if `is_agv_amr` is still False but the first 5,000 chars contain any keyword from `_AGV_DETECT_KWS` (loaded from `vehicle_types.json` → `agv_detection_keywords`), `is_agv_amr` is forced to True.
-
-#### Pass 2 — contact (conditional)
-
-Runs only if all three contact fields (contact_name, contact_email, contact_phone) are missing AND the document is longer than 6,000 characters.
-
-| Element | Value |
-|---|---|
-| System | `config/prompts/contact_system.txt` |
-| Template | `config/prompts/contact_template.txt` |
-| Placeholder | `{text}` ← last 4,000 chars of document |
-| Response schema | JSON object |
-| Key fields | contact_name, contact_email, contact_phone, deadline, tender_date |
-
-Only fills gaps — never overwrites values already found in Pass 1.
-
-#### Pass 3 — nace (always runs)
-
-| Element | Value |
-|---|---|
-| System | `config/prompts/nace_system.txt` |
-| Template | `config/prompts/nace_template.txt` |
-| Placeholders | `{tender_category}`, `{buyer_industry}`, `{category_list}` |
-| Response schema | JSON with nace_tender, nace_tender_name, priority, confidence, in_scope |
-
-`{category_list}` is a newline-separated list of NACE Prio-1 entries loaded from `config/nace_codes.json`. Falls back to tender_category = "unknown service" and buyer_industry = "unknown industry" if Pass 1 did not find them.
-
-If `in_scope=false`, processing continues (matching still runs) but the result is flagged in the frontend.
-
-If `is_agv_amr=false`, processing stops after Pass 3. Total: 2–3 calls.
-
-#### Pass 4a — vehicle type (conditional: is_agv_amr=true)
-
-| Element | Value |
-|---|---|
-| System | `AGV_SYSTEM` = `build_system_context()` |
-| Template | `config/prompts/vehicle_type_template.txt` |
-| Placeholder | `{text}` ← full PDF text |
-| Response schema | `{"required_agv_type": null, "required_vna_capable": null}` |
-
-`build_system_context()` concatenates:
-1. `config/industry_readme.md` (full domain knowledge)
-2. KO and COND_KO field names from `config/fields.json` via `src/field_spec.py`
-3. Nine critical extraction rules (Rule 8: conservative values; Rule 9: anti-hallucination)
-
-After parsing, AP0 validation runs on `required_agv_type` only. Up to 2 correction retries (`agv_4a_correction1/2`) if the value is not in the allowed list. If still invalid after 3 attempts, a warning is emitted and keyword fallback is used.
-
-Post-4a: vehicle type normalization (vt_map lookup, then text_overrides regex scan) sets `canonical_agv_type` and `is_vna_subtype`.
-
-#### Pass 4b — batch extraction (conditional: is_agv_amr=true)
-
-| Element | Value |
-|---|---|
-| System | `AGV_SYSTEM` |
-| Template | `config/prompts/extraction_template_<type>.txt` (type-specific) or `extraction_template.txt` (fallback) |
-| Placeholders | `{text}`, `{vehicle_type}`, `{vna_context}` |
-| Response schema | JSON object with ~40 fields + `<field>_source` for each numeric KO field |
-
-The type-specific template is selected via `_AGV_TYPE_TEMPLATES` dict (built from `vehicle_types.json` → `vt_prompt_map`). Template choice is data-driven — no type names hardcoded in Python.
-
-AP0 validation (`_find_invalid_ap0_fields`) runs on all 4b fields except those already validated in 4a (loaded from `vehicle_types.json` → `4a_fields`). Up to 2 correction retries (`agv_4b_correction1/2`).
-
-Numeric KO fields have automatic `<field>_source` companion keys in the template (injected by `build_extraction_template()` during config generation). The LLM must populate both or the source-span guard will null the value.
-
-#### Pass 4c — per-field extraction (conditional: is_agv_amr=true, runs after 4b)
-
-Pass 4c is a collection of individual LLM calls, one per numeric KO field. It is not driven by a pre-generated template file — prompts are constructed inline in `app.py`.
-
-**Field selection:** `_4c_fields` = fields in `_NUMERIC_KO_FIELD_HINTS` where `sheet` is either `_SHARED_SHEET` or `canonical_agv_type`. This scopes the pass to fields relevant to the detected vehicle type.
-
-**Per-field prompt structure:**
-
-```
-Vehicle type: {canonical_agv_type}. {vna_context}
-
-Find the value of '{field_key}' in the tender document.
-
-Field meaning: {hint_stripped_of_null_rule}
-
-Step 1: Scan the document for any sentence, table cell, or labelled line
-        that states this value directly.
-Step 2: If found, copy it verbatim as the source and extract the number
-        (note: commas in numbers are thousands separators — '1,000' means 1000).
-        {extraction_direction}
-Step 3: If not found anywhere in the document text, output null for both
-        — do NOT infer from vehicle type, warehouse layout, or industry standards.
-
-DOCUMENT:
-{text}
-
-Output ONLY this JSON:
-{"<field_key>": <number or null>, "<field_key>_source": "<verbatim quote or null>"}
+```json
+{
+  "signed_units": ["°C", "°F"],
+  "_comment": "Units with signed domain (zero is a real value). All other numeric units are non-negative — zero means no effective requirement for KO_IF_LT."
+}
 ```
 
-Key design decisions:
-- **NULL RULE stripped from hint**: the system prompt already contains the anti-hallucination rule. Including the NULL RULE in the per-field hint would triple-reinforce null-bias and over-suppress valid values.
-- **Extraction direction from operator**: `_4C_EXTRACTION_DIRECTION[field_key]` is derived from `fields.json` — KO_IF_LT → "extract the MAXIMUM", KO_IF_GT → "extract the MINIMUM". No domain logic hardcoded.
-- **Positive framing**: "Find the value of" rather than "Extract if present" — reduces the LLM's tendency to defer to the null path.
-- **Quote-first steps**: Step 1 finds the source sentence before Step 2 extracts the number — this mirrors human reasoning and reduces fabrication.
+**Purpose:** The `_is_active_requirement()` function in `src/matching.py` treats a tender value of 0 as "no effective requirement" for `KO_IF_LT` fields — unless the field's unit is in `_SIGNED_UNITS`. This allows a minimum temperature of 0°C to be treated as a real constraint (not "no minimum"), while a 0 kg payload requirement means "any payload is acceptable."
 
-**Result handling:**
-- If 4c returns a non-null value → stored in `agv_criteria[field_key]` and `agv_criteria[field_key+"_source"]`; `_4c_count` incremented
-- If 4c returns null → field added to `_4c_abstained`; 4b value is preserved for now
-- If 4c fails (parse error, call error, field absent from dict) → field added to `_4c_abstained`
+**Consumed by:** `src/matching.py` (loaded at startup into `_SIGNED_UNITS`), `app.py` (also loaded at startup).
 
-### 5.3 Source-Span Hallucination Guard
+---
 
-After Pass 4c, `app.py` calls `enforce_source_spans(agv_criteria, document_text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained)` from `src/json_repair.py`. This pure function (no async, no I/O) applies three enforcement layers per field; the first match nulls the value and stops:
+## 5. src/field_spec.py (Generated)
 
-```
-Layer 1: source absent/empty → null (no citation = inference)
-Layer 0: source present but not grounded in real document → null
-Layer 2 (4c abstentions only): source's own digit doesn't confirm value → null
-```
+Generated by `scripts/generate_all.py`. Never edit manually.
 
-Returns `(agv_criteria, messages)` — messages is a list of human-readable log strings surfaced as SSE `log` events.
-
-**Layer 1 — missing source (always active)**
-
-If `<field>_source` is absent or null for a non-null field value: value is set to null. No citation = the LLM inferred the value rather than reading it from the document.
-
-**Layer 0 — source not grounded in the real document (always active)**
-
-`source_is_grounded(value, source, document)` in `src/json_repair.py`:
-
-Two binary conditions must both hold:
-1. **Anchor**: value's digit-string (locale-aware via `_interpret_number_token()`, with ×1000/÷1000 unit-scale variants) must occur somewhere in the real document text.
-2. **Co-location**: at least one distinctive content word from the source quote (length > 3, not in the DE/EN function-word set `_FUNCTION_WORDS`) must appear within `_GROUNDING_WINDOW_CHARS` (80 chars) of an anchor occurrence.
-
-Zero values always pass (LL-06). Non-numeric values return True (field-agnostic). The 80-character window is a corpus-derived text-layout property — not a calibrated parameter.
-
-**Real regression case (CompanyX, 2026-06-16):** The model fabricated 7 numeric KO values, each paired with a self-consistent but document-absent quote. Examples:
-- `required_max_lift_height_m=4.8` with quote "The maximum lift height of the AGVs is up to 4.8 m." — the digit "4.8" does not appear anywhere in the 17,900-character CompanyX.pdf text.
-- `required_temp_max_c=40` with quote "from -25 °C to +40 °C." — "40" does occur in the document (in an unrelated shelf/transfer-point table), but none of the quote's content words ("operating", "temperature", "range") appear within 80 characters of those occurrences. Anchor-only detection would false-accept this; co-location correctly rejects it.
-
-All 7 fabrications are now pinned as regression tests in `tests/unit/test_source_is_grounded.py` (U-SG-07, U-SG-08) and `tests/unit/test_source_span_enforcement.py` (U-SS-04, U-SS-11).
-
-**Layer 2 — abstention + numeric mismatch (scoped to 4c abstentions)**
-
-Triggered only when both conditions hold:
-1. The field is in `_4c_abstained` (Pass 4c returned null or failed)
-2. `source_confirms_value(value, source_text)` in `src/json_repair.py` returns False
-
-`source_confirms_value(value, source_text)`:
-- Uses `_interpret_number_token()` for locale-aware number parsing (handles "3,4" → 3.4, "1,000" → 1000)
-- Returns True if: value is zero; direct float match; value × 1000 in source; value ÷ 1000 in source
-- Field-agnostic: no field names, no domain knowledge
-
-**Why three layers, and why Layer 0 runs unconditionally:**
-- Layer 1 catches absent citations — easy, high confidence
-- Layer 0 catches fabricated citations (value + quote both fabricated) — the fabricated quote is internally consistent but absent from the document. This is unconditional because a citation not in the real document is always wrong, regardless of what 4c did.
-- Layer 2 catches a narrower case: the source quote is genuinely in the document (L0 passes) but the quote's own digit doesn't spell out the extracted value. This could be a legitimate paraphrase — so the 4c abstention is required as additional evidence before nulling.
-
-### 5.4 Post-LLM Validation
-
-#### validate_tender_values() — src/matching.py
-
-Checks every Dropdown and Multi-Select field in the LLM output against `allowed_values` from `fields.json`. Case-insensitive substring matching: `"pallet eur"` matches `"Pallet EUR"`. Values not matching are set to None.
-
-Skipped fields (normalized separately by app.py after validation): `required_agv_type`, `required_vna_capable`, `required_outdoor`.
-
-#### validate_agv_criteria() — app.py
-
-Checks numeric fields against plausibility ranges from `config/plausibility.json`:
-
-| Field | Range | Unit (stored) | Auto-convert from mm? |
-|---|---|---|---|
-| required_max_payload_kg | 100 – 50,000 | kg | No |
-| required_lifting_height_mm | 0.5 – 30.0 | m | Yes (if > 10, factor 0.001) |
-| required_min_aisle_width_mm | 0.5 – 5.0 | m | Yes (if > 10, factor 0.001) |
-| required_tugger_min_aisle_width_mm | 0.5 – 5.0 | m | Yes (if > 10, factor 0.001) |
-| required_operating_temp_min_c | -40 – 30 | °C | No |
-| required_operating_temp_max_c | 0 – 60 | °C | No |
-
-Auto-conversion: if a field has a `conversion` block in `plausibility.json` and the raw value exceeds `conversion.threshold`, the function multiplies by `conversion.factor` (e.g. 0.001 for mm→m). If the converted value is in range, it is used. Otherwise, the value is set to None.
-
-#### Field text fallbacks
-
-After both validation steps, `app.py` applies regex-driven overrides from `_FIELD_TEXT_FALLBACKS` (loaded from `vehicle_types.json`). For each fallback rule `{tender_key, regex, value, only_if_null}`: if the full PDF text matches the regex and (`only_if_null` is False or the field is currently None), the field is set to the configured value. These rules allow AP0-driven overrides for cases where the LLM consistently misses a value that is reliably detectable by regex.
-
-### 5.5 TenderRequirements
-
-`TenderRequirements` (src/matching.py) wraps the raw LLM output dict. The matching engine calls `req.get(spec.uuid)` using the FieldSpec UUID, looks up the value in the raw criteria dict keyed by UUID (with a field_name fallback), and coerces it to the AP0 `data_type`.
+### 5.1 FieldSpec Dataclass
 
 ```python
-def get(self, spec: FieldSpec):
-    # Primary: UUID-keyed lookup (set by _criteria_to_uuid_keyed() in app.py)
-    raw_val = self._raw.get(spec.uuid)
-    # Fallback: field_name key (used in unit tests and legacy paths)
-    if raw_val is None:
-        raw_val = self._raw.get(spec.field_name)
-    coerce = _COERCE.get(spec.data_type, lambda v: v)
-    return coerce(raw_val)
+@dataclass
+class FieldSpec:
+    uuid: str
+    field_name: str
+    tender_key: Optional[str]      # "required_" + field_name
+    entity: str                    # "Company", "Product", "Base Model"
+    scope: str                     # scope_id string
+    level: Optional[str]           # KO, COND_KO, SCORING, CONTEXT
+    operator: Optional[str]        # KO_IF_LT, KO_IF_GT, KO_IF_NEQ, KO_BOOL_REQUIRED, KO_BOOL_EXCLUSIVE, KO_SUBSET
+    data_type: str                 # Boolean, Integer, Float, Dropdown, Multi-Select, Text
+    unit: Optional[str]
+    allowed_values: Optional[list]
+    score_function: Optional[str]
+    threshold_a: Optional[float]
+    threshold_b: Optional[float]
+    scoring_weight: Optional[int]
+    hint: Optional[str]
+    user_description: Optional[str]
+    display_mode: Optional[str]
+    value_if_null: object = None
 ```
 
-Type coercions: Float → `_f()`, Integer → `_i()`, Multi-Select → `_ms()` (splits on `|` or `,`), Boolean → identity, Dropdown → identity, Text → identity.
+### 5.2 Public API
+
+| Function | Returns | Notes |
+|----------|---------|-------|
+| `load_fields()` | `dict[str, FieldSpec]` | All fields keyed by UUID; asserts UUID uniqueness |
+| `fields_by_tender_key()` | `dict[str, list[FieldSpec]]` | Groups by tender_key; excludes fields with tender_key=None |
+| `fields_by_field_name()` | `dict[str, list[FieldSpec]]` | Groups by field_name; one name can appear in multiple scopes |
+
+Note: `fields_by_scope()` and `fields_by_sheet()` are NOT present in the generated file. Scope-based filtering is done by callers using `scope in resolution_order[leaf_scope]`.
 
 ---
 
-## 6. Prompt System
+## 6. app.py Module-Level Constants
 
-### 6.1 Prompt File Inventory
+All constants are loaded from config files at import time. No domain knowledge is hardcoded.
 
-All prompt files live in `config/prompts/`. All are generated by `generate_all.py`. Never edit manually.
+| Constant | Type | Source | Purpose |
+|----------|------|--------|---------|
+| `_SIGNED_UNITS` | `frozenset` | `config/unit_semantics.json` | Units where 0 is a real constraint for KO_IF_LT |
+| `_EXT_COLUMNS` | `list[str]` | `config/sqlite_schema.json["extensions_columns"]` | Extension column list for sync_airtable |
+| `_FIELDS_BY_TENDER_KEY` | `dict` | `fields_by_tender_key()` | tender_key -> list[FieldSpec] |
+| `_FIELDS_BY_FIELD_NAME` | `dict` | `fields_by_field_name()` | field_name -> list[FieldSpec] |
+| `_TK_TO_UUIDS` | `defaultdict(list)` | Built from `load_fields()` | tender_key -> list of UUIDs; used by `_criteria_to_uuid_keyed()` |
+| `_AP0_CONSTRAINED_FIELDS` | `dict` | Built from `_FIELDS_BY_TENDER_KEY` | tender_key -> {allowed: set, allowed_list: list} for Dropdown/Multi-Select |
+| `_NUMERIC_KO_TENDER_KEYS` | `frozenset` | Built from `_FIELDS_BY_TENDER_KEY` | tender_keys for Float/Integer KO_IF_LT or KO_IF_GT fields |
+| `_NUMERIC_KO_FIELD_HINTS` | `dict` | Built from `_FIELDS_BY_TENDER_KEY` | tender_key -> {hint, scope} for Pass 4c prompt construction |
+| `_4C_EXTRACTION_DIRECTION` | `dict` | Built from `_FIELDS_BY_TENDER_KEY` | tender_key -> direction string (MAXIMUM/MINIMUM) |
+| `_VT_MAP_CFG` | `dict` | `vehicle_types.json["vt_map"]` | llm_output_lower -> canonical VT name |
+| `_VNA_CFG` | `set` | `vehicle_types.json["vna_subtypes"]` | LLM output strings that indicate VNA |
+| `_VT_OVERRIDES` | `list` | `vehicle_types.json["text_overrides"]` | [{regex, canonical, vna}] for text-based VT override |
+| `_VNA_APPLICABLE` | `set` | `vehicle_types.json["vna_applicable_types"]` | Canonical types for which VNA gate applies |
+| `_AGV_DETECT_KWS` | `list` | `vehicle_types.json["agv_detection_keywords"]` | Keywords for is_agv_amr fallback |
+| `_FIELD_TEXT_FALLBACKS` | `list` | `vehicle_types.json["field_text_fallbacks"]` | Regex-based field value overrides |
+| `_LEGACY_MAP` | `dict` | `scope_registry.json["legacy_map"]` | Canonical VT name -> leaf scope_id |
+| `_RESOLUTION_ORDER` | `dict` | `scope_registry.json["resolution_order"]` | leaf_scope_id -> ordered list of ancestor scope_ids |
+| `_SHARED_SCOPE` | `str` | Derived from `scope_registry.json["scopes"]` | scope_id of the one child of "*" (= "Logistics:AGV") |
+| `_VALID_VTS` | `set` | `vehicle_types.json["scoring_bucket_map"].keys()` | Valid canonical VT names for /rematch VT change |
+| `CATEGORY_LIST` | `str` | `nace_codes.json["codes"]` | NACE code list for Pass 3 prompt |
+| `AGV_SYSTEM` | `str` | `build_system_context()` | LLM system prompt for all AGV passes (4a/4b/4c) |
+| `_AGV_TYPE_TEMPLATES` | `dict` | `vehicle_types.json["vt_prompt_map"]` + file reads | canonical_vt -> prompt template string |
+| `_4A_SKIP` | `frozenset` | `vehicle_types.json["4a_fields"]` | Fields from Pass 4a to skip in 4b AP0 validation |
 
-| File | Pass | System or Template | Key placeholders |
-|---|---|---|---|
-| `basic_system.txt` | 1 | System | — |
-| `basic_template.txt` | 1 | Template | `{text}` |
-| `contact_system.txt` | 2 | System | — |
-| `contact_template.txt` | 2 | Template | `{text}` |
-| `nace_system.txt` | 3 | System | — |
-| `nace_template.txt` | 3 | Template | `{tender_category}`, `{buyer_industry}`, `{category_list}` |
-| `vehicle_type_template.txt` | 4a | Template | `{text}` |
-| `extraction_template_forklift_agv.txt` | 4b | Template | `{text}`, `{vehicle_type}`, `{vna_context}` |
-| `extraction_template_tugger_agv.txt` | 4b | Template | `{text}`, `{vehicle_type}`, `{vna_context}` |
-| `extraction_template_mobile_amr.txt` | 4b | Template | `{text}`, `{vehicle_type}`, `{vna_context}` |
-| `extraction_template.txt` | 4b fallback | Template | `{text}` |
-| `extraction_retry_system.txt` | 4b retry | System | — |
-| `extraction_retry_template.txt` | 4b retry | Template | `{text}` |
-| `extraction_system.txt` | — | Static fallback | — |
+### 6.1 Startup Assertions (fail-fast)
 
-Pass 4c prompts are constructed inline in `app.py` (not from files) to allow per-field parameterization.
+```python
+assert _LEGACY_MAP,   "scope_registry.json missing legacy_map"
+assert _SHARED_SCOPE, "scope_registry.json: no shared scope found"
+# exactly 1 child of '*' in scopes (single-domain invariant, Step 7 will generalize)
+assert len(_shared_candidates) == 1
 
-The AGV extraction system prompt (`AGV_SYSTEM`) is not a file — it is built by `build_system_context()` in `src/context_builder.py` at startup.
+# All vt_map canonical values must resolve via legacy_map
+assert _vt_map_values <= set(_LEGACY_MAP)
 
-### 6.2 _fill() Function
+# Plausibility conversion factors must be present for these specific fields
+for _conv_key in ("required_lifting_height_mm", "required_min_aisle_width_mm"):
+    assert plausibility_cfg[_conv_key]["conversion"]["factor"]
+
+# Allowed_values consistency across multi-VT specs for the same tender_key
+for _tk, _specs in _FIELDS_BY_TENDER_KEY.items():
+    assert len(set(tuple(_s.allowed_values or []) for _s in _specs)) <= 1
+
+# Numeric KO infrastructure must be non-empty
+assert _NUMERIC_KO_TENDER_KEYS
+assert _NUMERIC_KO_FIELD_HINTS
+assert _4C_EXTRACTION_DIRECTION
+```
+
+---
+
+## 7. src/matching.py Module-Level Constants
+
+| Constant | Type | Source | Purpose |
+|----------|------|--------|---------|
+| `NULL_KO_PENALTY` | `int` = 15 | Hardcoded | Points deducted per null numeric KO field |
+| `_SIGNED_UNITS` | `frozenset` | `config/unit_semantics.json` | Same as app.py; loaded independently |
+| `_fields` | `dict[str, FieldSpec]` | `load_fields()` | All AP0 fields by UUID |
+| `_scope_registry` | `dict` | `config/scope_registry.json` | Full scope registry |
+| `_LEGACY_MAP` | `dict` | `_scope_registry["legacy_map"]` | Canonical VT name -> scope_id |
+| `_SHARED_SCOPE` | `str` | Derived from `_scope_registry["scopes"]` | scope_id of the shared child of "*" |
+| `OPERATORS` | `dict` | Module-level | operator name -> operator function |
+
+### 7.1 Guardian S2 Assertion
+
+At startup, `matching.py` asserts that every canonical VT name from `vt_map` is present in `legacy_map`:
+
+```python
+_vt_map_values = set(_load_vehicle_types().get("vt_map", {}).values())
+assert _vt_map_values <= set(_LEGACY_MAP)
+```
+
+---
+
+## 8. Matching Operators
+
+### KO_IF_LT
+
+K.O. if `float(supplier_value) < float(tender_value)`.
+
+Use case: payload capacity, lifting height, fleet size, operating hours — supplier must meet or exceed the requirement.
+
+Null behavior: `None` on either side -> no K.O. Tender value of 0 -> no effective requirement (unless field unit is in `_SIGNED_UNITS`).
+
+### KO_IF_GT
+
+K.O. if `float(supplier_value) > float(tender_value)`.
+
+Use case: minimum aisle width, turning radius — supplier must fit within the constraint.
+
+Null behavior: `None` on either side -> no K.O. Tender value of 0 with unsigned unit -> the most restrictive possible constraint (supplier aisle width must be <= 0, which is impossible for any real supplier) — this is a data quality issue, not intended behavior. Signed units (°C, °F) are excluded from the zero-treatment.
+
+### KO_IF_NEQ
+
+K.O. if `str(supplier_value).lower() != str(tender_value).lower()`.
+
+Use case: exact categorical match (e.g. agv_type must match exactly).
+
+Null behavior: `None` on either side -> no K.O. Lists on either side -> skip (use KO_SUBSET for list fields).
+
+### KO_BOOL_REQUIRED
+
+K.O. if tender is "required" (or True or 1) AND supplier is explicitly False (0).
+
+Use case: capabilities that are optionally required (outdoor_capable, cleanroom_capable).
+
+Null behavior: `None` supplier -> no K.O. (LL-06: absence of data != absence of capability).
+
+### KO_BOOL_EXCLUSIVE
+
+Bidirectional boolean gate.
+
+- Tender = "required" AND supplier = False -> K.O.
+- Tender = "not_required" AND supplier = True -> K.O.
+- Tender = None or "preferred" -> no K.O.
+- Supplier = None -> no K.O. (LL-06)
+
+Use case: VNA capability — VNA-required tenders exclude non-VNA suppliers; non-VNA tenders exclude VNA suppliers.
+
+### KO_SUBSET
+
+K.O. if no overlap between tender list and supplier list (substring matching in both directions).
+
+Use case: navigation_type, service_coverage, load_type — at least one common value required.
+
+Null behavior: empty tender or supplier list -> no K.O.
+
+Substring matching: "SLAM" matches "Natural Feature (SLAM)" and vice versa.
+
+---
+
+## 9. Null Rule (LL-06) and Null Penalty
+
+**LL-06:** `None` on either side never triggers a hard K.O. for numeric or categorical operators. Absence of data is not evidence of absent capability.
+
+**Null KO penalty:** When a tender specifies a numeric KO requirement (KO_IF_LT or KO_IF_GT) and the supplier has `None` for that field:
+- Supplier is NOT disqualified
+- A penalty of `-15 pts` (`NULL_KO_PENALTY`) is applied
+- Field is added to `null_gap_fields` for UI display
+
+This ranks suppliers with confirmed data above suppliers with unknown data, without excluding either.
+
+**_is_active_requirement() check:** The null penalty and null_gap tracking both use `_is_active_requirement()` to determine whether the tender actually has an active requirement. For boolean operators, `False`/`"not_required"` tender values are not active requirements and do not generate null_gap entries.
+
+---
+
+## 10. Source-Span Guard (src/json_repair.py)
+
+All functions in this module are field-agnostic. Never add field names, AP0 allowed-values lists, or domain knowledge to this module.
+
+### 10.1 enforce_source_spans()
+
+```python
+def enforce_source_spans(
+    agv_criteria: dict,
+    document_text: str,
+    numeric_ko_keys,       # frozenset of tender_keys subject to the guard
+    four_c_abstained: set, # tender_keys where Pass 4c returned null
+) -> tuple[dict, list[str]]:
+```
+
+For each key in `numeric_ko_keys` with a non-null value in `agv_criteria`, applies three layers in order. Returns `(agv_criteria, messages)`.
+
+**Layer 1:** `agv_criteria.get(f"{key}_source")` is falsy -> null value, add message.
+
+**Layer 0:** `source_is_grounded(value, source, document_text)` returns False -> null value, add message.
+
+**Layer 2 (scoped to abstentions):** `key in four_c_abstained` AND `source_confirms_value(value, source)` returns False -> null value, add message.
+
+### 10.2 source_is_grounded(value, source, document)
+
+Checks whether the LLM's self-reported source quote is actually present in the real document.
+
+Two binary conditions (no fractions, no calibrated cutoffs):
+
+1. **Anchor check:** value's digit-string (with locale ambiguity and x1000/÷1000 scale tolerance via `_interpret_number_token()`) must occur in the real document
+2. **Co-location check:** at least one distinctive content word (> 3 chars, not a function word) from the source quote must appear within `_GROUNDING_WINDOW_CHARS = 80` chars of an anchor occurrence
+
+Returns True if both conditions hold. Zero values always return True.
+
+### 10.3 source_confirms_value(value, source_text)
+
+Checks whether the source text contains a number matching the value within unit-scale tolerance.
+
+- Handles DE locale (comma decimal) and EN locale (period decimal)
+- Tolerance: exact match OR ×1000 OR ÷1000 (unit scale)
+- Zero values always return True
+
+### 10.4 _interpret_number_token(raw)
+
+Returns the set of all plausible float interpretations of a raw number string, handling both locale conventions without choosing one. Used by both source_confirms_value() and source_is_grounded().
+
+### 10.5 repair_and_parse(raw)
+
+5-stage LLM JSON repair parser. Never call `json.loads()` directly on LLM output.
+
+| Stage | Action |
+|-------|--------|
+| 0 | Brace-balanced extraction (finds shortest complete JSON object) |
+| 1 | Direct `json.loads()` |
+| 2 | Remove JS-style comments (`// ...`) |
+| 3 | Fix unescaped newlines inside strings |
+| 4 | Truncation fix (append closing suffix candidates) |
+| 5 | Generic regex field extraction (field-agnostic; sets `_parse_method = "regex_fallback"`) |
+
+Raises `ValueError` if no JSON-like structure can be extracted at all.
+
+---
+
+## 11. config/vehicle_types.json
+
+Generated by `generate_all.py`. Top-level keys:
+
+| Key | Type | Purpose |
+|-----|------|---------|
+| `vt_map` | dict | llm_output_lower -> canonical VT name |
+| `vna_subtypes` | list | LLM output strings indicating VNA (without separate canonical mapping) |
+| `text_overrides` | list | [{regex, canonical, vna}] — regex-based VT override against full PDF text |
+| `keyword_map` | dict | canonical_vt -> list of fallback keywords |
+| `llm_guide` | list | [{name, description, key_indicators}] for Pass 4a prompt |
+| `field_text_fallbacks` | list | [{tender_key, regex, value, only_if_null}] |
+| `vt_prompt_map` | dict | canonical_vt -> prompt filename for Pass 4b |
+| `4a_fields` | list | Field tender_keys determined in Pass 4a; excluded from 4b AP0 correction |
+| `vna_context_hint` | str | Text appended to Pass 4b/4c prompts when is_vna_subtype=True |
+| `scoring_bucket_map` | dict | canonical_vt -> scoring bucket name (for _VALID_VTS) |
+| `vna_applicable_types` | list | canonical VT names for which VNA gate applies (= ["Forklift AGV"]) |
+| `agv_detection_keywords` | list | All keywords from keyword_map, deduplicated; for is_agv_amr fallback |
+
+---
+
+## 12. config/plausibility.json
+
+Generated from AP0 Plausibility Min/Max/Unit columns + platform_config Unit Conversions. Maps tender_key -> range definition.
+
+```json
+{
+  "required_max_payload_kg": {
+    "min": 0.5,
+    "max": 50000.0,
+    "unit": "kg",
+    "label": "max_payload_kg",
+    "conversion": null
+  },
+  "required_lifting_height_mm": {
+    "min": 500.0,
+    "max": 20000.0,
+    "unit": "mm",
+    "label": "lifting_height_mm",
+    "conversion": {
+      "llm_alias": "m",
+      "factor": 0.001,
+      "threshold": 30.0
+    }
+  }
+}
+```
+
+If `conversion` is non-null: when the extracted value exceeds `threshold`, multiply by `factor` (mm -> m: 12000 * 0.001 = 12). If the converted value is within [min, max], accept it; otherwise set to None.
+
+---
+
+## 13. config/sqlite_schema.json
+
+Generated from `② Structure` tab (structural columns) + scope tabs (business field columns).
+
+Top-level keys:
+
+| Key | Type | Purpose |
+|-----|------|---------|
+| `companies` | str | CREATE TABLE SQL for companies |
+| `products` | str | CREATE TABLE SQL for products |
+| `base_models` | str | CREATE TABLE SQL for base_models |
+| `base_model_extensions` | str | CREATE TABLE SQL for base_model_extensions |
+| `bool_fields` | list[str] | All Boolean field_names (for coercion in sync_airtable) |
+| `int_fields` | list[str] | All Integer field_names |
+| `float_fields` | list[str] | All Float field_names |
+| `multiselect_fields` | list[str] | All Multi-Select field_names (pipe-separated in SQLite) |
+| `companies_columns` | list[str] | Ordered column list for companies INSERT |
+| `products_columns` | list[str] | Ordered column list for products INSERT |
+| `extensions_columns` | list[str] | Ordered column list for base_model_extensions INSERT |
+
+---
+
+## 14. Prompt Files (config/prompts/)
+
+All files under `config/prompts/` are generated by `generate_all.py` except where noted.
+
+| File | Generated | Purpose |
+|------|-----------|---------|
+| `basic_system.txt` | Yes | System prompt for Pass 1 (basic extraction) |
+| `basic_template.txt` | Yes | User prompt template for Pass 1; placeholder: `{text}` |
+| `contact_system.txt` | Yes | System prompt for Pass 2 (contact fallback) |
+| `contact_template.txt` | Yes | User prompt template for Pass 2; placeholder: `{text}` |
+| `nace_system.txt` | Yes | System prompt for Pass 3 (NACE classification) |
+| `nace_template.txt` | Yes | User prompt template for Pass 3; placeholders: `{tender_category}`, `{buyer_industry}`, `{category_list}` |
+| `vehicle_type_template.txt` | Yes | User prompt for Pass 4a (vehicle type); placeholder: `{text}` |
+| `extraction_template.txt` | Yes | Combined fallback extraction template (all scopes); placeholders: `{text}` |
+| `extraction_template_agv_forklift.txt` | Yes | Pass 4b template for Forklift AGV; placeholders: `{text}`, `{vehicle_type}`, `{vna_context}` |
+| `extraction_template_agv_tugger.txt` | Yes | Pass 4b template for Tugger AGV |
+| `extraction_template_agv_amr.txt` | Yes | Pass 4b template for Mobile AMR |
+| `extraction_system.txt` | Yes | System prompt for all AGV passes (4a/4b/4c) |
+| `extraction_retry_system.txt` | Yes | System prompt for JSON retry/correction passes |
+| `extraction_retry_template.txt` | Yes | User prompt for JSON retry (all fields, null schema) |
+
+**Note:** generate_all.py prunes stale `extraction_template_*.txt` files that are no longer referenced by `vt_prompt_map`.
+
+### 14.1 _fill() Function
+
+`_fill(template, **kwargs)` in `app.py` replaces `{key}` placeholders without touching JSON braces in the template:
 
 ```python
 def _fill(template: str, **kwargs) -> str:
@@ -611,808 +548,148 @@ def _fill(template: str, **kwargs) -> str:
     return template
 ```
 
-Uses explicit string replacement rather than Python's `.format()` so that JSON template literals like `{"field":null}` in the prompt are never interpreted as format specifiers. None values become empty strings.
+This avoids the `str.format()` pitfall of eating `{"field": null}` JSON syntax in templates.
 
-### 6.3 Context Builder (src/context_builder.py)
+### 14.2 Numeric KO Field Source Instrumentation
 
-`build_system_context()` assembles the AGV extraction system prompt (`AGV_SYSTEM`) used for all AGV passes (4a, 4b, 4c):
+For each numeric KO field (Float/Integer with KO_IF_LT or KO_IF_GT) in the extraction template, `build_extraction_template()` automatically adds:
+1. A `_CONSERVATIVE EXTRACTION` directive in the hint (extract MAXIMUM for KO_IF_LT, MINIMUM for KO_IF_GT)
+2. A companion `<field>_source` entry in the JSON schema requiring the verbatim quote
 
-1. Loads `config/industry_readme.md` (domain knowledge: AGV/AMR classification, VNA, G2P, battery types, VDA 5050, etc.). Falls back to a hard-coded brief summary if the file is missing.
-2. Builds a field section listing all KO and COND_KO fields with their level tags.
-3. Appends nine numbered critical matching rules:
-   - Rules 1–7: domain-specific extraction guidance
-   - Rule 8: CONSERVATIVE VALUE EXTRACTION — extract worst-case values (maximum for minimum-capability fields, minimum for maximum-constraint fields)
-   - Rule 9: ANTI-HALLUCINATION — every non-null value must be traceable to an exact sentence; never infer from warehouse type, AGV type, or domain defaults; do not read numbers from dates, filenames, or version strings
-
-`agv_type_keyword_fallback(text)` is also in context_builder.py. It scans the first 5,000 chars of the document against the `keyword_map` from `vehicle_types.json` and returns the canonical type with the most keyword hits (or None if no hits).
-
-### 6.4 Source Instrumentation in Templates
-
-`build_extraction_template()` in `generate_all.py` automatically adds `<field>_source` companion entries for each numeric KO field:
-
-```
-- required_weight_capacity_kg: ... CONSERVATIVE EXTRACTION: ...
-- required_weight_capacity_kg_source: The EXACT verbatim sentence or phrase from the document
-  that contains the value above. null if the value was not found explicitly in the
-  document — in which case required_weight_capacity_kg MUST also be null.
-```
-
-This instrumentation is also reflected in the JSON schema at the end of the template:
-```json
-{"required_weight_capacity_kg":null,"required_weight_capacity_kg_source":null,...}
-```
+This is what feeds the source-span guard. Fields without a `hint` in AP0 do not appear in the extraction template and do not get source instrumentation.
 
 ---
 
-## 7. Matching Engine (src/matching.py)
+## 15. src/context_builder.py
 
-### 7.1 Architecture
+`build_system_context()` assembles the AGV system prompt (used for Passes 4a, 4b, 4c):
 
-The matching engine is a pure rule interpreter. It reads all rules from `config/fields.json` via `src/field_spec.py` at module load time. No supplier names, AGV type strings, numeric thresholds, or domain decisions appear in the Python source.
+1. Loads `config/industry_readme.md` (domain knowledge)
+2. Iterates all FieldSpec entries; deduplicates by field_name; separates KO and COND_KO fields
+3. Builds `## Field-level descriptions` section from `spec.user_description`
+4. Appends 9 critical matching rules (conservative extraction, anti-hallucination, etc.)
 
-The module-level docstring explicitly states this and lists the permitted operators. Any addition of domain knowledge to this file is an architecture violation.
+`agv_type_keyword_fallback(text)` — independent of LLM — scores the first 5,000 chars against keyword lists from `vehicle_types.json["keyword_map"]` and returns the highest-scoring canonical VT name, or None if no keywords match. Used as fallback when Pass 4a fails.
 
-### 7.2 Operator Reference
+---
 
-All operators are registered in the `OPERATORS` dict and called by name from `fields.json`.
+## 16. TenderRequirements
 
-#### KO_IF_LT
+`TenderRequirements` (in `src/matching.py`) wraps a `TenderRun` for use by the matching engine.
 
-**Semantics:** K.O. if supplier value < tender value.
-**Use cases:** payload capacity, lifting height, towing capacity, battery runtime.
-**Null behavior:** None on either side → no K.O. (LL-06).
-**Example:** tender `required_weight_capacity_kg=2000`, supplier `max_payload_kg=1000` → K.O. ("1000.0 < required 2000.0").
+`.get(field_name)` resolves by field_name -> UUID(s) via `fields_by_field_name()`, returns first non-None value. Falls back to direct key lookup for from_dict callers.
 
-#### KO_IF_GT
+`TenderRequirements.from_dict(raw_dict)` — accepts a UUID-keyed criteria dict from `/match` and `/rematch` endpoints, wraps it in an ephemeral `TenderRun`.
 
-**Semantics:** K.O. if supplier value > tender value.
-**Use cases:** aisle width (supplier needs wider aisle than available), minimum temperature (supplier's lowest rated temp is higher than site minimum).
-**Null behavior:** None on either side → no K.O.
-**Example:** tender `required_min_aisle_width_m=1900` (mm), supplier `min_aisle_width_mm=2400` → K.O. ("needs 2400, only 1900 available").
+`_criteria_to_uuid_keyed(criteria)` in `app.py` translates tender_key -> UUID(s) before passing to the matching engine. Multi-sheet fields (same tender_key in multiple scopes) are broadcast to all matching UUIDs.
 
-#### KO_IF_NEQ
+---
 
-**Semantics:** K.O. if supplier value ≠ tender value (case-insensitive string comparison).
-**Use cases:** agv_type (exact type match required).
-**Null behavior:** None on either side → no K.O.
-**Lists:** if either value is a list, returns no K.O. (use KO_SUBSET instead).
+## 17. generate_all.py Pipeline
 
-#### KO_BOOL_REQUIRED
+`scripts/generate_all.py` executes in order:
 
-**Semantics:** K.O. only if tender="required" AND supplier=False.
-**Use cases:** outdoor_capable, infrastructure_required, forks_free_floating, multi_load_compatibility.
-**Null behavior:** supplier=None → no K.O. (LL-06: unknown ≠ absent).
-**Example:** tender `required_outdoor="required"`, supplier `outdoor_capable=False` → K.O. ("required but supplier does not support it"). Supplier `outdoor_capable=None` → no K.O.
+1. Read `③ Scope Registry` tab -> `data_sheets`, `shared_tab`, `leaf_tabs`, `tab_scope_map`, `scopes_raw`
+2. Read field data from all `data_sheets` -> `field_levels`, `scoring_weights`, `extraction_schema`
+3. Read `Vehicle Types` tab -> `vehicle_types`
+4. Read `Field Fallbacks` tab -> `field_text_fallbacks` (merged into vehicle_types)
+5. Read `② Structure` tab -> `sqlite_schema` (structural columns)
+6. Read scope tabs (business columns) -> extend `sqlite_schema`
+7. Read `platform_config.xlsx` -> NACE codes, platform scope, basic schema, unit conversions
+8. Build `plausibility` = `read_plausibility()` + `unit_conversions` (assert numeric KO fields have plausibility ranges)
+9. `emit_fields_json()` -> write `config/fields.json` and `src/field_spec.py`; apply SA-22/SA-25 hygiene asserts
+10. `_write_scope_registry()` -> write `config/scope_registry.json`; build `legacy_map` and `resolution_chains`
+11. Build VT-specific prompt templates for each leaf tab
+12. Add runtime-derived fields to vehicle_types (scoring_bucket_map, vna_applicable_types, agv_detection_keywords, vt_prompt_map, 4a_fields, vna_context_hint)
+13. Write all config files and prompt files
+14. Prune stale `extraction_template_*.txt` files
+15. Run `validate_vs_sqlite()` and `validate_unit_suffix_drift()` -> print warnings
 
-#### KO_BOOL_EXCLUSIVE
+**`_scope_resolution_chain(scope_id, parent_of)`** — single implementation used by both `_write_scope_registry` (to store resolution_order in JSON) and `generate()` (to select fields per VT for prompt templates). Walks the scope tree from leaf to root and returns the chain root-first.
 
-**Semantics:** Bidirectional boolean K.O.
-**Use cases:** vna_capable (the only field currently using this operator).
-**Behavior:**
-- tender="required" AND supplier ≠ True → K.O. (VNA required but supplier cannot do VNA)
-- tender="not_required" AND supplier = True → K.O. (VNA machine unsuitable for standard-aisle tender)
-- tender=None → no K.O.
-**Null supplier behavior:** None is treated as not True, so tender="required" + supplier=None → K.O. (LL-10 exception to LL-06 for VNA).
+**Dry-run mode** (`--dry-run`): reads everything and validates, but writes nothing. Prints a preview of what would be written.
 
-#### KO_SUBSET
+---
 
-**Semantics:** K.O. if no overlap between tender list and supplier list (substring matching).
-**Use cases:** navigation_type, load_type, special_fork_option.
-**Empty list behavior:** empty on either side → no K.O. (no constraint).
-**Substring matching:** "SLAM" matches "Natural Feature (SLAM)"; "Laser" matches "Laser Reflector".
-**Example:** tender `required_navigation=["Laser Reflector"]`, supplier `navigation_type=["Natural Feature"]` → K.O.
+## 18. VNA Logic End-to-End
 
-### 7.3 Null Rule (LL-06)
+### Detection
 
-**Rule:** None on either side of a KO_IF_LT, KO_IF_GT, KO_IF_NEQ, KO_BOOL_REQUIRED, or KO_SUBSET comparison → no K.O.
+1. Pass 4a: LLM returns `required_vna_capable=true` OR `required_agv_type` normalizes to a value in `_VNA_CFG`
+2. After 4a: text override regex applied; if `override["vna"]` is True, `is_vna_subtype = True`
 
-**Exception (LL-10):** KO_BOOL_EXCLUSIVE with tender="required" + supplier=None → K.O. None is treated as not-capable for the VNA gate.
-
-**Null penalty:** When a tender specifies a numeric KO requirement (level=KO, operator KO_IF_LT or KO_IF_GT) but the supplier has None for that field, a -15 pt penalty is applied instead of disqualification. This ranks confirmed suppliers above unverified ones without excluding them entirely.
+### Matching Assignment
 
 ```python
-NULL_KO_PENALTY = 15  # points deducted
-# Applied after KO phase, before scoring
-for spec in fields_by_sheet(supplier_vt):  # iterates FieldSpec objects from fields.json
-    if spec.operator not in {"KO_IF_LT", "KO_IF_GT"}:
-        continue
-    if req.get(spec) is not None and _supplier_val(ext, prod, spec.field_name) is None:
-        add_score(-NULL_KO_PENALTY, f"{spec.field_name}_null_penalty", None)
+new_req["required_vna_capable"] = (
+    "required"     if is_vna_subtype                                      # VNA tender
+    else "not_required" if canonical_agv_type in _VNA_APPLICABLE         # non-VNA forklift tender
+    else None                                                              # Tugger/AMR — no gate
+)
 ```
 
-### 7.4 Scoring
+`_VNA_APPLICABLE = ["Forklift AGV"]` — loaded from `vehicle_types.json["vna_applicable_types"]`.
 
-The `Matcher` class uses scoring data from `config/fields.json` (via `src/field_spec.py`), organized into buckets:
+### Operator Behavior
 
-| Bucket key | Applied to |
-|---|---|
-| `default` | All vehicle types (common fields: reference_count, lead_time_weeks, vda5050_compatible, etc.) |
-| `forklift_specific` | Forklift AGV additional fields (drop_accuracy_lat_mm, stacking_capability, etc.) |
-| `tugger_specific` | Tugger AGV additional fields |
-| `amr_specific` | Mobile AMR additional fields |
+`KO_BOOL_EXCLUSIVE` on the `vna_capable` field:
 
-The `scoring_bucket_map` in `vehicle_types.json` maps canonical type names to bucket keys. Weights for fields in `default` are always evaluated; the type-specific bucket is added on top.
-
-**Scoring rules:**
-
-| Rule | Behavior |
-|---|---|
-| `bool` | Full pts if supplier value is True |
-| `bool_cond` | Full pts if True AND tender marks field as "required"; otherwise `max(0, pts-2)` |
-| `proportional` | Scales linearly from 0 to pts based on `val / t1` (capped at t1) |
-| `threshold_lower` | Full pts if val ≤ t1 |
-| `threshold_upper` | Full pts if val ≥ t1; half pts otherwise |
-| `tiered_lower` | Full pts if val ≤ t1; half pts if val ≤ t2; 0 otherwise |
-| `tiered_upper` | Full pts if val ≥ t1; half pts if val ≥ t2; 0 otherwise |
-| `nonempty` | Full pts if value is truthy (non-None, non-empty) |
-
-### 7.5 Vehicle Type Logic
-
-**Layer 1 — vt_map normalization (from vehicle_types.json):**
-
-The LLM may return strings like "vna", "reach truck", "agv", or "autonomous mobile robot". All are mapped to exactly one canonical type:
-
-| LLM output (case-insensitive) | Canonical |
-|---|---|
-| "forklift agv", "forklift", "counterbalanced", "reach truck", "vna", "very narrow aisle", "agv" | Forklift AGV |
-| "tugger agv", "tugger" | Tugger AGV |
-| "mobile amr", "amr", "underride amr", "underride", "autonomous mobile robot" | Mobile AMR |
-
-If the LLM output does not match any vt_map key, `agv_type_keyword_fallback()` scans the first 5,000 chars of the document.
-
-**Layer 2 — text_overrides regex scan (from vehicle_types.json):**
-
-Two patterns currently active:
-- `\bVNA\b` → forces canonical_agv_type="Forklift AGV" and is_vna_subtype=True
-- `(?i)schmalgangstapler` → same
-
-The text_overrides are checked against the full document text and can override the LLM's Pass 4a result.
-
-**VNA logic post-normalization:**
-
-After both layers, the VNA flag is set:
-- `is_vna_subtype=True`: `required_vna_capable = "required"`
-- canonical_agv_type in `vna_applicable_types` ("Forklift AGV") but not VNA: `required_vna_capable = "not_required"`
-- All other types: `required_vna_capable = None`
-
-**Critical invariant — VNA state written to agv_criteria:** After computing `new_req["required_vna_capable"]`, the app immediately writes `agv_criteria["required_vna_capable"] = new_req["required_vna_capable"]`. This keeps the server-side cached criteria in sync with the matching requirements. Without this write, the `/rematch` endpoint would reload raw agv_criteria, find the old LLM boolean (e.g. `False`), and pass it as the tender value — causing `_op_bool_exclusive` to never fire. See Section 8.3 for the bug history.
-
-### 7.6 Match Result Structure
-
-`Matcher.match()` returns two lists: `(qualified[:top_n] + disqualified[:top_n], all_results)`.
-
-`to_dict()` on a MatchResult returns:
-
-```python
-{
-    "product":         str,
-    "company":         str,
-    "score":           int,
-    "max_score":       int,
-    "rank":            int,
-    "disqualified":    bool,
-    "disqualified_by": list[str],   # KO failure messages
-    "score_details":   list[{"field": str, "points": int, "value": Any}],
-    "agv_type":        str,
-    "reasons":         list[str],   # "+N pts" summaries for positive scores
-    "knockouts":       list[str],
-    "website":         str,
-    "origin":          str,
-    "description":     str,
-    "navigation":      str,         # pipe-joined navigation types
-    "max_payload_kg":  float | None,
-    "lifting_height_mm": int | None,
-    "min_aisle_width_mm": int | None,
-    "max_speed_ms":    float | None,
-    "vda5050":         bool | None,
-    "battery_runtime_h": float | None,
-    "autonomous_charging": bool | None,
-    "reference_count": int | None,
-    "lead_time_weeks": int | None,
-    "service_coverage": list[str],
-}
-```
+| Tender required_vna_capable | Supplier vna_capable | Result |
+|-----------------------------|---------------------|--------|
+| "required" | True | Pass |
+| "required" | False | K.O. |
+| "required" | None | Pass (LL-06) |
+| "not_required" | True | K.O. (VNA equipment in standard aisle) |
+| "not_required" | False | Pass |
+| "not_required" | None | Pass (LL-06) |
+| None (Tugger/AMR) | any | Pass (no gate) |
 
 ---
 
-## 8. API & Frontend Integration
+## 19. /rematch Endpoint Logic
 
-### 8.1 FastAPI Endpoints
+Accepts `{analysis_id, overrides, vehicle_type?}` and re-runs matching against the cached extraction.
 
-| Method | Path | Description |
-|---|---|---|
-| GET | `/` | Serves `templates/index.html` (Jinja2) |
-| POST | `/analyze` | Main analysis endpoint; accepts `multipart/form-data` with `file` field; returns SSE stream |
-| POST | `/match` | Direct matching API; accepts JSON body with tender requirements; returns `{top, all, total}` |
-| POST | `/rematch` | Re-run matching after user clarification; accepts `{overrides: {field_name: value}}`; returns `{top, all, total}` |
-| GET | `/debug-page` | Serves `templates/debug.html` for full extraction debug view |
-| GET | `/db` | Serves `templates/db.html` for supplier database browser |
-| GET | `/db-status` | Reports whether SQLite is loaded and how many suppliers are active |
-| GET | `/api/field-meta` | Returns AP0 field metadata (label, tender_key, level, data_type, operator, sheet) for all fields |
-| GET | `/api/last-result` | Returns `_last_analysis_result` (server-side cache); 404 if no analysis has run |
-| GET | `/api/suppliers` | Returns all active supplier records; columns driven by `sqlite_schema.json` |
-| GET | `/health` | Reports Ollama reachability and model availability |
-
-### 8.2 SSE Streaming
-
-The `/analyze` endpoint uses `StreamingResponse(stream(), media_type="text/event-stream")`. Events are emitted progressively throughout processing:
-
-```
-event: step
-data: {"id": "upload", "status": "done", "message": "'doc.pdf' empfangen"}
-
-event: step
-data: {"id": "extract", "status": "running", "message": "Text wird extrahiert…"}
-
-event: log
-data: {"message": "PDF-Größe: 245 KB"}
-
-event: step
-data: {"id": "agv", "status": "running", "message": "Pass 4c: 8 numerische Felder einzeln…"}
-
-event: result
-data: { "buyer": "...", "agv_criteria": {...}, "matches": [...], "matches_all": [...] }
-```
-
-| Event type | Description | Frontend visibility |
-|---|---|---|
-| `step` | Progress update (id, status: running/done/error, message) | Shown as progress indicator |
-| `log` | Diagnostic detail including AP0 filter warnings and source-span guard nullings | Hidden by default |
-| `result` | Full final payload | Rendered as match results |
-| `error` | Fatal error, processing stops | Shown as error state |
-| `warning` | Non-fatal field-level warning (e.g. AP0 violation after 3 retries) | Shown inline |
-
-### 8.3 /rematch Endpoint — Post-Clarification Re-matching
-
-After the SSE stream completes, the frontend may show a clarification panel asking the user to fill in missing KO fields. When the user submits, `confirmClarification()` in `templates/index.html` calls `/rematch` rather than `/analyze`.
-
-**Endpoint contract:**
-
-```
-POST /rematch
-Body: {"overrides": {"lifting_height_mm": 12000, "min_aisle_width_mm": 2400}}
-```
-
-Overrides use AP0 `db_field` names (the same names as in `fields.json`) with values in native AP0 units (mm for lengths, kg for weights).
-
-**Server-side logic (app.py lines 916–945):**
-
-1. Reads `_last_analysis_result["agv_criteria"]` as base — all previously extracted KO fields are preserved
-2. For each override: looks up the AP0 `tender_key` via `_FIELDS_BY_FIELD_NAME`; applies mm→m unit conversion via plausibility.json conversion block if applicable; writes to `criteria[tender_key]`
-3. Calls `match_suppliers_new(criteria, _SUPPLIERS, top_n=10)`
-4. Updates `_last_analysis_result["matches"]`, `["matches_all"]`, and `["agv_criteria"]` in-place
-
-The in-place update to `_last_analysis_result` is the key: it means `/api/last-result` (and therefore `debug.html`) always reflect the post-clarification state.
-
-**Frontend handling (templates/index.html lines 494–503):**
-
-```javascript
-fetch('/rematch', { ... body: JSON.stringify({ overrides }) })
-  .then(r => r.json())
-  .then(result => {
-    _pendingResultData.matches     = result.top  || [];
-    _pendingResultData.matches_all = result.all  || [];
-    _lastResult = _pendingResultData;
-    showResult(_pendingResultData);
-  });
-```
-
-The frontend merges the rematch results into `_pendingResultData` (which already has the buyer, NACE, and agv_criteria from the SSE stream), sets `_lastResult`, and re-renders. This was the single-data-source fix: prior to 2026-06-21, `confirmClarification()` called `/match` directly with only the override fields — losing the full analysis context.
-
-**VNA state bug and fix (2026-06-22):**
-
-Before the fix, `agv_criteria["required_vna_capable"]` retained the raw LLM boolean (`False`) while `new_req["required_vna_capable"]` held the correct string (`"not_required"`). The `/rematch` endpoint loaded `agv_criteria` as base, found `required_vna_capable=False`, and passed it to the matching engine. The `_op_bool_exclusive` handler received `t=False` (not the string `"not_required"`) and never fired the VNA exclusion — so VNA-capable suppliers passed non-VNA tenders after clarification.
-
-Fix: after computing `new_req["required_vna_capable"]`:
-
-```python
-agv_criteria["required_vna_capable"] = new_req["required_vna_capable"]
-```
-
-This keeps `agv_criteria` in sync with `new_req` before `agv_criteria` is stored in `_last_analysis_result`.
-
-### 8.4 Shortlist — Company-Level Aggregation
-
-The backend returns all matched products (typically 70–80 rows) in `matches_all`. The frontend aggregates by company before displaying the shortlist.
-
-**`_aggregateByCompany(allResults)` (templates/index.html):**
-
-1. Groups products by `r.company` into a dict
-2. For each company:
-   - Splits products into qualified (non-DQ) and disqualified (DQ) buckets
-   - Builds a `qualified_products` list: all non-DQ products sorted by score descending, capped at 5
-   - Selects the "best" product as `qualified_products[0]` (or the best DQ product if no qualified products exist)
-3. Sorts companies: qualified companies first (by best score descending), then disqualified companies (by best score descending)
-
-**Shortlist rendering (`renderSupplierCards`):**
-
-- `qualified.slice(0, 5)` — shows the top 5 qualified companies as cards with match-quality labels (Top Match ≥70%, Good Match ≥40%, Partial Match <40%)
-- Each company card renders a `.sc-product-list` showing all entries in `qualified_products` (up to 5):
-  - The first (best-score) product renders as the primary row
-  - Additional products render as `.sc-product-row .sc-product-secondary` rows with name, score, and a `.sc-score-pct` percentage badge
-- Disqualified companies are shown as a collapsed "excluded" section below
-- "Vollständige Analyse →" button opens `debug.html` in a new tab with all 70–80 individual product rows
-
-**CSS classes introduced:** `sc-product-list`, `sc-product-row`, `sc-product-secondary`, `sc-score-pct`.
-
-### 8.5 Debug Page Data Flow
-
-`/debug-page` serves `templates/debug.html`. The debug page opens in a new tab and fetches `/api/last-result` on load:
-
-```javascript
-fetch('/api/last-result')
-  .then(r => r.json())
-  .then(data => renderDebug(data));
-```
-
-`/api/last-result` returns `_last_analysis_result` — the same server-side cache that is updated by both the SSE stream endpoint (`/analyze`) and the `/rematch` endpoint. Because `/rematch` updates `_last_analysis_result` in-place (Section 8.3), the debug page and the shortlist always show the same data after a clarification.
-
-**Stylesheet fix (2026-06-22):** `templates/debug.html` previously loaded Google Fonts directly and was missing `/static/haystacked/haystacked.css`. This caused Times New Roman rendering in tables (no `body { font-family }` set) and broken CSS custom properties. Fixed by replacing the Google Fonts `<link>` with `/static/haystacked/haystacked.css` — the same stylesheet used by `index.html` — so CSS variables, font stack, and table styles are consistent across both pages.
-
-**Before the single data source fix (2026-06-21):** The shortlist after clarification used `_pendingResultData.matches` (updated via `/match`), while the debug page fetched `/api/last-result` which still had the pre-clarification matches from the SSE stream. The two views were inconsistent.
+1. Load cached `agv_criteria` from `_analyses[analysis_id]`
+2. Apply `overrides` (by field_name -> tender_key via `_FIELDS_BY_FIELD_NAME`; empty string -> None)
+3. If `vehicle_type` changed: clear all fields scoped to the old VT's leaf scope from criteria; reset `required_vna_capable = None` (cannot determine VNA without re-running Pass 4a)
+4. Apply `validate_agv_criteria()` (same unit conversion and plausibility as main flow)
+5. Apply `_to_match_units()` and `_criteria_to_uuid_keyed()`
+6. Run `match_suppliers_new()` and return results
+7. Update `_analyses[analysis_id]` so `/api/last-result` stays in sync
 
 ---
 
-## 9. Test Strategy
+## 20. Step 6 Behavior Changes (UFR Sprint)
 
-### 9.1 Existing Tests
+The following fields changed level or operator in AP0 during Step 6 of the UFR Sprint:
 
-**`tests/unit/test_matching_logic.py`** — 28 tests (U-M-01 to U-M-28)
+| Field | Old level/operator | New level | Reason |
+|-------|--------------------|-----------|--------|
+| `navigation_type` | COND_KO / KO_SUBSET | CONTEXT | No matching, informational only |
+| `battery_type` | COND_KO | CONTEXT | No matching, informational only |
+| `fleet_management_system` | COND_KO | CONTEXT | No matching, informational only |
+| `max_fleet_size` | SCORING | CONTEXT | No matching, informational only |
+| `ingress_protection_rating` | COND_KO | CONTEXT | No matching, informational only |
+| `floor_flatness_req` | COND_KO | CONTEXT | No matching, informational only |
+| `integration_capability` | SCORING | COND_KO / KO_SUBSET | Now a real matching criterion |
+| `infrastructure_required` | COND_KO / KO_BOOL_REQUIRED | Renamed + inverted | See infrastructure_free below |
+| `infrastructure_free` | (new field) | COND_KO / KO_BOOL_REQUIRED | TRUE = no infrastructure needed |
 
-Covers: KO_IF_LT payload check; null payload not disqualified; wrong AGV type; navigation no match; COND_KO outdoor not-required; COND_KO outdoor required + False; COND_KO outdoor required + None; forks_free_floating required; scoring reference_count ranking; null reference_count; VDA5050 preferred no filter; empty tender returns all; VNA KO_BOOL_EXCLUSIVE (both directions, pass, null); special_fork_option (null tender, mismatch, match); null KO penalty fires; null KO penalty absent when tender null; VDA5050 not double-counted; no hardcoded preferred-bonus labels; service_coverage KO_SUBSET DACH vs EU-only (U-M-14 — uses correct tender_key `required_service_coverage`).
+**infrastructure_free boolean semantics:**
+- True: vehicle operates without fixed infrastructure (SLAM, contour navigation, free-path planning)
+- False: vehicle requires fixed infrastructure (magnetic tape, QR codes, reflectors, wire guidance)
 
-**`tests/unit/test_extraction_nulls.py`** — 7 tests (U-E-01 to U-E-07)
-
-Covers: Dragonfly.pdf golden values (lift height must be null, aisle width 1.9m, payload 1000kg, VNA required); null lift height survives validate_agv_criteria; `source_confirms_value()` boundary conditions (direct match, thousands separator, mm/m scale, false positive guard, zero); `_NUMERIC_KO_TENDER_KEYS` non-empty and contains expected keys.
-
-**`tests/unit/test_source_span_enforcement.py`** — 11 tests (U-SS-01 to U-SS-11). Imports `enforce_source_spans()` from `src/json_repair.py` directly.
-
-Covers: Layer 1 (source None; source empty string); Layer 0 (fabricated CompanyX lift-height value with self-consistent but document-absent quote nulled; genuine CompanyX weight with paraphrased quote preserved; German decimal comma grounded; PDF private-use-area glyph does not merge temperature numbers); Layer 2 (digit-free but grounded quote + 4c abstained → nulled; same quote without abstention → preserved); None value skipped entirely; documented gradient/10 residual regression.
-
-Note: this file previously contained a hand-maintained inline copy of the enforcement loop. It now imports the real production function — ensuring tests cannot drift from the code that actually runs.
-
-**`tests/unit/test_source_is_grounded.py`** — 12 tests (U-SG-01 to U-SG-12). All cases use real value/quote/document triples from the tender corpus.
-
-Covers: genuine verbatim quote (Dragonfly); genuine paraphrased quote (CompanyX); German decimal comma (Nordlicht "3,4 m"); unit-scale mismatch meter/mm (Dragonfly); PDF glyph artifact in temperature range (Mama); bullet-glyph noise near weight value (Mama); all 7 CompanyX fabrications rejected as a batch (U-SG-07); temp_max=40 anchor-present-but-colocation-fails case (U-SG-08, the anchor-only false-positive trap); lift-height=4.8 anchor-absent case (U-SG-09); zero always grounded; empty/None source; non-numeric value passthrough.
-
-**`tests/unit/test_source_confirms_value.py`** / **`test_source_confirms_value_german.py`** — `source_confirms_value()` boundary tests (function is in `src/json_repair.py`).
-
-Covers: direct numeric match; thousands-separator comma; mm/m unit scale (×1000, ÷1000); false positive guard (different number); German decimal comma (`3,4` interpreted as `3.4`); negative temperatures.
-
-**`tests/unit/test_validate_tender_values.py`** — AP0 allowed-values filter tests.
-
-Covers: valid Dropdown values pass; invalid values nulled; Multi-Select intersection filtering; case-insensitive substring matching.
-
-**`tests/unit/test_4c_direction_constants.py`** — Pass 4c direction constant tests.
-
-Covers: `_4C_EXTRACTION_DIRECTION` non-empty; KO_IF_LT fields map to "MAXIMUM"; KO_IF_GT fields map to "MINIMUM"; no unknown direction values.
-
-**`tests/unit/test_find_invalid_ap0_fields.py`** — AP0 constraint violation detection tests.
-
-**`tests/unit/test_json_repair_parser.py`** — 10 tests (U-J-01 to U-J-10)
-
-Covers: clean JSON; markdown fences; prose before JSON; string "null"; string booleans; truncated JSON; unescaped newlines; completely unparseable (raises ValueError); stray brace in trailing prose (Stage 0 brace-balance); nested braces.
-
-Tests import from `src.json_repair` — the single canonical implementation used by app.py, llm_client.py, and tests.
-
-**`tests/unit/test_agv_keyword_fallback.py`** — 8 tests (U-K-01 to U-K-08)
-
-Covers: VNA, Schmalgangstapler, Routenzug, milk run, AMR, goods-to-person, no keywords (returns None), 5,000-char boundary (keyword beyond 5,000 chars not detected).
-
-**`tests/unit/test_data_loader.py`** — 14 tests (U-D-01 to U-D-16, some IDs skipped)
-
-Covers: pipe-separated multiselect; empty string → []; None → []; bool parsing (int, string, None); int/float parsing; empty string → None; UUID format; embedded comma in multiselect; whitespace trimming; NaN → None.
-
-**`tests/unit/test_golden_extraction.py`** — Parametrized golden-run regression test.
-
-Loads all `tests/tenders/tender_XXX.json` fixtures that have `golden_extraction` or `expected_out_of_scope=true` and compares against the corresponding `golden_run_tender_XXX.json` output files. As of 2026-06-17, covers 5 fixtures (tender_001 Nordlicht, tender_002 Dragonfly, tender_003 OeA-199-25 out-of-scope, tender_004 Mama, tender_005 CompanyX). Includes a floor guard asserting at least 5 fixtures are always collected. Covers all 8 numeric KO fields per tender (not just a subset). CompanyX (tender_005) is the key regression case: all 7 fabricated fields must be null in the golden run.
-
-**`tests/unit/test_ap0_consistency.py`** — AP0 → UI consistency tests (T-CON-01–T-CON-07, T-UI-01–T-UI-03)
-
-Introduced 2026-06-19 to catch the class of bug where fields present in the AP0 xlsx were silently absent from API responses. The original incident: `/api/suppliers` had a ~55-field hardcoded whitelist — all Mobile AMR-specific fields were silently absent.
-
-All assertions are driven by the generated config files (no field names hardcoded in tests). Covers:
-- T-CON-01: every extension column in `sqlite_schema.json` has a corresponding attribute on the `Extension` dataclass (or is listed in `_EXT_INTERNAL`)
-- T-CON-02: `Extension` field types match the `sqlite_schema.json` SQL type (flags throughput_picks_per_hour mismatch: declared Optional[int] but TEXT in schema)
-- T-CON-03: every Extension attribute has a wiring path in `data_loader.py` (every column parsed and assigned)
-- T-CON-04–06: field meta and supplier API exposure checks
-- T-UI-01–T-UI-03: `/api/field-meta` and `/api/suppliers` coverage
-
-Currently produces xfail entries for six Extension-dataclass gaps: installation_process, modification_process, min_fleet_size, typical_project_value_eur, multi_language_display, gamification (tracked as C-1 in Section 12).
-
-**`tests/integration/test_llm_preflight.py`** — 2 tests (I-S-01, I-S-02)
-
-Session-scoped fixture checks Ollama is reachable and the model is in the manifest before any test runs. On failure, `pytest.exit()` aborts the entire integration suite.
-
-- I-S-01: model in Ollama manifest
-- I-S-02: model responds to a minimal prompt with parseable JSON
-
-Requires a running Ollama instance with qwen2.5:7b. Run separately: `pytest tests/integration/ -v`.
-
-### 9.2 Coverage Assessment
-
-**Well covered:**
-- All six matching operators across KO and COND_KO scenarios
-- Null rule (LL-06) in both directions
-- VNA KO_BOOL_EXCLUSIVE bidirectional gate
-- Null KO penalty mechanism
-- JSON repair and parse edge cases (including Stage 0 brace-balance)
-- Data loader type coercions
-- Keyword fallback boundary behavior
-- `source_confirms_value()` boundary conditions (including German decimal comma, unit scale)
-- `_NUMERIC_KO_TENDER_KEYS` completeness guard
-- All three source-span guard layers (L1, L0, L2) — including corpus-grounded real CompanyX cases
-- `source_is_grounded()` — anchor-only false-positive trap, PDF glyph artifacts, paraphrase vs. verbatim
-- Golden extraction regression for 5 tenders including out-of-scope case
-- AP0 → dataclass → data_loader → API field wiring consistency
-
-**Identified gaps:**
-
-| Gap | Risk | Recommended test |
-|---|---|---|
-| No live extraction tests | High — hallucinations only caught on live runs | Run `scripts/capture_pipeline_run.py` for new tenders; commit golden run files |
-| No end-to-end SSE test | Medium — streaming pipeline not integration-tested | Test with TestClient + httpx streaming |
-| mm→m conversion in validate_agv_criteria | Medium | Test: value 1900 + mm_to_m field → stored as 1.9 |
-| Field text fallbacks | Medium | Test: regex matches → tender_key overridden |
-| /rematch endpoint | Medium — new code path | Test: override writes to criteria[tender_key]; mm→m conversion in override; VNA state preserved |
-
-### 9.3 Recommended Additional Tests
-
-**U-E-next: validate_agv_criteria mm→m conversion**
-```python
-criteria = {"required_min_aisle_width_m": 1900}  # mm value for an m field
-cleaned, _ = validate_agv_criteria(criteria)
-assert cleaned["required_min_aisle_width_m"] == pytest.approx(1.9)
-```
-
-**U-R-01: /rematch writes tender_key, not field_name**
-Verify that overriding `lifting_height_mm` writes to `required_max_lift_height_m` in criteria (the tender_key), not to `lifting_height_mm`.
-
-**U-R-02: /rematch preserves VNA state**
-Set up `_last_analysis_result` with `agv_criteria["required_vna_capable"] = "required"`, call `/rematch` with a payload override, assert `required_vna_capable` is still `"required"` in the returned criteria.
-
-**U-R-03: /rematch mm→m conversion**
-Override with `{"min_aisle_width_mm": 1800}`, assert criteria contains `required_min_aisle_width_m = 1.8`.
-
-**U-M-29: COND_KO + CONTEXT field does not trigger KO**
-Ensure a field with level=CONTEXT and no operator is never evaluated as a KO rule.
+The field replaces `infrastructure_required` with inverted boolean: if a tender is `infrastructure_free=True` (no infrastructure available), then a supplier with `infrastructure_free=False` (requires infrastructure) receives a K.O.
 
 ---
 
-## 10. Configuration Reference
-
-### config/fields.json
-
-**Generated by:** `generate_all.py` → `emit_fields_json()`
-**Read by:** `src/field_spec.py` (load_fields, helpers); `src/matching.py` (all matching logic); `app.py` (_FIELDS_BY_TENDER_KEY, _FIELDS_BY_FIELD_NAME, _NUMERIC_KO_TENDER_KEYS, _NUMERIC_KO_FIELD_HINTS, _4C_EXTRACTION_DIRECTION, _AP0_CONSTRAINED_FIELDS); `/api/field-meta` endpoint
-
-Schema per entry, keyed by UUID:
-```json
-"3f7a2b1c-...": {
-    "uuid": "3f7a2b1c-...",
-    "label": "Max Payload",
-    "field_name": "max_payload_kg",
-    "tender_key": "required_max_payload_kg",
-    "entity": "Product",
-    "sheet": "Forklift AGV",
-    "operator": "KO_IF_LT",
-    "data_type": "Float",
-    "unit": "kg",
-    "allowed_values": null,
-    "score_function": null,
-    "threshold_a": null,
-    "threshold_b": null,
-    "weight": 10,
-    "hint": "...",
-    "user_description": null,
-    "display_mode": null
-}
-```
-
-> **Naming note:** the matching operator field is keyed `"operator"` (not `"matching_operator"`) in both `fields.json` and `FieldSpec`. A grep on `matching_operator` returns no results — use `operator` when querying or auditing operator coverage.
-
-### config/vehicle_types.json
-
-**Generated by:** `generate_all.py` → `read_vehicle_types()` + runtime additions
-**Read by:** `app.py` (multiple constants); `src/matching.py` (_SCORING_BUCKET_MAP); `src/context_builder.py` (AGV_KEYWORDS)
-
-Key top-level keys:
-- `vt_map`: dict mapping LLM output strings (lowercase) to canonical types
-- `vna_subtypes`: list of LLM output strings that imply VNA
-- `text_overrides`: list of {regex, canonical, vna} — regex patterns that force a type/VNA flag
-- `keyword_map`: dict mapping canonical type → list of fallback keywords
-- `llm_guide`: list of {name, description, key_indicators} for Pass 4a prompt
-- `agv_detection_keywords`: flat list of all keywords for is_agv_amr fallback detection
-- `scoring_bucket_map`: canonical type → scoring_weights bucket name
-- `vna_applicable_types`: list of types where VNA gate applies (currently ["Forklift AGV"])
-- `shared_sheet_name`: string name of the SHARED sheet — loaded as `_SHARED_SHEET` in app.py (asserted non-empty at startup)
-- `vt_prompt_map`: canonical type → template filename for Pass 4b
-- `4a_fields`: list of fields determined in Pass 4a (excluded from 4b validation)
-- `vna_context_hint`: string injected as `{vna_context}` placeholder for VNA tenders
-- `field_text_fallbacks`: list of {tender_key, regex, value, only_if_null}
-
-### Scoring (formerly config/scoring_weights.json — removed)
-
-Scoring weights and rules are now part of `config/fields.json` (fields with `score_function` and `weight` populated). The `scoring_bucket_map` in `vehicle_types.json` maps canonical type names to bucket keys so the matching engine knows which fields apply to each vehicle type. `config/scoring_weights.json` no longer exists.
-
-### config/nace_codes.json
-
-**Generated by:** `generate_all.py` → `read_platform()`
-**Read by:** `app.py` (CATEGORY_LIST for Pass 3 nace_template)
-
-Keys: `codes` (list of "CODE: Name | hint" strings), `scope_in`, `scope_out`, `basic_schema`.
-
-### config/plausibility.json
-
-**Generated by:** `generate_all.py` → `build_plausibility_config()`
-**Read by:** `app.py` (AGV_PLAUSIBILITY, conversion lookup)
-
-Per key: `{min, max, unit, label, conversion}`. `conversion` is null or `{llm_alias, factor, threshold}` for fields where the LLM may output a different unit (e.g. mm→m: factor=0.001, threshold=10.0). Plausibility ranges come from AP0 xlsx (Plausibility Min/Max columns); conversion parameters come from the platform config xlsx Unit Conversions sheet.
-
-### config/sqlite_schema.json
-
-**Generated by:** `generate_all.py` → `read_sqlite_schema()`
-**Read by:** `sync_airtable.py` (_SQLITE_SCHEMA, _EXT_COLUMNS); `tests/unit/test_ap0_consistency.py` (T-CON-01–T-CON-07)
-
-Keys: `companies`, `products`, `base_models`, `base_model_extensions` (CREATE TABLE SQL strings); `bool_fields`, `int_fields`, `float_fields` (lists of field names for type coercion); `extensions_columns` (ordered column list for INSERT).
-
-### Extraction hints (formerly config/extraction_hints.json — removed)
-
-Extraction hints are now part of `config/fields.json` (the `hint` field on each FieldSpec). The `sheet` value (for Pass 4c scoping) is also in `fields.json`. `config/extraction_hints.json` no longer exists — all consumers read from `src/field_spec.py` helpers.
-
-### config/industry_readme.md
-
-**Source:** `Spec/haystacked_industry_readme.md`
-**Synced by:** `generate_all.py` (file copy, only when Spec version is newer)
-**Read by:** `src/context_builder.py` (build_system_context)
-
-Contains AGV/AMR domain knowledge: vehicle classification rules, VNA logic, G2P workflows, battery types, VDA 5050 overview, OEM rebadging, the Blank ≠ Zero principle, and additional fleet/integration context. This is the primary domain knowledge source for the LLM — edit `Spec/haystacked_industry_readme.md`, then run `generate_all.py` to sync.
-
-### config/prompts/*.txt
-
-All generated by `generate_all.py`. Never edit. See Section 6.1 for the full inventory.
-
----
-
-## 11. Agent Coordination Model
-
-As of 2026-06-21, `CLAUDE.md` defines a Tech Lead/PM role with a 7-step agent coordination protocol. This section documents how development work is structured across agents.
-
-### 11.1 Tech Lead Role (main Claude instance)
-
-The main Claude instance acts as Tech Lead and PM — not as implementer. Responsibilities:
-
-1. **Sparring partner** — evaluates feasibility before committing to changes; pushes back on over-engineering
-2. **Agent coordinator** — runs the 7-step flow for every change
-3. **Continuous improvement** — flags architectural drift proactively
-4. **Agent skills management** — after Lessons Learned: distinguishes agent-prompt problems (→ update agent definition) from architecture problems (→ update AP0 or code)
-5. **Critical stance** — verifies agent output before relaying; escalates to senior-architect when agents conflict
-
-### 11.2 7-Step Coordination Flow
-
-For every change:
-
-| Step | Action | Agent |
-|---|---|---|
-| a | Draft implementation plan — file-level, scoped, with Definition of Done | Tech Lead |
-| b | Pre-plan risk check (if touching AP0, hallucination guard, KO logic, or matching engine) | senior-architect |
-| c | Consult review agents; incorporate feedback | ap0-architecture-guardian + reference-integrity-guardian |
-| d | Brief the developer agent with full context | haystacked-developer |
-| e | Review implementation against plan; stop on scope creep | Tech Lead |
-| f | Optional: background E2E check if matching or extraction was touched | backend-llm-tester |
-| g | Optional: commit (only when user explicitly requests) | Tech Lead |
-
-### 11.3 haystacked-developer Agent
-
-Defined in `.claude/agents/haystacked-developer.md`. Key characteristics:
-- Model: Sonnet
-- Tools: Bash, Read, Write, Edit (no web, no Agent spawning)
-- Never commits — commits are always the Tech Lead's decision
-- Never edits generated files
-- Never adds domain logic to Python
-- Reports via a structured IMPLEMENTATION REPORT: changes made, test results, deviations, flags for Tech Lead
-- Flags immediately if a plan step requires editing a generated file, adding domain logic, is ambiguous, or would affect more files than planned
-
-### 11.4 Other Agents
-
-| Agent | Purpose | When to invoke |
-|---|---|---|
-| `ap0-architecture-guardian` | Checks that changes respect AP0-as-SSoT boundary | Before finalizing any plan touching matching, scoring, prompts, or extraction |
-| `reference-integrity-guardian` | Verifies all imports and paths remain valid after file moves/renames | After any refactor that changes file locations |
-| `senior-architect` | Architectural decisions when agents conflict or a systemic fix is needed | When other agents are stuck, or for full codebase audits |
-| `backend-llm-tester` | End-to-end pipeline test: generate_all → analyze tenders → run LLM → compare against expectations | After matching or extraction changes; runs in background |
-| `agv-spec-researcher` | Research real-world AGV specs from manufacturer websites | When populating or verifying supplier database fields |
-| `app-documentation-writer` | Generate/update technical documentation | After significant architectural changes or AP0 updates |
-
----
-
-## 12. Operational Guide
-
-### 12.1 start.sh
-
-```bash
-REQUIRED_MODEL="qwen2.5:7b"
-
-# Start Ollama if not already running
-if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
-    ollama serve &> /tmp/ollama.log &
-    sleep 2
-fi
-
-# Check manifest — not just blob existence
-if ! ollama show "$REQUIRED_MODEL" > /dev/null 2>&1; then
-    ollama pull "$REQUIRED_MODEL"
-fi
-
-# Start FastAPI with JSON hot-reload
-cd "$(dirname "$0")"
-python3 -m uvicorn app:app --reload --reload-include "*.json" --host 0.0.0.0 --port 8000
-```
-
-Uvicorn is started with `--reload-include "*.json"` so changes to config files trigger a server restart without needing to restart manually.
-
-### 12.2 Environment Variables
-
-Required only for live Airtable sync (`sync_airtable.py` without `--local`):
-
-| Variable | Value |
-|---|---|
-| `AIRTABLE_TOKEN` | `pat...` — Airtable Personal Access Token |
-| `AIRTABLE_BASE_ID` | `app...` — Airtable base ID |
-
-Set in `.env` at the project root. `sync_airtable.py` loads it via `python-dotenv`. The file is listed in `.gitignore`.
-
-Ollama must be running at `http://localhost:11434` with `qwen2.5:7b` pulled. `start.sh` handles this automatically.
-
-### 12.3 How to Add a New Matching Rule
-
-1. Open `Spec/haystacked_AP0_field_spec_v0_10.xlsx`
-2. Find the field row on the appropriate sheet (SHARED if it applies to all vehicle types, otherwise type-specific)
-3. Set the Level column to "K.O." or "Cond. K.O."
-4. Set the Matching Operator column to the appropriate operator name (e.g. `KO_IF_LT`)
-5. Set the Tender JSON Key column to the extraction field name (e.g. `required_my_field`)
-6. If Dropdown or Multi-Select, set the Allowed Values / Unit column to a pipe-separated list
-7. Run `python3 scripts/generate_all.py`
-8. Verify no CONSISTENCY WARNINGS for this field
-9. Run `pytest tests/`
-
-For a new numeric KO field, the source-span companion (`<field>_source`) is generated automatically. The field will automatically appear in `_NUMERIC_KO_TENDER_KEYS` and be included in Pass 4c.
-
-### 12.4 How to Add a New Supplier Field
-
-1. Add the field to the appropriate AP0 sheet with the correct Data Type
-2. Add it to the Entity Model sheet under the appropriate layer (L3 for technical specs)
-3. Run `python3 scripts/generate_all.py` — this regenerates `sqlite_schema.json`
-4. Run `python3 sync_airtable.py` — this recreates the database with the new column
-5. Add the field to `src/data_loader.py` — find the `Extension(...)` or `Product(...)` constructor and add the new field with the appropriate parse helper
-6. Add the field to `src/models.py` — add to the `Extension` or `Product` dataclass with `Optional[type] = None`
-7. Run `pytest tests/unit/test_ap0_consistency.py` — T-CON-01 and T-CON-03 will catch any wiring gaps
-
-### 12.5 How to Update LLM Extraction Hints
-
-1. Find the field's row in the AP0 xlsx "LLM Hint" column
-2. Update the text. Rules:
-   - Describe patterns verbally: "looks like X" not "the value is typically 1000"
-   - Never include numeric example values — they will be copied as hallucinations
-   - Use "NULL RULE — READ FIRST:" prefix for fields with strong null-bias risk
-   - Use "CONSERVATIVE EXTRACTION:" prefix for fields where worst-case extraction matters
-   - For multi-value fields, specify which value to take (MAXIMUM or MINIMUM)
-3. Run `python3 scripts/generate_all.py`
-4. The updated hint appears in `config/fields.json` and in the generated Pass 4b templates
-
-To strengthen a null rule without adding domain logic, add a NULL RULE clause to the Description cell. This text is stripped from Pass 4c prompts (reducing null-bias) but retained in 4b templates.
-
----
-
-## 13. Known Gaps and TODOs
-
-### Critical
-
-**C-1: Six Extension dataclass gaps**
-
-The following fields are present in `sqlite_schema.json` (generated from AP0) but not wired in `src/data_loader.py`:
-- `installation_process`
-- `modification_process`
-- `min_fleet_size`
-- `typical_project_value_eur`
-- `multi_language_display`
-- `gamification`
-
-`test_ap0_consistency.py` (T-CON-01, T-CON-03) produces xfail entries for these. Until resolved, these fields are silently None for all suppliers regardless of Airtable data.
-
-**C-2: PLAUSIBILITY_RANGES still hardcoded in generate_all.py**
-
-The seven plausibility ranges (min/max/unit per field) are defined in a module-level dict in `generate_all.py`, not in the AP0 xlsx. A new tender field with a numeric KO operator will not get plausibility validation until someone edits generate_all.py. Should be moved to a dedicated AP0 sheet (e.g. "Plausibility Ranges") and read like all other config. Workaround: edit PLAUSIBILITY_RANGES in generate_all.py.
-
-**C-3: throughput_picks_per_hour type mismatch**
-
-`Extension.throughput_picks_per_hour` is declared `Optional[int]` but the field is typed TEXT in `sqlite_schema.json`. A non-numeric TEXT value would be silently coerced to None by `_parse_int()`. Flagged by T-CON-02 (xfail).
-
-### Safeguards Applied (2026-06-15)
-
-After the 2026-06-15 architecture audit, three safeguards were applied:
-
-**S-1: `_SHARED_SHEET` startup assertion**
-
-Changed from `_vehicle_cfg.get("shared_sheet_name", "SHARED – All AGV Types")` (silent fallback) to an empty-string default with `assert _SHARED_SHEET`. If `vehicle_types.json` is missing the key (e.g. after a failed `generate_all.py` run), the app now fails loudly at startup instead of silently using a stale hardcoded string.
-
-**S-2: `is not None` in lift/aisle mm→m conversion**
-
-`app.py` lines converting `required_max_lift_height_m` and `required_min_aisle_width_m` to mm used `if raw_val else None` — falsely treating zero as absent. Changed to `if raw_val is not None else None`. Zero lift height is nonsensical in practice but the code should not have a latent bug.
-
-**S-3: VNA state kept in sync with agv_criteria**
-
-After computing `new_req["required_vna_capable"]`, the app writes `agv_criteria["required_vna_capable"] = new_req["required_vna_capable"]`. This prevents the /rematch endpoint from receiving a stale raw LLM boolean. See Section 8.3 for the full bug history.
-
-### Benchmark Baseline (2026-06-16)
-
-File: `tests/benchmark_results/benchmark_qwen2_5_7b_20260616_140000.json`
-Model: `qwen2.5:7b` — AP0 checksum `2b38100e`
-Result: **5/5 tenders, 139 tests pass** (with Layer 0 source-grounding guard active)
-
-| Tender | Vehicle | Key fields after source-span guard | Top match |
-|---|---|---|---|
-| Nordlicht | Forklift AGV | weight=1200 kg, lift=10 m, aisle=3.4 m | REACHY |
-| Dragonfly | Forklift AGV (VNA) | weight=1000 kg, aisle=2.0 m, lift=null (L2) | VEENY |
-| Mama | Forklift AGV | weight=2000 kg, temp 10–30 °C | AMADEUS Classic |
-| CompanyX | Forklift AGV | weight=1000 kg; lift/aisle/temp/humidity/gradient all null (L0 nulled 6, weight correct) | FM-X iGo |
-| OeA-199-25 | Out of scope | is_agv_amr=False | — |
-
-The CompanyX result is the regression case for Layer 0: all 7 fields the model previously hallucinated are now null. The one genuinely-specified field (weight=1000 kg) correctly survives.
-
-### Test Gaps
-
-**T-1: No live extraction tests**
-
-`test_golden_extraction.py` compares against pre-captured golden run files but does not call Ollama itself. A fresh golden run must be generated manually when the model or prompts change. Need: a CI fixture that runs the actual LLM pipeline and asserts against golden extractions (requires live Ollama in CI).
-
-**T-2: No SSE end-to-end test**
-
-The `/analyze` endpoint has no integration test. A streaming response test with FastAPI TestClient + event parsing would catch pipeline regressions.
-
-**T-3: No /rematch endpoint test**
-
-The `/rematch` endpoint is not tested. Priority cases: tender_key resolution, mm→m conversion in override, VNA state preservation, update of `_last_analysis_result`. See Section 9.3 (U-R-01 to U-R-03).
-
-**T-4: validate_agv_criteria mm→m conversion not tested**
-
-**T-5: Field text fallbacks not tested**
-
-### Architecture Improvements
-
-**A-1: `enforce_source_spans()` call site should cross-reference src/json_repair.py**
-
-The call site in `app.py` should include a comment explaining the three-layer contract and the layer order (L1 → L0 → L2).
-
-**A-2: Extraction direction dictionary could be generated as a config file**
-
-`_4C_EXTRACTION_DIRECTION` is built in app.py from `fields.json` (via `_FIELDS_BY_TENDER_KEY`). It could be written to a generated config file (e.g. `config/extraction_directions.json`) by generate_all.py, making it inspectable without running the app.
-
-**A-3: Pass 4c prompt language inconsistency**
-
-Pass 4c user prompts are in English. App-facing SSE messages are in German. This inconsistency is harmless for the model but may confuse maintainers reading logs.
-
-**A-4: Supplier database data gaps**
-
-Based on prior audits:
-- `route_type`: 0 of 21 Forklift suppliers have a value — this field cannot meaningfully gate any tender
-- `workflow_capability`: 0 of 21 Mobile AMR suppliers have a value
-- `vna_capable`: only 4 of 21 Forklift suppliers have a value — reduces VNA gate effectiveness
-
-**A-5: /api/suppliers column set previously hardcoded**
-
-Before 2026-06-19, `/api/suppliers` had a ~55-field hardcoded whitelist, silently omitting all Mobile AMR-specific fields. Fixed: the endpoint now derives its column set from `sqlite_schema.json` via `dataclasses.asdict()` — adding a new AP0 field now surfaces it automatically. `test_ap0_consistency.py` guards against regression.
-
-### Housekeeping
-
-**H-1: `docs/sync_anleitung.md` may be outdated**
-
-The Airtable sync guide predates the `--local` mode addition and the versioned CSV workflow.
-
-**H-2: nace_categories.json in root**
-
-The file `/nace_categories.json` in the project root appears to be a legacy file superseded by `config/nace_codes.json`. It is not read by any current module. Should be removed or documented.
-
-**H-3: src/llm_client.py deletion**
-
-`src/llm_client.py` is marked as deleted in the current branch (per git status). If the branch is merged, imports in any script that referenced `from src.llm_client import ...` will break. Verify no remaining references before merging.
+## 21. Known Gaps and Technical Debt
+
+| ID | Area | Description | Severity |
+|----|------|-------------|----------|
+| OI-55 | Unit naming | field_name suffix (_mm) disagrees with AP0 unit column (m) after unit-conversion refactor. Warning only. | Low |
+| OI-56 | Data loader | Startup assertion detects column-name collisions between Base Model and Product/Company. | Mitigation active |
+| M1 | Hardcoding | m->mm conversion factor (0.001) computed from plausibility.json but the startup assertion check uses field-name strings. | Low |
+| H2 | Sync | sync_airtable.py positional INSERTs not yet fully schema-driven from column lists. | Medium |
+| OI-73 | Architecture | Multi-domain scoping (Step 7): scope tree currently enforces single-domain invariant (exactly 1 child of "*"). Future work to generalize. | Future |
