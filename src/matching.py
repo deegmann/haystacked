@@ -19,22 +19,31 @@ Operator semantics:
     KO_SUBSET        K.O. if no overlap between tender list and supplier list
 
 Null rule (LL-06): None on either side never triggers a hard K.O. for numeric/categorical
-operators. Exception: KO_BOOL_EXCLUSIVE treats None the same as False when tender=required
-(VNA logic, LL-10).
+operators. For KO_BOOL_EXCLUSIVE, None supplier_val → no constraint (LL-06). Closed-world
+assumption is declared per-field via value_if_null in the AP0 xlsx, not in this module.
 
 NULL penalty: when a tender specifies a numeric KO requirement but the supplier has no
 data for that field, a scoring penalty is applied (-15 pts per field) to rank confirmed
 suppliers above unverified ones, without excluding them entirely.
 """
 import json
+import logging
 from pathlib import Path
 from typing import Optional
 
 from src.models import FieldValue, Product, SupplierRecord
-from src.field_spec import FieldSpec, load_fields, fields_by_sheet, fields_by_field_name
+from src.field_spec import FieldSpec, load_fields, fields_by_field_name
+
+log = logging.getLogger(__name__)
 
 CONFIG_DIR = Path(__file__).parent.parent / "config"
 NULL_KO_PENALTY = 15
+
+_SIGNED_UNITS: frozenset = frozenset(
+    json.loads((Path(__file__).parent.parent / "config" / "unit_semantics.json").read_text())
+    .get("signed_units", [])
+)
+assert _SIGNED_UNITS is not None, "unit_semantics.json failed to load — check config/"
 
 
 # ── Config loading ────────────────────────────────────────────────────────────
@@ -48,14 +57,19 @@ def _load_vehicle_types() -> dict:
 
 
 _fields = load_fields()  # dict[str, FieldSpec], keyed by UUID
-_SHARED_SHEET: str = _load_vehicle_types().get("shared_sheet_name", "")
-assert _SHARED_SHEET, "vehicle_types.json missing 'shared_sheet_name' — run generate_all.py"
+_scope_registry = json.loads((Path(__file__).parent.parent / "config" / "scope_registry.json").read_text())
+_LEGACY_MAP: dict[str, str] = _scope_registry.get("legacy_map", {})
+assert _LEGACY_MAP, "scope_registry.json missing legacy_map — run generate_all.py"
+_SHARED_SCOPE: str = next(
+    (data["scope_id"] for data in _scope_registry["scopes"].values() if data.get("parent") == "*"),
+    ""
+)
+assert _SHARED_SCOPE, "scope_registry.json: no scope with parent='*' found — run generate_all.py"
 
-# Guardian S2: Startup-Assertion — every vt_map value must have a sheet in fields.json
-_vt_sheets = {f.sheet for f in _fields.values()}
+# Guardian S2: Startup-Assertion — every vt_map canonical value must resolve via legacy_map
 _vt_map_values = set(_load_vehicle_types().get("vt_map", {}).values())
-assert _vt_map_values <= _vt_sheets, (
-    f"vt_map values without a fields.json sheet: {_vt_map_values - _vt_sheets}"
+assert _vt_map_values <= set(_LEGACY_MAP), (
+    f"vt_map values without scope in legacy_map: {_vt_map_values - set(_LEGACY_MAP)}"
 )
 
 
@@ -87,8 +101,10 @@ def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
         if val is None:
             continue
 
-        # Normalise: split multi-values and check each against allowed list
-        vals = [v.strip() for v in str(val).replace("|", ",").split(",") if v.strip()]
+        # Normalise: split multi-values on pipe, comma, or slash-with-spaces.
+        # Slash-split handles LLM compound strings like "REST / OPC UA" → ["REST", "OPC UA"]
+        normalised = str(val).replace("|", ",").replace(" / ", ",")
+        vals = [v.strip() for v in normalised.split(",") if v.strip()]
         allowed_lower = [a.lower() for a in allowed]
 
         valid = []
@@ -149,21 +165,30 @@ def _op_bool_required(tender, supplier) -> tuple[bool, str]:
     NULL is not excluded (LL-06: absence of data ≠ absence of capability).
     For bidirectional exclusion (e.g. vna_capable) use KO_BOOL_EXCLUSIVE instead.
     SQLite returns integers (0/1), so compare with == not `is`.
+    LLM extraction may return Python True instead of 'required' — both are accepted.
     """
-    if str(tender).lower() == "required" and supplier is not None and not bool(supplier):
+    t = str(tender).lower() if tender is not None else ""
+    is_required = t == "required" or tender is True or tender == 1
+    if is_required and supplier is not None and not bool(supplier):
         return True, "required but supplier does not support it"
     return False, ""
 
 
 def _op_bool_exclusive(tender, supplier) -> tuple[bool, str]:
     """Bidirectional boolean K.O. (e.g. vna_capable).
-    - tender=required  → supplier MUST be truthy (else K.O.; None=False per LL-10)
+    - tender=required  → supplier MUST be truthy (else K.O.)
     - tender=not_required → supplier must NOT be truthy (else K.O.)
     - tender=None / preferred → no K.O.
     SQLite stores booleans as integers (0/1); use bool() to normalise before comparing.
+    None supplier_val → no constraint (LL-06).
+    Closed-world assumption is declared per-field via value_if_null in AP0, not here.
     """
     t = str(tender).lower() if tender is not None else None
-    s = bool(supplier)  # normalises int 1→True, int 0/None→False (LL-10: None=False when required)
+    # None supplier_val → no constraint (LL-06).
+    # Closed-world assumption is declared per-field via value_if_null in AP0, not here.
+    if supplier is None:
+        return False, ""
+    s = bool(supplier)
     if t == "required" and not s:
         return True, f"required but not confirmed (value: {supplier})"
     if t == "not_required" and s:
@@ -308,6 +333,8 @@ class MatchResult:
         self.score_details: list[dict] = []
         self.disqualified = False
         self.disqualified_by: list[str] = []
+        self.null_gap_fields: list[str] = []
+        self.null_pass_fields: list[str] = []  # KO fields skipped because tender had no requirement
 
     @property
     def product_name(self) -> str:
@@ -328,6 +355,8 @@ class MatchResult:
             "rank":            getattr(self, "rank", 0),
             "disqualified":    self.disqualified,
             "disqualified_by": self.disqualified_by,
+            "null_gap_fields":  self.null_gap_fields,
+            "null_pass_fields": self.null_pass_fields,
             "score_details":   self.score_details,
             "agv_type":        prod.agv_type,
             "reasons":         [f"{d['field']}: +{d['points']} pts" for d in self.score_details if d['points'] > 0],
@@ -344,14 +373,44 @@ class MatchResult:
         }
 
 
+# ── Active requirement guard ──────────────────────────────────────────────────
+
+def _is_active_requirement(tender_val, operator: str, unit: Optional[str] = None) -> bool:
+    """Returns True only if tender_val is an active matching constraint.
+
+    For boolean operators (KO_BOOL_REQUIRED, KO_BOOL_EXCLUSIVE): only True/1/'required'
+    are active requirements. False/'not_required'/0 mean no constraint — null supplier
+    is safe under LL-06 and must not generate a null_gap.
+    For all other operators: any non-None tender value is an active constraint.
+    """
+    if tender_val is None:
+        return False
+    if operator in ("KO_BOOL_REQUIRED", "KO_BOOL_EXCLUSIVE"):
+        t = str(tender_val).lower()
+        return t == "required" or tender_val is True or tender_val == 1
+    # KO_IF_LT only: 0 means no minimum requirement (e.g. flat floor = no gradient constraint).
+    # KO_IF_GT is excluded — a 0 tender value there is a real (maximally restrictive) constraint.
+    if operator == "KO_IF_LT" and unit not in _SIGNED_UNITS:
+        try:
+            if float(tender_val) == 0:
+                return False
+        except (TypeError, ValueError):
+            pass
+    return True
+
+
 # ── Supplier field accessor ───────────────────────────────────────────────────
 
 def _supplier_val(values: dict[str, FieldValue], prod: Product, spec: FieldSpec):
     fv = values.get(spec.uuid)
     if fv is not None:
-        return fv.value
-    # Fallback: product-level fields not yet in values dict
-    return getattr(prod, spec.field_name, None)
+        result = fv.value
+    else:
+        # Fallback: product-level fields not yet in values dict
+        result = getattr(prod, spec.field_name, None)
+    if result is None and spec.value_if_null is not None:
+        return spec.value_if_null
+    return result
 
 
 # ── Main matcher ──────────────────────────────────────────────────────────────
@@ -386,8 +445,14 @@ class Matcher:
             r.max_score += pts
 
         # ── OI-47: only SHARED + VT-specific fields of the supplier ──────────
-        vt_sheet = prod.agv_type  # e.g. "Forklift AGV"
-        relevant = fields_by_sheet(_SHARED_SHEET) + fields_by_sheet(vt_sheet)
+        vt_scope = _LEGACY_MAP.get(prod.agv_type)
+        if not vt_scope:
+            log.error("agv_type %r not in legacy_map — supplier %s skipped", prod.agv_type, prod.product_id)
+            r.disqualified = True
+            r.disqualified_by.append(f"agv_type '{prod.agv_type}' not in scope_registry legacy_map")
+            return r
+        resolution = _scope_registry["resolution_order"].get(vt_scope, [])
+        relevant = [f for f in _fields.values() if f.scope in resolution]
 
         # ── K.O. and Cond. K.O. rules (data-driven from fields.json) ─────────
         for field_spec in relevant:
@@ -420,15 +485,39 @@ class Matcher:
         for field_spec in relevant:
             if field_spec.level != "KO" or field_spec.operator not in NUMERIC_OPS:
                 continue
-            if req.get(field_spec.field_name) is not None and _supplier_val(values, prod, field_spec) is None:
+            if _is_active_requirement(req.get(field_spec.field_name), field_spec.operator, field_spec.unit) and _supplier_val(values, prod, field_spec) is None:
                 add_score(-NULL_KO_PENALTY, f"{field_spec.field_name}_null_penalty", None)
+
+        # ── NULL gap tracking (for UI — no score impact) ─────────────────────────────
+        # Collect any KO or COND_KO field where tender has an active requirement but
+        # supplier has no data. Superset of null penalty: includes COND_KO fields too.
+        # Uses _is_active_requirement() so that False/'not_required' tender values do
+        # not produce spurious null_gap chips (LL-06).
+        for field_spec in relevant:
+            if field_spec.level not in ("KO", "COND_KO"):
+                continue
+            if (_is_active_requirement(req.get(field_spec.field_name), field_spec.operator, field_spec.unit)
+                    and _supplier_val(values, prod, field_spec) is None):
+                if field_spec.field_name not in r.null_gap_fields:
+                    r.null_gap_fields.append(field_spec.field_name)
+
+        # ── NULL pass tracking (OI-39 — for UI, no score impact) ──────────────
+        # KO fields where tender_val is None (no requirement extracted) → supplier
+        # passes trivially. Distinct from explicit 'not_required'/False values.
+        # Shown in UI as a "? N fields unchecked" hint on confirmed cards.
+        for field_spec in relevant:
+            if field_spec.level not in ("KO", "COND_KO") or not field_spec.operator:
+                continue
+            if req.get(field_spec.field_name) is None:
+                if field_spec.field_name not in r.null_pass_fields:
+                    r.null_pass_fields.append(field_spec.field_name)
 
         # ── Scoring (data-driven from fields.json) ────────────────────────────
         # No hardcoded AGV type names or numeric thresholds — all from AP0 via config.
         for field_spec in relevant:
-            if not field_spec.weight:
+            if not field_spec.scoring_weight:
                 continue
-            pts  = field_spec.weight
+            pts  = field_spec.scoring_weight
             rule = field_spec.score_function or "bool"
             t1   = field_spec.threshold_a
             t2   = field_spec.threshold_b

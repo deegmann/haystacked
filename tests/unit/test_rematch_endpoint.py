@@ -73,7 +73,9 @@ def test_rematch_happy_path_override_changes_match_count():
     with a real payload value, leaving only null-payload suppliers qualified.
 
     max_payload_kg maps to tender_key required_max_payload_kg (KO_IF_LT).
-    Setting it to 999999 kg KOs every supplier with a real payload (all <= 5000 kg).
+    Setting it to 45000 kg KOs every supplier with a real payload (all <= 5000 kg).
+    Value must stay within plausibility range [100–50000 kg] — values above that
+    are silently dropped by validate_agv_criteria and no KOs fire.
     Suppliers with max_payload_kg = NULL survive (null-rule LL-06) but get -15 pt penalty.
     DB-agnostic: asserts structural behavior (majority KO'd) rather than exact counts.
     """
@@ -82,7 +84,7 @@ def test_rematch_happy_path_override_changes_match_count():
     try:
         response = client.post(
             "/rematch",
-            json={"analysis_id": test_id, "overrides": {"max_payload_kg": 999999}},
+            json={"analysis_id": test_id, "overrides": {"max_payload_kg": 45000}},
         )
         assert response.status_code == 200
         data = response.json()
@@ -311,12 +313,12 @@ def test_rematch_same_vt_does_not_clear_criteria():
 
 
 def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
-    """GET /api/field-meta must assign each KO field to the correct VT sheet.
+    """GET /api/field-meta must assign each KO field to the correct VT scope.
 
     Verified fields:
-    - towing_capacity_kg   → sheet == 'Tugger AGV'         (tugger-only)
-    - lifting_height_mm    → sheet == 'Forklift AGV'        (forklift-only)
-    - max_payload_kg       → sheet == shared_sheet_name     (shared across all VTs)
+    - towing_capacity_kg   → scope == legacy_map['Tugger AGV']    (tugger-only)
+    - lifting_height_mm    → scope == legacy_map['Forklift AGV']  (forklift-only)
+    - max_payload_kg       → scope == shared_scope                (shared across all VTs)
     """
     response = client.get("/api/field-meta")
     assert response.status_code == 200
@@ -324,24 +326,73 @@ def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
 
     vt_config = meta.get("__vt_config__")
     assert vt_config is not None
-    shared_sheet = vt_config.get("shared_sheet_name")
-    assert shared_sheet == "SHARED – All AGV Types"
+    shared_scope = vt_config.get("shared_scope")
+    assert isinstance(shared_scope, str) and shared_scope, \
+        f"shared_scope must be a non-empty string, got: {shared_scope!r}"
+    legacy_map = vt_config.get("legacy_map", {})
 
     # Tugger-only KO field
     tugger = meta.get("towing_capacity_kg")
     assert tugger is not None, "towing_capacity_kg missing from /api/field-meta"
-    assert tugger["sheet"] == "Tugger AGV"
-    assert tugger["sheet"] != shared_sheet
-    assert tugger["sheet"] != "Forklift AGV"
+    assert tugger["scope"] != shared_scope
+    assert tugger["scope"] != legacy_map.get("Forklift AGV", "")
 
     # Forklift-only KO field
     forklift = meta.get("lifting_height_mm")
     assert forklift is not None, "lifting_height_mm missing from /api/field-meta"
-    assert forklift["sheet"] == "Forklift AGV"
-    assert forklift["sheet"] != shared_sheet
-    assert forklift["sheet"] != "Tugger AGV"
+    assert forklift["scope"] != shared_scope
+    assert forklift["scope"] != legacy_map.get("Tugger AGV", "")
 
     # Shared KO field
     shared = meta.get("max_payload_kg")
     assert shared is not None, "max_payload_kg missing from /api/field-meta"
-    assert shared["sheet"] == shared_sheet
+    assert shared["scope"] == shared_scope
+
+
+def test_replay_endpoint_golden_companyx():
+    """POST /analyze with a golden JSON file must return a valid result SSE event
+    without making any LLM calls (parse_method == 'replay').
+
+    Verifies:
+    - A 'result' SSE event is emitted
+    - parse_method == 'replay'
+    - vehicle_type_canonical matches the golden file's vehicle_type
+    - matches is non-empty
+    """
+    golden_path = _ROOT / "tests" / "tenders" / "golden_run_tender_companyx.json"
+    assert golden_path.exists(), f"Golden file not found: {golden_path}"
+    golden_bytes = golden_path.read_bytes()
+    golden = json.loads(golden_bytes)
+
+    response = client.post(
+        "/analyze",
+        files={"file": ("golden_run_tender_companyx.json", golden_bytes, "application/json")},
+    )
+    assert response.status_code == 200, (
+        f"Expected 200 from /analyze replay, got {response.status_code}: {response.text[:200]}"
+    )
+
+    result_event = None
+    for line in response.text.splitlines():
+        if line.startswith("data: ") and result_event == "result":
+            try:
+                result_event = json.loads(line[6:])
+            except json.JSONDecodeError:
+                pass
+            break
+        if line.startswith("event: result"):
+            result_event = "result"
+
+    assert isinstance(result_event, dict), (
+        f"No 'result' SSE event found in response. Raw (first 500 chars): {response.text[:500]}"
+    )
+    assert result_event.get("parse_method") == "replay", (
+        f"Expected parse_method='replay', got: {result_event.get('parse_method')!r}"
+    )
+    assert result_event.get("vehicle_type_canonical") == golden.get("vehicle_type"), (
+        f"vehicle_type_canonical mismatch: got {result_event.get('vehicle_type_canonical')!r}, "
+        f"expected {golden.get('vehicle_type')!r}"
+    )
+    assert result_event.get("matches"), (
+        "matches must be non-empty for a valid AGV golden replay"
+    )

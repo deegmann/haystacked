@@ -1,0 +1,51 @@
+{
+  "scopes": {
+    "*": {
+      "scope_id": "*",
+      "parent": null,
+      "tab_name": "Global"
+    },
+    "Logistics:AGV": {
+      "scope_id": "Logistics:AGV",
+      "parent": "*",
+      "tab_name": "AGV_Shared"
+    },
+    "Logistics:AGV:Forklift": {
+      "scope_id": "Logistics:AGV:Forklift",
+      "parent": "Logistics:AGV",
+      "tab_name": "AGV_Forklift"
+    },
+    "Logistics:AGV:Tugger": {
+      "scope_id": "Logistics:AGV:Tugger",
+      "parent": "Logistics:AGV",
+      "tab_name": "AGV_Tugger"
+    },
+    "Logistics:AGV:AMR": {
+      "scope_id": "Logistics:AGV:AMR",
+      "parent": "Logistics:AGV",
+      "tab_name": "AGV_AMR"
+    }
+  },
+  "resolution_order": {
+    "Logistics:AGV:Forklift": [
+      "*",
+      "Logistics:AGV",
+      "Logistics:AGV:Forklift"
+    ],
+    "Logistics:AGV:Tugger": [
+      "*",
+      "Logistics:AGV",
+      "Logistics:AGV:Tugger"
+    ],
+    "Logistics:AGV:AMR": [
+      "*",
+      "Logistics:AGV",
+      "Logistics:AGV:AMR"
+    ]
+  },
+  "legacy_map": {
+    "Forklift AGV": "Logistics:AGV:Forklift",
+    "Tugger AGV": "Logistics:AGV:Tugger",
+    "Mobile AMR": "Logistics:AGV:AMR"
+  }
+}

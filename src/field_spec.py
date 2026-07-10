@@ -15,7 +15,7 @@ class FieldSpec:
     field_name: str
     tender_key: Optional[str]
     entity: str
-    sheet: str
+    scope: str
     level: Optional[str]
     operator: Optional[str]
     data_type: str
@@ -24,10 +24,11 @@ class FieldSpec:
     score_function: Optional[str]
     threshold_a: Optional[float]
     threshold_b: Optional[float]
-    weight: Optional[int]
+    scoring_weight: Optional[int]
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
+    value_if_null: object = None
 
 
 def load_fields() -> dict[str, FieldSpec]:
@@ -49,13 +50,10 @@ def fields_by_tender_key() -> dict[str, list[FieldSpec]]:
 
 
 def fields_by_field_name() -> dict[str, list[FieldSpec]]:
-    """Returns fields grouped by field_name. One name can appear in multiple VT sheets."""
+    """Returns fields grouped by field_name. One name can appear in multiple VT scopes."""
     result: dict[str, list[FieldSpec]] = {}
     for f in load_fields().values():
         result.setdefault(f.field_name, []).append(f)
     return result
 
 
-def fields_by_sheet(sheet: str) -> list[FieldSpec]:
-    """Returns all fields for a specific sheet (VT-Filter)."""
-    return [f for f in load_fields().values() if f.sheet == sheet]

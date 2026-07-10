@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import pytest
 from src.models import FieldValue, Product, SupplierRecord
 from src.field_spec import load_fields
 from src.matching import TenderRequirements, Matcher
@@ -90,9 +91,15 @@ def test_U_M_03_ko_wrong_agv_type():
     assert top[0].disqualified
 
 
-def test_U_M_04_ko_navigation_no_match():
+def test_U_M_04_navigation_context_no_disqualification():
+    """Step 6: navigation_type is now CONTEXT (no operator). A mismatch must NOT disqualify.
+
+    Before Step 6 (COND_KO / KO_SUBSET): supplier with Natural Feature was excluded
+    when tender required Laser Reflector. After Step 6: navigation_type is informational
+    only — no KO fires regardless of the mismatch.
+    """
     r = _match_one({"navigation_type": ["Laser Reflector"]}, navigation_type=["Natural Feature"])
-    assert r.disqualified
+    assert not r.disqualified
 
 
 def test_U_M_05_cond_ko_outdoor_not_required_no_filter():
@@ -290,4 +297,228 @@ def test_OI47_tugger_supplier_not_penalised_for_forklift_field():
     penalty_labels = [d["field"] for d in r.score_details if "null_penalty" in d["field"]]
     assert "lifting_height_mm_null_penalty" not in penalty_labels, (
         "Tugger supplier must not receive null-penalty for Forklift-specific lifting_height_mm"
+    )
+
+
+# ── value_if_null: VNA closed-world assumption ────────────────────────────────
+
+def test_value_if_null_vna_supplier_none_is_kod_on_vna_tender():
+    """Supplier vna_capable=None gets KO'd on VNA tender because value_if_null=False."""
+    r = _match_one({"required_vna_capable": "required"}, vna_capable=None)
+    assert r.disqualified, (
+        "Supplier with vna_capable=None must be KO'd on VNA tender — "
+        "value_if_null=False substitutes None, then KO_BOOL_EXCLUSIVE fires"
+    )
+
+
+def test_value_if_null_vna_supplier_none_passes_non_vna_tender():
+    """Supplier vna_capable=None is NOT KO'd on non-VNA tender (required_vna_capable=None)."""
+    r = _match_one({}, vna_capable=None)
+    assert not r.disqualified, (
+        "Supplier with vna_capable=None must not be KO'd when tender has no VNA requirement — "
+        "tender-side value stays None, no constraint applies"
+    )
+
+
+def test_value_if_null_no_null_penalty_when_value_substituted():
+    """When value_if_null substitutes None, no _null_penalty appears in score_details."""
+    r = _match_one({"required_vna_capable": "required"}, vna_capable=None)
+    penalty_labels = [d["field"] for d in r.score_details if "null_penalty" in d["field"]]
+    assert "vna_capable_null_penalty" not in penalty_labels, (
+        "After value_if_null substitution, vna_capable must not appear as a null_penalty entry"
+    )
+
+
+# ── Bool operator: True/False handling ───────────────────────────────────────
+
+def test_U_M_29_bool_required_true_triggers_ko():
+    """KO_BOOL_REQUIRED with tender=True (LLM boolean) must trigger KO when supplier=False."""
+    from src.matching import _op_bool_required
+    failed, msg = _op_bool_required(True, False)
+    assert failed, "tender=True must trigger KO_BOOL_REQUIRED when supplier=False"
+    assert "required" in msg.lower()
+
+def test_U_M_30_bool_required_false_no_ko():
+    """KO_BOOL_REQUIRED with tender=False must NOT trigger KO (not required)."""
+    from src.matching import _op_bool_required
+    failed, _ = _op_bool_required(False, False)
+    assert not failed, "tender=False means 'not required' — must not trigger KO"
+
+def test_U_M_31_bool_required_null_supplier_no_ko():
+    """KO_BOOL_REQUIRED with tender=True but supplier=None must NOT trigger KO (LL-06)."""
+    from src.matching import _op_bool_required
+    failed, _ = _op_bool_required(True, None)
+    assert not failed, "Null supplier must not trigger KO (LL-06)"
+
+def test_U_M_32_is_active_requirement_false_not_active():
+    """_is_active_requirement returns False for boolean False tender value."""
+    from src.matching import _is_active_requirement
+    assert not _is_active_requirement(False, "KO_BOOL_REQUIRED")
+    assert not _is_active_requirement(False, "KO_BOOL_EXCLUSIVE")
+
+def test_U_M_33_is_active_requirement_true_is_active():
+    """_is_active_requirement returns True for boolean True tender value."""
+    from src.matching import _is_active_requirement
+    assert _is_active_requirement(True, "KO_BOOL_REQUIRED")
+    assert _is_active_requirement("required", "KO_BOOL_REQUIRED")
+
+def test_U_M_34_is_active_requirement_numeric_nonzero():
+    """_is_active_requirement returns False for KO_IF_LT with value 0 (no minimum = no constraint).
+    Signed units (°C) are exempt — 0 °C is a real temperature constraint.
+    """
+    from src.matching import _is_active_requirement
+    assert not _is_active_requirement(0, "KO_IF_LT")          # 0 = no min requirement (e.g. flat floor)
+    assert not _is_active_requirement(0, "KO_IF_LT", None)    # unsigned unit also inactive
+    assert _is_active_requirement(0, "KO_IF_LT", "°C")        # signed unit — 0 °C is a real constraint
+    assert _is_active_requirement(1200, "KO_IF_LT")
+    assert not _is_active_requirement(None, "KO_IF_LT")
+
+
+# ── OI-20: mm→m auto-conversion in validate_agv_criteria ─────────────────────
+
+def test_U_M_35_lifting_height_mm_auto_converted_to_m():
+    """validate_agv_criteria converts lifting height from mm to m when LLM returns mm.
+
+    The AP0 Unit Conversions sheet defines: threshold=10, factor=0.001 (mm→m).
+    A value of 8000 (clearly in mm, > threshold of 10) must be converted to 8.0 m.
+    A value of 8.0 (already in m, <= threshold) must pass through unchanged.
+    """
+    from app import validate_agv_criteria
+    result_mm, warnings_mm = validate_agv_criteria(
+        {"required_lifting_height_mm": 8000}
+    )
+    assert result_mm["required_lifting_height_mm"] == pytest.approx(8.0), (
+        "8000 mm must be auto-converted to 8.0 m (factor=0.001 from plausibility.json)"
+    )
+    assert any("konvertiert" in w or "converted" in w.lower() for w in warnings_mm), (
+        "A conversion warning must be emitted when mm→m auto-conversion fires"
+    )
+
+    result_m, warnings_m = validate_agv_criteria(
+        {"required_lifting_height_mm": 8.0}
+    )
+    assert result_m["required_lifting_height_mm"] == pytest.approx(8.0), (
+        "8.0 m (already in m, <= threshold of 10) must pass through unchanged"
+    )
+
+
+def test_U_M_36_aisle_width_mm_auto_converted_to_m():
+    """validate_agv_criteria converts aisle width from mm to m when LLM returns mm.
+
+    Same conversion rule as lifting height: threshold=10, factor=0.001.
+    1800 mm → 1.8 m; 1.8 stays as 1.8.
+    """
+    from app import validate_agv_criteria
+    result, warnings = validate_agv_criteria({"required_min_aisle_width_mm": 1800})
+    assert result["required_min_aisle_width_mm"] == pytest.approx(1.8), (
+        "1800 mm must be auto-converted to 1.8 m"
+    )
+    assert any("konvertiert" in w or "converted" in w.lower() for w in warnings)
+
+    result2, _ = validate_agv_criteria({"required_min_aisle_width_mm": 1.8})
+    assert result2["required_min_aisle_width_mm"] == pytest.approx(1.8)
+
+
+def test_U_M_37_integration_capability_ko_subset_mismatch_disqualifies():
+    """Step 6: integration_capability is now COND_KO / KO_SUBSET.
+
+    A supplier whose integration_capability has no overlap with the tender's
+    required_integration_capability must be disqualified.
+    Supplier has only WMS+ERP; tender requires REST API — no overlap → KO.
+    """
+    r = _match_one(
+        {"integration_capability": ["REST API"]},
+        integration_capability=["WMS", "ERP"],
+    )
+    assert r.disqualified
+
+
+def test_U_M_38_integration_capability_ko_subset_overlap_passes():
+    """Step 6: integration_capability KO_SUBSET — overlap is sufficient to pass.
+
+    Tender requires WMS; supplier has SAP+WMS+REST API — overlap on WMS → not KO.
+    """
+    r = _match_one(
+        {"integration_capability": ["WMS"]},
+        integration_capability=["SAP", "WMS", "REST API"],
+    )
+    assert not r.disqualified
+
+
+def test_U_M_39_integration_capability_null_supplier_no_ko():
+    """Step 6: null supplier integration_capability must not trigger KO (LL-06 null rule)."""
+    r = _match_one(
+        {"integration_capability": ["WMS"]},
+        integration_capability=None,
+    )
+    assert not r.disqualified
+
+
+# ---------------------------------------------------------------------------
+# SA-18: Structural CONTEXT guard — all CONTEXT fields must never disqualify
+# ---------------------------------------------------------------------------
+# Dynamically loaded: when new fields are demoted to CONTEXT, they are
+# automatically covered here without any test update.
+import json as _json
+_CONTEXT_MISMATCH_CASES = []
+_all_fields = _json.loads((Path(__file__).parent.parent.parent / "config" / "fields.json").read_text())
+for _spec in _all_fields.values():
+    if _spec.get("level") != "CONTEXT" or not _spec.get("allowed_values"):
+        continue
+    _av = _spec["allowed_values"]
+    if len(_av) >= 2:
+        _tender_val = [_av[0]] if _spec.get("data_type") == "Multi-Select" else _av[0]
+        _supplier_val = [_av[1]] if _spec.get("data_type") == "Multi-Select" else _av[1]
+        _CONTEXT_MISMATCH_CASES.append((_spec["field_name"], _tender_val, _supplier_val))
+
+
+@pytest.mark.parametrize("field_name,tender_val,supplier_val", _CONTEXT_MISMATCH_CASES)
+def test_U_M_44_context_fields_never_disqualify(field_name, tender_val, supplier_val):
+    """SA-18: CONTEXT-level fields must never trigger disqualification regardless of mismatch.
+
+    Structural guard: dynamically built from fields.json at import time. Automatically
+    covers future CONTEXT demotions. If this test fails, the field has a residual operator
+    in AP0 — AP0 hygiene assert in generate_all.py (SA-22) should have caught it first.
+    """
+    r = _match_one({field_name: tender_val}, **{field_name: supplier_val})
+    assert not r.disqualified, (
+        f"CONTEXT field '{field_name}' must never disqualify. "
+        f"Tender={tender_val!r}, Supplier={supplier_val!r}. "
+        "Fix: check AP0 xlsx — CONTEXT fields must have no operator."
+    )
+
+
+# ---------------------------------------------------------------------------
+# SA-19: infrastructure_free boolean-inversion semantic tests (Step 6)
+# ---------------------------------------------------------------------------
+
+def test_U_M_45a_infrastructure_free_required_supplier_false_disqualifies():
+    """SA-19: COND_KO fires when buyer requires infra-free AND supplier needs infrastructure.
+
+    infrastructure_free=False means the AGV REQUIRES permanent infrastructure (reflectors,
+    tape, etc.). When the tender demands infra-free operation and the supplier cannot deliver
+    it, the supplier must be disqualified.
+    """
+    r = _match_one({"infrastructure_free": "required"}, infrastructure_free=False)
+    assert r.disqualified, (
+        "Supplier with infrastructure_free=False must be disqualified when tender requires "
+        "infrastructure-free operation (COND_KO/KO_BOOL_REQUIRED)."
+    )
+
+
+def test_U_M_45b_infrastructure_free_required_supplier_true_passes():
+    """SA-19: No KO when supplier is infrastructure-free and tender requires it."""
+    r = _match_one({"infrastructure_free": "required"}, infrastructure_free=True)
+    assert not r.disqualified
+
+
+def test_U_M_45c_infrastructure_free_null_supplier_no_ko():
+    """SA-19: Null supplier infrastructure_free must not trigger KO (LL-06 null rule).
+
+    Unknown infra status is not the same as 'requires infrastructure'. Blank ≠ Zero.
+    """
+    r = _match_one({"infrastructure_free": "required"}, infrastructure_free=None)
+    assert not r.disqualified, (
+        "Supplier with infrastructure_free=None must not be disqualified — "
+        "null means unknown, not infrastructure-required. LL-06 null rule."
     )

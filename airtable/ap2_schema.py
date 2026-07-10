@@ -107,7 +107,6 @@ COMPANIES_FIELDS = [
     text("contact_person"),
     ms("certifications_generic", ["ISO 9001", "ISO 14001", "CE", "TÜV", "VDA5050 ready"]),
     ms("languages_spoken", ["DE", "EN", "FR", "ES", "IT", "ZH", "DK", "+local"]),
-    check("export_capable"),
     ms("service_coverage", ["None", "DACH", "EU", "Global"]),
     date_f("last_updated"),
 ]

@@ -1,11 +1,14 @@
-"""Unit tests for data_loader parsing helpers (U-D-01 to U-D-16)."""
+"""Unit tests for data_loader parsing helpers (U-D-01 to U-D-16) and DB integrity."""
+import sqlite3
 import sys
+import uuid
 from pathlib import Path
+
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.data_loader import _parse_multiselect, _parse_bool, _parse_int, _parse_float
-import uuid
-import pytest
+from src.data_loader import DB_PATH, _parse_bool, _parse_float, _parse_int, _parse_multiselect
 
 
 def test_U_D_01_multiselect_pipe_separated():
@@ -82,3 +85,46 @@ def test_int_parses_float_string():
 
 def test_float_nan_is_none():
     assert _parse_float(float("nan")) is None
+
+
+# ── DB integrity (U-D-DB-01 / U-D-DB-02) ─────────────────────────────────────
+
+def test_U_D_DB_01_no_active_products_without_product_id():
+    """Every active product must have a non-null product_id.
+
+    Fails red when import scripts are run without a subsequent sync_airtable.py,
+    making the affected products invisible to matching with no other signal.
+    Fix: run  python3 sync_airtable.py
+    """
+    con = sqlite3.connect(DB_PATH)
+    rows = con.execute(
+        "SELECT product_name FROM products "
+        "WHERE active = 1 AND (product_id IS NULL OR product_id = '')"
+    ).fetchall()
+    con.close()
+    missing = [r[0] for r in rows]
+    assert not missing, (
+        f"{len(missing)} active product(s) have no product_id and are silently "
+        f"excluded from matching — run sync_airtable.py to fix: {missing}"
+    )
+
+
+def test_U_D_DB_02_no_duplicate_product_ids():
+    """Each product_id must be unique across active products.
+
+    Duplicate IDs arise when the JOIN (products ⋈ extensions) returns multiple
+    extension rows for the same product — data_loader silently drops the extras.
+    Fix: remove duplicate extension records in Airtable, then resync.
+    """
+    con = sqlite3.connect(DB_PATH)
+    rows = con.execute(
+        "SELECT product_id, COUNT(*) as cnt FROM products "
+        "WHERE active = 1 AND product_id IS NOT NULL "
+        "GROUP BY product_id HAVING cnt > 1"
+    ).fetchall()
+    con.close()
+    dupes = {r[0]: r[1] for r in rows}
+    assert not dupes, (
+        f"Duplicate product_ids found (product_id → count): {dupes}. "
+        "Remove duplicate extension records in Airtable, then run sync_airtable.py."
+    )

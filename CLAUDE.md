@@ -75,12 +75,15 @@ pytest tests/unit/test_matching_logic.py::test_U_M_01_ko_payload_too_low -v
 
 **`scripts/generate_all.py`** reads both AP0 xlsx and `Spec/haystacked_platform_config.xlsx` (NACE codes, scope) and writes all files under `config/`. **Never edit generated files directly** — changes will be overwritten. Files that are always generated (never edit manually):
 - `config/fields.json` — all field definitions keyed by UUID; consumed by `src/field_spec.py` and all runtime consumers
-- `src/field_spec.py` — `FieldSpec` dataclass + `load_fields()`, `fields_by_tender_key()`, `fields_by_field_name()`, `fields_by_sheet()` helpers
+- `src/field_spec.py` — `FieldSpec` dataclass + `load_fields()`, `fields_by_tender_key()`, `fields_by_field_name()`, `fields_by_scope()` helpers
 - `config/vehicle_types.json` — vehicle type map, VNA detection, keyword fallback
 - `config/nace_codes.json`
 - `config/plausibility.json`
+- `config/scope_registry.json` — scope tree, `legacy_map` (VT-name → scope_id), `resolution_order` per leaf; consumed by `matching.py` and `app.py`
 - `config/sqlite_schema.json` — CREATE TABLE SQL + field type lists consumed by `sync_airtable.py` and `src/data_loader.py`
-- `config/prompts/*.txt` — all LLM prompt files, especially `extraction_template.txt`
+- `config/prompts/*.txt` — LLM prompt files; Pass 4b uses VT-specific templates (`extraction_template_agv_forklift.txt`, `_agv_tugger`, `_agv_amr`); `extraction_template.txt` is the combined fallback
+
+Note: `config/unit_semantics.json` is **manually maintained** (not generated) — it lists units with a signed domain (currently `°C`, `°F`). Do not delete it; do not add domain logic to it.
 
 At startup, `app.py` checksums the AP0 xlsx and auto-regenerates all config if it changed.
 
@@ -126,9 +129,10 @@ PDF upload
 
 Module-level constants built from config at startup:
 - `_NUMERIC_KO_TENDER_KEYS` — frozenset of tender keys subject to source-span guard; asserted non-empty.
-- `_NUMERIC_KO_FIELD_HINTS` — subset of fields.json (numeric KO fields with hint+sheet) for Pass 4c prompt construction.
+- `_NUMERIC_KO_FIELD_HINTS` — subset of fields.json (numeric KO fields with hint+**scope**) for Pass 4c prompt construction.
 - `_4C_EXTRACTION_DIRECTION` — maps tender_key → extraction direction string (from operator: KO_IF_LT → MAXIMUM, KO_IF_GT → MINIMUM).
-- `_SHARED_SHEET` — AP0 shared sheet name from `vehicle_types.json`; never hardcoded in Python.
+- `_SHARED_SCOPE` — the shared scope_id (e.g. `"Logistics:AGV"`) read from `config/scope_registry.json`; replaces the former `_SHARED_SHEET` constant.
+- `_LEGACY_MAP` — maps canonical VT name → leaf scope_id; read from `config/scope_registry.json`.
 
 ### Matching Engine (`src/matching.py`)
 
@@ -144,7 +148,7 @@ Pure rule engine — no domain knowledge hardcoded. Reads all rules from `config
 
 ### Data Layer
 
-- **`data/haystacked.db`** — SQLite, populated by `sync_airtable.py`. Schema generated from AP0 Entity Model sheet.
+- **`data/haystacked.db`** — SQLite, populated by `sync_airtable.py`. Schema generated from the **② Structure Registry** tab in AP0 xlsx (not the Entity Model tab, which is documentation-only).
 - **`src/data_loader.py`** — 3-way JOIN: `products ⋈ companies ⋈ base_model_extensions`, returns `list[SupplierRecord]`. Loads only `active=1` records.
 - **`src/models.py`** — Dataclasses: `Company`, `Product`, `FieldValue`, `SupplierRecord`. `None` (never `0` or `[]`) represents unknown values.
 - Multi-select fields stored as pipe-separated strings in SQLite; `_parse_multiselect()` splits on `|`.

@@ -44,10 +44,10 @@
           <rect x="0" y="41.33" width="100" height="13.33" rx="2.22" fill="#003942"/>
         </svg>
       </div>
-      <p>Drop tender PDF here or</p>
+      <p>Drop tender PDF or replay JSON here or</p>
       <label class="btn-upload" for="fileInput">Choose file</label>
-      <input type="file" id="fileInput" accept=".pdf" hidden>
-      <p class="hint">PDF only · max 20 MB</p>
+      <input type="file" id="fileInput" accept=".pdf,application/json" hidden>
+      <p class="hint">PDF or JSON replay · max 20 MB</p>
     </div>
   </section>
 
@@ -241,11 +241,33 @@
       <!-- Top 5 Supplier Cards -->
       <div class="supplier-shortlist">
         <div class="shortlist-header">
-          <h3 class="shortlist-title">Supplier-Shortlist</h3>
+          <h3 class="shortlist-title">Confirmed Matches</h3>
           <button class="btn-debug" id="debugBtn" onclick="openDebug()">Full analysis &rarr;</button>
         </div>
         <div id="supplierCards" class="supplier-cards"></div>
         <div id="supplierExcludedNote" class="excluded-note hidden"></div>
+      </div>
+
+      <div class="supplier-shortlist potential-shortlist hidden" id="potentialSection">
+        <button class="shortlist-divider potential-toggle" id="potentialToggle" onclick="togglePotentialSection()" aria-expanded="false">
+          <div>
+            <span class="shortlist-divider-label">Potential matches — data gaps</span>
+            <span class="shortlist-divider-sub">These suppliers pass all checks we have data for, but key fields are missing. Request their data to confirm eligibility.</span>
+          </div>
+          <span class="potential-toggle-icon" id="potentialToggleIcon">Show &#9660;</span>
+        </button>
+        <div id="potentialCards" class="supplier-cards hidden"></div>
+      </div>
+
+      <div class="supplier-shortlist excluded-shortlist hidden" id="excludedSection">
+        <button class="shortlist-divider excluded-toggle" id="excludedToggle" onclick="toggleExcludedSection()" aria-expanded="false">
+          <div>
+            <span class="shortlist-divider-label excluded-label">Excluded — K.O. not met</span>
+            <span class="shortlist-divider-sub">These suppliers were disqualified by at least one hard K.O. criterion. Showing up to 5, sorted by fewest total issues.</span>
+          </div>
+          <span class="excluded-toggle-icon" id="excludedToggleIcon">Show &#9660;</span>
+        </button>
+        <div id="excludedCards" class="supplier-cards hidden"></div>
       </div>
     </div>
 
@@ -324,6 +346,12 @@ function _updateStepProgress(id, status, done, total) {
   const count = document.getElementById('progress-count-' + id);
   if (!ring) return;
 
+  if (status === 'pending') {
+    ring.classList.remove('indeterminate');
+    ring.style.strokeDashoffset = _RING_CIRC;
+    if (count) count.classList.add('hidden');
+    return;
+  }
   if (status === 'done') {
     ring.classList.remove('indeterminate');
     ring.style.strokeDashoffset = 0;
@@ -359,7 +387,8 @@ function _updateStepProgress(id, status, done, total) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function handleFile(file) {
-  if (!file.name.toLowerCase().endsWith('.pdf')) { showError('Please select a PDF file.'); return; }
+  const name = file.name.toLowerCase();
+  if (!name.endsWith('.pdf') && !name.endsWith('.json')) { showError('Please select a PDF or JSON replay file.'); return; }
 
   hide('uploadSection'); hide('resultSection'); hide('errorSection');
   show('progressSection');
@@ -473,7 +502,47 @@ function _fieldLabel(key) {
   if (_fieldMeta[key]?.label) return _fieldMeta[key].label;
   return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
+
+// Human-readable label for raw gap field names (suffix-stripping, no AP0 dependency)
+function _gapFieldLabel(fn) {
+  const units = [['_mm','mm'],['_kg','kg'],['_pct','%'],['_ms','m/s'],['_c','°C'],['_h','h'],['_m','m']];
+  let name = fn, unit = '';
+  for (const [sfx, u] of units) {
+    if (name.endsWith(sfx)) { name = name.slice(0, -sfx.length); unit = u; break; }
+  }
+  const label = name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return unit ? `${label} (${unit})` : label;
+}
 function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
+
+function _koReasonChip(reason) {
+  const colon = reason.indexOf(':');
+  if (colon === -1) return reason;
+  const field = reason.slice(0, colon).trim();
+  const detail = reason.slice(colon + 1).trim();
+  return `${_gapFieldLabel(field)}: ${detail}`;
+}
+
+function _koDeviation(koReason) {
+  // KO_IF_LT: "field: 60.0 < required 1200"
+  const ltMatch = koReason.match(/([0-9.]+)\s*<\s*required\s+([0-9.]+)/i);
+  if (ltMatch) {
+    const sup = parseFloat(ltMatch[1]), req = parseFloat(ltMatch[2]);
+    return req !== 0 ? Math.abs(sup - req) / req : 1.0;
+  }
+  // KO_IF_GT: "field: needs 2000, only 1800 available"
+  const gtMatch = koReason.match(/needs\s+([0-9.]+),\s*only\s+([0-9.]+)\s+available/i);
+  if (gtMatch) {
+    const sup = parseFloat(gtMatch[1]), req = parseFloat(gtMatch[2]);
+    return req !== 0 ? Math.abs(sup - req) / req : 1.0;
+  }
+  // Boolean / categorical / KO_IF_NEQ / KO_SUBSET → 100 %
+  return 1.0;
+}
+
+function _totalDeviation(knockouts) {
+  return (knockouts || []).reduce((sum, r) => sum + _koDeviation(r), 0);
+}
 
 // Summary panel: read-only chip display of all non-null tender fields.
 function renderAgvRequirements(crit) {
@@ -602,15 +671,16 @@ function _buildFieldRow(key, info, val) {
 
 // Build "Feld hinzufügen" picker — shows VT-relevant fields not already displayed
 function buildAddFieldPicker(crit, renderedKeys) {
-  const sharedSheet = _fieldMeta.__vt_config__?.shared_sheet_name;
+  const sharedScope = _fieldMeta.__vt_config__?.shared_scope ?? '';
+  const legacyMap   = _fieldMeta.__vt_config__?.legacy_map ?? {};
   const currentVt = _lastResult?.vehicle_type_canonical;
   const pickerSeen = new Set();
   const candidates = Object.entries(_fieldMeta)
     .filter(([k, v]) =>
       k !== '__vt_config__' &&
-      (k !== v.tender_key || v.sheet === sharedSheet) &&
+      (k !== v.tender_key || v.scope === sharedScope) &&
       !renderedKeys.has(v.tender_key) &&
-      (v.sheet === currentVt || v.sheet === sharedSheet) &&
+      (v.scope === (legacyMap[currentVt] ?? '') || v.scope === sharedScope) &&
       !pickerSeen.has(v.tender_key) && pickerSeen.add(v.tender_key)
     )
     .map(([, v]) => ({ key: v.tender_key, label: v.label || _fieldLabel(v.tender_key) }))
@@ -707,9 +777,12 @@ function _aggregateByCompany(allResults) {
     if (!companies[key]) companies[key] = { company: r.company, products: [], best: null };
     companies[key].products.push(r);
     const cur = companies[key].best;
+    const rGaps  = (r.null_gap_fields || []).length;
+    const curGaps = cur ? (cur.null_gap_fields || []).length : Infinity;
     if (!cur ||
         (!r.disqualified && cur.disqualified) ||
-        (!r.disqualified && !cur.disqualified && r.score > cur.score) ||
+        (!r.disqualified && !cur.disqualified && rGaps < curGaps) ||
+        (!r.disqualified && !cur.disqualified && rGaps === curGaps && r.score > cur.score) ||
         (r.disqualified && cur.disqualified && r.score > cur.score)) {
       companies[key].best = r;
     }
@@ -727,21 +800,34 @@ function _aggregateByCompany(allResults) {
   });
 }
 
+function requestSupplier(event, company, missingFields) {
+  event.stopPropagation();
+  console.log('Request supplier:', company, 'missing fields:', missingFields);
+  // PoC: no-op. In production: sends automated outreach to supplier requesting field data.
+}
+
 function renderSupplierCards(allResults) {
-  const container = document.getElementById('supplierCards');
-  const note      = document.getElementById('supplierExcludedNote');
+  const container       = document.getElementById('supplierCards');
+  const note            = document.getElementById('supplierExcludedNote');
+  const potentialSection = document.getElementById('potentialSection');
+  const potentialCards  = document.getElementById('potentialCards');
   container.innerHTML = '';
+  potentialCards.innerHTML = '';
   if (!allResults || !allResults.length) {
     container.innerHTML = '<p style="color:var(--steel);font-size:14px">Keine Ergebnisse.</p>';
     note.classList.add('hidden');
+    potentialSection.classList.add('hidden');
     return;
   }
   const maxScore  = allResults[0]?.max_score || 100;
   const companies = _aggregateByCompany(allResults);
-  const qualified = companies.filter(c => !c.best.disqualified).slice(0, 5);
-  const excluded  = companies.filter(c => c.best.disqualified);
 
-  qualified.forEach((c, i) => {
+  const confirmed  = companies.filter(c => !c.best.disqualified && (c.best.null_gap_fields || []).length === 0);
+  const potential  = companies.filter(c => !c.best.disqualified && (c.best.null_gap_fields || []).length > 0);
+  const excluded   = companies.filter(c => c.best.disqualified);
+
+  // ── Confirmed matches ─────────────────────────────────────────────────────
+  confirmed.slice(0, 5).forEach((c, i) => {
     const m   = c.best;
     const pct = maxScore > 0 ? Math.max(0, Math.round(m.score / maxScore * 100)) : 0;
     const label = pct >= 70 ? 'Top Match' : pct >= 40 ? 'Good Match' : 'Partial Match';
@@ -755,6 +841,10 @@ function renderSupplierCards(allResults) {
         <span class="sc-score-pct">${ppct}%</span>
       </div>`;
     }).join('');
+    const passFields = m.null_pass_fields || [];
+    const passNote   = passFields.length
+      ? `<div class="sc-null-pass" title="These KO fields had no requirement in the tender — supplier was not checked against them: ${passFields.map(f => _gapFieldLabel(f)).join(', ')}">&#x2753; ${passFields.length} field${passFields.length === 1 ? '' : 's'} not checked</div>`
+      : '';
     const card = document.createElement('div');
     card.className = 'sc-card';
     card.innerHTML = `
@@ -767,12 +857,139 @@ function renderSupplierCards(allResults) {
         <div class="sc-bar-wrap"><div class="sc-bar" style="width:${pct}%" data-pct="${pct}"></div></div>
         <div class="sc-product-list">${productRows}</div>
         ${chips.length ? `<div class="sc-chips">${chips.map(ch => `<span class="sc-chip">${ch}</span>`).join('')}</div>` : ''}
+        ${passNote}
       </div>`;
     container.appendChild(card);
   });
 
-  if (!qualified.length) {
+  if (!confirmed.length) {
     container.innerHTML = '<p class="sc-empty">No supplier meets all K.O. criteria. Open full analysis for details.</p>';
+  }
+
+  // ── Potential matches ─────────────────────────────────────────────────────
+  const sortedPotential = potential
+    .slice()
+    .sort((a, b) => {
+      const gapDiff = (a.best.null_gap_fields || []).length - (b.best.null_gap_fields || []).length;
+      if (gapDiff !== 0) return gapDiff;
+      return b.best.score - a.best.score;
+    })
+    .slice(0, 5);
+
+  if (sortedPotential.length > 0) {
+    potentialSection.classList.remove('hidden');
+    // cards stay hidden; toggle stays at aria-expanded=false / "Show ▼"
+    sortedPotential.forEach((c, i) => {
+      const m   = c.best;
+      const pct = maxScore > 0 ? Math.max(0, Math.round(m.score / maxScore * 100)) : 0;
+      const label = pct >= 70 ? 'Top Match' : pct >= 40 ? 'Good Match' : 'Partial Match';
+      const cls   = pct >= 70 ? 'match-great' : pct >= 40 ? 'match-good' : 'match-partial';
+      const chips = _koChips(m);
+      const productRows = c.qualified_products.map((p, pi) => {
+        const ppct = maxScore > 0 ? Math.max(0, Math.round(p.score / maxScore * 100)) : 0;
+        return `<div class="sc-product-row${pi > 0 ? ' sc-product-secondary' : ''}">
+          <span class="type-pill">${p.agv_type || '–'}</span>
+          <span class="sc-product-name">${p.product}</span>
+          <span class="sc-score-pct">${ppct}%</span>
+        </div>`;
+      }).join('');
+      const gapFields = m.null_gap_fields || [];
+      const gapChips  = gapFields.map(f => `<span class="sc-chip sc-chip-gap">&#9888; ${_gapFieldLabel(f)}</span>`).join('');
+      const card = document.createElement('div');
+      card.className = 'sc-card';
+      card.innerHTML = `
+        <div class="sc-rank">${i + 1}</div>
+        <div class="sc-body">
+          <div class="sc-header">
+            <div class="sc-company">${m.company}</div>
+            <span class="sc-label ${cls}">${label}</span>
+          </div>
+          <div class="sc-bar-wrap"><div class="sc-bar" style="width:${pct}%" data-pct="${pct}"></div></div>
+          <div class="sc-product-list">${productRows}</div>
+          ${chips.length ? `<div class="sc-chips">${chips.map(ch => `<span class="sc-chip">${ch}</span>`).join('')}</div>` : ''}
+          <div class="sc-gap-row">
+            <div class="sc-gap-chips">
+              <span class="sc-gap-label">Missing</span>
+              <div class="sc-chips sc-chips-gap">${gapChips}</div>
+            </div>
+            <button class="request-supplier-btn" onclick="requestSupplier(event, ${JSON.stringify(m.company)}, ${JSON.stringify(gapFields)})">Request supplier</button>
+          </div>
+        </div>`;
+      potentialCards.appendChild(card);
+    });
+  } else {
+    potentialSection.classList.add('hidden');
+  }
+
+  // ── Excluded section ──────────────────────────────────────────────────────
+  const excludedSection = document.getElementById('excludedSection');
+  const excludedCards   = document.getElementById('excludedCards');
+  excludedCards.innerHTML = '';
+
+  const tenderVT = _lastResult?.vehicle_type_canonical || '';
+
+  const excludedCompanies = [];
+  for (const c of companies) {
+    const matchingDisq = c.products.filter(p =>
+      p.disqualified && (!tenderVT || p.agv_type === tenderVT)
+    );
+    if (!matchingDisq.length) continue;
+    const vtBest = matchingDisq.reduce((a, b) => (b.score > a.score ? b : a));
+    excludedCompanies.push({ company: c.company, best: vtBest, products: matchingDisq });
+  }
+
+  const sortedExcluded = excludedCompanies
+    .slice()
+    .sort((a, b) => _totalDeviation(a.best.knockouts) - _totalDeviation(b.best.knockouts))
+    .slice(0, 5);
+
+  if (sortedExcluded.length > 0) {
+    excludedSection.classList.remove('hidden');
+    // cards stay hidden; toggle stays at aria-expanded=false / "Show ▼"
+
+    sortedExcluded.forEach((c, i) => {
+      const m = c.best;
+      const productRows = c.products
+        .filter(p => p.disqualified)
+        .slice(0, 2)
+        .map((p, pi) => `<div class="sc-product-row${pi > 0 ? ' sc-product-secondary' : ''}">
+          <span class="type-pill">${p.agv_type || '–'}</span>
+          <span class="sc-product-name">${p.product}</span>
+        </div>`).join('');
+
+      const koChips  = (m.knockouts || []).map(r =>
+        `<span class="sc-chip sc-chip-ko">&#10007; ${_koReasonChip(r)}</span>`
+      ).join('');
+      const gapFields = m.null_gap_fields || [];
+      const gapChips  = gapFields.map(f =>
+        `<span class="sc-chip sc-chip-gap">&#9888; ${_gapFieldLabel(f)}</span>`
+      ).join('');
+
+      const card = document.createElement('div');
+      card.className = 'sc-card sc-card-excluded';
+      card.innerHTML = `
+        <div class="sc-rank sc-rank-excluded">${i + 1}</div>
+        <div class="sc-body">
+          <div class="sc-header">
+            <div class="sc-company">${m.company}</div>
+            <span class="sc-label match-ko">Excluded</span>
+          </div>
+          <div class="sc-product-list">${productRows}</div>
+          <div class="sc-gap-row sc-gap-row-ko">
+            <div>
+              <span class="sc-gap-label sc-ko-label">K.O.</span>
+              <div class="sc-chips">${koChips}</div>
+            </div>
+            ${gapChips ? `<div style="margin-top:6px">
+              <span class="sc-gap-label">Missing</span>
+              <div class="sc-chips sc-chips-gap">${gapChips}</div>
+            </div>` : ''}
+          </div>
+        </div>`;
+      excludedCards.appendChild(card);
+    });
+  } else {
+    excludedSection.classList.add('hidden');
   }
 
   note.classList.toggle('hidden', !excluded.length);
@@ -787,13 +1004,14 @@ function renderSupplierCards(allResults) {
 // INVARIANT: all field selection driven by _fieldMeta (AP0-sourced).
 // No hardcoded field names or vehicle type strings.
 function buildClarificationFields(crit, currentVt) {
-  const sharedSheet = _fieldMeta.__vt_config__?.shared_sheet_name;
+  const sharedScope = _fieldMeta.__vt_config__?.shared_scope ?? '';
+  const legacyMap   = _fieldMeta.__vt_config__?.legacy_map ?? {};
   const seen = new Set();
   return Object.entries(_fieldMeta)
     .filter(([key, info]) =>
-      (key !== info.tender_key || info.sheet === sharedSheet) &&
+      (key !== info.tender_key || info.scope === sharedScope) &&
       info.level === 'KO' &&
-      (info.sheet === currentVt || info.sheet === sharedSheet) &&
+      (info.scope === (legacyMap[currentVt] ?? '') || info.scope === sharedScope) &&
       info.display_mode !== 'display' &&
       (crit[info.tender_key] == null || crit[info.tender_key] === '' || (Array.isArray(crit[info.tender_key]) && crit[info.tender_key].length === 0))
     )
@@ -808,14 +1026,15 @@ function buildClarificationFields(crit, currentVt) {
 
 // buildEditFields: selects fields to show in the post-matching edit dialog.
 function buildEditFields(crit, currentVt) {
-  const sharedSheet = _fieldMeta.__vt_config__?.shared_sheet_name;
+  const sharedScope = _fieldMeta.__vt_config__?.shared_scope ?? '';
+  const legacyMap   = _fieldMeta.__vt_config__?.legacy_map ?? {};
   const seen = new Set();
   return Object.entries(_fieldMeta)
     .filter(([key, info]) =>
-      (key !== info.tender_key || info.sheet === sharedSheet) &&
+      (key !== info.tender_key || info.scope === sharedScope) &&
       (info.entity === 'Base Model' || info.entity === 'Product') &&
       (info.level === 'KO' || info.level === 'COND_KO') &&
-      (info.sheet === currentVt || info.sheet === sharedSheet) &&
+      (info.scope === (legacyMap[currentVt] ?? '') || info.scope === sharedScope) &&
       info.display_mode !== 'display' &&
       !key.endsWith('_source') &&
       crit[info.tender_key] != null && crit[info.tender_key] !== ''
@@ -857,8 +1076,6 @@ function openFieldDialog({ title, subtitle, confirmLabel, dismissLabel, fields, 
     pickerWrap.innerHTML = '';
   }
 
-  hide('progressSection');
-  hide('resultSection');
   show('fieldQueryDialog');
 }
 
@@ -907,8 +1124,13 @@ function collectDialogOverrides() {
     const info = _fieldMeta[key] || {};
     const dt = info.data_type || 'String';
     if (dt === 'Float' || dt === 'Integer') {
-      const v = parseFloat(String(ctrl.value).replace(',', '.'));
-      if (!isNaN(v)) overrides[key] = v;
+      const raw = String(ctrl.value).replace(',', '.').trim();
+      if (raw === '') {
+        overrides[key] = null;  // explicit null = remove requirement
+      } else {
+        const v = parseFloat(raw);
+        if (!isNaN(v)) overrides[key] = v;
+      }
     } else if (dt === 'Boolean') {
       if (ctrl.value !== '') overrides[key] = ctrl.value;
     } else if (dt === 'Multi-Select') {
@@ -974,6 +1196,27 @@ function dismissDialog() {
   _dialogData = null;
   if (pendingData) showResult(pendingData);  // clarification skip → show result as-is
   else show('resultSection');               // edit cancel → restore result view
+}
+
+// ── Potential section toggle ──────────────────────────────────────────────────
+function togglePotentialSection() {
+  const cards = document.getElementById('potentialCards');
+  const btn   = document.getElementById('potentialToggle');
+  const icon  = btn.querySelector('.potential-toggle-icon');
+  const open  = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', String(!open));
+  cards.classList.toggle('hidden', open);
+  icon.innerHTML = open ? 'Show &#9660;' : 'Hide &#9650;';
+}
+
+function toggleExcludedSection() {
+  const cards = document.getElementById('excludedCards');
+  const btn   = document.getElementById('excludedToggle');
+  const icon  = document.getElementById('excludedToggleIcon');
+  const open  = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', String(!open));
+  cards.classList.toggle('hidden', open);
+  icon.innerHTML = open ? 'Show &#9660;' : 'Hide &#9650;';
 }
 
 // ── Error / reset ─────────────────────────────────────────────────────────────

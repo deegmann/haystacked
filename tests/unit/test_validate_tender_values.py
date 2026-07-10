@@ -15,22 +15,20 @@ from src.matching import validate_tender_values
 
 
 # ---------------------------------------------------------------------------
-# U-V-01: OPC UA (space) is rejected — not in AP0 allowed list
+# U-V-01: OPC UA (space) is rejected after Step 6 — only 'OPC-UA' is canonical
 # ---------------------------------------------------------------------------
 
-def test_U_V_01_opc_ua_space_rejected():
-    """'OPC UA' (with space) is not a valid AP0 integration value.
+def test_U_V_01_opc_ua_space_rejected_post_step6():
+    """Step 6: 'OPC UA' (with space) is no longer a valid AP0 integration value.
 
-    AP0 allows 'OPC-UA' (hyphen). A space variant is a known LLM fragility
-    (Mama and Nordlicht tenders). Must be set to None with a warning.
+    The 'OPC UA' alias (added in OI-32) was removed in Step 6 allowed_values cleanup.
+    Only 'OPC-UA' (hyphen) is now canonical. 'OPC UA' must be rejected with a warning.
     """
     result, warnings = validate_tender_values({"required_integration_capability": "OPC UA"})
     assert result.get("required_integration_capability") is None, (
-        "'OPC UA' (space) must be rejected — AP0 requires 'OPC-UA' (hyphen)"
+        "'OPC UA' (space) is no longer an AP0 alias after Step 6 — must be rejected"
     )
-    assert any("OPC UA" in w for w in warnings), (
-        "Expected a warning for 'OPC UA' not in AP0 allowed values"
-    )
+    assert warnings, f"A warning must be emitted for rejected value 'OPC UA'"
 
 
 # ---------------------------------------------------------------------------
@@ -47,21 +45,23 @@ def test_U_V_02_opc_ua_hyphen_accepted():
 
 
 # ---------------------------------------------------------------------------
-# U-V-03: REST / OPC UA compound string is rejected
+# U-V-03: REST / OPC UA compound string — split on ' / ', OPC UA now rejected (Step 6)
 # ---------------------------------------------------------------------------
 
-def test_U_V_03_rest_opc_ua_compound_rejected():
-    """'REST / OPC UA' is a compound string not matching any AP0 allowed value.
+def test_U_V_03_rest_opc_ua_compound_split_post_step6():
+    """Step 6: 'REST / OPC UA' is split on ' / ' into ['REST', 'OPC UA'].
+    'REST' passes (substring-matches 'REST API'). 'OPC UA' is now rejected
+    (no longer an AP0 alias after Step 6 allowed_values cleanup).
 
-    The Nordlicht tender returns this string from the LLM. Neither 'REST / OPC UA'
-    nor its parts match an AP0 entry ('REST API' and 'OPC-UA' are separate allowed
-    values, but the compound string fails substring containment from the wrong direction).
+    Result contains only 'REST'; a warning is emitted for 'OPC UA'.
+    OI-61 slash-split behavior is still active and still necessary.
     """
     result, warnings = validate_tender_values({"required_integration_capability": "REST / OPC UA"})
-    assert result.get("required_integration_capability") is None, (
-        "'REST / OPC UA' compound must be rejected by AP0 filter"
-    )
-    assert any("REST / OPC UA" in w or "REST" in w for w in warnings)
+    val = result.get("required_integration_capability", "")
+    parts = [p.strip() for p in val.split(",") if p.strip()] if val else []
+    assert len(parts) == 1, f"Expected 1 valid part after split (OPC UA rejected), got: {parts!r}"
+    assert "rest" in parts[0].lower(), f"'REST' part missing from {parts}"
+    assert warnings, "Expected a warning for rejected 'OPC UA'"
 
 
 # ---------------------------------------------------------------------------
@@ -158,3 +158,31 @@ def test_U_V_08_substring_match_pallet():
     assert not warnings, (
         "'Pallet' triggers no warning — it passes the AP0 filter via substring match"
     )
+
+
+# ---------------------------------------------------------------------------
+# U-V-09: OI-61 — slash-separated compound strings are split before validation
+# ---------------------------------------------------------------------------
+
+def test_U_V_09_slash_compound_split_into_valid_parts():
+    """OI-61: ' / ' separator is normalised before AP0 validation. Step 6 update.
+
+    Before OI-61 fix: compound strings like 'REST / OPC UA' passed the AP0 filter
+    as a single opaque string, causing KO_SUBSET mismatches.
+
+    After OI-61 fix + Step 6: the string is split on ' / '; each part is individually
+    validated. 'REST' passes (matches 'REST API' via substring). 'OPC UA' is now
+    rejected (removed from AP0 allowed_values in Step 6). Result is 'REST' with
+    a warning for the rejected 'OPC UA' part.
+    """
+    result, warnings = validate_tender_values(
+        {"required_integration_capability": "REST / OPC UA"}
+    )
+    val = result.get("required_integration_capability", "")
+    parts = [p.strip() for p in val.split(",") if p.strip()] if val else []
+    assert len(parts) == 1, (
+        f"Expected 1 valid part after split (OPC UA rejected post-Step6), got {parts!r}. "
+        "The ' / ' separator must be normalised before AP0 validation."
+    )
+    assert "rest" in parts[0].lower(), f"'REST' part missing from {parts}"
+    assert warnings, "Expected a warning for rejected 'OPC UA' part"

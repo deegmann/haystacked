@@ -1,7 +1,7 @@
 """Unit tests for Pass 4c module-level startup constants from app.py (U-C-xx).
 
-Tests that _4C_EXTRACTION_DIRECTION, _NUMERIC_KO_FIELD_HINTS, and _SHARED_SHEET
-are non-empty, correctly typed, and internally consistent.
+Tests that _4C_EXTRACTION_DIRECTION, _NUMERIC_KO_FIELD_HINTS, _LEGACY_MAP, and
+_SHARED_SCOPE are non-empty, correctly typed, and internally consistent.
 
 These constants are built at app startup from fields.json via field_spec.py. An empty or
 mismatched constant means the source-span guard and Pass 4c are silently inactive.
@@ -15,7 +15,8 @@ from app import (
     _4C_EXTRACTION_DIRECTION,
     _NUMERIC_KO_FIELD_HINTS,
     _NUMERIC_KO_TENDER_KEYS,
-    _SHARED_SHEET,
+    _LEGACY_MAP,
+    _SHARED_SCOPE,
 )
 
 
@@ -123,16 +124,12 @@ def test_U_C_06_direction_values_are_strings():
 
 
 # ---------------------------------------------------------------------------
-# U-C-07: _SHARED_SHEET is a non-empty string
+# U-C-07: _LEGACY_MAP and _SHARED_SCOPE are loaded from scope_registry.json
 # ---------------------------------------------------------------------------
 
-def test_U_C_07_shared_sheet_non_empty():
-    """_SHARED_SHEET must be a non-empty string loaded from vehicle_types.json.
-
-    This constant controls which extraction hints apply to all vehicle types
-    in Pass 4c. A missing or empty value would mean shared fields are excluded
-    from per-field extraction.
-    """
-    assert isinstance(_SHARED_SHEET, str) and len(_SHARED_SHEET) > 0, (
-        f"_SHARED_SHEET must be a non-empty string. Got: {_SHARED_SHEET!r}"
-    )
+def test_U_C_07_shared_scope_loaded():
+    """_LEGACY_MAP and _SHARED_SCOPE must be loaded from scope_registry.json."""
+    assert _LEGACY_MAP and all(isinstance(v, str) and v for v in _LEGACY_MAP.values()), \
+        f"_LEGACY_MAP must be non-empty with string scope_ids. Got: {_LEGACY_MAP!r}"
+    assert isinstance(_SHARED_SCOPE, str) and _SHARED_SCOPE, \
+        f"_SHARED_SCOPE must be a non-empty string. Got: {_SHARED_SCOPE!r}"

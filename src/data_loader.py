@@ -9,9 +9,12 @@ No field names or types are hardcoded in this file.
 To add a new AP0 field: edit the AP0 xlsx, run generate_all.py.
 """
 import json
+import logging
 import sqlite3
 from pathlib import Path
 from typing import Optional
+
+_log = logging.getLogger(__name__)
 
 from src.models import Company, FieldValue, Product, SupplierRecord
 from src.field_spec import FieldSpec, load_fields
@@ -34,6 +37,11 @@ FROM products p
 JOIN companies c ON p.company_id = c.company_id
 JOIN base_model_extensions bme ON p.base_model_id = bme.base_model_id
 WHERE p.active = 1
+  AND p.product_id IS NOT NULL
+"""
+
+_NULL_ID_SQL = """
+SELECT product_name FROM products WHERE active = 1 AND (product_id IS NULL OR product_id = '')
 """
 
 
@@ -112,13 +120,40 @@ def load_suppliers(db_path: Path = DB_PATH) -> list[SupplierRecord]:
     _unknown_entities = {s.entity for s in load_fields().values()} - _KNOWN_ENTITIES
     assert not _unknown_entities, f"Unknown entity values in fields.json: {_unknown_entities}"
 
+    # OI-56: Base Model entity fields must not share a name with explicitly-selected
+    # product or company columns — bme.* would be shadowed by row_first (first-occurrence wins).
+    # JOIN keys (base_model_id, company_id) are intentional overlaps and excluded.
+    _JOIN_KEYS = {"base_model_id", "company_id", "product_id"}
+    _bm_field_names = {
+        s.field_name for s in load_fields().values() if s.entity == "Base Model"
+    }
+    _explicit_pr_co = (
+        set(_SCHEMA.get("products_columns", [])) | set(_SCHEMA.get("companies_columns", []))
+    ) - _JOIN_KEYS
+    _shadow = _bm_field_names & _explicit_pr_co
+    assert not _shadow, (
+        f"Column-name collision (OI-56): Base Model fields {_shadow} share a name with "
+        "explicitly-selected product/company columns. The bme.* value would be silently "
+        "ignored — rename the field in AP0 xlsx and run generate_all.py."
+    )
+
     con = sqlite3.connect(db_path)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
+
+    missing_id = [r[0] for r in con.execute(_NULL_ID_SQL).fetchall()]
+    if missing_id:
+        _log.warning(
+            "load_suppliers: %d active product(s) have no product_id and are excluded "
+            "from matching — run sync_airtable.py to fix: %s",
+            len(missing_id), missing_id,
+        )
+
     cur.execute(JOIN_SQL)
     rows = cur.fetchall()
     con.close()
 
+    seen_product_ids: set[str] = set()
     records: list[SupplierRecord] = []
     for row in rows:
         d = dict(row)
@@ -130,8 +165,13 @@ def load_suppliers(db_path: Path = DB_PATH) -> list[SupplierRecord]:
             if key not in row_first:
                 row_first[key] = row[i]
 
+        pid = row_first["product_id"]
+        if pid in seen_product_ids:
+            continue
+        seen_product_ids.add(pid)
+
         product = Product(
-            product_id            = row_first["product_id"],
+            product_id            = pid,
             company_id            = row_first["company_id"],
             base_model_id         = row_first["base_model_id"],
             product_name          = row_first["product_name"],

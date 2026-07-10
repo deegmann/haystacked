@@ -19,7 +19,7 @@ And writes all of these:
 | Output file | What it controls | Who reads it |
 |---|---|---|
 | `config/fields.json` | All field defs UUID-keyed: operator, allowed_values, weight, score_function, hint, user_description, etc. | `src/field_spec.py`, `src/matching.py`, `app.py`, `/api/field-meta` |
-| `src/field_spec.py` | FieldSpec dataclass + load_fields(), fields_by_tender_key(), fields_by_field_name(), fields_by_sheet() | `app.py`, `src/matching.py`, `src/context_builder.py` |
+| `src/field_spec.py` | FieldSpec dataclass + load_fields(), fields_by_tender_key(), fields_by_field_name(), fields_by_scope() | `app.py`, `src/matching.py`, `src/context_builder.py` |
 | `config/vehicle_types.json` | vt_map, VNA subtypes, text_overrides, keyword fallback, scoring_bucket_map | `app.py`, `src/context_builder.py` |
 | `config/nace_codes.json` | NACE Prio-1 list for LLM classification | `app.py` |
 | `config/plausibility.json` | Min/max ranges for LLM value validation | `app.py validate_agv_criteria()` |
@@ -77,7 +77,7 @@ If generate_all.py prints `[WARN] 'your_field_name' has operator but no Tender J
 **Steps:**
 
 1. Open `Spec/haystacked_AP0_field_spec_v0_10.xlsx`
-2. Navigate to the sheet that contains the field (SHARED, Forklift AGV, Tugger AGV, or Mobile AMR)
+2. Navigate to the sheet that contains the field (Global, AGV_Shared, AGV_Forklift, AGV_Tugger, or AGV_AMR)
 3. Find the row for the field
 4. Change the **Level** column value (see exact strings above)
 5. Optionally update the **Matching Operator** column if the operator also needs to change
@@ -135,7 +135,7 @@ This mismatch was the root cause of two bugs fixed on 2026-06-01: `fork_spread` 
 
 ## How to improve an LLM extraction hint
 
-The **Description** column in the SHARED, Forklift AGV, Tugger AGV, and Mobile AMR sheets directly controls what the LLM is told about each field in the extraction prompt. Improving the hint is the primary way to fix extraction errors.
+The **Description** column in the Global, AGV_Shared, AGV_Forklift, AGV_Tugger, and AGV_AMR sheets directly controls what the LLM is told about each field in the extraction prompt. Improving the hint is the primary way to fix extraction errors.
 
 **Steps:**
 
@@ -171,7 +171,7 @@ Adding a new matchable field requires changes in two places: the AP0 xlsx (for m
 
 **In the AP0 xlsx:**
 
-1. Add a new row to the appropriate data sheet (SHARED or one of the AGV-type sheets)
+1. Add a new row to the appropriate data sheet (Global for cross-type fields, AGV_Shared for all AGV types, or one of the AGV-type-specific sheets: AGV_Forklift, AGV_Tugger, AGV_AMR)
 2. Set the **Field Name** column — this must exactly match the Airtable column name (snake_case)
 3. Set the **Level** column — one of the four exact strings above
 4. Set the **Data Type** column — `Boolean`, `Float`, `Integer`, `Dropdown`, `Multi-Select`, or `Text`

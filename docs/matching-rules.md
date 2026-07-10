@@ -118,8 +118,10 @@ Uses substring matching for flexibility: `"SLAM"` will match `"Natural Feature (
 
 **Examples:**
 - `load_type`: tender requires `["Pallet EUR", "Pallet ISO"]`, supplier only handles `["Tote"]` → K.O. (no overlap)
-- `navigation_type` (Cond. K.O.): tender requires `["Natural Feature (SLAM)"]`, supplier supports `["Laser Reflector", "Magnetic Tape"]` → K.O. if navigation is required, scoring penalty if not
-- `fleet_management_system`: tender requires `["VDA 5050 compatible"]`, supplier only offers `["Proprietary"]` → K.O.
+- `integration_capability` (Cond. K.O.): tender requires `["WMS"]`, supplier only supports `["SAP", "ERP"]` → K.O. if integration is required
+- `storage_system_type` (Cond. K.O., AMR only): tender requires `["Bin-to-Person"]`, supplier is Shelf-to-Person only → K.O.
+
+Note: `navigation_type` and `fleet_management_system` were demoted from KO_SUBSET to **CONTEXT** in AP0 v0.10 Step 6 (2026-07-10) — they are now informational only and do not affect filtering.
 
 ---
 

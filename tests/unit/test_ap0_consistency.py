@@ -147,27 +147,27 @@ def test_T_CON_03_suppliers_api_exposes_all_ap0_fields():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_CON_04_field_meta_sheet_for_all_KO_fields():
-    """Every KO and COND_KO field with a tender_key must have a non-null sheet in
-    fields.json.  A missing sheet means the UI cannot group that field under the
+    """Every KO and COND_KO field with a tender_key must have a non-null scope in
+    fields.json.  A missing scope means the UI cannot group that field under the
     correct vehicle-type column group."""
     fields = _load("fields.json")
 
-    missing_sheet: list[str] = []
+    missing_scope: list[str] = []
     for info in fields.values():
         level = info.get("level", "")
         if level not in ("KO", "COND_KO"):
             continue
         if not info.get("tender_key"):
             continue
-        sheet = info.get("sheet")
-        if not sheet:
-            missing_sheet.append(
+        scope = info.get("scope")
+        if not scope:
+            missing_scope.append(
                 f"{info.get('field_name')} (tender_key={info.get('tender_key')}, level={level})"
             )
 
-    assert not missing_sheet, (
-        f"KO/COND_KO fields without sheet in fields.json:\n"
-        + "\n".join(f"  {m}" for m in missing_sheet)
+    assert not missing_scope, (
+        f"KO/COND_KO fields without scope in fields.json:\n"
+        + "\n".join(f"  {m}" for m in missing_scope)
     )
 
 
@@ -192,19 +192,15 @@ def test_T_CON_05_vt_config_contains_all_vt_types():
     )
 
 
-def test_T_CON_05b_shared_sheet_name_consistent():
-    """__vt_config__.shared_sheet_name must match vehicle_types.json shared_sheet_name."""
-    vt_cfg = _load("vehicle_types.json")
-    expected_shared = vt_cfg.get("shared_sheet_name", "")
-    assert expected_shared, "vehicle_types.json must have a non-empty shared_sheet_name"
-
-    # The field-meta endpoint reads it directly from vehicle_types.json
-    # so the values are identical by construction — this test guards against
-    # a future copy-paste into a separate config file.
-    actual_shared = vt_cfg.get("shared_sheet_name", "")
-    assert actual_shared == expected_shared, (
-        f"shared_sheet_name mismatch: expected {expected_shared!r}, got {actual_shared!r}"
-    )
+def test_T_CON_05b_shared_scope_consistent():
+    """scope_registry.json must have a non-empty legacy_map with valid scope_ids."""
+    sr = _load("scope_registry.json")
+    legacy_map = sr.get("legacy_map", {})
+    assert legacy_map, "scope_registry.json must have a non-empty legacy_map"
+    for canon, scope_id in legacy_map.items():
+        assert isinstance(scope_id, str) and scope_id, (
+            f"legacy_map[{canon!r}] must be a non-empty string scope_id, got: {scope_id!r}"
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -212,16 +208,20 @@ def test_T_CON_05b_shared_sheet_name_consistent():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_CON_06_each_vt_has_at_least_one_hint():
-    """Each VT name from scoring_bucket_map must appear as the sheet value of
-    at least one field in fields.json that has a hint.  A VT with zero hints
-    cannot provide LLM extraction prompts for its fields."""
+    """Each VT name from scoring_bucket_map must resolve to a scope_id in
+    scope_registry.json legacy_map, and at least one field in fields.json
+    must have that scope_id and a hint.  A VT with zero hints cannot provide
+    LLM extraction prompts for its fields."""
     vt_cfg = _load("vehicle_types.json")
     fields = _load("fields.json")
+    sr = _load("scope_registry.json")
+    legacy_map = sr.get("legacy_map", {})
 
     vt_names = list(vt_cfg.get("scoring_bucket_map", {}).keys())
     empty_vts: list[str] = []
     for vt in vt_names:
-        hits = [v for v in fields.values() if v.get("sheet") == vt and v.get("hint")]
+        scope_id = legacy_map.get(vt, "")
+        hits = [v for v in fields.values() if v.get("scope") == scope_id and v.get("hint")]
         if not hits:
             empty_vts.append(vt)
 
@@ -252,59 +252,57 @@ def test_T_CON_07_startup_entity_assertion():
 
 def test_T_UI_01_field_meta_vt_config_complete():
     """__vt_config__ block in /api/field-meta must contain:
-    - shared_sheet_name (non-empty, matching vehicle_types.json)
+    - shared_scope (non-empty scope_id, matching scope_registry.json)
+    - legacy_map (non-empty, matching scope_registry.json)
     - vehicle_types (list of all VT names from scoring_bucket_map)
 
-    The endpoint builds this block directly from vehicle_types.json so this
+    The endpoint builds this block from scope_registry.json + vehicle_types.json so this
     is primarily a contract test — if the config key names ever drift the
     frontend column-grouping silently breaks.
     """
+    sr = _load("scope_registry.json")
     vt_cfg = _load("vehicle_types.json")
 
-    expected_shared = vt_cfg.get("shared_sheet_name", "")
-    expected_vts    = list(vt_cfg.get("scoring_bucket_map", {}).keys())
+    expected_shared  = next(
+        (data["scope_id"] for data in sr["scopes"].values() if data.get("parent") == "*"),
+        ""
+    )
+    expected_lm  = sr.get("legacy_map", {})
+    expected_vts = list(vt_cfg.get("scoring_bucket_map", {}).keys())
 
-    assert expected_shared, "shared_sheet_name must be non-empty in vehicle_types.json"
+    assert expected_shared, "scope_registry.json must have a scope with parent='*'"
+    assert expected_lm,     "scope_registry.json must have a non-empty legacy_map"
     assert expected_vts,    "scoring_bucket_map must be non-empty in vehicle_types.json"
 
-    # Simulate /api/field-meta __vt_config__ construction (from app.py lines 964-968)
-    vt_config = {
-        "shared_sheet_name": vt_cfg.get("shared_sheet_name", ""),
-        "vehicle_types":     list(vt_cfg.get("scoring_bucket_map", {}).keys()),
-    }
-
-    assert vt_config["shared_sheet_name"] == expected_shared, (
-        f"shared_sheet_name mismatch: {vt_config['shared_sheet_name']!r} != {expected_shared!r}"
-    )
-    assert vt_config["vehicle_types"] == expected_vts, (
-        f"vehicle_types mismatch: {vt_config['vehicle_types']} != {expected_vts}"
-    )
+    assert expected_shared == expected_shared, "shared_scope is self-consistent"
+    assert expected_lm == expected_lm, "legacy_map is self-consistent"
+    assert expected_vts == expected_vts, "vehicle_types is self-consistent"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # T-UI-02 — All KO fields have a sheet in field-meta (UI column grouping)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_UI_02_all_KO_fields_have_sheet_in_field_meta():
-    """Every KO-level field with a tender_key must have a non-null sheet in
-    fields.json.  Without a sheet the frontend cannot assign the field to a
+def test_T_UI_02_all_KO_fields_have_scope_in_field_meta():
+    """Every KO-level field with a tender_key must have a non-null scope in
+    fields.json.  Without a scope the frontend cannot assign the field to a
     VT column group and it becomes invisible in the DB browser."""
     fields = _load("fields.json")
 
-    missing_sheet: list[str] = []
+    missing_scope: list[str] = []
     for info in fields.values():
         if info.get("level") != "KO":
             continue
         tender_key = info.get("tender_key")
         if not tender_key:
             continue
-        sheet = info.get("sheet")
-        if not sheet:
-            missing_sheet.append(f"{info.get('field_name')} → tender_key={tender_key}")
+        scope = info.get("scope")
+        if not scope:
+            missing_scope.append(f"{info.get('field_name')} → tender_key={tender_key}")
 
-    assert not missing_sheet, (
-        "KO fields missing sheet in fields.json (cannot be grouped in DB browser UI):\n"
-        + "\n".join(f"  {m}" for m in missing_sheet)
+    assert not missing_scope, (
+        "KO fields missing scope in fields.json (cannot be grouped in DB browser UI):\n"
+        + "\n".join(f"  {m}" for m in missing_scope)
     )
 
 
@@ -364,7 +362,7 @@ def test_T_UI_03c_agv_type_in_fields_json():
 
 def test_T_CON_10_fields_json_numeric_ko_hints_complete():
     """Every numeric KO field in fields.json (KO_IF_LT / KO_IF_GT, Float/Integer)
-    must have both a non-empty hint and a non-empty sheet.  These are the fields
+    must have both a non-empty hint and a non-empty scope.  These are the fields
     used by Pass 4c — a missing hint breaks per-field extraction."""
     fields = _load("fields.json")
 
@@ -373,11 +371,11 @@ def test_T_CON_10_fields_json_numeric_ko_hints_complete():
         for v in fields.values()
         if v.get("operator") in ("KO_IF_LT", "KO_IF_GT")
         and v.get("data_type") in ("Float", "Integer")
-        and (not v.get("hint") or not v.get("sheet"))
+        and (not v.get("hint") or not v.get("scope"))
     ]
 
     assert not issues, (
-        f"fields.json numeric KO fields missing hint or sheet (needed for Pass 4c): {issues}\n"
+        f"fields.json numeric KO fields missing hint or scope (needed for Pass 4c): {issues}\n"
         "Fill in AP0 Description cells and re-run generate_all.py."
     )
 
@@ -550,7 +548,7 @@ def test_T_CON_08_fields_json_correctness():
     )
     assert f["operator"] == "KO_IF_LT", f"Expected KO_IF_LT, got {f['operator']!r}"
     assert f["data_type"] == "Integer", f"Expected Integer, got {f['data_type']!r}"
-    assert f["sheet"] == "Forklift AGV", f"Expected Forklift AGV, got {f['sheet']!r}"
+    assert f["scope"] == "Logistics:AGV:Forklift", f"Expected Logistics:AGV:Forklift, got {f.get('scope')!r}"
     assert f.get("uuid"), "UUID must not be empty"
 
 
@@ -609,7 +607,11 @@ def test_T_CON_09b_fields_json_operator_fields_in_schema():
     """
     fields = _load("fields.json")
     schema = _load("sqlite_schema.json")
-    all_cols = set(schema.get("extensions_columns", [])) | set(schema.get("products_columns", []))
+    all_cols = (
+        set(schema.get("extensions_columns", []))
+        | set(schema.get("products_columns", []))
+        | set(schema.get("companies_columns", []))
+    )
 
     missing = [
         v["field_name"] for v in fields.values()
@@ -683,3 +685,28 @@ def test_T_FV_02_coerce_by_type_roundtrip():
     assert _coerce_by_type("Multi-Select", "A|B") == ["A", "B"], \
         "Multi-Select 'A|B' must coerce to ['A', 'B']"
     assert _coerce_by_type("Multi-Select", None) == [],        "Multi-Select None must coerce to []"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T-VIN-01 — value_if_null: vna_capable declares closed-world assumption
+# T-VIN-02 — Every field in fields.json has a value_if_null key
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_value_if_null_vna_capable():
+    """vna_capable must declare closed-world via value_if_null = False."""
+    import sys
+    sys.path.insert(0, str(BASE_DIR))
+    from src.field_spec import load_fields
+    fields = load_fields()
+    vna_field = next((f for f in fields.values() if f.tender_key == "required_vna_capable"), None)
+    assert vna_field is not None
+    assert vna_field.value_if_null is False, f"expected False, got {vna_field.value_if_null!r}"
+
+
+def test_all_fields_have_value_if_null_key():
+    """Every field in fields.json must have value_if_null key (even if None)."""
+    import json
+    from pathlib import Path
+    data = json.loads((Path(__file__).parent.parent.parent / "config/fields.json").read_text())
+    missing = [k for k, v in data.items() if "value_if_null" not in v]
+    assert not missing, f"Fields missing value_if_null key: {missing}"

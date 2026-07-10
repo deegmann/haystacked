@@ -19,7 +19,6 @@ class Company:
     website:                Optional[str]          = None
     certifications_generic: list[str]              = field(default_factory=list)
     languages_spoken:       list[str]              = field(default_factory=list)
-    export_capable:         Optional[bool]         = None
     last_updated:           Optional[str]          = None
 
 

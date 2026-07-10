@@ -240,7 +240,6 @@ def import_companies(l1_rows):
             "contact_person":       parse_text(row.get("contact_person")),
             "certifications_generic": parse_ms(row.get("certifications_generic")),
             "languages_spoken":     parse_ms(row.get("languages_spoken")),
-            "export_capable":       parse_bool(row.get("export_capable")),
             "service_coverage":     parse_ms(row.get("service_coverage")),
             "last_updated":         parse_date(row.get("last_updated")),
             # NOTES / source not imported (no source_notes field in Companies)

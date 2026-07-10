@@ -79,6 +79,9 @@ init_db()
 
 # ── Vehicle types — loaded from generated config (no hardcoding) ──────────────
 _vehicle_cfg    = json.loads((_CONFIG_DIR / "vehicle_types.json").read_text())
+_SIGNED_UNITS = frozenset(
+    json.loads((_CONFIG_DIR / "unit_semantics.json").read_text()).get("signed_units", [])
+)
 
 # ── Extension column list — loaded once at startup from AP0-generated schema ──
 _schema_path = _CONFIG_DIR / "sqlite_schema.json"
@@ -162,8 +165,8 @@ _NUMERIC_KO_TENDER_KEYS: frozenset = frozenset(
 _NUMERIC_KO_FIELD_HINTS: dict = {}
 for _tk in _NUMERIC_KO_TENDER_KEYS:
     for _spec in _FIELDS_BY_TENDER_KEY.get(_tk, []):
-        if _spec.hint and _spec.sheet:
-            _NUMERIC_KO_FIELD_HINTS[_tk] = {"hint": _spec.hint, "sheet": _spec.sheet}
+        if _spec.hint and _spec.scope:
+            _NUMERIC_KO_FIELD_HINTS[_tk] = {"hint": _spec.hint, "scope": _spec.scope}
             break
 assert _NUMERIC_KO_FIELD_HINTS, (
     "fields.json has no numeric KO field hints — run generate_all.py"
@@ -249,8 +252,19 @@ _VNA_APPLICABLE = set(_vehicle_cfg.get("vna_applicable_types", []))  # C-5: type
 _AGV_DETECT_KWS = _vehicle_cfg.get("agv_detection_keywords", [])     # C-1: is_agv_amr fallback keywords
 
 _FIELD_TEXT_FALLBACKS = _vehicle_cfg.get("field_text_fallbacks", [])  # [{tender_key, regex, value, only_if_null}]
-_SHARED_SHEET         = _vehicle_cfg.get("shared_sheet_name", "")  # C-6: AP0 shared sheet name
-assert _SHARED_SHEET, "vehicle_types.json missing 'shared_sheet_name' — run generate_all.py"
+_scope_reg        = json.loads((_CONFIG_DIR / "scope_registry.json").read_text())
+_LEGACY_MAP       = _scope_reg.get("legacy_map", {})
+_RESOLUTION_ORDER = _scope_reg.get("resolution_order", {})
+_shared_candidates = [
+    data["scope_id"] for data in _scope_reg["scopes"].values() if data.get("parent") == "*"
+]
+assert len(_shared_candidates) == 1, (
+    f"scope_registry.json: expected exactly 1 child of '*', found {_shared_candidates}. "
+    "Step 7 will generalize multi-domain support — until then the hierarchy must be single-domain."
+)
+_SHARED_SCOPE = _shared_candidates[0]
+assert _LEGACY_MAP,   "scope_registry.json missing legacy_map — run generate_all.py"
+assert _SHARED_SCOPE, "scope_registry.json: no shared scope found — run generate_all.py"
 _VALID_VTS = set(_vehicle_cfg.get("scoring_bucket_map", {}).keys())
 
 # ── NACE — loaded from generated config ───────────────────────────────────────
@@ -429,147 +443,191 @@ async def analyze(file: UploadFile = File(...)):
 
         yield sse("step", {"id": "upload", "status": "done", "message": f"'{filename}' received"})
 
-        if not filename.lower().endswith(".pdf"):
-            yield sse("error", {"message": "Only PDF files are supported."}); return
+        is_replay = filename.lower().endswith(".json")
 
-        size_kb = len(pdf_bytes) // 1024
-        log.info("PDF-Größe: %d KB", size_kb)
-        yield sse("log", {"message": f"PDF size: {size_kb} KB"})
-
-        if len(pdf_bytes) > 20 * 1024 * 1024:
-            yield sse("error", {"message": "PDF too large (max. 20 MB)."}); return
-
-        # ── PDF extraction ────────────────────────────────────────────────────
-        yield sse("step", {"id": "extract", "status": "running", "message": "Extracting text…"})
-        await asyncio.sleep(0)
-
-        try:
-            text, num_pages = extract_text_from_pdf(pdf_bytes)
-        except Exception as e:
-            log.exception("PDF-Extraktion fehlgeschlagen")
-            yield sse("error", {"message": f"PDF could not be read: {e}"}); return
-
-        if not text.strip():
-            yield sse("error", {"message": "No text found (scanned document?)"}); return
-
-        # qwen2.5:7b has 128k token context; we activate 32k via num_ctx.
-        # 50k chars ≈ 14k tokens — covers virtually all tender documents in full.
-        max_chars = 50_000
-        truncated = len(text) > max_chars
-        if truncated:
-            log.info("Text gekürzt: %d → %d Z.", len(text), max_chars)
-            text = text[:max_chars] + "\n\n[... document truncated ...]"
-
-        yield sse("step", {"id": "extract", "status": "done",
-                            "message": f"{num_pages} pages · {len(text):,} characters" + (" · truncated" if truncated else "")})
-        yield sse("log", {"message": f"Extrahiert: {num_pages} Seiten | {len(text):,} Z. | Gekürzt: {truncated}"})
-
-        # ── LLM Step 1: Basic extraction ──────────────────────────────────────
-        yield sse("step", {"id": "llm", "status": "running",
-                            "message": f"Extracting basic data ({OLLAMA_MODEL})…"})
-        await asyncio.sleep(0)
-
-        # Use full available text for basic extraction so contact info
-        # and summaries from later pages are visible to the model.
-        basic_user = _fill(BASIC_USER_TEMPLATE, text=text)
-        try:
-            raw_basic = await call_ollama(MAIN_SYSTEM, basic_user, "basic")
-        except httpx.ConnectError:
-            yield sse("error", {"message": "Ollama not reachable — please run './start.sh'."}); return
-        except Exception as e:
-            log.exception("LLM-Fehler (basic)")
-            yield sse("error", {"message": f"LLM error: {e}"}); return
-
-        t1 = (datetime.now() - t0).total_seconds()
-        yield sse("step", {"id": "llm", "status": "done", "message": f"LLM analysis done ({t1:.1f}s)"})
-        yield sse("log", {"message": f"Grunddaten: {t1:.1f}s | {len(raw_basic)} Z."})
-
-        yield sse("step", {"id": "parse", "status": "running", "message": "Antwort wird geparst…"})
-        await asyncio.sleep(0)
-
-        try:
-            result = repair_and_parse(raw_basic)
-        except ValueError as e:
-            log.error("Parse-Fehler: %s", e)
-            yield sse("step", {"id": "parse", "status": "error", "message": str(e)})
-            yield sse("error", {"message": str(e), "raw_preview": raw_basic[:500]}); return
-
-        parse_method = result.pop("_parse_method", "direct")
-
-        # Clean up string "null" values the LLM sometimes emits instead of JSON null
-        for k, v in result.items():
-            if v == "null" or v == "NULL":
-                result[k] = None
-
-        # Keyword fallback: if LLM missed is_agv_amr but doc contains clear AGV terms, force true
-        if not result.get("is_agv_amr"):
-            text_lower = text[:5000].lower()
-            if any(kw in text_lower for kw in _AGV_DETECT_KWS):
-                result["is_agv_amr"] = True
-                log.info("AGV-Keyword-Fallback: is_agv_amr auf True gesetzt")
-
-        # ── Contact fallback: targeted pass on document tail ──────────────────
-        # Contact info is often at the end of a document. If the main extraction
-        # missed contact fields and the document has a meaningful tail, run a
-        # short focused call on the last 4000 chars.
-        contact_missing = not any(result.get(f) for f in ("contact_name", "contact_email", "contact_phone"))
-        full_text_len = result.get("text_length", len(text))  # not set yet, use len(text)
-        if contact_missing and len(text) > 6000:
-            tail = text[-4000:]
+        if is_replay:
+            # ── Replay mode: skip LLM, use cached extraction ──────────────────
             try:
-                raw_contact = await call_ollama(CONTACT_SYSTEM, _fill(CONTACT_USER_TEMPLATE, text=tail), "contact")
-                contact_data = repair_and_parse(raw_contact)
-                contact_data.pop("_parse_method", None)
-                for field in ("contact_name", "contact_email", "contact_phone", "deadline", "tender_date"):
-                    if contact_data.get(field) and not result.get(field):
-                        result[field] = contact_data[field]
-                        log.info("Kontakt-Fallback: %s = %s", field, contact_data[field])
+                cached = json.loads(pdf_bytes.decode("utf-8"))
             except Exception as e:
-                log.warning("Kontakt-Fallback fehlgeschlagen: %s", e)
+                yield sse("error", {"message": f"Invalid JSON: {e}"}); return
 
-        # ── LLM Step 2: NACE classification (short, targeted) ────────────────
-        yield sse("step", {"id": "parse", "status": "running", "message": "NACE klassifizieren…"})
-        # Fallback chain: tender_category → project_name → generic
-        tender_cat = (result.get("tender_category")
-                      or result.get("project_name")
-                      or "unknown service")
-        # Fallback chain: buyer_industry → buyer name → generic
-        buyer_ind  = (result.get("buyer_industry")
-                      or result.get("buyer")
-                      or "unknown industry")
-        nace_user  = _fill(NACE_USER_TEMPLATE,
-            tender_category=tender_cat, buyer_industry=buyer_ind,
-            category_list=CATEGORY_LIST
-        )
-        try:
-            raw_nace = await call_ollama(NACE_SYSTEM, nace_user, "nace")
-            nace_data = repair_and_parse(raw_nace)
-            nace_data.pop("_parse_method", None)
-            in_scope = nace_data.pop("in_scope", True)
-            result.update(nace_data)
-            result["in_scope"] = bool(in_scope)
-            log.info("NACE: tender=%s in_scope=%s", result.get("nace_tender"), result["in_scope"])
-        except Exception as e:
-            log.warning("NACE-Klassifizierung fehlgeschlagen: %s", e)
-            result["in_scope"] = True  # don't hide result on classification error
+            replay_vt       = cached.get("vehicle_type") or ""
+            replay_criteria = cached.get("agv_criteria") or {}
 
-        t2 = (datetime.now() - t0).total_seconds()
-        scope_label = "" if result.get("in_scope", True) else " · out of scope"
-        yield sse("step", {"id": "parse", "status": "done",
-                            "message": f"Parsing OK ({parse_method}) | NACE: {result.get('nace_tender','–')}{scope_label}"})
-        yield sse("log", {"message": f"Parse+NACE: {t2:.1f}s gesamt"})
+            if not replay_vt or not replay_criteria:
+                yield sse("error", {"message": "JSON must contain 'vehicle_type' and 'agv_criteria'."}); return
 
-        is_agv = bool(result.get("is_agv_amr", False))
-        log.info("AGV/AMR-Tender erkannt: %s", is_agv)
+            yield sse("step", {"id": "extract", "status": "done",
+                               "message": "Replay mode — LLM extraction skipped"})
+            yield sse("log",  {"message": f"Loaded cached extraction: vehicle_type={replay_vt}, "
+                                          f"{len(replay_criteria)} criteria fields"})
 
-        # ── LLM: AGV criteria extraction (if applicable) ──────────────────────
-        agv_criteria = None
-        matches = []
-        matches_all = []
-        canonical_agv_type = None
-        is_vna_subtype = False
+            canonical_agv_type = _VT_MAP_CFG.get(replay_vt.lower().strip()) or replay_vt
+            is_vna_subtype     = bool(cached.get("is_vna", False))
+            agv_criteria       = dict(replay_criteria)
+            text               = ""
+            parse_method       = "replay"
+            result             = {
+                "is_agv_amr":  cached.get("is_agv_amr", True),
+                "in_scope":    cached.get("in_scope", True),
+                "buyer":       cached.get("buyer"),
+                "project":     cached.get("project"),
+                "contact":     cached.get("contact"),
+                "summary":     cached.get("summary"),
+                "nace_code":   cached.get("nace_code"),
+                "nace_label":  cached.get("nace_label"),
+            }
+            analysis_id = str(uuid.uuid4())
+            is_agv = True
 
-        if is_agv:
+        elif filename.lower().endswith(".pdf"):
+            size_kb = len(pdf_bytes) // 1024
+            log.info("PDF-Größe: %d KB", size_kb)
+            yield sse("log", {"message": f"PDF size: {size_kb} KB"})
+
+            if len(pdf_bytes) > 20 * 1024 * 1024:
+                yield sse("error", {"message": "PDF too large (max. 20 MB)."}); return
+
+            # ── PDF extraction ────────────────────────────────────────────────────
+            yield sse("step", {"id": "extract", "status": "running", "message": "Extracting text…"})
+            await asyncio.sleep(0)
+
+            try:
+                text, num_pages = extract_text_from_pdf(pdf_bytes)
+            except Exception as e:
+                log.exception("PDF-Extraktion fehlgeschlagen")
+                yield sse("error", {"message": f"PDF could not be read: {e}"}); return
+
+            if not text.strip():
+                yield sse("error", {"message": "No text found (scanned document?)"}); return
+
+            # qwen2.5:7b has 128k token context; we activate 32k via num_ctx.
+            # 50k chars ≈ 14k tokens — covers virtually all tender documents in full.
+            max_chars = 50_000
+            truncated = len(text) > max_chars
+            if truncated:
+                log.info("Text gekürzt: %d → %d Z.", len(text), max_chars)
+                text = text[:max_chars] + "\n\n[... document truncated ...]"
+
+            yield sse("step", {"id": "extract", "status": "done",
+                                "message": f"{num_pages} pages · {len(text):,} characters" + (" · truncated" if truncated else "")})
+            yield sse("log", {"message": f"Extrahiert: {num_pages} Seiten | {len(text):,} Z. | Gekürzt: {truncated}"})
+
+            # ── LLM Step 1: Basic extraction ──────────────────────────────────────
+            yield sse("step", {"id": "llm", "status": "running",
+                                "message": f"Extracting basic data ({OLLAMA_MODEL})…"})
+            await asyncio.sleep(0)
+
+            # Use full available text for basic extraction so contact info
+            # and summaries from later pages are visible to the model.
+            basic_user = _fill(BASIC_USER_TEMPLATE, text=text)
+            try:
+                raw_basic = await call_ollama(MAIN_SYSTEM, basic_user, "basic")
+            except httpx.ConnectError:
+                yield sse("error", {"message": "Ollama not reachable — please run './start.sh'."}); return
+            except Exception as e:
+                log.exception("LLM-Fehler (basic)")
+                yield sse("error", {"message": f"LLM error: {e}"}); return
+
+            t1 = (datetime.now() - t0).total_seconds()
+            yield sse("step", {"id": "llm", "status": "done", "message": f"LLM analysis done ({t1:.1f}s)"})
+            yield sse("log", {"message": f"Grunddaten: {t1:.1f}s | {len(raw_basic)} Z."})
+
+            yield sse("step", {"id": "parse", "status": "running", "message": "Antwort wird geparst…"})
+            await asyncio.sleep(0)
+
+            try:
+                result = repair_and_parse(raw_basic)
+            except ValueError as e:
+                log.error("Parse-Fehler: %s", e)
+                yield sse("step", {"id": "parse", "status": "error", "message": str(e)})
+                yield sse("error", {"message": str(e), "raw_preview": raw_basic[:500]}); return
+
+            parse_method = result.pop("_parse_method", "direct")
+
+            # Clean up string "null" values the LLM sometimes emits instead of JSON null
+            for k, v in result.items():
+                if v == "null" or v == "NULL":
+                    result[k] = None
+
+            # Keyword fallback: if LLM missed is_agv_amr but doc contains clear AGV terms, force true
+            if not result.get("is_agv_amr"):
+                text_lower = text[:5000].lower()
+                if any(kw in text_lower for kw in _AGV_DETECT_KWS):
+                    result["is_agv_amr"] = True
+                    log.info("AGV-Keyword-Fallback: is_agv_amr auf True gesetzt")
+
+            # ── Contact fallback: targeted pass on document tail ──────────────────
+            # Contact info is often at the end of a document. If the main extraction
+            # missed contact fields and the document has a meaningful tail, run a
+            # short focused call on the last 4000 chars.
+            contact_missing = not any(result.get(f) for f in ("contact_name", "contact_email", "contact_phone"))
+            full_text_len = result.get("text_length", len(text))  # not set yet, use len(text)
+            if contact_missing and len(text) > 6000:
+                tail = text[-4000:]
+                try:
+                    raw_contact = await call_ollama(CONTACT_SYSTEM, _fill(CONTACT_USER_TEMPLATE, text=tail), "contact")
+                    contact_data = repair_and_parse(raw_contact)
+                    contact_data.pop("_parse_method", None)
+                    for field in ("contact_name", "contact_email", "contact_phone", "deadline", "tender_date"):
+                        if contact_data.get(field) and not result.get(field):
+                            result[field] = contact_data[field]
+                            log.info("Kontakt-Fallback: %s = %s", field, contact_data[field])
+                except Exception as e:
+                    log.warning("Kontakt-Fallback fehlgeschlagen: %s", e)
+
+            # ── LLM Step 2: NACE classification (short, targeted) ────────────────
+            yield sse("step", {"id": "parse", "status": "running", "message": "NACE klassifizieren…"})
+            # Fallback chain: tender_category → project_name → generic
+            tender_cat = (result.get("tender_category")
+                          or result.get("project_name")
+                          or "unknown service")
+            # Fallback chain: buyer_industry → buyer name → generic
+            buyer_ind  = (result.get("buyer_industry")
+                          or result.get("buyer")
+                          or "unknown industry")
+            nace_user  = _fill(NACE_USER_TEMPLATE,
+                tender_category=tender_cat, buyer_industry=buyer_ind,
+                category_list=CATEGORY_LIST
+            )
+            try:
+                raw_nace = await call_ollama(NACE_SYSTEM, nace_user, "nace")
+                nace_data = repair_and_parse(raw_nace)
+                nace_data.pop("_parse_method", None)
+                in_scope = nace_data.pop("in_scope", True)
+                result.update(nace_data)
+                result["in_scope"] = bool(in_scope)
+                log.info("NACE: tender=%s in_scope=%s", result.get("nace_tender"), result["in_scope"])
+            except Exception as e:
+                log.warning("NACE-Klassifizierung fehlgeschlagen: %s", e)
+                result["in_scope"] = True  # don't hide result on classification error
+
+            t2 = (datetime.now() - t0).total_seconds()
+            scope_label = "" if result.get("in_scope", True) else " · out of scope"
+            yield sse("step", {"id": "parse", "status": "done",
+                                "message": f"Parsing OK ({parse_method}) | NACE: {result.get('nace_tender','–')}{scope_label}"})
+            yield sse("log", {"message": f"Parse+NACE: {t2:.1f}s gesamt"})
+
+            is_agv = bool(result.get("is_agv_amr", False))
+            log.info("AGV/AMR-Tender erkannt: %s", is_agv)
+
+            # ── LLM: AGV criteria extraction (if applicable) ──────────────────────
+            agv_criteria = None
+            matches = []
+            matches_all = []
+            canonical_agv_type = None
+            is_vna_subtype = False
+            analysis_id = str(uuid.uuid4())
+
+        else:
+            yield sse("error", {"message": "Only PDF or JSON replay files are supported."}); return
+
+        if not is_replay:
+            matches = []
+            matches_all = []
+
+        if is_agv and not is_replay:
             yield sse("step", {"id": "agv", "status": "running",
                                 "message": "Fahrzeugtyp wird klassifiziert…"})
             await asyncio.sleep(0)
@@ -651,9 +709,11 @@ async def analyze(file: UploadFile = File(...)):
             vna_label = " (VNA)" if is_vna_subtype else ""
             log.info("Pass 4a: vehicle_type=%s%s", canonical_agv_type, vna_label)
             # Pre-compute 4c field set now that vehicle type is known; needed for progress total
+            _leaf_scope = _LEGACY_MAP.get(canonical_agv_type, "")
+            _4c_scopes  = frozenset(_RESOLUTION_ORDER.get(_leaf_scope, [_SHARED_SCOPE, _leaf_scope]))
             _4c_fields = {
                 k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
-                if v["sheet"] in (_SHARED_SHEET, canonical_agv_type)
+                if v["scope"] in _4c_scopes
             }
             _agv_total = 2 + len(_4c_fields)   # 4a(1) + 4b(1) + N×4c
             yield sse("step", {"id": "agv", "status": "running",
@@ -827,6 +887,7 @@ async def analyze(file: UploadFile = File(...)):
             agv_criteria["required_agv_type"] = vt_criteria.get("required_agv_type")
             agv_criteria["required_vna_capable"] = vt_criteria.get("required_vna_capable")
 
+        if is_agv:
             # Validate against AP0 allowed_values — reject values not in the allowed list
             from src.matching import validate_tender_values
             agv_criteria, av_warnings = validate_tender_values(agv_criteria)
@@ -883,9 +944,6 @@ async def analyze(file: UploadFile = File(...)):
 
             if is_vna_subtype and not agv_criteria.get("required_vna_capable"):
                 agv_criteria["required_vna_capable"] = True
-
-            # Generate run_id before new_req construction so it is available for persistence
-            analysis_id = str(uuid.uuid4())
 
             new_req = dict(agv_criteria)
             new_req["required_agv_type"] = canonical_agv_type
@@ -1001,7 +1059,8 @@ async def rematch_endpoint(request: Request):
     for field_name, value in overrides.items():
         _fn_specs = _FIELDS_BY_FIELD_NAME.get(field_name, [])
         tender_key = _fn_specs[0].tender_key if _fn_specs and _fn_specs[0].tender_key else field_name
-        criteria[tender_key] = value
+        # Normalize empty string → None (empty field in dialog = remove requirement)
+        criteria[tender_key] = None if isinstance(value, str) and not value.strip() else value
 
     old_vt = cached.get("vehicle_type_canonical")
     if new_vt and new_vt in _VALID_VTS:
@@ -1015,12 +1074,16 @@ async def rematch_endpoint(request: Request):
             if tender_key == 'required_vna_capable':
                 continue  # always recomputed below — do not clear via loop
             _tk_specs = _FIELDS_BY_TENDER_KEY.get(tender_key, [])
-            sheet = _tk_specs[0].sheet if _tk_specs else None
-            if sheet == old_vt:
+            scope     = _tk_specs[0].scope if _tk_specs else None
+            old_scope = _LEGACY_MAP.get(old_vt, "")
+            if scope and old_scope and scope == old_scope:
                 del criteria[tender_key]
         # required_vna_capable: set to None — VNA status cannot be determined without re-running Pass 4a.
         # Setting "not_required" would wrongly suppress VNA suppliers from a potentially-VNA tender.
         criteria["required_vna_capable"] = None
+
+    # Apply same unit-conversion + plausibility logic as main flow — handles mm→m input from dialog
+    criteria, _ = validate_agv_criteria(criteria)
 
     top_raw, all_raw = match_suppliers_new(
         TenderRequirements.from_dict(_criteria_to_uuid_keyed(_to_match_units(criteria))),
@@ -1049,13 +1112,15 @@ async def field_meta():
               "_c":"°C","_eur":"EUR","_min":"min","_m":"m","_deg":"°"}
     _ABBR = {"Agv":"AGV","Amr":"AMR","Vda":"VDA","Vda5050":"VDA 5050","Wms":"WMS","Oem":"OEM",
              "Ko":"KO","Ui":"UI","Id":"ID","Ip":"IP","Fps":"FPS","Roi":"ROI"}
-    def _label(key: str) -> str:
+    def _label(key: str, ap0_unit=None) -> str:
         k = key
-        unit = None
+        # Prefer AP0 unit over suffix heuristic — avoids "_mm" label when storage is actually "m"
+        unit = ap0_unit
         for suf, u in _UNITS.items():
             if k.endswith(suf):
                 k = k[:-len(suf)]
-                unit = u
+                if unit is None:
+                    unit = u
                 break
         words = [_ABBR.get(w.capitalize(), w.capitalize()) for w in k.replace("_", " ").split()]
         label = " ".join(words)
@@ -1070,26 +1135,27 @@ async def field_meta():
         seen_field_names.add(db_key)
         tender_key = spec.tender_key
         entry = {
-            "label":          _label(db_key),
+            "label":          _label(db_key, spec.unit),
             "tender_key":     tender_key,
             "entity":         spec.entity,
             "level":          spec.level,
             "data_type":      spec.data_type,
             "operator":       spec.operator,
             "allowed_values": spec.allowed_values,
-            "sheet":          spec.sheet,
+            "scope":          spec.scope,
             "display_mode":      spec.display_mode or "editable",
             "user_description":  spec.user_description,
         }
         meta[db_key] = entry
         if tender_key and tender_key != db_key:
             # Clone entry keyed by tender_key — used for label lookups by tender_key in the frontend.
-            clones[tender_key] = {**entry, "label": _label(tender_key)}
+            clones[tender_key] = {**entry, "label": _label(tender_key, spec.unit)}
     meta.update(clones)
     # VT config for frontend column grouping — read entirely from generated config files
     meta["__vt_config__"] = {
-        "shared_sheet_name": vt_cfg.get("shared_sheet_name", ""),
-        "vehicle_types":     list(vt_cfg.get("scoring_bucket_map", {}).keys()),
+        "shared_scope":  _SHARED_SCOPE,
+        "legacy_map":    _LEGACY_MAP,
+        "vehicle_types": list(vt_cfg.get("scoring_bucket_map", {}).keys()),
     }
     return meta
 

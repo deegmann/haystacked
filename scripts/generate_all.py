@@ -21,7 +21,7 @@ Generated files:
     config/fields.json             — all field definitions keyed by UUID (AP0 SSoT)
     config/vehicle_types.json      — _VT_MAP, VNA detection, keyword fallback
     config/nace_codes.json         — NACE Prio-1 list + platform scope
-    config/sqlite_schema.json      — CREATE TABLE SQL generated from AP0 Entity Model
+    config/sqlite_schema.json      — CREATE TABLE SQL generated from ② Structure + scope tabs
     config/plausibility.json       — LLM value plausibility ranges per extraction field
     config/prompts/*.txt           — all LLM prompt files (generated, never edit manually)
     config/ap0_checksum.txt        — MD5 for startup auto-regen
@@ -63,7 +63,6 @@ PROMPTS_DIR  = CONFIG_DIR / "prompts"
 
 LEVEL_MAP = {"K.O.": "KO", "Cond. K.O.": "COND_KO", "Scoring": "SCORING", "Context": "CONTEXT"}
 VALID_OPS  = {"KO_IF_LT","KO_IF_GT","KO_IF_NEQ","KO_BOOL_REQUIRED","KO_BOOL_EXCLUSIVE","KO_SUBSET"}
-DATA_SHEETS = ["SHARED – All AGV Types", "Forklift AGV", "Tugger AGV", "Mobile AMR"]
 
 # AP0 Data Type → SQLite column type mapping
 SQLITE_TYPE_MAP = {
@@ -79,7 +78,7 @@ SQLITE_TYPE_MAP = {
 SQLITE_SKIP = {
     "extension_id","base_model_id","company_id","product_id","company_name","product_name",
     "product_description","base_model_name","oem_company_id","oem_link_public","website",
-    "last_updated","export_capable","is_oem_product","active","extra_fields",
+    "last_updated","is_oem_product","active","extra_fields",
     "pick_req_accuracy_lat_mm_amr","pick_req_accuracy_dep_mm_amr","pick_req_accuracy_angle_deg_amr",
     "drop_accuracy_lat_mm_amr","drop_accuracy_dep_mm_amr","drop_accuracy_angle_deg_amr",
     "min_project_value_eur","max_project_value_eur",
@@ -99,9 +98,76 @@ def _find_header(rows, key="Field Name"):
     return None, {}
 
 
-def read_field_levels(wb) -> dict:
+SCOPE_REGISTRY_TAB = "③ Scope Registry"
+
+
+def read_scope_registry(wb) -> tuple:
+    """Read ③ Scope Registry tab. Returns (data_sheets, shared_tab, leaf_tabs).
+
+    data_sheets: ordered list of all non-blank tab_name values from ③ Scope Registry
+    shared_tab:  tab_name of the scope with parent_scope == "*" and a non-blank tab_name
+    leaf_tabs:   tab_names of scopes that have no children (type-specific sheets only)
+
+    Hard error if any non-blank tab_name is absent from the workbook.
+    """
+    if SCOPE_REGISTRY_TAB not in wb.sheetnames:
+        sys.exit(f"[FEHLER] read_scope_registry: Tab '{SCOPE_REGISTRY_TAB}' nicht in AP0 xlsx gefunden.")
+
+    rows = _rows(wb[SCOPE_REGISTRY_TAB])
+    hi, cols = _find_header(rows, key="scope_id")
+    if hi is None:
+        sys.exit(f"[FEHLER] read_scope_registry: Kein Header 'scope_id' in '{SCOPE_REGISTRY_TAB}' gefunden.")
+
+    c_scope_id = cols.get("scope_id", 0)
+    c_parent   = cols.get("parent_scope")
+    c_tab_name = cols.get("tab_name")
+    c_active   = cols.get("active")
+
+    scopes = []  # (scope_id, parent_scope, tab_name)
+    for row in rows[hi + 1:]:
+        if not row or not row[c_scope_id]:
+            continue
+        scope_id = str(row[c_scope_id]).strip()
+        parent   = str(row[c_parent]).strip()   if c_parent   is not None and c_parent   < len(row) and row[c_parent]   else ""
+        tab_name = str(row[c_tab_name]).strip() if c_tab_name is not None and c_tab_name < len(row) and row[c_tab_name] else ""
+        active   = str(row[c_active]).strip()   if c_active   is not None and c_active   < len(row) and row[c_active]   else ""
+        if not active:
+            continue
+        scopes.append((scope_id, parent, tab_name))
+
+    # Hard error: non-blank tab_name absent from workbook
+    for scope_id, _, tab_name in scopes:
+        if tab_name and tab_name not in wb.sheetnames:
+            sys.exit(
+                f"[FEHLER] read_scope_registry: tab_name '{tab_name}' (scope '{scope_id}') "
+                f"nicht in AP0 xlsx vorhanden. Fehlender Tab oder Tippfehler in ③."
+            )
+
+    data_sheets = [t for _, _, t in scopes if t]
+
+    shared_tabs = [t for sid, p, t in scopes if p == "*" and t]
+    if len(shared_tabs) != 1:
+        sys.exit(
+            f"[FEHLER] read_scope_registry: Genau ein Scope mit parent_scope='*' und "
+            f"nicht-leerem tab_name erwartet, gefunden: {shared_tabs}"
+        )
+    shared_tab = shared_tabs[0]
+
+    parent_ids = {p for _, p, _ in scopes if p}
+    leaf_tabs  = [t for sid, _, t in scopes if t and sid not in parent_ids]
+    if not leaf_tabs:
+        sys.exit(
+            f"[FEHLER] read_scope_registry: Keine Leaf-Scopes mit tab_name gefunden. "
+            f"Mindestens ein Scope ohne Kinder mit nicht-leerem tab_name wird benötigt."
+        )
+
+    tab_scope_map = {t: sid for sid, _, t in scopes if t}
+    return data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes
+
+
+def read_field_levels(wb, data_sheets) -> dict:
     fields = {}
-    for sheet in DATA_SHEETS:
+    for sheet in data_sheets:
         if sheet not in wb.sheetnames:
             print(f"  [WARN] Sheet missing: {sheet}")
             continue
@@ -233,19 +299,14 @@ def read_field_text_fallbacks(wb) -> list:
     return result
 
 
-def read_scoring_weights(wb) -> dict:
+def read_scoring_weights(wb, data_sheets) -> dict:
     """Read scoring weights + rules from AP0 xlsx.
 
     Reads: Scoring Weight, Score Function, Score Threshold A, Score Threshold B.
     Output format per field: {"weight": int, "rule": str, "t1": num|None, "t2": num|None}
     """
-    result = {"default": {}, "forklift_specific": {}, "tugger_specific": {}, "amr_specific": {}}
-    sheet_map = {
-        "SHARED – All AGV Types": "default",
-        "Forklift AGV": "forklift_specific",
-        "Tugger AGV": "tugger_specific",
-        "Mobile AMR": "amr_specific",
-    }
+    result = {sheet: {} for sheet in data_sheets}
+    sheet_map = {sheet: sheet for sheet in data_sheets}
     def _int(v):
         try: return int(v) if v is not None and v != '' else 0
         except: return 0
@@ -284,16 +345,18 @@ def read_scoring_weights(wb) -> dict:
     return result
 
 
-def read_extraction_schema(wb) -> list:
+def read_extraction_schema(wb, data_sheets, tab_scope_map: dict = None) -> list:
     """Build extraction schema from AP0 field sheets.
 
     tender_key is derived as "required_" + field_name.
     LLM extraction hint comes from the "LLM Hint" column.
     """
+    if tab_scope_map is None:
+        tab_scope_map = {}
     schema = []
     seen = set()
 
-    for sheet in DATA_SHEETS:
+    for sheet in data_sheets:
         if sheet not in wb.sheetnames: continue
         rows = _rows(wb[sheet])
         hi, cols = _find_header(rows)
@@ -311,144 +374,266 @@ def read_extraction_schema(wb) -> list:
             if not hint:
                 continue  # fields without LLM Hint are not extracted by the LLM
             seen.add(jk)
-            schema.append({"key": jk, "db_field": fname, "mandatory": False, "hint": hint, "sheet": sheet})
+            schema.append({"key": jk, "db_field": fname, "mandatory": False, "hint": hint, "scope": tab_scope_map.get(sheet, sheet)})
 
     return schema
 
 
-def read_sqlite_schema(wb) -> dict:
-    """Generate CREATE TABLE SQL statements from AP0 Entity Model + AGV-type sheets.
+STRUCTURE_TAB = "② Structure"
 
-    Returns dict:
-      {
-        "companies":             CREATE TABLE SQL,
-        "products":              CREATE TABLE SQL,
-        "base_models":           CREATE TABLE SQL,
-        "base_model_extensions": CREATE TABLE SQL,
-        "bool_fields":  [list of boolean field names for sync_airtable coercion],
-        "int_fields":   [list],
-        "float_fields": [list],
-      }
+
+def read_structure_registry(wb) -> dict:
+    """Read ② Structure tab. Returns structural columns per table.
+
+    Returns dict keyed by table name. Each value is a list of:
+      {"column": str, "sqlite_type": str, "role": str,
+       "references": str, "nullable": bool, "notes": str}
+
+    Roles: PK, FK, ADMIN, PLAIN, DERIVED.
+    Business fields (KO/COND_KO/SCORING/CONTEXT) are NOT listed here —
+    they live in scope tabs and are appended by read_sqlite_schema via fields.json.
     """
-    # ── Parse Entity Model for L1 / L2 / L3 structural fields ─────────────────
-    ws = wb["Entity Model"] if "Entity Model" in wb.sheetnames else None
-    l1, l2, l3 = [], [], []   # list of (name, sqlite_type, mandatory, desc, notes)
+    if STRUCTURE_TAB not in wb.sheetnames:
+        sys.exit(f"[FEHLER] read_structure_registry: Tab '{STRUCTURE_TAB}' nicht in AP0 xlsx.")
 
-    if ws:
-        rows = list(ws.iter_rows(values_only=True))
-        current = None
-        for row in rows:
-            if not any(row):
-                continue
-            cells = [str(c).strip() if c else "" for c in row]
-            r1 = cells[1]  # field/header text lives in column B
+    rows = _rows(wb[STRUCTURE_TAB])
+    hi, cols = _find_header(rows, key="table")
+    if hi is None:
+        sys.exit(f"[FEHLER] read_structure_registry: Kein Header 'table' in '{STRUCTURE_TAB}'.")
 
-            if "L1 · Company" in r1:
-                current = "L1"; continue
-            elif "L2 · Product" in r1:
-                current = "L2"; continue
-            elif "L3 · OEM Base Model" in r1:
-                current = "L3"; continue
-            elif r1 in ("Field", "") or r1.startswith("→") or r1.startswith("Reading") \
-                    or "Three-Layer" in r1 or "Matching happens" in r1 \
-                    or "Company (1)" in r1 or "L1 (seller)" in r1:
-                continue
+    c_table    = cols.get("table", 0)
+    c_column   = cols.get("column")
+    c_type     = cols.get("sqlite_type")
+    c_role     = cols.get("role")
+    c_refs     = cols.get("references")
+    c_nullable = cols.get("nullable")
+    c_notes    = cols.get("notes")
 
-            if current and r1 and cells[2]:
-                entry = (
-                    r1,                                          # name
-                    SQLITE_TYPE_MAP.get(cells[2], "TEXT"),       # sqlite type
-                    cells[4] == "✓",                             # mandatory
-                    cells[3][:120] if cells[3] else "",          # description
-                    cells[5][:80]  if cells[5] else "",          # notes
-                )
-                if current == "L1":
-                    l1.append(entry)
-                elif current == "L2":
-                    l2.append(entry)
-                elif current == "L3":
-                    l3.append(entry)
+    result: dict = {}
+    for row in rows[hi + 1:]:
+        if not row or not row[c_table]:
+            continue
+        table  = str(row[c_table]).strip()
+        column = str(row[c_column]).strip() if c_column is not None and c_column < len(row) and row[c_column] else ""
+        if not column:
+            continue
+        sql_type = str(row[c_type]).strip()   if c_type     is not None and c_type     < len(row) and row[c_type]     else "TEXT"
+        role     = str(row[c_role]).strip()   if c_role     is not None and c_role     < len(row) and row[c_role]     else "PLAIN"
+        refs     = str(row[c_refs]).strip()   if c_refs     is not None and c_refs     < len(row) and row[c_refs]     else ""
+        nullable = bool(row[c_nullable])      if c_nullable is not None and c_nullable < len(row) and row[c_nullable] else False
+        notes    = str(row[c_notes]).strip()  if c_notes    is not None and c_notes    < len(row) and row[c_notes]    else ""
 
-    def _is_pk(desc: str) -> bool:
-        return "Primary key" in desc
+        result.setdefault(table, []).append({
+            "column": column, "sqlite_type": sql_type, "role": role,
+            "references": refs, "nullable": nullable, "notes": notes,
+        })
 
-    def _is_fk(desc: str) -> bool:
-        return desc.startswith("FK →")
+    if not result:
+        sys.exit(f"[FEHLER] read_structure_registry: Keine Zeilen in '{STRUCTURE_TAB}' gefunden.")
 
-    def _col_sql(name, sql_type, mandatory, desc, notes) -> str:
-        constraints = ""
-        if _is_pk(desc):
-            constraints = " PRIMARY KEY"
-        elif mandatory:
-            constraints = " NOT NULL"
-        return f"    {name:<45} {sql_type}{constraints}"
+    return result
 
-    def _fk_sql(name, target_table, target_col="rowid") -> str:
-        fk_map = {
-            "company_id":    "companies(company_id)",
-            "base_model_id": "base_models(base_model_id)",
-            "oem_company_id": "companies(company_id)",
-        }
-        ref = fk_map.get(name, f"{target_table}({name})")
-        return f"    FOREIGN KEY ({name}) REFERENCES {ref}"
+
+def _entity_fields_from_sheet(ws, entity: str) -> list:
+    """Return ordered list of field_names for a given entity from a scope tab worksheet."""
+    rows = _rows(ws)
+    hi, cols = _find_header(rows)
+    if hi is None:
+        return []
+    c_entity = cols.get("Entity")
+    if c_entity is None:
+        return []
+    result = []
+    seen = set()
+    for row in rows[hi + 1:]:
+        if not row or not row[0]:
+            continue
+        fname = str(row[0]).strip()
+        if fname.startswith("──") or fname in seen:
+            continue
+        ent = str(row[c_entity]).strip() if c_entity < len(row) and row[c_entity] else ""
+        if ent == entity:
+            seen.add(fname)
+            result.append(fname)
+    return result
+
+
+def read_sqlite_schema(wb, data_sheets) -> dict:
+    """Build sqlite_schema.json from ② Structure (structural cols) + scope tabs (business cols).
+
+    Structural columns (PK/FK/ADMIN/PLAIN/DERIVED) come from ② Structure.
+    Business field columns are appended per entity from the scope tabs (data_sheets loop).
+    Returns the same keys as before: companies, products, base_models,
+    base_model_extensions SQL strings + column lists + field type lists.
+    """
+    struct = read_structure_registry(wb)
+
+    def _col_sql(col_entry) -> str:
+        name     = col_entry["column"]
+        sql_type = col_entry["sqlite_type"]
+        role     = col_entry["role"]
+        nullable = col_entry["nullable"]
+
+        if role == "PK":
+            constraint = " PRIMARY KEY"
+        elif role == "DERIVED":
+            constraint = ""   # derived: never NOT NULL in INSERT
+        elif not nullable:
+            constraint = " NOT NULL"
+        else:
+            constraint = ""
+        return f"    {name:<45} {sql_type}{constraint}"
+
+    def _fk_sql(refs: str, col: str) -> str:
+        return f"    FOREIGN KEY ({col}) REFERENCES {refs}"
 
     # ── companies ──────────────────────────────────────────────────────────────
-    co_lines = ["CREATE TABLE IF NOT EXISTS companies ("]
-    for entry in l1:
-        co_lines.append(_col_sql(*entry) + ",")
-    # Remove trailing comma from last real column, add closing paren
-    co_lines[-1] = co_lines[-1].rstrip(",")
-    co_lines.append(");")
-    companies_sql = "\n".join(co_lines)
-
-    # ── products ───────────────────────────────────────────────────────────────
-    pr_lines = ["CREATE TABLE IF NOT EXISTS products ("]
-    fk_clauses = []
-    for entry in l2:
-        name, sql_type, mandatory, desc, notes = entry
-        if name == "is_oem_product":
-            mandatory = False  # derived field, never mandatory in insert
-        pr_lines.append(_col_sql(*entry) + ",")
-        if _is_fk(desc):
-            fk_clauses.append(_fk_sql(name, ""))
-    for fk in fk_clauses:
-        pr_lines.append(fk + ",")
-    pr_lines[-1] = pr_lines[-1].rstrip(",")
-    pr_lines.append(");")
-    products_sql = "\n".join(pr_lines)
-
-    # ── base_models ────────────────────────────────────────────────────────────
-    bm_lines = ["CREATE TABLE IF NOT EXISTS base_models ("]
-    bm_fk = []
-    for entry in l3:
-        name, sql_type, mandatory, desc, notes = entry
-        if name == "→ all AP0 fields":
-            continue  # placeholder row, not a real field
-        bm_lines.append(_col_sql(*entry) + ",")
-        if _is_fk(desc):
-            bm_fk.append(_fk_sql(name, ""))
-    for fk in bm_fk:
-        bm_lines.append(fk + ",")
-    bm_lines[-1] = bm_lines[-1].rstrip(",")
-    bm_lines.append(");")
-    base_models_sql = "\n".join(bm_lines)
-
-    # ── base_model_extensions: read all fields from AGV-type sheets ───────────
-    ext_fields        = []   # list of (name, sqlite_type)
-    ext_seen          = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
-    bool_fields       = []
-    int_fields        = []
-    float_fields      = []
-    multiselect_fields = []
-
-    for sheet in DATA_SHEETS:
+    co_struct = struct.get("companies", [])
+    co_lines  = ["CREATE TABLE IF NOT EXISTS companies ("]
+    co_fk     = []
+    for e in co_struct:
+        co_lines.append(_col_sql(e) + ",")
+        if e["role"] == "FK":
+            co_fk.append(_fk_sql(e["references"], e["column"]))
+    # Append business field columns (entity=Company) from scope tabs
+    for sheet in data_sheets:
         if sheet not in wb.sheetnames:
             continue
         rows = _rows(wb[sheet])
         hi, cols = _find_header(rows)
         if hi is None:
             continue
-        c_dt   = cols.get("Data Type")
+        c_entity = cols.get("Entity")
+        c_dt     = cols.get("Data Type")
+        if c_entity is None or c_dt is None:
+            continue
+        for row in rows[hi + 1:]:
+            if not row or not row[0]:
+                continue
+            fname = str(row[0]).strip()
+            if fname.startswith("──"):
+                continue
+            entity = str(row[c_entity]).strip() if c_entity < len(row) and row[c_entity] else ""
+            if entity != "Company":
+                continue
+            raw_dt = str(row[c_dt]).strip() if c_dt < len(row) and row[c_dt] else "Text"
+            sql_t  = SQLITE_TYPE_MAP.get(raw_dt, "TEXT")
+            # Check not already added (dedup)
+            if any(e["column"] == fname for e in co_struct):
+                continue
+            co_lines.append(f"    {fname:<45} {sql_t},")
+    for fk in co_fk:
+        co_lines.append(fk + ",")
+    co_lines[-1] = co_lines[-1].rstrip(",")
+    co_lines.append(");")
+    companies_sql = "\n".join(co_lines)
+
+    # ── products ───────────────────────────────────────────────────────────────
+    pr_struct = struct.get("products", [])
+    pr_lines  = ["CREATE TABLE IF NOT EXISTS products ("]
+    pr_fk     = []
+    pr_struct_names = {e["column"] for e in pr_struct}
+    for e in pr_struct:
+        pr_lines.append(_col_sql(e) + ",")
+        if e["role"] == "FK":
+            pr_fk.append(_fk_sql(e["references"], e["column"]))
+    # Append business field columns (entity=Product)
+    pr_seen = set(pr_struct_names)
+    for sheet in data_sheets:
+        if sheet not in wb.sheetnames:
+            continue
+        rows = _rows(wb[sheet])
+        hi, cols = _find_header(rows)
+        if hi is None:
+            continue
+        c_entity = cols.get("Entity")
+        c_dt     = cols.get("Data Type")
+        if c_entity is None or c_dt is None:
+            continue
+        for row in rows[hi + 1:]:
+            if not row or not row[0]:
+                continue
+            fname = str(row[0]).strip()
+            if fname.startswith("──") or fname in pr_seen:
+                continue
+            entity = str(row[c_entity]).strip() if c_entity < len(row) and row[c_entity] else ""
+            if entity != "Product":
+                continue
+            pr_seen.add(fname)
+            raw_dt = str(row[c_dt]).strip() if c_dt < len(row) and row[c_dt] else "Text"
+            sql_t  = SQLITE_TYPE_MAP.get(raw_dt, "TEXT")
+            pr_lines.append(f"    {fname:<45} {sql_t},")
+    for fk in pr_fk:
+        pr_lines.append(fk + ",")
+    pr_lines[-1] = pr_lines[-1].rstrip(",")
+    pr_lines.append(");")
+    products_sql = "\n".join(pr_lines)
+
+    # ── base_models ────────────────────────────────────────────────────────────
+    bm_struct = struct.get("base_models", [])
+    bm_lines  = ["CREATE TABLE IF NOT EXISTS base_models ("]
+    bm_fk     = []
+    for e in bm_struct:
+        bm_lines.append(_col_sql(e) + ",")
+        if e["role"] == "FK":
+            bm_fk.append(_fk_sql(e["references"], e["column"]))
+    for fk in bm_fk:
+        bm_lines.append(fk + ",")
+    bm_lines[-1] = bm_lines[-1].rstrip(",")
+    bm_lines.append(");")
+    base_models_sql = "\n".join(bm_lines)
+
+    # ── base_model_extensions: structural from ② + business fields from scope tabs ──
+    ext_struct       = struct.get("base_model_extensions", [])
+    ext_struct_names = {e["column"] for e in ext_struct}
+
+    # Pass 1: collect global type metadata for sync_airtable.py coercion — all entities
+    bool_fields        = []
+    int_fields         = []
+    float_fields       = []
+    multiselect_fields = []
+    _type_seen = set()  # dedup by field_name
+
+    for sheet in data_sheets:
+        if sheet not in wb.sheetnames:
+            continue
+        rows = _rows(wb[sheet])
+        hi, cols = _find_header(rows)
+        if hi is None:
+            continue
+        c_dt = cols.get("Data Type")
+        if c_dt is None:
+            continue
+        for row in rows[hi + 1:]:
+            if not row or not row[0]:
+                continue
+            fname = str(row[0]).strip()
+            if fname.startswith("──") or fname in _type_seen:
+                continue
+            _type_seen.add(fname)
+            raw_dt = str(row[c_dt]).strip() if c_dt < len(row) and row[c_dt] else "Text"
+            if raw_dt in ("Boolean", "Boolean (derived)"):
+                bool_fields.append(fname)
+            elif raw_dt == "Integer":
+                int_fields.append(fname)
+            elif raw_dt in ("Real", "Float"):
+                float_fields.append(fname)
+            elif raw_dt == "Multi-Select":
+                multiselect_fields.append(fname)
+
+    # Pass 2: collect base_model_extensions business columns — Base Model entity only
+    ext_fields  = []   # (name, sqlite_type)
+    ext_seen    = set(ext_struct_names)  # dedup guard, init with structural columns
+
+    for sheet in data_sheets:
+        if sheet not in wb.sheetnames:
+            continue
+        rows = _rows(wb[sheet])
+        hi, cols = _find_header(rows)
+        if hi is None:
+            continue
+        c_dt     = cols.get("Data Type")
+        c_entity = cols.get("Entity")
         if c_dt is None:
             continue
         for row in rows[hi + 1:]:
@@ -457,53 +642,50 @@ def read_sqlite_schema(wb) -> dict:
             fname = str(row[0]).strip()
             if fname.startswith("──") or fname in ext_seen:
                 continue
+            # Only Base Model fields belong in base_model_extensions
+            entity = str(row[c_entity]).strip() if c_entity is not None and c_entity < len(row) and row[c_entity] else ""
+            if entity and entity != "Base Model":
+                continue
             ext_seen.add(fname)
             raw_dt = str(row[c_dt]).strip() if c_dt < len(row) and row[c_dt] else "Text"
             sql_t  = SQLITE_TYPE_MAP.get(raw_dt, "TEXT")
             ext_fields.append((fname, sql_t))
-            if raw_dt in ("Boolean", "Boolean (derived)"):
-                bool_fields.append(fname)
-            elif raw_dt in ("Integer",):
-                int_fields.append(fname)
-            elif raw_dt in ("Real", "Float"):
-                float_fields.append(fname)
-            elif raw_dt == "Multi-Select":
-                multiselect_fields.append(fname)
 
-    ext_lines = [
-        "CREATE TABLE IF NOT EXISTS base_model_extensions (",
-        "    extension_id                    TEXT PRIMARY KEY,",
-        "    base_model_id                   TEXT NOT NULL,",
-        "    agv_type                        TEXT NOT NULL,",
-    ]
+    ext_lines = ["CREATE TABLE IF NOT EXISTS base_model_extensions ("]
+    for e in ext_struct:
+        ext_lines.append(_col_sql(e) + ",")
     for fname, sql_t in ext_fields:
         ext_lines.append(f"    {fname:<45} {sql_t},")
-    ext_lines.append("    extra_fields                    TEXT,")
-    ext_lines.append("    FOREIGN KEY (base_model_id) REFERENCES base_models(base_model_id)")
+    # FK clause for base_model_id (from ② struct)
+    for e in ext_struct:
+        if e["role"] == "FK":
+            ext_lines.append(_fk_sql(e["references"], e["column"]) + ",")
+    ext_lines[-1] = ext_lines[-1].rstrip(",")
     ext_lines.append(");")
     extensions_sql = "\n".join(ext_lines)
 
-    # C-6: explicit column lists for sync_airtable.py (derived from generated SQL,
-    # so sync_airtable never hardcodes field names)
-    companies_columns  = [entry[0] for entry in l1]
-    products_columns   = [entry[0] for entry in l2]
+    # ── Column lists for sync_airtable.py ──────────────────────────────────────
+    companies_columns  = [e["column"] for e in co_struct] + [
+        fname for sheet in data_sheets
+        if sheet in wb.sheetnames
+        for fname in _entity_fields_from_sheet(wb[sheet], "Company")
+        if fname not in {e["column"] for e in co_struct}
+    ]
+    products_columns   = [e["column"] for e in pr_struct] + [
+        fname for sheet in data_sheets
+        if sheet in wb.sheetnames
+        for fname in _entity_fields_from_sheet(wb[sheet], "Product")
+        if fname not in pr_struct_names
+    ]
     extensions_columns = (
-        ["extension_id", "base_model_id", "agv_type"]
+        [e["column"] for e in ext_struct]
         + [f for f, _ in ext_fields]
-        + ["extra_fields"]
     )
 
-    # Fields from the SHARED AGV sheet that land in extensions_columns but are
-    # semantically owned by Product or Company — loaded into Product in data_loader.py.
-    # Exceptions: employee_count_range, hq_city, founding_year come from the companies
-    # table but are intentionally loaded into Extension (company context on the record).
-    _structural    = {"extension_id", "base_model_id", "agv_type", "extra_fields"}
-    _company_in_ext = {"employee_count_range", "hq_city", "founding_year"}
-    _ext_set = set(extensions_columns)
-    shared_in_product_columns = sorted(
-        ((set(products_columns) | set(companies_columns)) & _ext_set)
-        - _structural - _company_in_ext
-    )
+    # Step 5 invariant: no Company/Product fields may appear in extensions
+    _denorm_check = (set(extensions_columns) - set(e["column"] for e in ext_struct)) & (set(companies_columns) | set(products_columns))
+    if _denorm_check:
+        sys.exit(f"[FEHLER] read_sqlite_schema: Company/Product fields still in extensions: {_denorm_check} — check Entity column in AP0 scope tabs")
 
     return {
         "companies":                  companies_sql,
@@ -517,11 +699,10 @@ def read_sqlite_schema(wb) -> dict:
         "companies_columns":          companies_columns,
         "products_columns":           products_columns,
         "extensions_columns":         extensions_columns,
-        "shared_in_product_columns":  shared_in_product_columns,
     }
 
 
-def read_plausibility(wb) -> dict:
+def read_plausibility(wb, data_sheets) -> dict:
     """Read plausibility ranges from AP0 xlsx — tender_key → {min, max, unit, label}.
 
     Unit conversion rules are read separately from haystacked_platform_config.xlsx
@@ -529,7 +710,7 @@ def read_plausibility(wb) -> dict:
     """
     plausibility: dict = {}
 
-    for sheet_name in DATA_SHEETS:
+    for sheet_name in data_sheets:
         if sheet_name not in wb.sheetnames:
             continue
         rows = _rows(wb[sheet_name])
@@ -695,11 +876,13 @@ def build_vehicle_type_template(vehicle_types: dict) -> str:
         lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
         lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
         lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+        lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
+        lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
         lines.append("")
     lines += [
         "Fields:",
         "- required_agv_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
-        "- required_vna_capable: true if VNA / Schmalgang / very narrow aisle / aisle<2m with high-bay racking. Only applicable when required_agv_type='Forklift AGV'. false otherwise.",
+        "- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_agv_type='Forklift AGV'.",
         "",
         "DOCUMENT:",
         "{text}",
@@ -722,19 +905,21 @@ _NUMERIC_DTYPES = {"Float", "Integer"}
 
 
 def build_extraction_template(vehicle_types: dict, extraction_schema: list,
-                               sheet_filter: str = None, field_levels: dict = None) -> str:
+                               scope_filter: str = None, field_levels: dict = None,
+                               shared_scope: str = "", resolution=None) -> str:
     """Build LLM extraction template.
 
-    sheet_filter=None  → full combined template (backward compat / JSON-retry fallback).
-    sheet_filter=<sheet> → Pass 4b type-specific template; includes SHARED + that sheet only,
-                           excludes fields already determined in Pass 4a.
-                           Placeholders {vehicle_type} and {vna_context} filled by app.py at runtime.
+    scope_filter=None  → full combined template (backward compat / JSON-retry fallback).
+    scope_filter=<scope_id> → Pass 4b type-specific template; includes shared scope + that scope only,
+                              excludes fields already determined in Pass 4a.
+                              Placeholders {vehicle_type} and {vna_context} filled by app.py at runtime.
     """
-    if sheet_filter:
-        # Pass 4b: only relevant fields for this vehicle type
+    if scope_filter:
+        # Pass 4b: fields for this vehicle type (shared + type-specific + global if resolution given)
+        _filter_set = set(resolution) if resolution else {shared_scope, scope_filter}
         schema_to_use = [
             f for f in extraction_schema
-            if f.get("sheet") in ("SHARED – All AGV Types", sheet_filter)
+            if f.get("scope") in _filter_set
             and f["key"] not in _4A_FIELDS
         ]
         lines = [
@@ -748,6 +933,7 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
         # Full combined template (backward compat)
         schema_to_use = extraction_schema
         lines = ["Extract AGV/AMR technical requirements from this tender. Values may appear in running text OR in tables — extract from both.",
+                 "The document may be written in any language (German, English, French, etc.). Extract fields based on their semantic meaning, not on specific keywords or section headings.",
                  ""]
         guide = vehicle_types.get("llm_guide", [])
         if guide:
@@ -900,6 +1086,45 @@ def build_basic_template() -> str:
 
 # ── Validators ────────────────────────────────────────────────────────────────
 
+def _scope_resolution_chain(scope_id: str, parent_of: dict) -> list:
+    """Walk the scope tree from root to leaf; return all scope_ids in order.
+
+    Used by both _write_scope_registry (to store resolution_order) and
+    generate() (to select fields for VT-specific extraction templates) —
+    single implementation eliminates the SA-06 drift risk.
+    """
+    chain, cur = [], scope_id
+    while cur:
+        chain.insert(0, cur)
+        cur = parent_of.get(cur)
+    return chain
+
+
+def validate_unit_suffix_drift(fields: dict) -> list:
+    """OI-55: warn when a field_name unit suffix disagrees with the AP0 unit column.
+
+    Example: lifting_height_mm has suffix '_mm' but AP0 unit='m' after the
+    unit-conversion refactor. This is a documentation smell, not a runtime error.
+    The check is deliberately a warning (not an assert) so generation is never blocked.
+    Suffix aliases (e.g. 'h' == 'hours') are normalised before comparison.
+    """
+    _SUFFIX_UNIT = {"_mm": "mm", "_kg": "kg", "_h": "h", "_min": "min", "_pct": "%"}
+    _ALIASES = {"hours": "h", "meter": "m", "metres": "m", "meters": "m"}
+    warnings = []
+    for uuid, f in fields.items():
+        fn = f.get("field_name", "")
+        raw_unit = (f.get("unit") or "").strip()
+        unit = _ALIASES.get(raw_unit.lower(), raw_unit)
+        for suffix, expected in _SUFFIX_UNIT.items():
+            if fn.endswith(suffix) and unit and unit != expected:
+                warnings.append(
+                    f"Unit-suffix drift: '{fn}' ends in '{suffix}' "
+                    f"but AP0 unit='{raw_unit}' — rename field_name or update AP0 unit column"
+                )
+                break
+    return warnings
+
+
 def validate_vs_sqlite(field_levels: dict, db_path: Path) -> list:
     if not db_path.exists():
         return ["SQLite DB not found — schema validation skipped"]
@@ -921,12 +1146,17 @@ def validate_vs_sqlite(field_levels: dict, db_path: Path) -> list:
 
 # ── Fields JSON + field_spec.py ───────────────────────────────────────────────
 
-def emit_fields_json(wb) -> None:
-    """Read all 4 DATA_SHEETS and write config/fields.json + src/field_spec.py.
+def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict = None) -> None:
+    """Read all sheets from data_sheets and write config/fields.json + src/field_spec.py.
 
     fields.json is keyed by UUID. field_spec.py is a generated Python module with
     FieldSpec dataclass and helper accessors.
     """
+    if plausibility_raw is None:
+        plausibility_raw = {}
+    if tab_scope_map is None:
+        tab_scope_map = {}
+
     def _nullable_float(v):
         if v is None or v == "":
             return None
@@ -943,9 +1173,12 @@ def emit_fields_json(wb) -> None:
         except (TypeError, ValueError):
             return None
 
+    def _snake(s: str) -> str:
+        return s.strip().lower().replace(" ", "_").replace("-", "_")
+
     fields_by_uuid: dict = {}
 
-    for sheet in DATA_SHEETS:
+    for sheet in data_sheets:
         if sheet not in wb.sheetnames:
             print(f"  [WARN] Sheet missing for emit_fields_json: {sheet}")
             continue
@@ -954,21 +1187,25 @@ def emit_fields_json(wb) -> None:
         if hi is None:
             continue
 
-        col_uuid     = cols.get("UUID")
-        col_fname    = cols.get("Field Name", 0)
-        col_entity   = cols.get("Entity")
-        col_level    = cols.get("Level")
-        col_op       = cols.get("Matching Operator")
-        col_dtype    = cols.get("Data Type")
-        col_unit     = cols.get("Unit")
-        col_allowed  = cols.get("Allowed Values")
-        col_sfunc    = cols.get("Score Function")
-        col_ta       = cols.get("Score Threshold A")
-        col_tb       = cols.get("Score Threshold B")
-        col_weight   = cols.get("Scoring Weight")
-        col_hint     = cols.get("LLM Hint")
-        col_display  = cols.get("Display Mode")
-        col_client   = cols.get("UI Hint")
+        # Normalise column headers to snake_case for robust lookup
+        cols_snake = {_snake(k): v for k, v in cols.items()}
+
+        col_uuid          = cols.get("UUID")
+        col_fname         = cols.get("Field Name", 0)
+        col_entity        = cols.get("Entity")
+        col_level         = cols.get("Level")
+        col_op            = cols.get("Matching Operator")
+        col_dtype         = cols.get("Data Type")
+        col_unit          = cols.get("Unit")
+        col_allowed       = cols.get("Allowed Values")
+        col_sfunc         = cols.get("Score Function")
+        col_ta            = cols.get("Score Threshold A")
+        col_tb            = cols.get("Score Threshold B")
+        col_weight        = cols.get("Scoring Weight")
+        col_hint          = cols.get("LLM Hint")
+        col_display       = cols.get("Display Mode")
+        col_client        = cols.get("UI Hint")
+        col_value_if_null = cols_snake.get("value_if_null")
 
         for row in rows[hi + 1:]:
             fname = row[col_fname] if col_fname < len(row) else None
@@ -987,7 +1224,7 @@ def emit_fields_json(wb) -> None:
                 existing = fields_by_uuid[uuid_str]
                 sys.exit(
                     f"[FEHLER] emit_fields_json: UUID-Kollision! '{uuid_str}' erscheint in "
-                    f"Sheet '{sheet}' (field='{fname}') UND in Sheet '{existing['sheet']}' "
+                    f"Sheet '{sheet}' (field='{fname}') UND in Sheet '{existing.get('scope', '')}' "
                     f"(field='{existing['field_name']}'). UUIDs müssen eindeutig sein."
                 )
 
@@ -1015,12 +1252,47 @@ def emit_fields_json(wb) -> None:
                 if av_list:
                     allowed = av_list
 
+            # Parse Value if Null — typed coercion with validation
+            raw_vin = str(row[col_value_if_null]).strip() if col_value_if_null is not None and col_value_if_null < len(row) and row[col_value_if_null] else ""
+            value_if_null = None
+            if raw_vin:
+                fname_str = str(fname).strip()
+                if dtype == "Boolean":
+                    if raw_vin.lower() not in ("true", "false"):
+                        sys.exit(f"ERROR: Value if Null for '{fname_str}' is '{raw_vin}' but data_type is Boolean — must be 'true' or 'false'")
+                    value_if_null = raw_vin.lower() == "true"
+                elif dtype in ("Float", "Integer"):
+                    try:
+                        value_if_null = float(raw_vin) if dtype == "Float" else int(float(raw_vin))
+                    except ValueError:
+                        sys.exit(f"ERROR: Value if Null for '{fname_str}' is '{raw_vin}' but data_type is {dtype} — must be numeric")
+                    plaus = plausibility_raw.get("required_" + fname_str)
+                    if plaus:
+                        lo, hi_val = plaus.get("min"), plaus.get("max")
+                        if lo is not None and value_if_null < lo:
+                            sys.exit(f"ERROR: Value if Null for '{fname_str}' = {value_if_null} is below plausibility min {lo}")
+                        if hi_val is not None and value_if_null > hi_val:
+                            sys.exit(f"ERROR: Value if Null for '{fname_str}' = {value_if_null} is above plausibility max {hi_val}")
+                elif dtype in ("String", "Single-select", "Dropdown"):
+                    if allowed and raw_vin not in allowed:
+                        sys.exit(f"ERROR: Value if Null for '{fname_str}' is '{raw_vin}' — not in allowed_values {allowed}")
+                    value_if_null = raw_vin
+                elif dtype == "Multi-Select":
+                    parts = [p.strip() for p in raw_vin.split("|")]
+                    if allowed:
+                        bad = [p for p in parts if p not in allowed]
+                        if bad:
+                            sys.exit(f"ERROR: Value if Null for '{fname_str}': {bad} not in allowed_values {allowed}")
+                    value_if_null = parts
+                else:
+                    value_if_null = raw_vin
+
             fields_by_uuid[uuid_str] = {
                 "uuid":             uuid_str,
                 "field_name":       str(fname).strip(),
                 "tender_key":       tkey,
                 "entity":           entity,
-                "sheet":            sheet,
+                "scope":            tab_scope_map.get(sheet, sheet),
                 "level":            level,
                 "operator":         op,
                 "data_type":        dtype,
@@ -1029,13 +1301,36 @@ def emit_fields_json(wb) -> None:
                 "score_function":   sfunc,
                 "threshold_a":      ta,
                 "threshold_b":      tb,
-                "weight":           weight,
+                "scoring_weight":    weight,
                 "hint":             hint,
                 "user_description": client_exp,
                 "display_mode":     display,
+                "value_if_null":    value_if_null,
             }
 
-    print(f"  Fields JSON: {len(fields_by_uuid)} entries across {len(DATA_SHEETS)} sheets")
+    print(f"  Fields JSON: {len(fields_by_uuid)} entries across {len(data_sheets)} sheets")
+
+    # SA-22: CONTEXT fields must not have an operator — fail generation if violated.
+    context_with_op = [
+        f"{v['field_name']} (op={v['operator']!r})"
+        for v in fields_by_uuid.values()
+        if v.get("level") == "CONTEXT" and v.get("operator")
+    ]
+    if context_with_op:
+        sys.exit(
+            f"[FEHLER] AP0 hygiene: CONTEXT-level fields must not have an operator. "
+            f"Fix in AP0 xlsx:\n  " + "\n  ".join(context_with_op)
+        )
+
+    # SA-25: Warn about SCORING fields that carry no weight and no score_function — they are inert.
+    inert_scoring = [
+        v["field_name"]
+        for v in fields_by_uuid.values()
+        if v.get("level") == "SCORING" and not v.get("scoring_weight") and not v.get("score_function")
+    ]
+    if inert_scoring:
+        print(f"  [SA-25 WARN] {len(inert_scoring)} SCORING-level fields carry no weight/score_function "
+              f"— inert in matching. Assign weights in AP0 or demote to CONTEXT.")
 
     # Write config/fields.json
     (CONFIG_DIR / "fields.json").write_text(
@@ -1061,7 +1356,7 @@ class FieldSpec:
     field_name: str
     tender_key: Optional[str]
     entity: str
-    sheet: str
+    scope: str
     level: Optional[str]
     operator: Optional[str]
     data_type: str
@@ -1070,10 +1365,11 @@ class FieldSpec:
     score_function: Optional[str]
     threshold_a: Optional[float]
     threshold_b: Optional[float]
-    weight: Optional[int]
+    scoring_weight: Optional[int]
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
+    value_if_null: object = None
 
 
 def load_fields() -> dict[str, FieldSpec]:
@@ -1095,18 +1391,69 @@ def fields_by_tender_key() -> dict[str, list[FieldSpec]]:
 
 
 def fields_by_field_name() -> dict[str, list[FieldSpec]]:
-    """Returns fields grouped by field_name. One name can appear in multiple VT sheets."""
+    """Returns fields grouped by field_name. One name can appear in multiple VT scopes."""
     result: dict[str, list[FieldSpec]] = {}
     for f in load_fields().values():
         result.setdefault(f.field_name, []).append(f)
     return result
 
 
-def fields_by_sheet(sheet: str) -> list[FieldSpec]:
-    """Returns all fields for a specific sheet (VT-Filter)."""
-    return [f for f in load_fields().values() if f.sheet == sheet]
 '''
     (ROOT / "src" / "field_spec.py").write_text(field_spec_src, encoding="utf-8")
+
+
+def _write_scope_registry(config_dir: Path, scopes_raw: list, tab_scope_map: dict, vt_map: dict,
+                           dry_run: bool = False) -> dict:
+    """Write config/scope_registry.json from scope registry data. Returns legacy_map."""
+    parent_of = {sid: parent for sid, parent, _ in scopes_raw}
+    tab_of    = {sid: tab for sid, _, tab in scopes_raw}
+
+    def resolution_chain(scope_id: str) -> list:
+        return _scope_resolution_chain(scope_id, parent_of)
+
+    parent_ids    = {parent for _, parent, _ in scopes_raw if parent}
+    leaf_scope_ids = [sid for sid, _, tab in scopes_raw if sid not in parent_ids and tab]
+
+    scopes = {
+        sid: {"scope_id": sid, "parent": parent_of.get(sid) or None, "tab_name": tab_of.get(sid, "")}
+        for sid, _, _ in scopes_raw
+    }
+
+    # Build legacy_map: canonical VT name → scope_id.
+    # Try direct key match first (old convention: tab_name == canonical_name).
+    # Fall back to last-segment match of scope_id (new convention after tab rename).
+    _leaf_sids = set(leaf_scope_ids)
+    legacy_map = {}
+    for canon in set(vt_map.values()):
+        if canon in tab_scope_map:
+            legacy_map[canon] = tab_scope_map[canon]
+        else:
+            for sid in _leaf_sids:
+                if sid.rsplit(":", 1)[-1].lower() in canon.lower():
+                    legacy_map[canon] = sid
+                    break
+
+    missing = set(vt_map.values()) - set(legacy_map)
+    if missing:
+        sys.exit(f"[FEHLER] _write_scope_registry: canonical VT names not resolved to scope_id: {missing} — add Canonical Name column to ③ Scope Registry or fix scope_id naming")
+
+    resolution_order = {
+        leaf_sid: resolution_chain(leaf_sid)
+        for leaf_sid in leaf_scope_ids
+    }
+
+    result = {
+        "scopes": scopes,
+        "resolution_order": resolution_order,
+        "legacy_map": legacy_map,
+    }
+
+    if not dry_run:
+        (config_dir / "scope_registry.json").write_text(
+            json.dumps(result, indent=2, ensure_ascii=False) + "\n"
+        )
+    print(f"  scope_registry.json: {len(scopes)} scopes, {len(leaf_scope_ids)} leaf scopes, {len(legacy_map)} legacy mappings")
+    return legacy_map
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -1117,14 +1464,16 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     print(f"Reading platform config: {platform_path.name if platform_path.exists() else '(not found)'}")
     wb = openpyxl.load_workbook(str(xlsx_path), read_only=True, data_only=True)
 
-    field_levels         = read_field_levels(wb)
+    data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes_raw = read_scope_registry(wb)
+
+    field_levels         = read_field_levels(wb, data_sheets)
     vehicle_types        = read_vehicle_types(wb)
     field_text_fallbacks = read_field_text_fallbacks(wb)
     vehicle_types["field_text_fallbacks"] = field_text_fallbacks
-    scoring_weights      = read_scoring_weights(wb)
-    extraction_schema = read_extraction_schema(wb)
-    sqlite_schema     = read_sqlite_schema(wb)
-    plausibility_raw  = read_plausibility(wb)
+    scoring_weights      = read_scoring_weights(wb, data_sheets)
+    extraction_schema = read_extraction_schema(wb, data_sheets, tab_scope_map=tab_scope_map)
+    sqlite_schema     = read_sqlite_schema(wb, data_sheets)
+    plausibility_raw  = read_plausibility(wb, data_sheets)
 
     wb_platform       = openpyxl.load_workbook(str(platform_path), read_only=True, data_only=True) \
                         if platform_path.exists() else None
@@ -1169,9 +1518,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     # C-5: canonical types for which VNA logic applies
     vehicle_types["vna_applicable_types"] = ["Forklift AGV"]
 
-    # C-6: name of the shared (cross-vehicle-type) AP0 sheet — consumed by Pass 4c in app.py
-    # so the string never needs to be hardcoded in Python.
-    vehicle_types["shared_sheet_name"] = DATA_SHEETS[0]
+    # shared_sheet_name removed in Step 3 — consumers now read scope_registry.json
 
     # C-1: flat list of all keyword_map values for is_agv_amr detection
     _all_kws: list = []
@@ -1196,22 +1543,41 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     print(f"  Plausibility ranges: {len(plausibility)} fields")
 
     # Build prompts
+    shared_scope_id = tab_scope_map[shared_tab]
     vehicle_type_template = build_vehicle_type_template(vehicle_types)
-    extraction_template   = build_extraction_template(vehicle_types, extraction_schema, field_levels=field_levels)
+    extraction_template   = build_extraction_template(vehicle_types, extraction_schema, field_levels=field_levels, shared_scope=shared_scope_id)
     retry_template        = build_retry_template(extraction_schema)
 
-    # Build type-specific Pass 4b templates — derived from DATA_SHEETS, no hardcoded type names
-    # vt_prompt_map written to vehicle_types.json so app.py never needs to know canonical names.
+    # Step 4: compute scope→canonical mapping and resolution chains before building templates.
+    # _write_scope_registry is called here (before dry_run check) so its return value is
+    # available for the vt_prompt_map loop. File write is guarded by dry_run flag.
+    legacy_map = _write_scope_registry(CONFIG_DIR, scopes_raw, tab_scope_map, vehicle_types.get("vt_map", {}), dry_run=dry_run)
+    # scope_id → canonical VT name (reverse of legacy_map)
+    scope_to_canonical = {v: k for k, v in legacy_map.items()}
+    # Build resolution chains for each leaf scope (walk up parent chain)
+    _parent_of = {sid: p for sid, p, _ in scopes_raw}
+    resolution_chains = {
+        tab_scope_map[t]: _scope_resolution_chain(tab_scope_map[t], _parent_of)
+        for t in leaf_tabs
+        if t in tab_scope_map
+    }
+
+    # Build type-specific Pass 4b templates — derived from leaf_tabs, no hardcoded type names
+    # vt_prompt_map keyed by canonical VT name so app.py never needs to know tab names.
     vt_prompt_map: dict = {}
     type_templates: dict = {}
-    for _sheet in DATA_SHEETS:
-        if _sheet == "SHARED – All AGV Types":
-            continue
-        _slug  = _sheet.lower().replace(" ", "_")          # e.g. "forklift_agv"
-        _fname = f"extraction_template_{_slug}.txt"
-        vt_prompt_map[_sheet] = _fname
-        type_templates[_sheet] = build_extraction_template(vehicle_types, extraction_schema,
-                                                            sheet_filter=_sheet, field_levels=field_levels)
+    for _sheet in leaf_tabs:
+        _scope     = tab_scope_map.get(_sheet, _sheet)
+        _canonical = scope_to_canonical.get(_scope, _sheet)
+        _slug      = _sheet.lower().replace(" ", "_")
+        _fname     = f"extraction_template_{_slug}.txt"
+        vt_prompt_map[_canonical] = _fname
+        type_templates[_sheet]    = build_extraction_template(
+            vehicle_types, extraction_schema,
+            scope_filter=_scope, field_levels=field_levels,
+            shared_scope=shared_scope_id,
+            resolution=resolution_chains.get(_scope),
+        )
     vehicle_types["vt_prompt_map"]     = vt_prompt_map
     vehicle_types["4a_fields"]         = list(_4A_FIELDS)   # fields owned by Pass 4a, excluded from 4b
     vehicle_types["vna_context_hint"]  = "VNA (very narrow aisle) operation is required."
@@ -1221,6 +1587,11 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     # Checksums & validation
     xlsx_md5 = hashlib.md5(xlsx_path.read_bytes()).hexdigest()
     warnings = validate_vs_sqlite(field_levels, db_path)
+    drift_warnings = validate_unit_suffix_drift(
+        json.loads((CONFIG_DIR / "fields.json").read_text()) if (CONFIG_DIR / "fields.json").exists() else {}
+    )
+    for w in drift_warnings:
+        print(f"[OI-55 WARN] {w}")
 
     if dry_run:
         print("\n[DRY RUN] Would write:")
@@ -1291,7 +1662,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
 
         (CONFIG_DIR / "ap0_checksum.txt").write_text(xlsx_md5)
 
-        emit_fields_json(wb)
+        emit_fields_json(wb, data_sheets, plausibility_raw=plausibility_raw, tab_scope_map=tab_scope_map)
 
         print(f"\nWrote all config files. AP0 checksum: {xlsx_md5[:8]}…")
 

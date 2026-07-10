@@ -9,7 +9,7 @@
     "required_operating_temp_min_c": null,
     "required_operating_temp_max_c": null,
     "required_operating_humidity_max_pct": null,
-    "required_max_gradient_pct": null,
+    "required_max_gradient_pct": 1.5,
     "required_min_total_height_mm": null,
     "required_min_aisle_width_mm": null
   },
@@ -18,7 +18,8 @@
     "Pre-fix (2026-06-16) the 7B fabricated all 7 fields above except weight_capacity_kg, each paired with a plausible-but-fabricated <field>_source quote (e.g. 'The maximum lift height of the AGVs is up to 4.8 m.') that does not occur anywhere in the real 17.9k-char CompanyX.pdf text — confirmed by direct pdfplumber re-extraction.",
     "Only required_max_payload_kg=1000 is genuine: real text is 'Most pallet weights are less than 500 kg, with a maximum of 1,000 kg.'",
     "This fixture is the regression proof for the source_is_grounded() Layer 0 guard (src/json_repair.py): source_is_grounded() returns False for all 7 numeric fabrications and True for the genuine weight value -- see test_golden_extraction.py and test_source_is_grounded.py.",
-    "RESOLVED 2026-06-16: golden_run_tender_companyx.json was re-captured live against the post-fix pipeline (./start.sh + scripts/capture_pipeline_run.py tenders/CompanyX.pdf, 439.1s). All 7 fields above are null in the fresh capture (each still carries its original fabricated _source quote, now correctly rejected by Layer 0), weight_capacity_kg=1000 survives, and the qualified-supplier count rose from the previously-suppressed ~11 to 24 (matches_all, not disqualified) -- consistent with the ~26 baseline. test_golden_extraction[tender_005] now passes."
+    "RESOLVED 2026-06-16: golden_run_tender_companyx.json was re-captured live against the post-fix pipeline (./start.sh + scripts/capture_pipeline_run.py tenders/CompanyX.pdf, 439.1s). All 7 fields above are null in the fresh capture (each still carries its original fabricated _source quote, now correctly rejected by Layer 0), weight_capacity_kg=1000 survives, and the qualified-supplier count rose from the previously-suppressed ~11 to 24 (matches_all, not disqualified) -- consistent with the ~26 baseline. test_golden_extraction[tender_005] now passes.",
+    "required_max_gradient_pct: UPDATED 2026-06-25 to 1.5. Re-capture confirmed extraction from source 'The floor has a gradient of approximately 1.5% near the loading gates.' — document-grounded, Layer 0 passes, plausibility passes."
   ],
   "expected_ko_exclusions": [],
   "expected_top_3": []

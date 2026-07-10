@@ -15,18 +15,19 @@ from app import _find_invalid_ap0_fields
 
 
 # ---------------------------------------------------------------------------
-# U-F-01: 'OPC UA' (space) triggers a violation for required_integration_capability
+# U-F-01: 'OPC UA' (space) is rejected after Step 6 — only 'OPC-UA' is canonical
 # ---------------------------------------------------------------------------
 
-def test_U_F_01_opc_ua_space_violation():
-    """'OPC UA' with a space is not a valid AP0 integration value — must be in violations.
+def test_U_F_01_opc_ua_space_rejected_post_step6():
+    """Step 6: 'OPC UA' (with space) is no longer a valid AP0 integration value.
 
-    AP0 allows 'OPC-UA' (hyphen). Space variant is a recurring LLM output
-    (Mama, Nordlicht tenders). This check fires before the correction prompt is built.
+    The duplicate alias 'OPC UA' (added in OI-32) was removed in Step 6 when
+    integration_capability allowed_values were cleaned up. Only 'OPC-UA' (hyphen)
+    is now canonical. The LLM extraction hint guides the LLM toward 'OPC-UA'.
     """
     violations = _find_invalid_ap0_fields({"required_integration_capability": "OPC UA"})
     assert "required_integration_capability" in violations, (
-        "'OPC UA' must trigger a violation for required_integration_capability"
+        "'OPC UA' (space) must now be flagged — it is no longer a valid AP0 alias after Step 6"
     )
 
 
@@ -80,14 +81,15 @@ def test_U_F_05_skip_excludes_field():
 
     The skip parameter is used in Pass 4b to exclude fields already validated
     in Pass 4a (vehicle type, vna flag) from double-checking.
+    Uses 'PROFINET' as a genuinely invalid integration value (not in AP0).
     """
     violations_without_skip = _find_invalid_ap0_fields(
-        {"required_integration_capability": "OPC UA"}
+        {"required_integration_capability": "PROFINET"}
     )
     assert "required_integration_capability" in violations_without_skip
 
     violations_with_skip = _find_invalid_ap0_fields(
-        {"required_integration_capability": "OPC UA"},
+        {"required_integration_capability": "PROFINET"},
         skip=frozenset({"required_integration_capability"}),
     )
     assert "required_integration_capability" not in violations_with_skip, (

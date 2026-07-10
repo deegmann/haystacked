@@ -1,0 +1,4 @@
+{
+  "signed_units": ["°C", "°F"],
+  "_comment": "Units with signed domain (zero is a real value). All other numeric units are non-negative — zero means no effective requirement for KO_IF_LT."
+}

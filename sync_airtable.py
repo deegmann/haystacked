@@ -233,7 +233,7 @@ CREATE_EXTENSIONS = _SQLITE_SCHEMA["base_model_extensions"]
 
 # Type coercion sets — loaded from generated schema, not hardcoded.
 # Extra fields that are structural/non-extension but need coercion are added explicitly.
-BOOL_FIELDS  = set(_SQLITE_SCHEMA.get("bool_fields",  [])) | {"export_capable", "is_oem_product", "active"}
+BOOL_FIELDS  = set(_SQLITE_SCHEMA.get("bool_fields",  [])) | {"is_oem_product", "active"}
 INT_FIELDS   = set(_SQLITE_SCHEMA.get("int_fields",   [])) | {"min_project_value_eur", "max_project_value_eur"}
 FLOAT_FIELDS = set(_SQLITE_SCHEMA.get("float_fields", []))
 
@@ -307,14 +307,20 @@ def import_to_sqlite(
 
     # Companies — dynamic INSERT from config/sqlite_schema.json companies_columns
     assert _CO_COLUMNS, "sqlite_schema.json missing 'companies_columns' — run generate_all.py"
-    _CO_DEFAULTS = {"company_name": "UNKNOWN"}
+    _CO_DEFAULTS = {
+        "company_name": "UNKNOWN",
+        "country": "??",
+        "employee_count_range": "unknown",
+        "languages_spoken": "unknown",
+        "last_updated": "unknown",
+    }
     co_sql = (
         f"INSERT OR REPLACE INTO companies ({','.join(_CO_COLUMNS)}) "
         f"VALUES ({','.join('?' * len(_CO_COLUMNS))})"
     )
     cos = csv_rows(companies_csv)
     for row in cos:
-        vals = [_coerce(col, row.get(col, _CO_DEFAULTS.get(col, ""))) for col in _CO_COLUMNS]
+        vals = [_coerce(col, row.get(col) or _CO_DEFAULTS.get(col, "")) for col in _CO_COLUMNS]
         cur.execute(co_sql, vals)
     print(f"  SQLite companies: {len(cos)} rows")
 
@@ -331,7 +337,13 @@ def import_to_sqlite(
 
     # Products — dynamic INSERT from config/sqlite_schema.json products_columns
     assert _PROD_COLUMNS, "sqlite_schema.json missing 'products_columns' — run generate_all.py"
-    _PROD_DEFAULTS = {"product_name": "UNKNOWN", "agv_type": "", "active": "true"}
+    _PROD_DEFAULTS = {
+        "product_name": "UNKNOWN",
+        "agv_type": "unknown",
+        "active": "true",
+        "product_description": "(not specified)",
+        "service_coverage": "EU",
+    }
     prod_sql = (
         f"INSERT OR REPLACE INTO products ({','.join(_PROD_COLUMNS)}) "
         f"VALUES ({','.join('?' * len(_PROD_COLUMNS))})"
@@ -346,11 +358,21 @@ def import_to_sqlite(
         _fk = {"company_id": co_uuid, "base_model_id": bm_uuid}
         vals = [
             _fk[col] if col in _fk
-            else _coerce(col, row.get(col, _PROD_DEFAULTS.get(col, "")))
+            else _coerce(col, row.get(col) or _PROD_DEFAULTS.get(col, ""))
             for col in _PROD_COLUMNS
         ]
         cur.execute(prod_sql, vals)
     print(f"  SQLite products: {len(prods)} rows")
+
+    # Validate agv_type values against scope_registry.json legacy_map
+    _sr_path = Path(__file__).parent / "config" / "scope_registry.json"
+    if _sr_path.exists():
+        _sr = json.loads(_sr_path.read_text())
+        _lm = _sr.get("legacy_map", {})
+        if _lm:
+            _unknown = {row.get("agv_type") for row in prods if row.get("agv_type") and row.get("agv_type") not in _lm}
+            if _unknown:
+                sys.exit(f"ERROR: agv_type values not in scope_registry legacy_map: {_unknown} — check AP0 or run generate_all.py")
 
     # Extensions
     exts = csv_rows(extensions_csv)
