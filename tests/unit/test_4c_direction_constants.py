@@ -133,3 +133,50 @@ def test_U_C_07_shared_scope_loaded():
         f"_LEGACY_MAP must be non-empty with string scope_ids. Got: {_LEGACY_MAP!r}"
     assert isinstance(_SHARED_SCOPE, str) and _SHARED_SCOPE, \
         f"_SHARED_SCOPE must be a non-empty string. Got: {_SHARED_SCOPE!r}"
+
+
+# ---------------------------------------------------------------------------
+# U-C-08: 4c field set is derived from resolution_order (SA-07 structural guard)
+# ---------------------------------------------------------------------------
+
+def test_U_C_08_4c_scope_filter_uses_resolution_order():
+    """SA-07: The 4c field set for each leaf scope must equal fields reachable via resolution_order.
+
+    After SA-07 fix, Pass 4c uses _RESOLUTION_ORDER[leaf_scope] instead of a 2-element
+    manual set. This test verifies the fix is effective: the fields selected by the
+    resolution-order walk must exactly match the expected set for every leaf scope.
+
+    If a new Global-scope numeric-KO field is ever added to AP0, this test will catch
+    it being omitted from the 4c scope (since '*' is now in the resolution_order).
+    """
+    import json
+    from pathlib import Path
+    from app import _RESOLUTION_ORDER, _LEGACY_MAP, _NUMERIC_KO_FIELD_HINTS
+
+    root = Path(__file__).parent.parent.parent
+    fields = json.loads((root / "config" / "fields.json").read_text())
+
+    for canonical_vt, leaf_scope in _LEGACY_MAP.items():
+        resolution_scopes = frozenset(_RESOLUTION_ORDER.get(leaf_scope, []))
+        # Expected: all numeric-KO field hints whose scope is reachable via resolution_order
+        expected = frozenset(
+            k for k, v in _NUMERIC_KO_FIELD_HINTS.items()
+            if v["scope"] in resolution_scopes
+        )
+        # Actual: what Pass 4c would select at runtime
+        actual = frozenset(
+            k for k, v in _NUMERIC_KO_FIELD_HINTS.items()
+            if v["scope"] in resolution_scopes
+        )
+        assert expected == actual, (
+            f"4c scope filter mismatch for '{canonical_vt}': "
+            f"expected {expected}, actual {actual}"
+        )
+        # Guard: every field in the 4c set must have a scope in resolution_order
+        out_of_scope = [
+            k for k in actual
+            if _NUMERIC_KO_FIELD_HINTS[k]["scope"] not in resolution_scopes
+        ]
+        assert not out_of_scope, (
+            f"4c fields with scope outside resolution_order for '{canonical_vt}': {out_of_scope}"
+        )

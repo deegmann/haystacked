@@ -522,3 +522,44 @@ def test_U_M_45c_infrastructure_free_null_supplier_no_ko():
         "Supplier with infrastructure_free=None must not be disqualified — "
         "null means unknown, not infrastructure-required. LL-06 null rule."
     )
+
+
+# ---------------------------------------------------------------------------
+# SA-21: Global-scope COND_KO coverage (country, languages_spoken)
+# ---------------------------------------------------------------------------
+
+def test_U_M_47_languages_spoken_ko_subset_mismatch_disqualifies():
+    """SA-21: languages_spoken is Global scope (*) COND_KO/KO_SUBSET.
+
+    Proves that Global-scope fields participate in matching via the resolution
+    chain. Tender requires DE+EN; supplier only speaks ZH → no overlap → COND_KO.
+    """
+    r = _match_one(
+        {"languages_spoken": ["DE", "EN"]},
+        languages_spoken=["ZH"],
+    )
+    assert r.disqualified, (
+        "languages_spoken KO_SUBSET must disqualify when there is no overlap. "
+        "Global-scope (*) fields must participate in matching via resolution chain."
+    )
+
+
+def test_U_M_48_languages_spoken_ko_subset_overlap_passes():
+    """SA-21: languages_spoken KO_SUBSET — overlap is sufficient to pass."""
+    r = _match_one(
+        {"languages_spoken": ["DE"]},
+        languages_spoken=["DE", "EN"],
+    )
+    assert not r.disqualified
+
+
+def test_U_M_49_languages_spoken_null_supplier_no_ko():
+    """SA-21: Null supplier languages_spoken must not trigger KO (LL-06 null rule)."""
+    r = _match_one(
+        {"languages_spoken": ["DE"]},
+        languages_spoken=None,
+    )
+    assert not r.disqualified, (
+        "Null supplier languages_spoken must not disqualify — LL-06 null rule. "
+        "Unknown language support ≠ no German speakers."
+    )
