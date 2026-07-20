@@ -130,6 +130,7 @@ def read_scope_registry(wb) -> tuple:
     c_vna_applicable    = cols.get("vna_applicable")
     c_scoring_bucket    = cols.get("scoring_bucket")
     c_vna_hint          = cols.get("vna_hint")
+    c_variant_guide_json = cols.get("variant_guide_json")
 
     def _str(row, c):
         return str(row[c]).strip() if c is not None and c < len(row) and row[c] else ""
@@ -178,6 +179,11 @@ def read_scope_registry(wb) -> tuple:
             node["scoring_bucket"] = scoring_bucket
         if vna_hint:
             node["vna_hint"] = vna_hint
+        if c_variant_guide_json is not None and c_variant_guide_json < len(row) and row[c_variant_guide_json]:
+            raw_vgj = str(row[c_variant_guide_json]).strip()
+            if raw_vgj:
+                import json as _json
+                node["variant_guides"] = _json.loads(raw_vgj)
         scope_nodes[scope_id] = node
 
     # Hard error: non-blank tab_name absent from workbook
@@ -979,8 +985,20 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
              or scope_id.startswith(domain_scope_id + ":"))
     ]
     names = [n["canonical_name"] for n in leaf_scopes]
-    has_vna_types = any(n.get("vna_applicable") for n in leaf_scopes)
-    if leaf_scopes:
+    has_vna_types = False  # initialised before conditional; set in elif branch if needed
+    # Check if this is a single-leaf domain with per-variant guides (e.g. IK)
+    dom_node = scope_nodes.get(domain_scope_id, {}) if domain_scope_id else {}
+    dom_variant_guides = dom_node.get("variant_guides", {})
+
+    if dom_variant_guides:
+        # Single-leaf domain (e.g. FoodBev:Refrigeration): present scope_variants as valid outputs
+        names = list(dom_variant_guides.keys())
+        lines.append("Product sub-type classification guide:")
+        for variant, guide in dom_variant_guides.items():
+            lines.append(f'  * "{variant}" → {guide}')
+        lines.append(f"  IMPORTANT: Only {len(names)} values are valid: {', '.join(repr(n) for n in names)}.")
+    elif leaf_scopes:
+        has_vna_types = any(n.get("vna_applicable") for n in leaf_scopes)
         lines.append("Product sub-type classification guide:")
         for scope in leaf_scopes:
             lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
@@ -1015,7 +1033,11 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
         '{"required_agv_type":null,"required_vna_capable":null}',
     ]
     content = "\n".join(lines)
-    if leaf_scopes:
+    if dom_variant_guides:
+        expected_names = list(dom_variant_guides.keys())
+        assert all(n in content for n in expected_names), \
+            f"classification template missing variant names: {expected_names}"
+    elif leaf_scopes:
         expected_names = [n["canonical_name"] for n in leaf_scopes]
         assert all(n in content for n in expected_names), \
             f"classification template missing canonical names: {expected_names}"
@@ -1023,7 +1045,7 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
 
 
 # Fields determined in Pass 4a — excluded from Pass 4b templates
-_4A_FIELDS = {"required_agv_type", "required_vna_capable"}
+_4A_FIELDS = {"required_agv_type", "required_vna_capable", "required_served_categories"}
 
 
 _OPERATOR_DIRECTION = {
@@ -1440,7 +1462,13 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             allowed = None
             if dtype in ("Dropdown", "Multi-Select") and col_allowed is not None and col_allowed < len(row) and row[col_allowed]:
                 raw_av = str(row[col_allowed]).strip()
-                if raw_av == "@SCOPE_CANONICAL_NAMES":
+                if isinstance(raw_av, str) and raw_av.startswith("@SCOPE_VARIANTS:"):
+                    scope_ref = raw_av.split(":", 1)[1].strip()  # e.g. "FoodBev:Refrigeration"
+                    _sn = scope_nodes or {}
+                    av_list = (_sn.get(scope_ref) or {}).get("scope_variants", [])
+                    if not av_list:
+                        print(f"  [WARN] @SCOPE_VARIANTS:{scope_ref} — scope_variants empty or scope not found")
+                elif raw_av == "@SCOPE_CANONICAL_NAMES":
                     # Expand sentinel: sorted canonical_names of all scope nodes
                     _sn = scope_nodes or {}
                     av_list = sorted(

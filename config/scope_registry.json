@@ -92,13 +92,25 @@
     "FoodBev:Refrigeration": {
       "scope_id": "FoodBev:Refrigeration",
       "parent": "*",
-      "tab_name": "",
+      "tab_name": "FoodBev_Refrigeration",
       "canonical_name": "Industrial Refrigeration",
       "classification_guide": "* \"Industrial Refrigeration\" → Industrial refrigeration system for food & beverage: process cooling, cold storage, or deep-freeze applications. Keywords: Kälteanlage, Kältetechnik, refrigeration, industrial cooling, cold store, deep freeze, blast freezer.",
       "scope_variants": [
         "Process Cooling",
         "Cold Store",
         "Deep Freeze"
+      ],
+      "scope_keywords": [
+        "kälteanlage",
+        "kältetechnik",
+        "refrigeration",
+        "industrial cooling",
+        "cold store",
+        "deep freeze",
+        "blast freezer",
+        "prozesskühlung",
+        "tiefkühlung",
+        "kühlhaus"
       ]
     }
   },
@@ -192,7 +204,17 @@
     "underride amr",
     "unterfahrfahrzeug",
     "underride",
-    "autonomous mobile robot"
+    "autonomous mobile robot",
+    "kälteanlage",
+    "kältetechnik",
+    "refrigeration",
+    "industrial cooling",
+    "cold store",
+    "deep freeze",
+    "blast freezer",
+    "prozesskühlung",
+    "tiefkühlung",
+    "kühlhaus"
   ],
   "domain_keywords": {
     "Logistics:AGV": [
@@ -223,6 +245,18 @@
       "unterfahrfahrzeug",
       "underride",
       "autonomous mobile robot"
+    ],
+    "FoodBev:Refrigeration": [
+      "kälteanlage",
+      "kältetechnik",
+      "refrigeration",
+      "industrial cooling",
+      "cold store",
+      "deep freeze",
+      "blast freezer",
+      "prozesskühlung",
+      "tiefkühlung",
+      "kühlhaus"
     ]
   }
 }
