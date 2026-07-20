@@ -1027,3 +1027,15 @@ input[type=number]::placeholder { color: var(--hs-mist); font-style: italic; }
 .sc-ko-label {
   color: var(--red);
 }
+.sc-ctx-section { margin-top: 8px; }
+.sc-ctx-toggle {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.78em; color: #666; padding: 0;
+  display: flex; align-items: center; gap: 4px;
+}
+.sc-ctx-toggle:hover { color: #333; }
+.sc-ctx-body { display: none; padding: 4px 0 0 12px; }
+.sc-ctx-section.sc-ctx-open .sc-ctx-body { display: block; }
+.sc-ctx-row { display: flex; gap: 8px; font-size: 0.78em; padding: 2px 0; }
+.sc-ctx-label { color: #888; flex-shrink: 0; }
+.sc-ctx-val { color: #444; }

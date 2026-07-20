@@ -107,18 +107,19 @@ The strictest boolean operator. Used for VNA (Very Narrow Aisle), where the mach
 
 This operator is only used for `vna_capable`.
 
-### KO_SUBSET — Knock out if no overlap between two lists
+### KO_SUBSET — Knock out if any required item is not covered
 
-Used for Multi-Select fields. The tender specifies a list of required values; the supplier has a list of supported values. If there is no overlap at all, it is a K.O.
+Used for Multi-Select fields. The tender specifies a list of required values; the supplier has a list of supported values. If any required item from the tender list has no match in the supplier's list, it is a K.O. ALL items stated in the tender must be covered. The supplier may support additional items beyond those required.
 
 Uses substring matching for flexibility: `"SLAM"` will match `"Natural Feature (SLAM)"`.
 
-**Fires when:** no item in the tender list is contained in (or contains) any item in the supplier list  
+**Fires when:** any item in the tender list is not contained in (or does not contain) any item in the supplier list  
 **Does not fire when:** either list is empty
 
 **Examples:**
-- `load_type`: tender requires `["Pallet EUR", "Pallet ISO"]`, supplier only handles `["Tote"]` → K.O. (no overlap)
-- `integration_capability` (Cond. K.O.): tender requires `["WMS"]`, supplier only supports `["SAP", "ERP"]` → K.O. if integration is required
+- `load_type`: tender requires `["Pallet EUR", "Pallet ISO"]`, supplier only handles `["Pallet EUR", "Tote"]` → K.O. (Pallet ISO not covered)
+- `load_type`: tender requires `["Pallet EUR"]`, supplier handles `["Pallet EUR", "Pallet ISO", "Tote"]` → passes (all tender items covered, supplier has extras)
+- `integration_capability` (Cond. K.O.): tender requires `["WMS", "REST API"]`, supplier only supports `["WMS"]` → K.O. (REST API not covered)
 - `storage_system_type` (Cond. K.O., AMR only): tender requires `["Bin-to-Person"]`, supplier is Shelf-to-Person only → K.O.
 
 Note: `navigation_type` and `fleet_management_system` were demoted from KO_SUBSET to **CONTEXT** in AP0 v0.10 Step 6 (2026-07-10) — they are now informational only and do not affect filtering.

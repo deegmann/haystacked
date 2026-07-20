@@ -17,6 +17,9 @@ Output file format:
     {
       "source_file": "<filename>",
       "vehicle_type": "...",
+      "buyer": "...", "project": "...", "contact": "...", "summary": "...",
+      "is_agv_amr": true, "in_scope": true,
+      "nace_code": "...", "nace_label": "...", "is_vna": false,
       "agv_criteria": { ... },
       "match_results": [ ... ],
       "captured_at": "2026-06-04T12:34:56",
@@ -142,11 +145,25 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
     )
 
     capture_doc = {
+        # Identity
         "source_file":    pdf_path.name,
         "vehicle_type":   vehicle_type,
+        # Metadata — read back by replay path in app.py so result page shows all fields
+        "buyer":          result.get("buyer"),
+        "project":        result.get("project"),
+        "contact":        result.get("contact"),
+        "summary":        result.get("summary"),
+        "is_agv_amr":     result.get("is_agv_amr", True),
+        "detected_domain": result.get("detected_domain"),
+        "in_scope":       result.get("in_scope", True),
+        "nace_code":      result.get("nace_code"),
+        "nace_label":     result.get("nace_label"),
+        "is_vna":         result.get("is_vna", False),
+        # Extraction + matching
         "agv_criteria":   agv_criteria,
         "match_results":  match_results,
         "matches_all":    matches_all,
+        # Provenance
         "captured_at":    datetime.now().isoformat(timespec="seconds"),
         "duration_s":     round(elapsed, 1),
     }

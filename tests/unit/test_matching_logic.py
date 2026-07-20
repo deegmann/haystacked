@@ -434,9 +434,9 @@ def test_U_M_37_integration_capability_ko_subset_mismatch_disqualifies():
 
 
 def test_U_M_38_integration_capability_ko_subset_overlap_passes():
-    """Step 6: integration_capability KO_SUBSET — overlap is sufficient to pass.
+    """Step 6: integration_capability KO_SUBSET — all tender items are covered — passes.
 
-    Tender requires WMS; supplier has SAP+WMS+REST API — overlap on WMS → not KO.
+    Tender requires WMS; supplier has SAP+WMS+REST API — WMS is covered → not KO.
     """
     r = _match_one(
         {"integration_capability": ["WMS"]},
@@ -545,7 +545,7 @@ def test_U_M_47_languages_spoken_ko_subset_mismatch_disqualifies():
 
 
 def test_U_M_48_languages_spoken_ko_subset_overlap_passes():
-    """SA-21: languages_spoken KO_SUBSET — overlap is sufficient to pass."""
+    """SA-21: languages_spoken KO_SUBSET — all tender items are covered — passes."""
     r = _match_one(
         {"languages_spoken": ["DE"]},
         languages_spoken=["DE", "EN"],
@@ -563,3 +563,44 @@ def test_U_M_49_languages_spoken_null_supplier_no_ko():
         "Null supplier languages_spoken must not disqualify — LL-06 null rule. "
         "Unknown language support ≠ no German speakers."
     )
+
+
+def test_U_M_50_ko_subset_partial_coverage_disqualifies():
+    """OI-33: AND semantics — ALL tender items must be covered.
+    Supplier covers Pallet EUR but not Pallet ISO → KO.
+    """
+    r = _match_one({"load_type": ["Pallet EUR", "Pallet ISO"]}, load_type=["Pallet EUR", "Tote"])
+    assert r.disqualified
+
+
+def test_U_M_51_ko_subset_superset_passes():
+    """OI-33: Supplier covers all tender items plus extras → passes."""
+    r = _match_one({"load_type": ["Pallet EUR"]}, load_type=["Pallet EUR", "Pallet ISO", "Tote"])
+    assert not r.disqualified
+
+
+def test_U_M_52_integration_capability_partial_overlap_now_ko():
+    """OI-33: AND semantics applies to all KO_SUBSET fields.
+    Tender requires VDA5050 AND REST API; supplier only has VDA5050 → KO.
+    Under old OR semantics this would have passed (VDA5050 overlaps).
+    """
+    r = _match_one(
+        {"integration_capability": ["VDA5050", "REST API"]},
+        integration_capability=["VDA5050"],
+    )
+    assert r.disqualified
+
+
+def test_U_M_53_context_info_in_to_dict():
+    """OI-66: to_dict() must include context_info dict with no null values and only CONTEXT fields."""
+    from src.field_spec import load_fields
+    fields = load_fields()
+    context_field_names = {f.field_name for f in fields.values() if f.level == "CONTEXT"}
+    r = _match_one({})
+    d = r.to_dict()
+    assert "context_info" in d, "context_info key must be present"
+    ctx = d["context_info"]
+    assert isinstance(ctx, dict), "context_info must be a dict"
+    for k, v in ctx.items():
+        assert v is not None, f"context_info must not contain null values (got {k}=None)"
+        assert k in context_field_names, f"{k} in context_info is not a CONTEXT-level field"

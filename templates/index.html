@@ -769,6 +769,21 @@ function _koChips(matchResult, maxChips = 3) {
   return chips;
 }
 
+function _contextSection(m) {
+  const ctxInfo = m.context_info || {};
+  const entries = Object.entries(ctxInfo).filter(([, v]) => v != null && v !== '');
+  if (!entries.length) return '';
+  const uid = 'ctx-' + Math.random().toString(36).slice(2, 8);
+  const rows = entries.map(([field, val]) => {
+    const label = _fieldMeta[field]?.label ?? field;
+    return `<div class="sc-ctx-row"><span class="sc-ctx-label">${label}</span><span class="sc-ctx-val">${val}</span></div>`;
+  }).join('');
+  return `<div class="sc-ctx-section" id="${uid}">
+    <button class="sc-ctx-toggle" onclick="document.getElementById('${uid}').classList.toggle('sc-ctx-open')" aria-expanded="false">&#9658; ${entries.length} further propert${entries.length === 1 ? 'y' : 'ies'}</button>
+    <div class="sc-ctx-body">${rows}</div>
+  </div>`;
+}
+
 // ── Supplier Cards (company-level aggregation) ────────────────────────────────
 function _aggregateByCompany(allResults) {
   const companies = {};
@@ -858,6 +873,7 @@ function renderSupplierCards(allResults) {
         <div class="sc-product-list">${productRows}</div>
         ${chips.length ? `<div class="sc-chips">${chips.map(ch => `<span class="sc-chip">${ch}</span>`).join('')}</div>` : ''}
         ${passNote}
+        ${_contextSection(m)}
       </div>`;
     container.appendChild(card);
   });
@@ -914,6 +930,7 @@ function renderSupplierCards(allResults) {
             </div>
             <button class="request-supplier-btn" onclick="requestSupplier(event, ${JSON.stringify(m.company)}, ${JSON.stringify(gapFields)})">Request supplier</button>
           </div>
+          ${_contextSection(m)}
         </div>`;
       potentialCards.appendChild(card);
     });

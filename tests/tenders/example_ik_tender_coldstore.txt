@@ -1,0 +1,32 @@
+AUSSCHREIBUNG KÜHLANLAGE — MOLKEREI MUSTERMANN GMBH
+Projektnummer: IK-2026-001
+Datum: 14.07.2026
+Deadline: 01.09.2026
+
+Auftraggeber:
+Molkerei Mustermann GmbH
+Industriestraße 12
+48149 Münster
+
+Ansprechpartner: Dipl.-Ing. Klaus Weber
+E-Mail: k.weber@molkerei-mustermann.de
+Tel.: +49 251 123456
+
+PROJEKTBESCHREIBUNG
+Die Molkerei Mustermann GmbH schreibt die Lieferung und Installation einer
+Kälteanlage für ein neues Kühllager aus.
+
+TECHNISCHE ANFORDERUNGEN
+- Kälteleistung: mindestens 80 kW
+- Lagertemperatur: +2°C bis +4°C (Zieltemperatur +3°C)
+- Lagervolumen: ca. 2.000 m³
+- Kältemittel: bevorzugt natürliche Kältemittel (R744 oder R290)
+- Feuchtigkeitsregelung erforderlich: ja
+- Aufstellung: Innenaufstellung (kein Außenbetrieb erforderlich)
+- Zertifizierungen: PED-konform, EN 378 erforderlich
+- Energieeffizienz: COP mindestens 3,0
+
+SONSTIGE ANFORDERUNGEN
+Die Anlage muss für den Lebensmittelbereich geeignet sein (HACCP-konform).
+Inbetriebnahme: Q1 2027
+Garantie: 5 Jahre

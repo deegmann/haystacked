@@ -245,11 +245,8 @@ def _build_correction_prompt(violations: dict, original_text: str) -> str:
         original_text[:4000],
     ]
     return "\n".join(lines)
-_VT_MAP_CFG     = _vehicle_cfg.get("vt_map", {})             # llm_output_lower → canonical
 _VNA_CFG        = set(_vehicle_cfg.get("vna_subtypes", []))   # set of vna llm outputs
 _VT_OVERRIDES   = _vehicle_cfg.get("text_overrides", [])      # [{regex, canonical, vna}]
-_VNA_APPLICABLE = set(_vehicle_cfg.get("vna_applicable_types", []))  # C-5: types where VNA gate applies
-_AGV_DETECT_KWS = _vehicle_cfg.get("agv_detection_keywords", [])     # C-1: is_agv_amr fallback keywords
 
 _FIELD_TEXT_FALLBACKS = _vehicle_cfg.get("field_text_fallbacks", [])  # [{tender_key, regex, value, only_if_null}]
 _scope_reg        = json.loads((_CONFIG_DIR / "scope_registry.json").read_text())
@@ -258,14 +255,55 @@ _RESOLUTION_ORDER = _scope_reg.get("resolution_order", {})
 _shared_candidates = [
     data["scope_id"] for data in _scope_reg["scopes"].values() if data.get("parent") == "*"
 ]
-assert len(_shared_candidates) == 1, (
-    f"scope_registry.json: expected exactly 1 child of '*', found {_shared_candidates}. "
-    "Step 7 will generalize multi-domain support — until then the hierarchy must be single-domain."
+assert len(_shared_candidates) >= 1, (
+    f"scope_registry.json: expected at least 1 child of '*', found {_shared_candidates}. "
+    "Add domain-level scopes to scope_registry to enable multi-domain support."
 )
-_SHARED_SCOPE = _shared_candidates[0]
-assert _LEGACY_MAP,   "scope_registry.json missing legacy_map — run generate_all.py"
-assert _SHARED_SCOPE, "scope_registry.json: no shared scope found — run generate_all.py"
-_VALID_VTS = set(_vehicle_cfg.get("scoring_bucket_map", {}).keys())
+_EXTRACTABLE_DOMAINS = frozenset(_shared_candidates)
+assert _EXTRACTABLE_DOMAINS, "scope_registry.json: no scopes with parent='*' found — run generate_all.py"
+assert _LEGACY_MAP, "scope_registry.json missing legacy_map — run generate_all.py"
+assert set(_LEGACY_MAP.values()) <= set(_RESOLUTION_ORDER), (
+    f"leaf scopes without resolution_order entry: {set(_LEGACY_MAP.values()) - set(_RESOLUTION_ORDER)}"
+)
+_VT_MAP_CFG     = _scope_reg.get("variant_map", {})           # variant_lower → canonical (Step 7)
+_VNA_APPLICABLE = {                                            # types where VNA gate applies (Step 7)
+    node["canonical_name"]
+    for node in _scope_reg["scopes"].values()
+    if node.get("vna_applicable")
+}
+_AGV_DETECT_KWS = _scope_reg.get("agv_detection_keywords", [])  # is_agv_amr fallback keywords (Step 7)
+_VALID_VTS = {                                                 # canonical types with scoring bucket (Step 7)
+    node["canonical_name"]
+    for node in _scope_reg["scopes"].values()
+    if node.get("scoring_bucket")
+}
+_VNA_CONTEXT_HINT = next(                                      # VNA context string for 4b prompt (Step 7)
+    (node.get("vna_hint", "") for node in _scope_reg["scopes"].values() if node.get("vna_applicable")),
+    ""
+)
+assert set(_VT_MAP_CFG.values()) <= set(_LEGACY_MAP), (
+    f"variant_map values without legacy_map entry: {set(_VT_MAP_CFG.values()) - set(_LEGACY_MAP)}"
+)
+_DOMAIN_KWS: dict = _scope_reg.get("domain_keywords", {})
+# Domain-scoped valid Pass 4a output values (derived, not hardcoded).
+# Multi-leaf domains (AGV): valid outputs = canonical_names of child leaves.
+# Single-leaf domains (IK): valid outputs = scope_variants of the domain node.
+_DOMAIN_CLASSIF_VALUES: dict = {}
+for _dom in _EXTRACTABLE_DOMAINS:
+    _children = [
+        n["canonical_name"]
+        for n in _scope_reg["scopes"].values()
+        if n.get("parent") == _dom and n.get("canonical_name")
+    ]
+    if _children:
+        _DOMAIN_CLASSIF_VALUES[_dom] = frozenset(_children)
+    else:
+        _dom_node = _scope_reg["scopes"].get(_dom, {})
+        _DOMAIN_CLASSIF_VALUES[_dom] = frozenset(_dom_node.get("scope_variants", []))
+assert all(_DOMAIN_CLASSIF_VALUES.values()), (
+    f"_DOMAIN_CLASSIF_VALUES has empty entry — check scope_registry.json: {_DOMAIN_CLASSIF_VALUES}"
+)
+# Phase 3 TODO: replace break-on-first with score-based selection
 
 # ── NACE — loaded from generated config ───────────────────────────────────────
 _nace_cfg     = json.loads((_CONFIG_DIR / "nace_codes.json").read_text())
@@ -289,22 +327,45 @@ def _fill(template: str, **kwargs) -> str:
         template = template.replace("{" + key + "}", str(value) if value is not None else "")
     return template
 
-MAIN_SYSTEM          = _load_prompt("basic_system.txt")
-BASIC_USER_TEMPLATE  = _load_prompt("basic_template.txt")
+MAIN_SYSTEM               = _load_prompt("basic_system.txt")
+BASIC_USER_TEMPLATE       = _load_prompt("basic_template.txt")
+DOMAIN_DETECTION_TEMPLATE = _load_prompt("domain_detection_template.txt")
 CONTACT_SYSTEM       = _load_prompt("contact_system.txt")
 CONTACT_USER_TEMPLATE= _load_prompt("contact_template.txt")
 NACE_SYSTEM          = _load_prompt("nace_system.txt")
 NACE_USER_TEMPLATE   = _load_prompt("nace_template.txt")
 # AGV system prompt = extraction role + full industry README (loaded via context_builder)
 # This gives the LLM domain knowledge about VNA, G2P, OEM rebadging, etc.
-AGV_SYSTEM              = build_system_context()
+_DOMAIN_SYSTEM: dict[str, str] = {
+    sid: build_system_context(domain_prefix=sid)
+    for sid in _EXTRACTABLE_DOMAINS
+}
 AGV_USER_TEMPLATE       = _load_prompt("extraction_template.txt")          # full fallback template
-VEHICLE_TYPE_TEMPLATE   = _load_prompt("vehicle_type_template.txt")         # Pass 4a
-# Pass 4b templates — loaded from vt_prompt_map in vehicle_types.json (AP0-driven, no hardcoded type names)
+# Pass 4a: scope_classification_template.txt (Step 7); fall back to vehicle_type_template.txt
+_scope_cls_path = _CONFIG_DIR / "prompts" / "scope_classification_template.txt"
+SCOPE_CLASSIFICATION_TEMPLATE = (
+    _load_prompt("scope_classification_template.txt")
+    if _scope_cls_path.exists()
+    else _load_prompt("vehicle_type_template.txt")
+)
+VEHICLE_TYPE_TEMPLATE = SCOPE_CLASSIFICATION_TEMPLATE  # alias for any remaining references
+# Per-domain Pass 4a classification templates (one per domain, domain-specific leaves only)
+_DOMAIN_CLASSIF_TEMPLATES: dict = {}
+for _domain_sid in _shared_candidates:  # all domain-level scope_ids
+    _slug = _domain_sid.lower().replace(":", "_")
+    _tmpl_path = _CONFIG_DIR / "prompts" / f"classification_template_{_slug}.txt"
+    if _tmpl_path.exists():
+        _DOMAIN_CLASSIF_TEMPLATES[_domain_sid] = _tmpl_path.read_text(encoding="utf-8")
+assert _DOMAIN_CLASSIF_TEMPLATES, (
+    "No classification templates found for any extractable domain — "
+    "run generate_all.py and check config/prompts/classification_template_*.txt"
+)
+# Pass 4b templates — derived from scope_registry.json scope nodes (Step 7)
 _AGV_TYPE_TEMPLATES = {
-    canon: _load_prompt(fname)
-    for canon, fname in _vehicle_cfg.get("vt_prompt_map", {}).items()
-    if (_CONFIG_DIR / "prompts" / fname).exists()
+    node["canonical_name"]: _load_prompt(f"extraction_template_{node['tab_name'].lower().replace(' ', '_')}.txt")
+    for node in _scope_reg["scopes"].values()
+    if node.get("canonical_name") and node.get("tab_name")
+    and (_CONFIG_DIR / "prompts" / f"extraction_template_{node['tab_name'].lower().replace(' ', '_')}.txt").exists()
 }
 # Fields determined in Pass 4a — excluded from 4b AP0 validation (loaded from vehicle_types.json)
 _4A_SKIP = frozenset(_vehicle_cfg.get("4a_fields", []))
@@ -469,7 +530,10 @@ async def analyze(file: UploadFile = File(...)):
             text               = ""
             parse_method       = "replay"
             result             = {
-                "is_agv_amr":  cached.get("is_agv_amr", True),
+                "detected_domain": (
+                    cached.get("detected_domain")
+                    or cached.get("detected_domain")
+                ),
                 "in_scope":    cached.get("in_scope", True),
                 "buyer":       cached.get("buyer"),
                 "project":     cached.get("project"),
@@ -479,7 +543,7 @@ async def analyze(file: UploadFile = File(...)):
                 "nace_label":  cached.get("nace_label"),
             }
             analysis_id = str(uuid.uuid4())
-            is_agv = True
+            is_extractable = True
 
         elif filename.lower().endswith(".pdf"):
             size_kb = len(pdf_bytes) // 1024
@@ -551,13 +615,6 @@ async def analyze(file: UploadFile = File(...)):
                 if v == "null" or v == "NULL":
                     result[k] = None
 
-            # Keyword fallback: if LLM missed is_agv_amr but doc contains clear AGV terms, force true
-            if not result.get("is_agv_amr"):
-                text_lower = text[:5000].lower()
-                if any(kw in text_lower for kw in _AGV_DETECT_KWS):
-                    result["is_agv_amr"] = True
-                    log.info("AGV-Keyword-Fallback: is_agv_amr auf True gesetzt")
-
             # ── Contact fallback: targeted pass on document tail ──────────────────
             # Contact info is often at the end of a document. If the main extraction
             # missed contact fields and the document has a meaningful tail, run a
@@ -609,8 +666,38 @@ async def analyze(file: UploadFile = File(...)):
                                 "message": f"Parsing OK ({parse_method}) | NACE: {result.get('nace_tender','–')}{scope_label}"})
             yield sse("log", {"message": f"Parse+NACE: {t2:.1f}s gesamt"})
 
-            is_agv = bool(result.get("is_agv_amr", False))
-            log.info("AGV/AMR-Tender erkannt: %s", is_agv)
+            # ── Pass 2b: Domain Detection ────────────────────────────────────────────
+            yield sse("step", {"id": "parse", "status": "running", "message": "Domain wird erkannt…"})
+            await asyncio.sleep(0)
+            detected_domain = None
+            try:
+                domain_user = _fill(DOMAIN_DETECTION_TEMPLATE,
+                                    tender_category=result.get("tender_category") or "",
+                                    summary=result.get("summary") or "")
+                raw_domain = await call_ollama(MAIN_SYSTEM, domain_user, "domain_detect")
+                domain_data = repair_and_parse(raw_domain)
+                domain_data.pop("_parse_method", None)
+                detected_domain = domain_data.get("detected_domain")
+                log.info("Domain Detection: detected_domain=%s", detected_domain)
+            except Exception as e:
+                log.warning("Domain Detection fehlgeschlagen: %s", e)
+
+            # Keyword-Fallback: wenn LLM kein Ergebnis liefert
+            if not detected_domain:
+                text_lower = text[:5000].lower()
+                for domain_id, kws in _DOMAIN_KWS.items():
+                    if any(kw in text_lower for kw in kws):
+                        detected_domain = domain_id
+                        log.info("Domain Keyword-Fallback: %s", domain_id)
+                        break  # Phase 3 TODO: replace with score-based selection
+
+            result["detected_domain"] = detected_domain
+            yield sse("step", {"id": "parse", "status": "done",
+                                "message": f"Domain: {detected_domain or 'unbekannt'}"})
+            yield sse("log", {"message": f"detected_domain={detected_domain}"})
+
+            is_extractable = result.get("detected_domain") in _EXTRACTABLE_DOMAINS
+            log.info("Domain erkannt: %s (is_extractable=%s)", result.get("detected_domain"), is_extractable)
 
             # ── LLM: AGV criteria extraction (if applicable) ──────────────────────
             agv_criteria = None
@@ -627,19 +714,22 @@ async def analyze(file: UploadFile = File(...)):
             matches = []
             matches_all = []
 
-        if is_agv and not is_replay:
+        if is_extractable and not is_replay:
             yield sse("step", {"id": "agv", "status": "running",
                                 "message": "Fahrzeugtyp wird klassifiziert…"})
             await asyncio.sleep(0)
 
             # ── Pass 4a: classify vehicle type only ───────────────────────────
-            vt_user = _fill(VEHICLE_TYPE_TEMPLATE, text=text)
+            _classif_tmpl = _DOMAIN_CLASSIF_TEMPLATES.get(
+                result.get("detected_domain"), SCOPE_CLASSIFICATION_TEMPLATE
+            )
+            vt_user = _fill(_classif_tmpl, text=text)
             vt_criteria: dict = {}
             _ap0_violations_4a: dict = {}
             try:
                 for _attempt in range(3):
                     if _attempt == 0:
-                        raw_vt = await call_ollama(AGV_SYSTEM, vt_user, "agv_4a")
+                        raw_vt = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], vt_user, "agv_4a")
                         try:
                             vt_criteria = repair_and_parse(raw_vt)
                         except ValueError:
@@ -669,6 +759,12 @@ async def analyze(file: UploadFile = File(...)):
                     _all_violations = _find_invalid_ap0_fields(vt_criteria)
                     _ap0_violations_4a = {k: v for k, v in _all_violations.items()
                                           if k == "required_agv_type"}
+                    # Domain-context guard: AP0 enum spans all domains — reject cross-domain values
+                    if not _ap0_violations_4a:
+                        _raw_4a = vt_criteria.get("required_agv_type")
+                        _domain_vals = _DOMAIN_CLASSIF_VALUES.get(result.get("detected_domain"), frozenset())
+                        if _raw_4a and _domain_vals and _raw_4a not in _domain_vals:
+                            _ap0_violations_4a = {"required_agv_type": (_raw_4a, sorted(_domain_vals))}
                     if not _ap0_violations_4a:
                         break
 
@@ -710,7 +806,7 @@ async def analyze(file: UploadFile = File(...)):
             log.info("Pass 4a: vehicle_type=%s%s", canonical_agv_type, vna_label)
             # Pre-compute 4c field set now that vehicle type is known; needed for progress total
             _leaf_scope = _LEGACY_MAP.get(canonical_agv_type, "")
-            _4c_scopes  = frozenset(_RESOLUTION_ORDER.get(_leaf_scope, [_SHARED_SCOPE, _leaf_scope]))
+            _4c_scopes  = frozenset(_RESOLUTION_ORDER.get(_leaf_scope, []))
             _4c_fields = {
                 k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
                 if v["scope"] in _4c_scopes
@@ -723,7 +819,7 @@ async def analyze(file: UploadFile = File(...)):
 
             # ── Pass 4b: extract type-specific fields ─────────────────────────
             _TEXT_TOKEN_ESTIMATE = len(text) // 4
-            _FIXED_OVERHEAD_TOKENS = 10_100  # AGV_SYSTEM (~5500) + 4b template (~4600)
+            _FIXED_OVERHEAD_TOKENS = 10_100  # domain system prompt (~5500) + 4b template (~4600)
             _TOTAL_ESTIMATE = _TEXT_TOKEN_ESTIMATE + _FIXED_OVERHEAD_TOKENS
             if _TOTAL_ESTIMATE > _OLLAMA_NUM_CTX:
                 yield sse("log", {
@@ -737,7 +833,7 @@ async def analyze(file: UploadFile = File(...)):
                 })
 
             template_4b = _AGV_TYPE_TEMPLATES.get(canonical_agv_type, AGV_USER_TEMPLATE)
-            vna_context = _vehicle_cfg.get("vna_context_hint", "") if is_vna_subtype else ""
+            vna_context = _VNA_CONTEXT_HINT if is_vna_subtype else ""
             agv_user_4b = _fill(template_4b, text=text,
                                 vehicle_type=canonical_agv_type, vna_context=vna_context)
 
@@ -747,7 +843,7 @@ async def analyze(file: UploadFile = File(...)):
             try:
                 for _attempt in range(3):
                     if _attempt == 0:
-                        raw_agv = await call_ollama(AGV_SYSTEM, agv_user_4b, "agv_4b")
+                        raw_agv = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], agv_user_4b, "agv_4b")
                         try:
                             agv_criteria = repair_and_parse(raw_agv)
                         except ValueError:
@@ -838,7 +934,7 @@ async def analyze(file: UploadFile = File(...)):
                         f'{{"{_fk}": <number or null>, "{_fk}_source": "<verbatim quote or null>"}}'
                     )
                     try:
-                        _per_raw    = await call_ollama(AGV_SYSTEM, _per_user, f"agv_4c_{_fk}")
+                        _per_raw    = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], _per_user, f"agv_4c_{_fk}")
                         _per_parsed = repair_and_parse(_per_raw)
                         if _fk in _per_parsed:
                             _4c_val = _per_parsed[_fk]
@@ -887,7 +983,7 @@ async def analyze(file: UploadFile = File(...)):
             agv_criteria["required_agv_type"] = vt_criteria.get("required_agv_type")
             agv_criteria["required_vna_capable"] = vt_criteria.get("required_vna_capable")
 
-        if is_agv:
+        if is_extractable:
             # Validate against AP0 allowed_values — reject values not in the allowed list
             from src.matching import validate_tender_values
             agv_criteria, av_warnings = validate_tender_values(agv_criteria)
@@ -1106,8 +1202,6 @@ async def field_meta():
     """Return AP0 field metadata for the frontend — labels, levels, data types, and sheet (vehicle-type group).
     Built from config/fields.json (generated from AP0 xlsx by generate_all.py)."""
     fields = load_fields()
-    vt_path = _CONFIG_DIR / "vehicle_types.json"
-    vt_cfg = json.loads(vt_path.read_text()) if vt_path.exists() else {}
     _UNITS = {"_kg":"kg","_mm":"mm","_pct":"%","_h":"h","_ms":"m/s",
               "_c":"°C","_eur":"EUR","_min":"min","_m":"m","_deg":"°"}
     _ABBR = {"Agv":"AGV","Amr":"AMR","Vda":"VDA","Vda5050":"VDA 5050","Wms":"WMS","Oem":"OEM",
@@ -1153,9 +1247,9 @@ async def field_meta():
     meta.update(clones)
     # VT config for frontend column grouping — read entirely from generated config files
     meta["__vt_config__"] = {
-        "shared_scope":  _SHARED_SCOPE,
+        "extractable_domains": sorted(_EXTRACTABLE_DOMAINS),
         "legacy_map":    _LEGACY_MAP,
-        "vehicle_types": list(vt_cfg.get("scoring_bucket_map", {}).keys()),
+        "vehicle_types": list(_VALID_VTS),
     }
     return meta
 

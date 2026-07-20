@@ -19,7 +19,7 @@ DB_PATH = Path(__file__).parent.parent / "data" / "haystacked.db"
 # Never use dict(result) — internal keys (_parse_method, agv_criteria, etc.) must not leak.
 _BASIC_INFO_KEYS = frozenset({
     "buyer", "project_name", "buyer_industry", "tender_category",
-    "is_agv_amr", "summary",
+    "is_agv_amr", "detected_domain", "summary",
     "contact_name", "contact_email", "contact_phone",
     "deadline", "tender_date",
     "nace_tender", "in_scope",

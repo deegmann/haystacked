@@ -316,9 +316,9 @@ def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
     """GET /api/field-meta must assign each KO field to the correct VT scope.
 
     Verified fields:
-    - towing_capacity_kg   → scope == legacy_map['Tugger AGV']    (tugger-only)
-    - lifting_height_mm    → scope == legacy_map['Forklift AGV']  (forklift-only)
-    - max_payload_kg       → scope == shared_scope                (shared across all VTs)
+    - towing_capacity_kg   → scope NOT in extractable_domains (tugger-only leaf scope)
+    - lifting_height_mm    → scope NOT in extractable_domains (forklift-only leaf scope)
+    - max_payload_kg       → scope IN extractable_domains     (shared across all VTs)
     """
     response = client.get("/api/field-meta")
     assert response.status_code == 200
@@ -326,27 +326,27 @@ def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
 
     vt_config = meta.get("__vt_config__")
     assert vt_config is not None
-    shared_scope = vt_config.get("shared_scope")
-    assert isinstance(shared_scope, str) and shared_scope, \
-        f"shared_scope must be a non-empty string, got: {shared_scope!r}"
+    extractable_domains = vt_config.get("extractable_domains", [])
+    assert isinstance(extractable_domains, list) and extractable_domains, \
+        f"extractable_domains must be a non-empty list, got: {extractable_domains!r}"
     legacy_map = vt_config.get("legacy_map", {})
 
     # Tugger-only KO field
     tugger = meta.get("towing_capacity_kg")
     assert tugger is not None, "towing_capacity_kg missing from /api/field-meta"
-    assert tugger["scope"] != shared_scope
+    assert tugger["scope"] not in extractable_domains
     assert tugger["scope"] != legacy_map.get("Forklift AGV", "")
 
     # Forklift-only KO field
     forklift = meta.get("lifting_height_mm")
     assert forklift is not None, "lifting_height_mm missing from /api/field-meta"
-    assert forklift["scope"] != shared_scope
+    assert forklift["scope"] not in extractable_domains
     assert forklift["scope"] != legacy_map.get("Tugger AGV", "")
 
     # Shared KO field
     shared = meta.get("max_payload_kg")
     assert shared is not None, "max_payload_kg missing from /api/field-meta"
-    assert shared["scope"] == shared_scope
+    assert shared["scope"] in extractable_domains
 
 
 def test_replay_endpoint_golden_companyx():

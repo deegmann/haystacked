@@ -29,7 +29,7 @@ def _fill(t, **kw):
         t = t.replace("{" + k + "}", str(v))
     return t
 
-AGV_SYSTEM       = build_system_context()  # matches production app.py — extraction_system.txt is fallback-only
+AGV_SYSTEM       = build_system_context("Logistics:AGV")
 AGV_USER_TPL     = _load("extraction_template.txt")
 OLLAMA_URL       = "http://localhost:11434/api/generate"
 OLLAMA_MODEL     = "qwen2.5:7b"

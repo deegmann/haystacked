@@ -48,28 +48,20 @@ assert _SIGNED_UNITS is not None, "unit_semantics.json failed to load — check 
 
 # ── Config loading ────────────────────────────────────────────────────────────
 
-def _load_vehicle_types() -> dict:
-    p = CONFIG_DIR / "vehicle_types.json"
-    if p.exists():
-        with open(p) as f:
-            return json.load(f)
-    return {}
-
 
 _fields = load_fields()  # dict[str, FieldSpec], keyed by UUID
 _scope_registry = json.loads((Path(__file__).parent.parent / "config" / "scope_registry.json").read_text())
 _LEGACY_MAP: dict[str, str] = _scope_registry.get("legacy_map", {})
 assert _LEGACY_MAP, "scope_registry.json missing legacy_map — run generate_all.py"
-_SHARED_SCOPE: str = next(
-    (data["scope_id"] for data in _scope_registry["scopes"].values() if data.get("parent") == "*"),
-    ""
-)
-assert _SHARED_SCOPE, "scope_registry.json: no scope with parent='*' found — run generate_all.py"
-
-# Guardian S2: Startup-Assertion — every vt_map canonical value must resolve via legacy_map
-_vt_map_values = set(_load_vehicle_types().get("vt_map", {}).values())
-assert _vt_map_values <= set(_LEGACY_MAP), (
-    f"vt_map values without scope in legacy_map: {_vt_map_values - set(_LEGACY_MAP)}"
+# Guardian S2: Startup-Assertion — every canonical_name in scope_registry must resolve via legacy_map
+_canon_names = {
+    node["canonical_name"]
+    for node in _scope_registry["scopes"].values()
+    if node.get("canonical_name")
+}
+assert _canon_names, "scope_registry.json has no nodes with canonical_name — run generate_all.py"
+assert _canon_names <= set(_LEGACY_MAP), (
+    f"canonical_names without legacy_map entry: {_canon_names - set(_LEGACY_MAP)}"
 )
 
 
@@ -197,7 +189,8 @@ def _op_bool_exclusive(tender, supplier) -> tuple[bool, str]:
 
 
 def _op_subset(tender, supplier) -> tuple[bool, str]:
-    """K.O. if no overlap between tender list and supplier list.
+    """K.O. if any required item in the tender list has no match in supplier list.
+    All tender items must be covered; supplier may have extras.
     Uses substring matching for flexibility (e.g. 'SLAM' matches 'Natural Feature (SLAM)').
     """
     if not tender or not supplier:
@@ -206,12 +199,9 @@ def _op_subset(tender, supplier) -> tuple[bool, str]:
     s_list = [str(x).strip().lower() for x in (supplier if isinstance(supplier, list) else [supplier]) if x]
     if not t_list or not s_list:
         return False, ""
-    matched = any(
-        any(t in s or s in t for s in s_list)
-        for t in t_list
-    )
-    if not matched:
-        return True, f"{supplier} does not include any of {tender}"
+    unmatched = [t for t in t_list if not any(t in s or s in t for s in s_list)]
+    if unmatched:
+        return True, f"{supplier} does not cover required: {unmatched}"
     return False, ""
 
 
@@ -369,6 +359,12 @@ class MatchResult:
                     " | ".join(v) if isinstance(v := _supplier_val(values, prod, field_spec), list) else v
                 )
                 for field_spec in _fields.values() if field_spec.level != "CONTEXT"
+            },
+            "context_info": {
+                field_spec.field_name: (" | ".join(v) if isinstance(v, list) else v)
+                for field_spec in _fields.values()
+                if field_spec.level == "CONTEXT"
+                if (v := _supplier_val(values, prod, field_spec)) is not None
             },
         }
 

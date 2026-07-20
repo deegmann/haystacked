@@ -114,6 +114,8 @@ For tugger / tractor trains, the **trailer** technology, not just the tractor, d
 
 So a tugger's own `min_aisle_width_mm` can be optimistic if paired with passive carts. Read `trailer_steering_technology` and `trailer_compatibility` together with the aisle figure. (Also: `auto_hitch` lets a train drop and collect carts without an operator — a throughput multiplier, not just a convenience.)
 
+**Conveyor incompatibility:** Tugger AGVs tow trailer trains and cannot interface with conveyor belts without manual reloading. If a tender requires direct conveyor integration (goods transferred automatically from/to a belt conveyor), a Tugger AGV is not appropriate — a Forklift AGV or AMR with a conveyor interface is needed instead.
+
 ---
 
 ## 10. VDA 5050 — interoperability, trending from optional to mandatory
@@ -233,3 +235,43 @@ If a product is clearly one of these, flag it as out-of-scope rather than forcin
 ---
 
 *haystacked · Industry Read Me · companion to the AP0 field specification · confidential*
+
+## Industrial Refrigeration (FoodBev:Refrigeration)
+
+### Domain Overview
+Industrial refrigeration systems in the Food & Beverage sector are purpose-engineered
+systems procured through formal B2B tender processes. They are never off-the-shelf
+products — each installation is engineered to the buyer's specific requirements.
+
+### Subcategory Classification
+- **Process Cooling**: Active cooling of production media (fermentation tanks, milk cooling,
+  glycol circuits, process water). Operates above freezing, typically +2°C to +15°C.
+  Buyer signals: Brauerei, Molkerei, process water, Prozesskühlung.
+- **Cold Store**: Refrigerated warehouse or room for fresh product storage.
+  Operates near freezing, typically 0°C to +8°C.
+  Buyer signals: Kühlhaus, Kühllager, fresh produce, Frischwarenlager.
+- **Deep Freeze**: Freezing or frozen-storage systems for temperatures well below freezing.
+  Operates -18°C to -40°C. Includes blast freezers.
+  Buyer signals: Tiefkühlung, Schockfrostung, blast freezer, Tiefkühlhaus.
+
+### Key Technical Concepts
+- **COP (Coefficient of Performance)**: Energy efficiency ratio. Higher COP = less energy per kW of cooling.
+- **Refrigerants**: R744 (CO₂, natural, low GWP), R290 (propane, natural), R717 (ammonia, high efficiency,
+  requires safety zones), R134a and R32 (HFCs, being phased out under EU F-Gas regulation).
+- **PED (Pressure Equipment Directive)**: EU mandatory certification for refrigeration pressure vessels.
+- **ATEX**: Required for installations in explosive atmospheres (e.g. near alcohol distillation).
+- **EN 378**: European safety standard specific to refrigeration systems.
+- **F-Gas Regulation**: EU law restricting high-GWP refrigerants; natural refrigerants (R744, R290, R717)
+  are compliant and increasingly preferred.
+- **Temperature stability**: How tightly the system holds its setpoint (e.g. ±0.5 K for dairy).
+- **Pulldown time**: How long it takes to cool from ambient to target temperature after loading.
+- **Blast freezing**: Rapid freezing using high-velocity cold air; measured in kg/h throughput.
+
+### Matching Rules
+- Blank ≠ Zero: A supplier not listing a refrigerant type does NOT mean they cannot use it.
+  Null = unknown, never absent capability.
+- temperature_min_celsius uses KO_IF_GT: tender requires at least as cold as X °C.
+  A supplier achieving -25°C satisfies a tender requiring -18°C (supplier value < tender value).
+- Negative °C values are valid and must not be treated as errors.
+- certifications_ik uses KO_SUBSET: tender may require a subset of certifications.
+  A supplier with PED+EN 378 satisfies a tender requiring only PED.

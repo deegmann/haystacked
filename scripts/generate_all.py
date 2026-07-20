@@ -102,11 +102,12 @@ SCOPE_REGISTRY_TAB = "③ Scope Registry"
 
 
 def read_scope_registry(wb) -> tuple:
-    """Read ③ Scope Registry tab. Returns (data_sheets, shared_tab, leaf_tabs).
+    """Read ③ Scope Registry tab. Returns (data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes, scope_nodes).
 
     data_sheets: ordered list of all non-blank tab_name values from ③ Scope Registry
     shared_tab:  tab_name of the scope with parent_scope == "*" and a non-blank tab_name
     leaf_tabs:   tab_names of scopes that have no children (type-specific sheets only)
+    scope_nodes: dict[scope_id → dict] with all columns per node (including 7 new Step-7 columns)
 
     Hard error if any non-blank tab_name is absent from the workbook.
     """
@@ -118,22 +119,66 @@ def read_scope_registry(wb) -> tuple:
     if hi is None:
         sys.exit(f"[FEHLER] read_scope_registry: Kein Header 'scope_id' in '{SCOPE_REGISTRY_TAB}' gefunden.")
 
-    c_scope_id = cols.get("scope_id", 0)
-    c_parent   = cols.get("parent_scope")
-    c_tab_name = cols.get("tab_name")
-    c_active   = cols.get("active")
+    c_scope_id          = cols.get("scope_id", 0)
+    c_parent            = cols.get("parent_scope")
+    c_tab_name          = cols.get("tab_name")
+    c_active            = cols.get("active")
+    c_canonical_name    = cols.get("canonical_name")
+    c_classification    = cols.get("classification_guide")
+    c_keywords          = cols.get("keywords")
+    c_variants          = cols.get("variants")
+    c_vna_applicable    = cols.get("vna_applicable")
+    c_scoring_bucket    = cols.get("scoring_bucket")
+    c_vna_hint          = cols.get("vna_hint")
+
+    def _str(row, c):
+        return str(row[c]).strip() if c is not None and c < len(row) and row[c] else ""
+
+    def _bool(row, c):
+        v = row[c] if c is not None and c < len(row) else None
+        if v is None:
+            return None
+        if isinstance(v, bool):
+            return v
+        return str(v).strip().lower() in ("true", "yes", "1")
 
     scopes = []  # (scope_id, parent_scope, tab_name)
+    scope_nodes = {}  # scope_id → dict with all new columns
     for row in rows[hi + 1:]:
         if not row or not row[c_scope_id]:
             continue
         scope_id = str(row[c_scope_id]).strip()
-        parent   = str(row[c_parent]).strip()   if c_parent   is not None and c_parent   < len(row) and row[c_parent]   else ""
-        tab_name = str(row[c_tab_name]).strip() if c_tab_name is not None and c_tab_name < len(row) and row[c_tab_name] else ""
-        active   = str(row[c_active]).strip()   if c_active   is not None and c_active   < len(row) and row[c_active]   else ""
+        parent   = _str(row, c_parent)
+        tab_name = _str(row, c_tab_name)
+        active   = _str(row, c_active)
         if not active:
             continue
         scopes.append((scope_id, parent, tab_name))
+
+        canonical_name = _str(row, c_canonical_name)
+        classification = _str(row, c_classification)
+        raw_keywords   = _str(row, c_keywords)
+        raw_variants   = _str(row, c_variants)
+        vna_applicable = _bool(row, c_vna_applicable)
+        scoring_bucket = _str(row, c_scoring_bucket)
+        vna_hint       = _str(row, c_vna_hint)
+
+        node: dict = {}
+        if canonical_name:
+            node["canonical_name"]      = canonical_name
+        if classification:
+            node["classification_guide"] = classification
+        if raw_keywords:
+            node["scope_keywords"] = [kw.strip() for kw in raw_keywords.split(",") if kw.strip()]
+        if raw_variants:
+            node["scope_variants"] = [v.strip() for v in raw_variants.split(",") if v.strip()]
+        if vna_applicable is not None:
+            node["vna_applicable"] = vna_applicable
+        if scoring_bucket:
+            node["scoring_bucket"] = scoring_bucket
+        if vna_hint:
+            node["vna_hint"] = vna_hint
+        scope_nodes[scope_id] = node
 
     # Hard error: non-blank tab_name absent from workbook
     for scope_id, _, tab_name in scopes:
@@ -146,9 +191,9 @@ def read_scope_registry(wb) -> tuple:
     data_sheets = [t for _, _, t in scopes if t]
 
     shared_tabs = [t for sid, p, t in scopes if p == "*" and t]
-    if len(shared_tabs) != 1:
+    if len(shared_tabs) < 1:
         sys.exit(
-            f"[FEHLER] read_scope_registry: Genau ein Scope mit parent_scope='*' und "
+            f"[FEHLER] read_scope_registry: Mindestens ein Scope mit parent_scope='*' und "
             f"nicht-leerem tab_name erwartet, gefunden: {shared_tabs}"
         )
     shared_tab = shared_tabs[0]
@@ -162,7 +207,7 @@ def read_scope_registry(wb) -> tuple:
         )
 
     tab_scope_map = {t: sid for sid, _, t in scopes if t}
-    return data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes
+    return data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes, scope_nodes
 
 
 def read_field_levels(wb, data_sheets) -> dict:
@@ -848,37 +893,58 @@ def read_platform(wb, platform_path: Path) -> dict:
 
 # ── Prompt builders ───────────────────────────────────────────────────────────
 
-def build_vehicle_type_template(vehicle_types: dict) -> str:
+def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -> str:
     """Pass 4a template — classify vehicle type and VNA flag only."""
     lines = [
         "Classify the required AGV/AMR vehicle type from this tender document.",
         "Output ONLY the JSON object shown below — nothing else.",
         "",
     ]
-    guide = vehicle_types.get("llm_guide", [])
-    if guide:
-        lines.append("Vehicle type classification guide:")
-        seen_names = set()
-        for vt in guide:
-            if vt["name"] in seen_names: continue
-            seen_names.add(vt["name"])
-            line = f'  * "{vt["name"]}" → {vt["description"]}'
-            if vt.get("key_indicators"):
-                line += f'. Signals: {vt["key_indicators"]}'
-            lines.append(line)
-        lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
-        lines.append("")
-        lines.append("  THINK STEP BY STEP:")
-        lines.append("  IMPORTANT: Only three values are valid: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
-        lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-        lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-        lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-        lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
-        lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-        lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
-        lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
-        lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
-        lines.append("")
+    if scope_nodes:
+        leaf_scopes = [n for n in scope_nodes.values() if n.get("canonical_name") and n.get("classification_guide")]
+        if leaf_scopes:
+            lines.append("Vehicle type classification guide:")
+            for scope in leaf_scopes:
+                lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
+            lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+            lines.append("")
+            lines.append("  THINK STEP BY STEP:")
+            names = [n["canonical_name"] for n in leaf_scopes]
+            lines.append(f"  IMPORTANT: Only {len(names)} values are valid: {', '.join(repr(n) for n in names)}.")
+            lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
+            lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+            lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
+            lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
+            lines.append("")
+    else:
+        guide = vehicle_types.get("llm_guide", [])
+        if guide:
+            lines.append("Vehicle type classification guide:")
+            seen_names = set()
+            for vt in guide:
+                if vt["name"] in seen_names: continue
+                seen_names.add(vt["name"])
+                line = f'  * "{vt["name"]}" → {vt["description"]}'
+                if vt.get("key_indicators"):
+                    line += f'. Signals: {vt["key_indicators"]}'
+                lines.append(line)
+            lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+            lines.append("")
+            lines.append("  THINK STEP BY STEP:")
+            lines.append("  IMPORTANT: Only three values are valid: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+            lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
+            lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+            lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
+            lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
+            lines.append("")
     lines += [
         "Fields:",
         "- required_agv_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
@@ -891,6 +957,69 @@ def build_vehicle_type_template(vehicle_types: dict) -> str:
         '{"required_agv_type":null,"required_vna_capable":null}',
     ]
     return "\n".join(lines)
+
+
+def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str = None) -> str:
+    """Generate a scope classification template from ③ Scope Registry scope nodes.
+
+    domain_scope_id=None  → combined template (all domains, backward compat).
+    domain_scope_id=<sid> → domain-specific template (leaves of that domain only).
+    Returns the template content string; caller is responsible for writing to disk.
+    """
+    lines = [
+        "Classify the required product sub-type from this tender document.",
+        "Output ONLY the JSON object shown below — nothing else.",
+        "",
+    ]
+    leaf_scopes = [
+        node for scope_id, node in scope_nodes.items()
+        if node.get("canonical_name") and node.get("classification_guide")
+        and (domain_scope_id is None
+             or scope_id == domain_scope_id
+             or scope_id.startswith(domain_scope_id + ":"))
+    ]
+    names = [n["canonical_name"] for n in leaf_scopes]
+    has_vna_types = any(n.get("vna_applicable") for n in leaf_scopes)
+    if leaf_scopes:
+        lines.append("Product sub-type classification guide:")
+        for scope in leaf_scopes:
+            lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
+        if has_vna_types:
+            lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+            lines.append("")
+            lines.append("  THINK STEP BY STEP:")
+        lines.append(f"  IMPORTANT: Only {len(names)} values are valid: {', '.join(repr(n) for n in names)}.")
+        if has_vna_types:
+            lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
+            lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+            lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured.")
+            lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
+            lines.append("")
+    _valid_values = ", ".join(repr(n) for n in names) if names else "null"
+    lines += [
+        "Fields:",
+        f"- required_agv_type: MANDATORY — exactly one of: {_valid_values}.",
+    ]
+    if has_vna_types:
+        lines.append("- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_agv_type='Forklift AGV'.")
+    lines += [
+        "",
+        "DOCUMENT:",
+        "{text}",
+        "",
+        "JSON:",
+        '{"required_agv_type":null,"required_vna_capable":null}',
+    ]
+    content = "\n".join(lines)
+    if leaf_scopes:
+        expected_names = [n["canonical_name"] for n in leaf_scopes]
+        assert all(n in content for n in expected_names), \
+            f"classification template missing canonical names: {expected_names}"
+    return content
 
 
 # Fields determined in Pass 4a — excluded from Pass 4b templates
@@ -906,7 +1035,8 @@ _NUMERIC_DTYPES = {"Float", "Integer"}
 
 def build_extraction_template(vehicle_types: dict, extraction_schema: list,
                                scope_filter: str = None, field_levels: dict = None,
-                               shared_scope: str = "", resolution=None) -> str:
+                               shared_scope: str = "", resolution=None,
+                               scope_nodes: dict = None) -> str:
     """Build LLM extraction template.
 
     scope_filter=None  → full combined template (backward compat / JSON-retry fallback).
@@ -935,30 +1065,50 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
         lines = ["Extract AGV/AMR technical requirements from this tender. Values may appear in running text OR in tables — extract from both.",
                  "The document may be written in any language (German, English, French, etc.). Extract fields based on their semantic meaning, not on specific keywords or section headings.",
                  ""]
-        guide = vehicle_types.get("llm_guide", [])
-        if guide:
-            lines += ["Vehicle type classification guide (for required_agv_type):"]
-            seen_names = set()
-            for vt in guide:
-                if vt["name"] in seen_names: continue
-                seen_names.add(vt["name"])
-                line = f'  * "{vt["name"]}" → {vt["description"]}'
-                if vt.get("key_indicators"):
-                    line += f'. Signals: {vt["key_indicators"]}'
-                lines.append(line)
-            lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
-            lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
-            lines.append("")
-            lines.append("  THINK STEP BY STEP when classifying required_agv_type:")
-            lines.append("  IMPORTANT: Only three values are valid for required_agv_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
-            lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-            lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-            lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-            lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_agv_type='Forklift AGV'.")
-            lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
-            lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
-            lines.append("")
+        if scope_nodes:
+            leaf_scopes = [n for n in scope_nodes.values() if n.get("canonical_name") and n.get("classification_guide")]
+            if leaf_scopes:
+                lines += ["Vehicle type classification guide (for required_agv_type):"]
+                for scope in leaf_scopes:
+                    lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
+                lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+                lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
+                lines.append("")
+                lines.append("  THINK STEP BY STEP when classifying required_agv_type:")
+                lines.append("  IMPORTANT: Only three values are valid for required_agv_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+                lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+                lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+                lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+                lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_agv_type='Forklift AGV'.")
+                lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
+                lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+                lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
+                lines.append("")
+        else:
+            guide = vehicle_types.get("llm_guide", [])
+            if guide:
+                lines += ["Vehicle type classification guide (for required_agv_type):"]
+                seen_names = set()
+                for vt in guide:
+                    if vt["name"] in seen_names: continue
+                    seen_names.add(vt["name"])
+                    line = f'  * "{vt["name"]}" → {vt["description"]}'
+                    if vt.get("key_indicators"):
+                        line += f'. Signals: {vt["key_indicators"]}'
+                    lines.append(line)
+                lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
+                lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
+                lines.append("")
+                lines.append("  THINK STEP BY STEP when classifying required_agv_type:")
+                lines.append("  IMPORTANT: Only three values are valid for required_agv_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+                lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
+                lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
+                lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
+                lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_agv_type='Forklift AGV'.")
+                lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
+                lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+                lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
+                lines.append("")
 
     lines.append("Field definitions:")
     _source_instrumented = set()  # numeric KO fields that get a _source companion
@@ -1071,17 +1221,59 @@ def build_basic_template() -> str:
         "- tender_category: describe what is being procured in 3-6 words",
         "  (e.g. \"Website Redesign\", \"Warehouse Automation System\", \"Security Consulting\").",
         "  Never leave null if the project name is present.",
-        "- is_agv_amr: set to true if the document requests Automated Guided Vehicles (AGV),",
-        "  Autonomous Mobile Robots (AMR), automated intralogistics vehicles, VNA robots,",
-        "  or any self-driving warehouse/factory transport robot.",
-        "  If the words AGV, AMR, or VNA appear in the document, set this to true.",
         "",
         "DOCUMENT:",
         "{text}",
         "",
         "JSON:",
-        '{"buyer":null,"project_name":null,"project_location":null,"tender_date":null,"deadline":null,"contact_name":null,"contact_email":null,"contact_phone":null,"buyer_industry":null,"tender_category":null,"is_agv_amr":false,"summary":null,"missing_info":[]}',
+        '{"buyer":null,"project_name":null,"project_location":null,"tender_date":null,"deadline":null,"contact_name":null,"contact_email":null,"contact_phone":null,"buyer_industry":null,"tender_category":null,"summary":null,"missing_info":[]}',
     ])
+
+
+def build_domain_detection_template(scope_nodes: dict, scopes_raw: list) -> str:
+    """Pass 2b: classify which haystacked domain this tender belongs to.
+
+    scope_nodes carries per-leaf info (keywords, classification_guide) but is empty
+    for domain-level nodes. Use scopes_raw (sid, parent, tab_name tuples) to identify
+    domain-level scopes (direct children of root '*' with a tab_name).
+    """
+    domain_scope_ids = [sid for sid, p, t in scopes_raw if p == "*" and t]
+
+    # Aggregate keywords from leaf children — domain-level nodes have no own keywords.
+    _parent_of = {sid: p for sid, p, _ in scopes_raw}
+    domain_kws: dict = {}
+    for domain_sid in domain_scope_ids:
+        child_kws = [
+            kw
+            for cnode_sid, cnode in scope_nodes.items()
+            if _parent_of.get(cnode_sid) == domain_sid
+            for kw in cnode.get("scope_keywords", [])
+        ]
+        domain_kws[domain_sid] = list(dict.fromkeys(child_kws))
+
+    lines = [
+        "Classify which procurement domain this tender belongs to.",
+        "Base your answer ONLY on the tender_category and summary provided.",
+        "Output ONLY valid JSON — nothing else.",
+        "",
+    ]
+    if domain_scope_ids:
+        lines.append("Available domains:")
+        for sid in domain_scope_ids:
+            kws_sample = ", ".join(domain_kws.get(sid, [])[:8])
+            lines.append(f'  * "{sid}". Keywords: {kws_sample}')
+        valid_ids = [repr(sid) for sid in domain_scope_ids]
+        lines.append(f"")
+        lines.append(f"Set detected_domain to one of: {', '.join(valid_ids)}, or null if none match.")
+    lines += [
+        "",
+        "TENDER_CATEGORY: {tender_category}",
+        "SUMMARY: {summary}",
+        "",
+        "JSON:",
+        '{"detected_domain": null}',
+    ]
+    return "\n".join(lines)
 
 
 # ── Validators ────────────────────────────────────────────────────────────────
@@ -1146,7 +1338,7 @@ def validate_vs_sqlite(field_levels: dict, db_path: Path) -> list:
 
 # ── Fields JSON + field_spec.py ───────────────────────────────────────────────
 
-def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict = None) -> None:
+def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict = None, scope_nodes: dict = None) -> None:
     """Read all sheets from data_sheets and write config/fields.json + src/field_spec.py.
 
     fields.json is keyed by UUID. field_spec.py is a generated Python module with
@@ -1248,7 +1440,14 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             allowed = None
             if dtype in ("Dropdown", "Multi-Select") and col_allowed is not None and col_allowed < len(row) and row[col_allowed]:
                 raw_av = str(row[col_allowed]).strip()
-                av_list = [v.strip() for v in raw_av.split("|") if v.strip() and v.strip() not in ("…", "")]
+                if raw_av == "@SCOPE_CANONICAL_NAMES":
+                    # Expand sentinel: sorted canonical_names of all scope nodes
+                    _sn = scope_nodes or {}
+                    av_list = sorted(
+                        n["canonical_name"] for n in _sn.values() if n.get("canonical_name")
+                    )
+                else:
+                    av_list = [v.strip() for v in raw_av.split("|") if v.strip() and v.strip() not in ("…", "")]
                 if av_list:
                     allowed = av_list
 
@@ -1332,6 +1531,22 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
         print(f"  [SA-25 WARN] {len(inert_scoring)} SCORING-level fields carry no weight/score_function "
               f"— inert in matching. Assign weights in AP0 or demote to CONTEXT.")
 
+    # Collision Guard: same field_name in multiple entries → (data_type, unit) must be identical.
+    # Exception: Global-scope fields (scope == "*") are allowed to appear in multiple domains.
+    seen: dict[str, tuple] = {}
+    for entry in fields_by_uuid.values():
+        name = entry.get("field_name", "")
+        scope = entry.get("scope", "")
+        if scope == "*":
+            continue
+        key = (entry.get("data_type"), entry.get("unit", ""))
+        if name in seen and seen[name] != key:
+            raise SystemExit(
+                f"Field name collision: '{name}' has conflicting (data_type, unit): "
+                f"{seen[name]} vs {key}"
+            )
+        seen[name] = key
+
     # Write config/fields.json
     (CONFIG_DIR / "fields.json").write_text(
         json.dumps(fields_by_uuid, indent=2, ensure_ascii=False) + "\n"
@@ -1403,7 +1618,7 @@ def fields_by_field_name() -> dict[str, list[FieldSpec]]:
 
 
 def _write_scope_registry(config_dir: Path, scopes_raw: list, tab_scope_map: dict, vt_map: dict,
-                           dry_run: bool = False) -> dict:
+                           scope_nodes: dict, dry_run: bool = False) -> dict:
     """Write config/scope_registry.json from scope registry data. Returns legacy_map."""
     parent_of = {sid: parent for sid, parent, _ in scopes_raw}
     tab_of    = {sid: tab for sid, _, tab in scopes_raw}
@@ -1412,30 +1627,98 @@ def _write_scope_registry(config_dir: Path, scopes_raw: list, tab_scope_map: dic
         return _scope_resolution_chain(scope_id, parent_of)
 
     parent_ids    = {parent for _, parent, _ in scopes_raw if parent}
-    leaf_scope_ids = [sid for sid, _, tab in scopes_raw if sid not in parent_ids and tab]
+    leaf_scope_ids = [sid for sid, _, _ in scopes_raw if sid not in parent_ids]
 
-    scopes = {
-        sid: {"scope_id": sid, "parent": parent_of.get(sid) or None, "tab_name": tab_of.get(sid, "")}
-        for sid, _, _ in scopes_raw
-    }
+    scopes = {}
+    for sid, _, _ in scopes_raw:
+        node = {
+            "scope_id": sid,
+            "parent": parent_of.get(sid) or None,
+            "tab_name": tab_of.get(sid, ""),
+        }
+        sn = scope_nodes.get(sid, {})
+        for field in ("canonical_name", "classification_guide", "scope_variants", "scope_keywords",
+                      "vna_applicable", "scoring_bucket", "vna_hint"):
+            v = sn.get(field)
+            if v is not None:
+                node[field] = v
+        scopes[sid] = node
 
-    # Build legacy_map: canonical VT name → scope_id.
-    # Try direct key match first (old convention: tab_name == canonical_name).
-    # Fall back to last-segment match of scope_id (new convention after tab rename).
-    _leaf_sids = set(leaf_scope_ids)
-    legacy_map = {}
-    for canon in set(vt_map.values()):
-        if canon in tab_scope_map:
-            legacy_map[canon] = tab_scope_map[canon]
-        else:
-            for sid in _leaf_sids:
-                if sid.rsplit(":", 1)[-1].lower() in canon.lower():
-                    legacy_map[canon] = sid
-                    break
+    # Derive variant_map: variant.lower() → canonical_name (from scope_variants × canonical_name)
+    variant_map: dict = {}
+    for node in scopes.values():
+        cn = node.get("canonical_name")
+        if not cn:
+            continue
+        for variant in node.get("scope_variants", []):
+            variant_map[variant.strip().lower()] = cn
 
-    missing = set(vt_map.values()) - set(legacy_map)
-    if missing:
-        sys.exit(f"[FEHLER] _write_scope_registry: canonical VT names not resolved to scope_id: {missing} — add Canonical Name column to ③ Scope Registry or fix scope_id naming")
+    # Derive agv_detection_keywords: union of scope_keywords of all nodes with canonical_name
+    agv_detection_keywords: list = list(dict.fromkeys(
+        kw
+        for node in scopes.values()
+        if node.get("canonical_name")
+        for kw in node.get("scope_keywords", [])
+    ))
+
+    # Derive domain_keywords: domain-node own keywords + union of all child scope_keywords
+    domain_keywords: dict = {}
+    for sid, node in scopes.items():
+        if node.get("parent") == "*" and node.get("tab_name"):
+            own_kws = node.get("scope_keywords", [])
+            child_kws = [
+                kw
+                for csid, cnode in scopes.items()
+                if cnode.get("parent") == sid
+                for kw in cnode.get("scope_keywords", [])
+            ]
+            domain_keywords[sid] = list(dict.fromkeys(own_kws + child_kws))
+
+    # Build legacy_map: canonical_name → scope_id, plus scope_variants → scope_id
+    # (scope_variants lets IK sub-categories like "Cold Store" route to FoodBev:Refrigeration)
+    legacy_map: dict = {}
+    for node in scopes.values():
+        cn  = node.get("canonical_name")
+        sid = node["scope_id"]
+        if cn:
+            legacy_map[cn] = sid
+        for _v in node.get("scope_variants", []):
+            v = _v.strip()
+            if v and v not in legacy_map:
+                legacy_map[v] = sid
+
+    # Parent-conformance assertion
+    _declared = set(scopes.keys())
+    _roots = [sid for sid, node in scopes.items() if node.get("parent") is None]
+    assert len(_roots) == 1, f"Expected exactly one root scope, got: {_roots}"
+    for sid, node in scopes.items():
+        p = node.get("parent")
+        if p is not None:
+            assert p in _declared, f"scope {sid!r} declares parent {p!r} which is not a declared scope_id"
+            prefix = sid.rsplit(":", 1)[0] if ":" in sid else None
+            expected_parent = prefix if prefix in _declared else "*"
+            assert p == expected_parent, \
+                f"scope {sid!r}: declared parent {p!r} != derived parent {expected_parent!r}"
+
+    # Variant superset assertion
+    _PRE_STEP7_VT_MAP_KEYS = frozenset([
+        "vna", "very narrow aisle", "reach truck", "counterbalanced", "forklift",
+        "forklift agv", "agv", "tugger", "tugger agv", "mobile amr", "amr",
+        "underride amr", "underride", "autonomous mobile robot"
+    ])
+    assert _PRE_STEP7_VT_MAP_KEYS <= set(variant_map.keys()), \
+        f"variant_map missing pre-Step-7 vt_map entries: {_PRE_STEP7_VT_MAP_KEYS - set(variant_map.keys())}"
+
+    # Keyword superset assertion
+    _PRE_STEP7_DETECT_KWS = frozenset([
+        "vna", "very narrow aisle", "reach truck", "schmalgangstapler", "counterbalanced",
+        "forklift", "stapler", "gabelstapler", "forklift agv", "agv", "tugger", "schlepper",
+        "routenzug", "milk run", "towing", "anhaenger", "tugger agv", "amr", "mobile robot",
+        "fahrroboter", "autonomer", "goods-to-person", "goods to person", "underride amr",
+        "unterfahrfahrzeug", "underride", "autonomous mobile robot"
+    ])
+    assert _PRE_STEP7_DETECT_KWS <= set(agv_detection_keywords), \
+        f"agv_detection_keywords missing pre-Step-7 entries: {_PRE_STEP7_DETECT_KWS - set(agv_detection_keywords)}"
 
     resolution_order = {
         leaf_sid: resolution_chain(leaf_sid)
@@ -1446,6 +1729,9 @@ def _write_scope_registry(config_dir: Path, scopes_raw: list, tab_scope_map: dic
         "scopes": scopes,
         "resolution_order": resolution_order,
         "legacy_map": legacy_map,
+        "variant_map": variant_map,
+        "agv_detection_keywords": agv_detection_keywords,
+        "domain_keywords": domain_keywords,
     }
 
     if not dry_run:
@@ -1464,7 +1750,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     print(f"Reading platform config: {platform_path.name if platform_path.exists() else '(not found)'}")
     wb = openpyxl.load_workbook(str(xlsx_path), read_only=True, data_only=True)
 
-    data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes_raw = read_scope_registry(wb)
+    data_sheets, shared_tab, leaf_tabs, tab_scope_map, scopes_raw, scope_nodes = read_scope_registry(wb)
 
     field_levels         = read_field_levels(wb, data_sheets)
     vehicle_types        = read_vehicle_types(wb)
@@ -1497,34 +1783,9 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     platform          = read_platform(wb_platform, platform_path)
     nace              = platform  # nace data is inside platform dict
 
-    # Additional runtime fields derived from AP0 — written to vehicle_types.json so
-    # Python code never contains canonical type names or AGV-domain keywords.
-
-    # C-2: canonical type → vehicle_types.json scoring_bucket_map bucket name
-    vehicle_types["scoring_bucket_map"] = {
-        canon: bucket
-        for canon, bucket in [("Forklift AGV", "forklift_specific"),
-                               ("Tugger AGV",   "tugger_specific"),
-                               ("Mobile AMR",   "amr_specific")]
-        if canon in vehicle_types.get("vt_map", {}).values()
-        or any(canon == v for v in vehicle_types.get("vt_map", {}).values())
-    }
-    # Ensure all three are always present (in case vt_map is incomplete)
-    for _c, _b in [("Forklift AGV", "forklift_specific"),
-                   ("Tugger AGV",   "tugger_specific"),
-                   ("Mobile AMR",   "amr_specific")]:
-        vehicle_types["scoring_bucket_map"].setdefault(_c, _b)
-
-    # C-5: canonical types for which VNA logic applies
-    vehicle_types["vna_applicable_types"] = ["Forklift AGV"]
-
-    # shared_sheet_name removed in Step 3 — consumers now read scope_registry.json
-
-    # C-1: flat list of all keyword_map values for is_agv_amr detection
-    _all_kws: list = []
-    for _kws in vehicle_types.get("keyword_map", {}).values():
-        _all_kws.extend(_kws)
-    vehicle_types["agv_detection_keywords"] = list(dict.fromkeys(_all_kws))
+    # Additional runtime fields derived from AP0.
+    # scoring_bucket_map, vna_applicable_types, agv_detection_keywords retired in Step 7:
+    # these are now emitted to scope_registry.json via _write_scope_registry().
 
     # M-1: ensure Schmalgangstapler text override sets vna=True
     _schmal_regex = "(?i)schmalgangstapler"
@@ -1544,16 +1805,20 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
 
     # Build prompts
     shared_scope_id = tab_scope_map[shared_tab]
-    vehicle_type_template = build_vehicle_type_template(vehicle_types)
-    extraction_template   = build_extraction_template(vehicle_types, extraction_schema, field_levels=field_levels, shared_scope=shared_scope_id)
+    vehicle_type_template = build_vehicle_type_template(vehicle_types, scope_nodes=scope_nodes)
+    extraction_template   = build_extraction_template(vehicle_types, extraction_schema, field_levels=field_levels, shared_scope=shared_scope_id, scope_nodes=scope_nodes)
     retry_template        = build_retry_template(extraction_schema)
 
     # Step 4: compute scope→canonical mapping and resolution chains before building templates.
     # _write_scope_registry is called here (before dry_run check) so its return value is
     # available for the vt_prompt_map loop. File write is guarded by dry_run flag.
-    legacy_map = _write_scope_registry(CONFIG_DIR, scopes_raw, tab_scope_map, vehicle_types.get("vt_map", {}), dry_run=dry_run)
+    legacy_map = _write_scope_registry(CONFIG_DIR, scopes_raw, tab_scope_map, vehicle_types.get("vt_map", {}), scope_nodes, dry_run=dry_run)
     # scope_id → canonical VT name (reverse of legacy_map)
-    scope_to_canonical = {v: k for k, v in legacy_map.items()}
+    scope_to_canonical = {
+        sid: n["canonical_name"]
+        for sid, n in scope_nodes.items()
+        if n.get("canonical_name")
+    }
     # Build resolution chains for each leaf scope (walk up parent chain)
     _parent_of = {sid: p for sid, p, _ in scopes_raw}
     resolution_chains = {
@@ -1563,7 +1828,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     }
 
     # Build type-specific Pass 4b templates — derived from leaf_tabs, no hardcoded type names
-    # vt_prompt_map keyed by canonical VT name so app.py never needs to know tab names.
+    # vt_prompt_map local var still needed for file pruning; NOT written to vehicle_types.json (retired).
     vt_prompt_map: dict = {}
     type_templates: dict = {}
     for _sheet in leaf_tabs:
@@ -1577,12 +1842,14 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             scope_filter=_scope, field_levels=field_levels,
             shared_scope=shared_scope_id,
             resolution=resolution_chains.get(_scope),
+            scope_nodes=scope_nodes,
         )
-    vehicle_types["vt_prompt_map"]     = vt_prompt_map
-    vehicle_types["4a_fields"]         = list(_4A_FIELDS)   # fields owned by Pass 4a, excluded from 4b
-    vehicle_types["vna_context_hint"]  = "VNA (very narrow aisle) operation is required."
-    nace_template       = build_nace_template(nace)
-    basic_template      = build_basic_template()
+    vehicle_types["4a_fields"] = list(_4A_FIELDS)   # fields owned by Pass 4a, excluded from 4b
+    # vt_prompt_map, vna_context_hint, scoring_bucket_map, vna_applicable_types,
+    # agv_detection_keywords retired in Step 7 — now in scope_registry.json.
+    nace_template             = build_nace_template(nace)
+    basic_template            = build_basic_template()
+    domain_detection_template = build_domain_detection_template(scope_nodes, scopes_raw)
 
     # Checksums & validation
     xlsx_md5 = hashlib.md5(xlsx_path.read_bytes()).hexdigest()
@@ -1598,6 +1865,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         print("  config/vehicle_types.json, nace_codes.json")
         print("  config/sqlite_schema.json, config/plausibility.json")
         print("  config/prompts/extraction_template.txt (and others)")
+        print("  config/prompts/scope_classification_template.txt")
         print(f"\nExtraction template preview (first 400 chars):\n{extraction_template[:400]}")
         print(f"\nSQLite companies preview:\n{sqlite_schema['companies'][:400]}")
     else:
@@ -1613,13 +1881,34 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
             json.dumps(plausibility, indent=2, ensure_ascii=False) + "\n")
 
         (PROMPTS_DIR / "extraction_system.txt").write_text(
-            "You are a warehouse automation specialist. Extract technical AGV/AMR requirements from tender documents. Output ONLY valid JSON. No markdown, no explanation.\n\n"
-            "ANTI-HALLUCINATION RULE — NULL IF NOT EXPLICITLY STATED:\n"
-            "Before outputting any non-null value you must be able to identify the exact sentence in the document that states it.\n"
-            "- Do NOT infer specifications from warehouse type or AGV type: a VNA warehouse does NOT imply IP65, cold-storage temperature, high humidity, ramp gradient, or VDA 5050 unless these are written in the document.\n"
-            "- Do NOT read numbers from dates, filenames, revision codes, version strings, or project metadata as specification values.\n"
-            "  Example: '25th May 2022' is a date — NOT a temperature. 'v1.3' is a version — NOT a floor flatness value.\n"
-            "- If a field's value is not directly stated in the document text, output null — never apply 'typical' industry values.")
+            "You are a technical procurement specialist. Extract technical requirements from tender documents. Output ONLY valid JSON. No markdown, no explanation.\n\n"
+            "## Critical extraction rules\n"
+            "8. CONSERVATIVE VALUE EXTRACTION (critical): When a document lists multiple values for the same parameter, always extract the most demanding value. "
+            "For minimum-capability fields (payload, lift height, capacity, operating hours, fleet size, maximum ambient temperature): extract the MAXIMUM value found. "
+            "For maximum-constraint fields (aisle width, minimum ambient temperature, minimum temperature setpoint): extract the MINIMUM value found. "
+            "Never average or omit ambiguous values — always pick the worst case for the supplier.\n"
+            "9. ANTI-HALLUCINATION (critical): Before outputting any non-null value you must be able to identify the exact sentence in the document that states it. "
+            "Do NOT infer specifications from the product type, industry, or environment — stated context does NOT imply unstated technical values. "
+            "Do NOT read numbers from dates, filenames, revision codes, version strings, or project metadata as specification values — "
+            "'25th May 2022' is a date, NOT a temperature; 'v1.3' is a version, NOT a specification value. "
+            "If a field's value is not directly stated in the document text, output null — never apply typical industry values."
+        )
+        # Per-domain classification templates (one per domain, domain-specific leaves only)
+        domain_classif_slugs = []
+        for _domain_sid, _p, _t in scopes_raw:
+            if _p == "*" and _t:  # domain-level scope with tab
+                _slug = _domain_sid.lower().replace(":", "_")
+                _fname = f"classification_template_{_slug}.txt"
+                _content = build_scope_classification_template(scope_nodes, domain_scope_id=_domain_sid)
+                domain_classif_slugs.append(_fname)
+                if not dry_run:
+                    (PROMPTS_DIR / _fname).write_text(_content)
+
+        # Combined fallback (all domains, backward compat for any code that still loads scope_classification_template.txt)
+        _combined = build_scope_classification_template(scope_nodes, domain_scope_id=None)
+        if not dry_run:
+            (PROMPTS_DIR / "scope_classification_template.txt").write_text(_combined)
+
         (PROMPTS_DIR / "vehicle_type_template.txt").write_text(vehicle_type_template)
         (PROMPTS_DIR / "extraction_template.txt").write_text(extraction_template)
         for _sheet, _tmpl in type_templates.items():
@@ -1633,9 +1922,12 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         expected = set(vt_prompt_map.values()) | {
             "extraction_template.txt", "extraction_retry_template.txt",
             "extraction_retry_system.txt", "extraction_system.txt",
-            "vehicle_type_template.txt", "basic_system.txt",
-            "basic_template.txt", "nace_template.txt",
+            "vehicle_type_template.txt", "scope_classification_template.txt",
+            "basic_system.txt", "basic_template.txt", "nace_template.txt",
+            "domain_detection_template.txt",
         }
+        for _f in PROMPTS_DIR.glob("classification_template_*.txt"):
+            expected.add(_f.name)
         for stale in PROMPTS_DIR.glob("extraction_template_*.txt"):
             if stale.name not in expected:
                 stale.unlink()
@@ -1650,19 +1942,30 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         (PROMPTS_DIR / "nace_system.txt").write_text(
             "You are an industrial classification specialist. Pick the single best NACE code from the provided list. Output ONLY valid JSON with exactly the field names shown.")
         (PROMPTS_DIR / "nace_template.txt").write_text(nace_template)
+        (PROMPTS_DIR / "domain_detection_template.txt").write_text(domain_detection_template)
 
-        # Sync README from Spec/ (single source of truth within repo) → config/
-        # config/industry_readme.md is the runtime copy loaded by context_builder.py.
-        readme_spec  = ROOT / "Spec" / "haystacked_industry_readme.md"
-        readme_local = CONFIG_DIR / "industry_readme.md"
-        if readme_spec.exists():
-            if not readme_local.exists() or readme_spec.stat().st_mtime > readme_local.stat().st_mtime:
-                readme_local.write_bytes(readme_spec.read_bytes())
-                print("  Industry README synced from Spec/")
+        # Sync per-domain READMEs from Spec/ → config/ (one file per domain)
+        for _domain_sid, _parent, _tab in scopes_raw:
+            if _parent != "*":
+                continue
+            _slug = _domain_sid.lower().replace(":", "_")
+            _readme_spec  = ROOT / "Spec" / f"haystacked_industry_readme_{_slug}.md"
+            _readme_local = CONFIG_DIR / f"industry_readme_{_slug}.md"
+            if not _readme_spec.exists():
+                raise SystemExit(
+                    f"Missing domain README for {_domain_sid}: {_readme_spec}"
+                )
+            _readme_local.write_bytes(_readme_spec.read_bytes())
+            print(f"  README synced: industry_readme_{_slug}.md")
+        # Remove legacy single-domain file to prevent silent fallback
+        _legacy_readme = CONFIG_DIR / "industry_readme.md"
+        if _legacy_readme.exists():
+            _legacy_readme.unlink()
+            print("  Removed legacy config/industry_readme.md")
 
         (CONFIG_DIR / "ap0_checksum.txt").write_text(xlsx_md5)
 
-        emit_fields_json(wb, data_sheets, plausibility_raw=plausibility_raw, tab_scope_map=tab_scope_map)
+        emit_fields_json(wb, data_sheets, plausibility_raw=plausibility_raw, tab_scope_map=tab_scope_map, scope_nodes=scope_nodes)
 
         print(f"\nWrote all config files. AP0 checksum: {xlsx_md5[:8]}…")
 

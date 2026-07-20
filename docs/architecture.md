@@ -108,7 +108,7 @@ python3 scripts/generate_all.py
 | File | Purpose | Notes |
 |------|---------|-------|
 | `config/unit_semantics.json` | Units with signed domain (°C, °F) | NOT generated — edit manually when adding signed-domain units |
-| `config/industry_readme.md` | Domain knowledge for AGV system prompt | Synced from `Spec/haystacked_industry_readme.md` by generate_all.py |
+| `config/industry_readme_{slug}.md` | Domain knowledge per domain (one file per domain slug) | Synced from `Spec/haystacked_industry_readme_{slug}.md` by generate_all.py |
 
 ---
 

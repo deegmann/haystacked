@@ -1,7 +1,7 @@
 """Unit tests for Pass 4c module-level startup constants from app.py (U-C-xx).
 
 Tests that _4C_EXTRACTION_DIRECTION, _NUMERIC_KO_FIELD_HINTS, _LEGACY_MAP, and
-_SHARED_SCOPE are non-empty, correctly typed, and internally consistent.
+_EXTRACTABLE_DOMAINS are non-empty, correctly typed, and internally consistent.
 
 These constants are built at app startup from fields.json via field_spec.py. An empty or
 mismatched constant means the source-span guard and Pass 4c are silently inactive.
@@ -16,7 +16,7 @@ from app import (
     _NUMERIC_KO_FIELD_HINTS,
     _NUMERIC_KO_TENDER_KEYS,
     _LEGACY_MAP,
-    _SHARED_SCOPE,
+    _EXTRACTABLE_DOMAINS,
 )
 
 
@@ -124,15 +124,15 @@ def test_U_C_06_direction_values_are_strings():
 
 
 # ---------------------------------------------------------------------------
-# U-C-07: _LEGACY_MAP and _SHARED_SCOPE are loaded from scope_registry.json
+# U-C-07: _LEGACY_MAP and _EXTRACTABLE_DOMAINS are loaded from scope_registry.json
 # ---------------------------------------------------------------------------
 
 def test_U_C_07_shared_scope_loaded():
-    """_LEGACY_MAP and _SHARED_SCOPE must be loaded from scope_registry.json."""
+    """_LEGACY_MAP and _EXTRACTABLE_DOMAINS must be loaded from scope_registry.json."""
     assert _LEGACY_MAP and all(isinstance(v, str) and v for v in _LEGACY_MAP.values()), \
         f"_LEGACY_MAP must be non-empty with string scope_ids. Got: {_LEGACY_MAP!r}"
-    assert isinstance(_SHARED_SCOPE, str) and _SHARED_SCOPE, \
-        f"_SHARED_SCOPE must be a non-empty string. Got: {_SHARED_SCOPE!r}"
+    assert isinstance(_EXTRACTABLE_DOMAINS, frozenset) and _EXTRACTABLE_DOMAINS, \
+        f"_EXTRACTABLE_DOMAINS must be a non-empty frozenset. Got: {_EXTRACTABLE_DOMAINS!r}"
 
 
 # ---------------------------------------------------------------------------

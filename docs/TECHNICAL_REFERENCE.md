@@ -564,7 +564,7 @@ This is what feeds the source-span guard. Fields without a `hint` in AP0 do not 
 
 `build_system_context()` assembles the AGV system prompt (used for Passes 4a, 4b, 4c):
 
-1. Loads `config/industry_readme.md` (domain knowledge)
+1. Loads `config/industry_readme_{slug}.md` for the given domain slug (domain knowledge); raises FileNotFoundError if slug file is absent — run generate_all.py
 2. Iterates all FieldSpec entries; deduplicates by field_name; separates KO and COND_KO fields
 3. Builds `## Field-level descriptions` section from `spec.user_description`
 4. Appends 9 critical matching rules (conservative extraction, anti-hallucination, etc.)

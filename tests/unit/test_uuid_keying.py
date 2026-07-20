@@ -26,6 +26,9 @@ def test_T_UUID_02_passthrough_non_ap0_keys():
     result = _criteria_to_uuid_keyed({"is_agv_amr": True, "summary": "test"})
     assert result.get("is_agv_amr") is True
     assert result.get("summary") == "test"
+    result_with_domain = _criteria_to_uuid_keyed({"detected_domain": "Logistics:AGV", "summary": "test"})
+    assert result_with_domain.get("detected_domain") == "Logistics:AGV", \
+        "detected_domain must pass through uuid_keying unchanged"
 
 
 def test_T_UUID_03_tender_requirements_reads_uuid_keyed_dict():

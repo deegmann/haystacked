@@ -176,19 +176,24 @@ def test_T_CON_04_field_meta_sheet_for_all_KO_fields():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_CON_05_vt_config_contains_all_vt_types():
-    """The __vt_config__.vehicle_types list must contain every VT name from
-    vehicle_types.json scoring_bucket_map.keys().  If a new VT is added to AP0
-    but not to scoring_bucket_map, the frontend cannot build its column groups."""
-    vt_cfg = _load("vehicle_types.json")
-    expected_vts = list(vt_cfg.get("scoring_bucket_map", {}).keys())
-    assert expected_vts, "scoring_bucket_map in vehicle_types.json must not be empty"
+    """The __vt_config__.vehicle_types list must contain every VT canonical name
+    from scope_registry.json (scopes with a scoring_bucket).  If a new VT is added
+    to AP0 but not emitted to scope_registry.json, the frontend cannot build its
+    column groups.  (scoring_bucket_map retired to scope_registry.json in Step 7.)"""
+    sr = _load("scope_registry.json")
+    expected_vts = [
+        n["canonical_name"]
+        for n in sr.get("scopes", {}).values()
+        if n.get("canonical_name") and n.get("scoring_bucket")
+    ]
+    assert expected_vts, "No scopes with canonical_name + scoring_bucket in scope_registry.json"
 
-    # Replicate the /api/field-meta __vt_config__ construction
-    vt_config_vehicle_types = list(vt_cfg.get("scoring_bucket_map", {}).keys())
+    # Replicate the /api/field-meta __vt_config__ construction (now reads from _VALID_VTS)
+    vt_config_vehicle_types = expected_vts  # _VALID_VTS is built from the same source
 
     missing = [vt for vt in expected_vts if vt not in vt_config_vehicle_types]
     assert not missing, (
-        f"VT types from scoring_bucket_map missing from __vt_config__: {missing}"
+        f"VT types from scope_registry.json missing from __vt_config__: {missing}"
     )
 
 
@@ -208,16 +213,19 @@ def test_T_CON_05b_shared_scope_consistent():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_T_CON_06_each_vt_has_at_least_one_hint():
-    """Each VT name from scoring_bucket_map must resolve to a scope_id in
-    scope_registry.json legacy_map, and at least one field in fields.json
-    must have that scope_id and a hint.  A VT with zero hints cannot provide
-    LLM extraction prompts for its fields."""
-    vt_cfg = _load("vehicle_types.json")
+    """Each VT canonical name from scope_registry.json must resolve to a scope_id
+    in legacy_map, and at least one field in fields.json must have that scope_id
+    and a hint.  A VT with zero hints cannot provide LLM extraction prompts.
+    (scoring_bucket_map retired to scope_registry.json in Step 7.)"""
     fields = _load("fields.json")
     sr = _load("scope_registry.json")
     legacy_map = sr.get("legacy_map", {})
 
-    vt_names = list(vt_cfg.get("scoring_bucket_map", {}).keys())
+    vt_names = [
+        n["canonical_name"]
+        for n in sr.get("scopes", {}).values()
+        if n.get("canonical_name") and n.get("scoring_bucket")
+    ]
     empty_vts: list[str] = []
     for vt in vt_names:
         scope_id = legacy_map.get(vt, "")
@@ -254,25 +262,26 @@ def test_T_UI_01_field_meta_vt_config_complete():
     """__vt_config__ block in /api/field-meta must contain:
     - shared_scope (non-empty scope_id, matching scope_registry.json)
     - legacy_map (non-empty, matching scope_registry.json)
-    - vehicle_types (list of all VT names from scoring_bucket_map)
+    - vehicle_types (list of all VT names from scope_registry.json scopes with scoring_bucket)
 
-    The endpoint builds this block from scope_registry.json + vehicle_types.json so this
-    is primarily a contract test — if the config key names ever drift the
-    frontend column-grouping silently breaks.
+    The endpoint builds this block entirely from scope_registry.json (Step 7 migration).
     """
     sr = _load("scope_registry.json")
-    vt_cfg = _load("vehicle_types.json")
 
     expected_shared  = next(
         (data["scope_id"] for data in sr["scopes"].values() if data.get("parent") == "*"),
         ""
     )
     expected_lm  = sr.get("legacy_map", {})
-    expected_vts = list(vt_cfg.get("scoring_bucket_map", {}).keys())
+    expected_vts = [
+        n["canonical_name"]
+        for n in sr.get("scopes", {}).values()
+        if n.get("canonical_name") and n.get("scoring_bucket")
+    ]
 
     assert expected_shared, "scope_registry.json must have a scope with parent='*'"
     assert expected_lm,     "scope_registry.json must have a non-empty legacy_map"
-    assert expected_vts,    "scoring_bucket_map must be non-empty in vehicle_types.json"
+    assert expected_vts,    "scope_registry.json must have scopes with canonical_name + scoring_bucket"
 
     assert expected_shared == expected_shared, "shared_scope is self-consistent"
     assert expected_lm == expected_lm, "legacy_map is self-consistent"
@@ -321,28 +330,47 @@ def test_T_UI_03_agv_type_field_present_in_extensions_columns():
 
 
 def test_T_UI_03b_agv_type_allowed_values_match_vt_names():
-    """The allowed_values for agv_type in fields.json must be identical to
-    scoring_bucket_map.keys() in vehicle_types.json.  If they diverge, the UI
-    VT filter will hide rows it should show (or show rows it should hide)."""
+    """The allowed_values for agv_type in fields.json must equal the set of all
+    canonical_names in scope_registry.json.  After Phase 2, agv_type scope='*'
+    (Global) and @SCOPE_CANONICAL_NAMES expands to every domain's canonical_name,
+    so the check is platform-wide rather than per-domain.
+    (scoring_bucket_map retired to scope_registry.json in Step 7.)"""
     fields = _load("fields.json")
-    vt_cfg = _load("vehicle_types.json")
+    sr = _load("scope_registry.json")
 
     agv_type_spec = next(
         (v for v in fields.values() if v.get("field_name") == "agv_type"), None
     )
     assert agv_type_spec, "agv_type field not found in fields.json"
 
-    fs_allowed   = set(agv_type_spec.get("allowed_values") or [])
-    vt_canonical = set(vt_cfg.get("scoring_bucket_map", {}).keys())
+    agv_domain = agv_type_spec.get("scope", "")
+    fs_allowed = set(agv_type_spec.get("allowed_values") or [])
+
+    if agv_domain == "*":
+        # Global field: must match ALL canonical_names across all scopes
+        vt_canonical = {
+            n["canonical_name"]
+            for n in sr.get("scopes", {}).values()
+            if n.get("canonical_name")
+        }
+    else:
+        # Domain-scoped field: match canonical_names within that domain only
+        domain_prefix = agv_domain + ":"
+        vt_canonical = {
+            n["canonical_name"]
+            for sid, n in sr.get("scopes", {}).items()
+            if n.get("canonical_name") and n.get("scoring_bucket")
+            and sid.startswith(domain_prefix)
+        }
 
     assert fs_allowed,   "agv_type allowed_values must not be empty in fields.json"
-    assert vt_canonical, "scoring_bucket_map must not be empty in vehicle_types.json"
+    assert vt_canonical, "scope_registry.json must have scopes with canonical_name in the expected domain"
 
     diff = fs_allowed.symmetric_difference(vt_canonical)
     assert not diff, (
-        f"agv_type allowed_values and scoring_bucket_map.keys() must be identical.\n"
-        f"In fields.json but not scoring_bucket_map: {fs_allowed - vt_canonical}\n"
-        f"In scoring_bucket_map but not fields.json: {vt_canonical - fs_allowed}"
+        f"agv_type allowed_values and scope_registry.json canonical_names (domain={agv_domain}) must be identical.\n"
+        f"In fields.json but not scope_registry: {fs_allowed - vt_canonical}\n"
+        f"In scope_registry but not fields.json: {vt_canonical - fs_allowed}"
     )
 
 

@@ -13,17 +13,93 @@
     "Logistics:AGV:Forklift": {
       "scope_id": "Logistics:AGV:Forklift",
       "parent": "Logistics:AGV",
-      "tab_name": "AGV_Forklift"
+      "tab_name": "AGV_Forklift",
+      "canonical_name": "Forklift AGV",
+      "classification_guide": "* \"VNA\" → AGV stores/retrieves in very narrow aisles (<2m), lifts to tall racking (>8m), high-bay warehouse. ONLY classify as VNA if the tender explicitly requires VNA capability for the AGVs being procured. If VNA racking is mentioned as existing infrastructure, historical context, or out-of-scope aisles not covered by this tender — do NOT classify as VNA. Signals: aisle<2m, lift>8m, high-bay, VNA keyword\n* \"Very Narrow Aisle\" → Same as VNA\n* \"Reach Truck\" → AGV picks/places in medium-width racking aisles (2–3m), lift 4–8m. Signals: 2–3m aisle, racking, lift 4–8m\n* \"Counterbalanced\" → AGV transports pallets on wide aisles (≥3m) or open floor between fixed transfer stations, floor-level pickup/deposit. USE THIS for heavy pallet transport (>1000 kg) in F&B, food production, or manufacturing environments — even when MES or OPC-UA integration is mentioned. The presence of filling lines or MES does NOT imply Mobile AMR if payload is heavy. Signals: ≥3m aisle, floor transport, transfer stations, warehouse/logistics, heavy pallet (>1000 kg)\n* \"Forklift\" → Generic forklift AGV",
+      "scope_variants": [
+        "vna",
+        "very narrow aisle",
+        "reach truck",
+        "counterbalanced",
+        "forklift",
+        "forklift agv",
+        "agv"
+      ],
+      "scope_keywords": [
+        "vna",
+        "very narrow aisle",
+        "reach truck",
+        "schmalgangstapler",
+        "counterbalanced",
+        "forklift",
+        "stapler",
+        "gabelstapler",
+        "forklift agv",
+        "agv"
+      ],
+      "vna_applicable": true,
+      "scoring_bucket": "forklift_specific",
+      "vna_hint": "VNA (very narrow aisle) operation is required."
     },
     "Logistics:AGV:Tugger": {
       "scope_id": "Logistics:AGV:Tugger",
       "parent": "Logistics:AGV",
-      "tab_name": "AGV_Tugger"
+      "tab_name": "AGV_Tugger",
+      "canonical_name": "Tugger AGV",
+      "classification_guide": "* \"Tugger\" → AGV tows a train of trolleys/trailers without lifting; no direct pallet fork interface. Signals: trailer train, towing, milk run",
+      "scope_variants": [
+        "tugger",
+        "tugger agv"
+      ],
+      "scope_keywords": [
+        "tugger",
+        "schlepper",
+        "routenzug",
+        "milk run",
+        "towing",
+        "anhaenger",
+        "tugger agv"
+      ],
+      "scoring_bucket": "tugger_specific"
     },
     "Logistics:AGV:AMR": {
       "scope_id": "Logistics:AGV:AMR",
       "parent": "Logistics:AGV",
-      "tab_name": "AGV_AMR"
+      "tab_name": "AGV_AMR",
+      "canonical_name": "Mobile AMR",
+      "classification_guide": "* \"Mobile AMR\" → Autonomous robot in PRODUCTION or MANUFACTURING environment (filling lines, assembly, processing), or with conveyor/shelf top modules, SLAM navigation, dispatched from MES/WMS. ONLY use for LIGHT payloads (typically <1000 kg). If payload >1000 kg or if the task is heavy pallet transport → use Forklift AGV instead. Signals: production, filling lines, manufacturing, SLAM, MES — BUT only if payload <1000 kg\n* \"Underride AMR\" → Robot slides under carts/dollies and lifts them a few cm for transport. Signals: underride, dolly, cart",
+      "scope_variants": [
+        "amr",
+        "mobile amr",
+        "underride",
+        "underride amr",
+        "autonomous mobile robot"
+      ],
+      "scope_keywords": [
+        "amr",
+        "mobile robot",
+        "fahrroboter",
+        "autonomer",
+        "goods-to-person",
+        "goods to person",
+        "underride amr",
+        "unterfahrfahrzeug",
+        "underride",
+        "autonomous mobile robot"
+      ],
+      "scoring_bucket": "amr_specific"
+    },
+    "FoodBev:Refrigeration": {
+      "scope_id": "FoodBev:Refrigeration",
+      "parent": "*",
+      "tab_name": "",
+      "canonical_name": "Industrial Refrigeration",
+      "classification_guide": "* \"Industrial Refrigeration\" → Industrial refrigeration system for food & beverage: process cooling, cold storage, or deep-freeze applications. Keywords: Kälteanlage, Kältetechnik, refrigeration, industrial cooling, cold store, deep freeze, blast freezer.",
+      "scope_variants": [
+        "Process Cooling",
+        "Cold Store",
+        "Deep Freeze"
+      ]
     }
   },
   "resolution_order": {
@@ -41,11 +117,112 @@
       "*",
       "Logistics:AGV",
       "Logistics:AGV:AMR"
+    ],
+    "FoodBev:Refrigeration": [
+      "*",
+      "FoodBev:Refrigeration"
     ]
   },
   "legacy_map": {
     "Forklift AGV": "Logistics:AGV:Forklift",
+    "vna": "Logistics:AGV:Forklift",
+    "very narrow aisle": "Logistics:AGV:Forklift",
+    "reach truck": "Logistics:AGV:Forklift",
+    "counterbalanced": "Logistics:AGV:Forklift",
+    "forklift": "Logistics:AGV:Forklift",
+    "forklift agv": "Logistics:AGV:Forklift",
+    "agv": "Logistics:AGV:Forklift",
     "Tugger AGV": "Logistics:AGV:Tugger",
-    "Mobile AMR": "Logistics:AGV:AMR"
+    "tugger": "Logistics:AGV:Tugger",
+    "tugger agv": "Logistics:AGV:Tugger",
+    "Mobile AMR": "Logistics:AGV:AMR",
+    "amr": "Logistics:AGV:AMR",
+    "mobile amr": "Logistics:AGV:AMR",
+    "underride": "Logistics:AGV:AMR",
+    "underride amr": "Logistics:AGV:AMR",
+    "autonomous mobile robot": "Logistics:AGV:AMR",
+    "Industrial Refrigeration": "FoodBev:Refrigeration",
+    "Process Cooling": "FoodBev:Refrigeration",
+    "Cold Store": "FoodBev:Refrigeration",
+    "Deep Freeze": "FoodBev:Refrigeration"
+  },
+  "variant_map": {
+    "vna": "Forklift AGV",
+    "very narrow aisle": "Forklift AGV",
+    "reach truck": "Forklift AGV",
+    "counterbalanced": "Forklift AGV",
+    "forklift": "Forklift AGV",
+    "forklift agv": "Forklift AGV",
+    "agv": "Forklift AGV",
+    "tugger": "Tugger AGV",
+    "tugger agv": "Tugger AGV",
+    "amr": "Mobile AMR",
+    "mobile amr": "Mobile AMR",
+    "underride": "Mobile AMR",
+    "underride amr": "Mobile AMR",
+    "autonomous mobile robot": "Mobile AMR",
+    "process cooling": "Industrial Refrigeration",
+    "cold store": "Industrial Refrigeration",
+    "deep freeze": "Industrial Refrigeration"
+  },
+  "agv_detection_keywords": [
+    "vna",
+    "very narrow aisle",
+    "reach truck",
+    "schmalgangstapler",
+    "counterbalanced",
+    "forklift",
+    "stapler",
+    "gabelstapler",
+    "forklift agv",
+    "agv",
+    "tugger",
+    "schlepper",
+    "routenzug",
+    "milk run",
+    "towing",
+    "anhaenger",
+    "tugger agv",
+    "amr",
+    "mobile robot",
+    "fahrroboter",
+    "autonomer",
+    "goods-to-person",
+    "goods to person",
+    "underride amr",
+    "unterfahrfahrzeug",
+    "underride",
+    "autonomous mobile robot"
+  ],
+  "domain_keywords": {
+    "Logistics:AGV": [
+      "vna",
+      "very narrow aisle",
+      "reach truck",
+      "schmalgangstapler",
+      "counterbalanced",
+      "forklift",
+      "stapler",
+      "gabelstapler",
+      "forklift agv",
+      "agv",
+      "tugger",
+      "schlepper",
+      "routenzug",
+      "milk run",
+      "towing",
+      "anhaenger",
+      "tugger agv",
+      "amr",
+      "mobile robot",
+      "fahrroboter",
+      "autonomer",
+      "goods-to-person",
+      "goods to person",
+      "underride amr",
+      "unterfahrfahrzeug",
+      "underride",
+      "autonomous mobile robot"
+    ]
   }
 }

@@ -225,6 +225,31 @@
     "display_mode": null,
     "value_if_null": null
   },
+  "325dd61d-f828-4639-a128-fd5e1a1a3728": {
+    "uuid": "325dd61d-f828-4639-a128-fd5e1a1a3728",
+    "field_name": "agv_type",
+    "tender_key": "required_agv_type",
+    "entity": "Product",
+    "scope": "*",
+    "level": "KO",
+    "operator": "KO_IF_NEQ",
+    "data_type": "Dropdown",
+    "unit": null,
+    "allowed_values": [
+      "Forklift AGV",
+      "Industrial Refrigeration",
+      "Mobile AMR",
+      "Tugger AGV"
+    ],
+    "score_function": null,
+    "threshold_a": null,
+    "threshold_b": null,
+    "scoring_weight": null,
+    "hint": "AGV/AMR category. Output exactly one of the allowed values. Hard K.O.: Forklift AGV never matches Tugger or AMR.",
+    "user_description": "What AGV type is required? (automatically detected from the document)",
+    "display_mode": "display",
+    "value_if_null": null
+  },
   "18b0abbe-33f3-4dbc-b03e-cb9fdb216fb8": {
     "uuid": "18b0abbe-33f3-4dbc-b03e-cb9fdb216fb8",
     "field_name": "navigation_type",
@@ -1132,30 +1157,6 @@
     "hint": "Verticals with live references. Source: 'industries / case studies'. Weigh F&B references for the target market.",
     "user_description": "In which industry will the AGV be used?",
     "display_mode": null,
-    "value_if_null": null
-  },
-  "325dd61d-f828-4639-a128-fd5e1a1a3728": {
-    "uuid": "325dd61d-f828-4639-a128-fd5e1a1a3728",
-    "field_name": "agv_type",
-    "tender_key": "required_agv_type",
-    "entity": "Product",
-    "scope": "Logistics:AGV",
-    "level": "KO",
-    "operator": "KO_IF_NEQ",
-    "data_type": "Dropdown",
-    "unit": null,
-    "allowed_values": [
-      "Forklift AGV",
-      "Tugger AGV",
-      "Mobile AMR"
-    ],
-    "score_function": null,
-    "threshold_a": null,
-    "threshold_b": null,
-    "scoring_weight": null,
-    "hint": "AGV/AMR category. Output exactly one of the allowed values. Hard K.O.: Forklift AGV never matches Tugger or AMR.",
-    "user_description": "What AGV type is required? (automatically detected from the document)",
-    "display_mode": "display",
     "value_if_null": null
   },
   "fe2f41c5-b630-4b4f-b6e7-2388eded0882": {

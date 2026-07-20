@@ -30,7 +30,7 @@ And writes all of these:
 | `config/prompts/nace_template.txt` | NACE classification prompt | `app.py` |
 | `config/prompts/contact_template.txt` | Contact fallback prompt | `app.py` |
 | `config/prompts/*_system.txt` | LLM system prompts (role definitions) | `app.py` |
-| `config/industry_readme.md` | Domain knowledge synced from `Spec/haystacked_industry_readme.md` | `src/context_builder.py` |
+| `config/industry_readme_{slug}.md` | Domain knowledge synced from `Spec/haystacked_industry_readme_{slug}.md` (one per domain) | `src/context_builder.py` |
 | `config/ap0_checksum.txt` | MD5 of AP0 xlsx for startup auto-regen | `app.py` |
 
 **After any AP0 xlsx change, run:**
@@ -215,11 +215,11 @@ If you need a new scoring rule that is not in this list, that requires a Python 
 The AGV extraction system prompt is assembled from two sources:
 
 1. **Field hints** (Description column in AP0 xlsx) — field-specific extraction instructions, updated via the process above
-2. **Industry README** (`Spec/haystacked_industry_readme.md`) — high-level domain knowledge about AGV/AMR types, VNA, G2P, OEM rebadging, battery types, VDA 5050, etc.
+2. **Industry README** (`Spec/haystacked_industry_readme_{slug}.md` per domain) — high-level domain knowledge about AGV/AMR types, VNA, G2P, OEM rebadging, battery types, VDA 5050, etc.
 
-To update the industry domain knowledge: edit `Spec/haystacked_industry_readme.md` directly. When `generate_all.py` runs, it syncs this file to `config/industry_readme.md` (the runtime copy). `context_builder.py` reads `config/industry_readme.md` when building the system prompt.
+To update the industry domain knowledge: edit `Spec/haystacked_industry_readme_{slug}.md` for the relevant domain directly. When `generate_all.py` runs, it syncs each file to `config/industry_readme_{slug}.md` (the runtime copy). `context_builder.py` reads `config/industry_readme_{slug}.md` when building the system prompt.
 
-Do not edit `config/industry_readme.md` directly — it will be overwritten.
+Do not edit `config/industry_readme_{slug}.md` files directly — they will be overwritten.
 
 ---
 
