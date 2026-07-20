@@ -182,7 +182,7 @@ def import_base_models(entries):
         records.append(omit_none({
             "base_model_name": e["product"],
             "base_model_id": str(uuid.uuid4()),
-            "agv_type": cast_value("Base Models", "agv_type", e["agv_type"]),
+            "product_type": cast_value("Base Models", "product_type", e["product_type"]),
         }))
     created = batch_create("base_models", records)
     print(f"    {len(created)} Base Models")
@@ -199,7 +199,7 @@ def import_products(entries, company_name_to_id, bm_ids):
             "product_id": str(uuid.uuid4()),
             "company_id": [co_at_id] if co_at_id else None,
             "base_model_id": [bm_ids[i]] if i < len(bm_ids) else None,
-            "agv_type": cast_value("Products", "agv_type", e["agv_type"]),
+            "product_type": cast_value("Products", "product_type", e["product_type"]),
             "active": True,
             "source_notes": cast_value("Products", "source_notes", source_notes) if source_notes else None,
         }))
@@ -216,7 +216,7 @@ def import_extensions(entries, bm_ids):
             "model_name": e["product"],
             "extension_id": str(uuid.uuid4()),
             "base_model_id": [bm_ids[i]] if i < len(bm_ids) else None,
-            "agv_type": cast_value("Base Model Extensions", "agv_type", e["agv_type"]),
+            "product_type": cast_value("Base Model Extensions", "product_type", e["product_type"]),
             "source_notes": cast_value("Base Model Extensions", "source_notes", source_notes) if source_notes else None,
         })
         for key, val in e["specs"].items():

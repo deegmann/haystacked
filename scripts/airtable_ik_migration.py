@@ -3,7 +3,7 @@
 One-shot migration: add IK (Industriekälteanlagen) suppliers to Airtable.
 
 Steps:
-  1. Add 'Process Cooling', 'Cold Store', 'Deep Freeze' to agv_type singleSelect
+  1. Add 'Process Cooling', 'Cold Store', 'Deep Freeze' to product_type singleSelect
      in Base Models, Products, and Base Model Extensions tables
   2. Add 11 IK-specific fields to Base Model Extensions
   3. Create 3 company records (GEA, Güntner, Bitzer)
@@ -94,14 +94,14 @@ def get_table_schema():
     return {t["name"]: t for t in data["tables"]}
 
 
-def step1_extend_agv_type(schema):
-    """New agv_type choices are added automatically via typecast=True during record creation.
+def step1_extend_product_type(schema):
+    """New product_type choices are added automatically via typecast=True during record creation.
     This step verifies the current state and reports — no API call needed."""
-    print("\nStep 1: agv_type choices — auto-extended via typecast=True during record creation.")
+    print("\nStep 1: product_type choices — auto-extended via typecast=True during record creation.")
     target_tables = ["Base Models", "Products", "Base Model Extensions"]
     for tname in target_tables:
         t = schema[tname]
-        agv_field = next(f for f in t["fields"] if f["name"] == "agv_type")
+        agv_field = next(f for f in t["fields"] if f["name"] == "product_type")
         existing  = {c["name"] for c in agv_field["options"]["choices"]}
         missing   = [n for n in NEW_AGV_TYPES if n not in existing]
         if not missing:
@@ -145,7 +145,7 @@ def _fetch_all(table_key):
 
 def _create_record(table_key, fields):
     url = f"{DATA_URL}/{TABLE_IDS[table_key]}"
-    # typecast=True auto-extends singleSelect choices for new values (e.g. agv_type)
+    # typecast=True auto-extends singleSelect choices for new values (e.g. product_type)
     result = _post(url, {"fields": fields, "typecast": True})
     return result["id"]  # Airtable record ID
 
@@ -210,9 +210,9 @@ def step4_create_base_models():
     existing = {r["fields"].get("base_model_name"): r["id"] for r in _fetch_all("base_models")}
 
     models = [
-        {"base_model_name": "GEA BluAstrum NH3 Chiller Plant",      "base_model_id": str(uuid.uuid4()), "agv_type": "Process Cooling"},
-        {"base_model_name": "Güntner GASC-AHE Cold Store Unit",     "base_model_id": str(uuid.uuid4()), "agv_type": "Cold Store"},
-        {"base_model_name": "BITZER COSS Transcritical CO2 System",  "base_model_id": str(uuid.uuid4()), "agv_type": "Deep Freeze"},
+        {"base_model_name": "GEA BluAstrum NH3 Chiller Plant",      "base_model_id": str(uuid.uuid4()), "product_type": "Process Cooling"},
+        {"base_model_name": "Güntner GASC-AHE Cold Store Unit",     "base_model_id": str(uuid.uuid4()), "product_type": "Cold Store"},
+        {"base_model_name": "BITZER COSS Transcritical CO2 System",  "base_model_id": str(uuid.uuid4()), "product_type": "Deep Freeze"},
     ]
 
     result = {}
@@ -237,7 +237,7 @@ def step5_create_products(co_ids, bm_ids):
         {
             "product_name":        "GEA BluAstrum Ammonia Chiller",
             "product_id":          str(uuid.uuid4()),
-            "agv_type":            "Process Cooling",
+            "product_type":            "Process Cooling",
             "active":              True,
             "reference_count":     0,
             "product_description": "Industrial ammonia (R717) chiller plant for process cooling in F&B production environments. Designed for dairy, brewing, and food processing applications.",
@@ -247,7 +247,7 @@ def step5_create_products(co_ids, bm_ids):
         {
             "product_name":        "Güntner GASC Cold Store Cooler",
             "product_id":          str(uuid.uuid4()),
-            "agv_type":            "Cold Store",
+            "product_type":            "Cold Store",
             "active":              True,
             "reference_count":     0,
             "product_description": "Air cooler unit for refrigerated cold store rooms and warehouses. Multi-refrigerant capable (R744/R134a). Designed for fresh produce and food logistics applications.",
@@ -257,7 +257,7 @@ def step5_create_products(co_ids, bm_ids):
         {
             "product_name":        "BITZER COSS Deep-Freeze System",
             "product_id":          str(uuid.uuid4()),
-            "agv_type":            "Deep Freeze",
+            "product_type":            "Deep Freeze",
             "active":              True,
             "reference_count":     0,
             "product_description": "Transcritical CO2 (R744) booster system for deep-freeze storage and blast freezing in industrial food production and frozen logistics.",
@@ -289,7 +289,7 @@ def step6_create_extensions(bm_ids):
             "model_name":               "GEA BluAstrum NH3 Chiller Plant",
             "extension_id":             str(uuid.uuid4()),
             "base_model_id":            [bm_ids["GEA BluAstrum NH3 Chiller Plant"]],
-            "agv_type":                 "Process Cooling",
+            "product_type":                 "Process Cooling",
             # IK fields
             "cooling_capacity_kw":      500.0,
             "temperature_min_celsius":  2.0,
@@ -306,7 +306,7 @@ def step6_create_extensions(bm_ids):
             "model_name":               "Güntner GASC-AHE Cold Store Unit",
             "extension_id":             str(uuid.uuid4()),
             "base_model_id":            [bm_ids["Güntner GASC-AHE Cold Store Unit"]],
-            "agv_type":                 "Cold Store",
+            "product_type":                 "Cold Store",
             # IK fields
             "cooling_capacity_kw":      120.0,
             "temperature_min_celsius":  0.0,
@@ -325,7 +325,7 @@ def step6_create_extensions(bm_ids):
             "model_name":               "BITZER COSS Transcritical CO2 System",
             "extension_id":             str(uuid.uuid4()),
             "base_model_id":            [bm_ids["BITZER COSS Transcritical CO2 System"]],
-            "agv_type":                 "Deep Freeze",
+            "product_type":                 "Deep Freeze",
             # IK fields
             "cooling_capacity_kw":              350.0,
             "temperature_min_celsius":          -25.0,
@@ -358,7 +358,7 @@ def main():
 
     schema  = get_table_schema()
 
-    step1_extend_agv_type(schema)
+    step1_extend_product_type(schema)
     step2_add_ik_fields(schema)
 
     co_ids  = step3_create_companies()

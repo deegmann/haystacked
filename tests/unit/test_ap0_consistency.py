@@ -316,37 +316,37 @@ def test_T_UI_02_all_KO_fields_have_scope_in_field_meta():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T-UI-03 — agv_type field present and valid in supplier data
+# T-UI-03 — product_type field present and valid in supplier data
 # ─────────────────────────────────────────────────────────────────────────────
 
-def test_T_UI_03_agv_type_field_present_in_extensions_columns():
-    """agv_type must be in extensions_columns so that /api/suppliers exposes it.
-    The frontend uses agv_type to filter supplier rows by selected VT."""
+def test_T_UI_03_product_type_field_present_in_extensions_columns():
+    """product_type must be in extensions_columns so that /api/suppliers exposes it.
+    The frontend uses product_type to filter supplier rows by selected VT."""
     schema = _load("sqlite_schema.json")
     ext_cols = schema["extensions_columns"]
-    assert "agv_type" in ext_cols, (
-        "agv_type must be in extensions_columns — UI VT row-filter depends on it"
+    assert "product_type" in ext_cols, (
+        "product_type must be in extensions_columns — UI VT row-filter depends on it"
     )
 
 
-def test_T_UI_03b_agv_type_allowed_values_match_vt_names():
-    """The allowed_values for agv_type in fields.json must equal the set of all
-    canonical_names in scope_registry.json.  After Phase 2, agv_type scope='*'
+def test_T_UI_03b_product_type_allowed_values_match_vt_names():
+    """The allowed_values for product_type in fields.json must equal the set of all
+    canonical_names in scope_registry.json.  After Phase 2, product_type scope='*'
     (Global) and @SCOPE_CANONICAL_NAMES expands to every domain's canonical_name,
     so the check is platform-wide rather than per-domain.
     (scoring_bucket_map retired to scope_registry.json in Step 7.)"""
     fields = _load("fields.json")
     sr = _load("scope_registry.json")
 
-    agv_type_spec = next(
-        (v for v in fields.values() if v.get("field_name") == "agv_type"), None
+    product_type_spec = next(
+        (v for v in fields.values() if v.get("field_name") == "product_type"), None
     )
-    assert agv_type_spec, "agv_type field not found in fields.json"
+    assert product_type_spec, "product_type field not found in fields.json"
 
-    agv_domain = agv_type_spec.get("scope", "")
-    fs_allowed = set(agv_type_spec.get("allowed_values") or [])
+    product_domain = product_type_spec.get("scope", "")
+    fs_allowed = set(product_type_spec.get("allowed_values") or [])
 
-    if agv_domain == "*":
+    if product_domain == "*":
         # Global field: must match ALL canonical_names across all scopes
         vt_canonical = {
             n["canonical_name"]
@@ -355,7 +355,7 @@ def test_T_UI_03b_agv_type_allowed_values_match_vt_names():
         }
     else:
         # Domain-scoped field: match canonical_names within that domain only
-        domain_prefix = agv_domain + ":"
+        domain_prefix = product_domain + ":"
         vt_canonical = {
             n["canonical_name"]
             for sid, n in sr.get("scopes", {}).items()
@@ -363,24 +363,24 @@ def test_T_UI_03b_agv_type_allowed_values_match_vt_names():
             and sid.startswith(domain_prefix)
         }
 
-    assert fs_allowed,   "agv_type allowed_values must not be empty in fields.json"
+    assert fs_allowed,   "product_type allowed_values must not be empty in fields.json"
     assert vt_canonical, "scope_registry.json must have scopes with canonical_name in the expected domain"
 
     diff = fs_allowed.symmetric_difference(vt_canonical)
     assert not diff, (
-        f"agv_type allowed_values and scope_registry.json canonical_names (domain={agv_domain}) must be identical.\n"
+        f"product_type allowed_values and scope_registry.json canonical_names (domain={product_domain}) must be identical.\n"
         f"In fields.json but not scope_registry: {fs_allowed - vt_canonical}\n"
         f"In scope_registry but not fields.json: {vt_canonical - fs_allowed}"
     )
 
 
-def test_T_UI_03c_agv_type_in_fields_json():
-    """agv_type must be a field in fields.json so that /api/suppliers can
+def test_T_UI_03c_product_type_in_fields_json():
+    """product_type must be a field in fields.json so that /api/suppliers can
     expose it via the values dict."""
     fields = _load("fields.json")
-    agv_type_spec = next((v for v in fields.values() if v.get("field_name") == "agv_type"), None)
-    assert agv_type_spec is not None, (
-        "agv_type must be present in fields.json — /api/suppliers reads it via values dict"
+    product_type_spec = next((v for v in fields.values() if v.get("field_name") == "product_type"), None)
+    assert product_type_spec is not None, (
+        "product_type must be present in fields.json — /api/suppliers reads it via values dict"
     )
 
 
@@ -519,34 +519,34 @@ client = _TestClient(_app)
 
 
 def test_T_DM_01_fields_json_has_display_mode_for_pipeline_fields():
-    """fields.json must have display_mode='display' for agv_type and vna_capable.
+    """fields.json must have display_mode='display' for product_type and vna_capable.
     These are pipeline-derived fields set by VT classification and VNA detection,
     not user-editable criteria. Verifies AP0 → generate_all.py → fields.json chain."""
     fields = _load("fields.json")
 
-    agv_type_spec  = next((v for v in fields.values() if v.get("field_name") == "agv_type"),  {})
+    product_type_spec  = next((v for v in fields.values() if v.get("field_name") == "product_type"),  {})
     vna_cap_spec   = next((v for v in fields.values() if v.get("field_name") == "vna_capable"), {})
 
-    assert agv_type_spec.get("display_mode") == "display", \
-        "agv_type must have display_mode='display' in fields.json"
+    assert product_type_spec.get("display_mode") == "display", \
+        "product_type must have display_mode='display' in fields.json"
     assert vna_cap_spec.get("display_mode") == "display", \
         "vna_capable must have display_mode='display' in fields.json"
 
 
 def test_T_DM_02_field_meta_display_mode_for_pipeline_tender_keys():
     """/api/field-meta must return display_mode='display' for both
-    the db_key (agv_type) and the tender_key clone (required_agv_type).
+    the db_key (product_type) and the tender_key clone (required_product_type).
     The clone propagates display_mode via {**entry} in the endpoint."""
     response = client.get("/api/field-meta")
     assert response.status_code == 200
     meta = response.json()
 
     # db_key entry
-    assert meta.get("agv_type", {}).get("display_mode") == "display", \
-        "agv_type must have display_mode='display' in /api/field-meta"
+    assert meta.get("product_type", {}).get("display_mode") == "display", \
+        "product_type must have display_mode='display' in /api/field-meta"
     # tender_key clone — this is what the frontend keyed by
-    assert meta.get("required_agv_type", {}).get("display_mode") == "display", \
-        "required_agv_type clone must have display_mode='display'"
+    assert meta.get("required_product_type", {}).get("display_mode") == "display", \
+        "required_product_type clone must have display_mode='display'"
     assert meta.get("required_vna_capable", {}).get("display_mode") == "display", \
         "required_vna_capable clone must have display_mode='display'"
 
@@ -610,7 +610,7 @@ def test_T_DM_05_to_dict_contains_debug_table_fields():
         company_id="co",
         base_model_id="bm",
         product_name="Test",
-        agv_type="Forklift AGV",
+        product_type="Forklift AGV",
     )
     values = {s.uuid: FieldValue(spec=s, value=None) for s in specs}
     record = SupplierRecord(product=product, values=values)

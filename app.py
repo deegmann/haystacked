@@ -18,7 +18,7 @@ from src.field_spec import load_fields, fields_by_tender_key, fields_by_field_na
 # ── New structured matching engine (AP-I1) ────────────────────────────────────
 from src.data_loader import load_suppliers
 from src.matching import match_suppliers_new, TenderRequirements, Matcher
-from src.context_builder import agv_type_keyword_fallback, build_system_context, AGV_KEYWORDS
+from src.context_builder import product_type_keyword_fallback, build_system_context, AGV_KEYWORDS
 from src.tender_store import init_db, build_tender_run, persist_tender_run
 _SUPPLIERS = load_suppliers()
 log_setup = logging.getLogger("haystacked")
@@ -524,7 +524,7 @@ async def analyze(file: UploadFile = File(...)):
             yield sse("log",  {"message": f"Loaded cached extraction: vehicle_type={replay_vt}, "
                                           f"{len(replay_criteria)} criteria fields"})
 
-            canonical_agv_type = _VT_MAP_CFG.get(replay_vt.lower().strip()) or replay_vt
+            canonical_product_type = _VT_MAP_CFG.get(replay_vt.lower().strip()) or replay_vt
             is_vna_subtype     = bool(cached.get("is_vna", False))
             agv_criteria       = dict(replay_criteria)
             text               = ""
@@ -703,7 +703,7 @@ async def analyze(file: UploadFile = File(...)):
             agv_criteria = None
             matches = []
             matches_all = []
-            canonical_agv_type = None
+            canonical_product_type = None
             is_vna_subtype = False
             analysis_id = str(uuid.uuid4())
 
@@ -755,13 +755,13 @@ async def analyze(file: UploadFile = File(...)):
                         if v in ("null", "NULL", "None", "none", "N/A", "n/a", ""):
                             vt_criteria[k] = None
 
-                    # Only validate required_agv_type in 4a — use domain-specific values, not AP0 enum.
-                    # AP0 allowed_values for agv_type = @SCOPE_CANONICAL_NAMES (excludes IK scope_variants
+                    # Only validate required_product_type in 4a — use domain-specific values, not AP0 enum.
+                    # AP0 allowed_values for product_type = @SCOPE_CANONICAL_NAMES (excludes IK scope_variants
                     # like "Process Cooling"). _DOMAIN_CLASSIF_VALUES is correct for all domains.
-                    _raw_4a = vt_criteria.get("required_agv_type")
+                    _raw_4a = vt_criteria.get("required_product_type")
                     _domain_vals = _DOMAIN_CLASSIF_VALUES.get(result.get("detected_domain"), frozenset())
                     if _raw_4a and _domain_vals and _raw_4a not in _domain_vals:
-                        _ap0_violations_4a = {"required_agv_type": (_raw_4a, sorted(_domain_vals))}
+                        _ap0_violations_4a = {"required_product_type": (_raw_4a, sorted(_domain_vals))}
                     else:
                         _ap0_violations_4a = {}
                     if not _ap0_violations_4a:
@@ -769,12 +769,12 @@ async def analyze(file: UploadFile = File(...)):
 
                     _bad = list(_ap0_violations_4a.values())[0][0]
                     _allowed = list(_ap0_violations_4a.values())[0][1]
-                    _msg = (f"required_agv_type='{_bad}' invalid "
+                    _msg = (f"required_product_type='{_bad}' invalid "
                             f"(allowed: {' / '.join(_allowed)}) — attempt {_attempt + 1}/3")
                     log.warning(_msg)
                     yield sse("log", {"message": f"⚠ {_msg}"})
                     if _attempt == 2:
-                        yield sse("warning", {"field": "required_agv_type",
+                        yield sse("warning", {"field": "required_product_type",
                                               "message": f"{_msg} — keyword fallback used"})
 
             except Exception as e:
@@ -782,29 +782,29 @@ async def analyze(file: UploadFile = File(...)):
                 yield sse("log", {"message": f"⚠ 4a error: {e} — keyword fallback"})
 
             # Normalize vehicle type from 4a result
-            raw_vt_str = vt_criteria.get("required_agv_type") or ""
+            raw_vt_str = vt_criteria.get("required_product_type") or ""
             if isinstance(raw_vt_str, list):
                 raw_vt_str = next(
                     (item for item in raw_vt_str if _VT_MAP_CFG.get(str(item).lower().strip())),
                     raw_vt_str[0] if raw_vt_str else ""
                 ) or ""
             raw_vt_lower = str(raw_vt_str).lower().strip()
-            canonical_agv_type = _VT_MAP_CFG.get(raw_vt_lower) or agv_type_keyword_fallback(text or "")
+            canonical_product_type = _VT_MAP_CFG.get(raw_vt_lower) or product_type_keyword_fallback(text or "")
 
             # VNA detection: LLM output from 4a + text_overrides
             is_vna_subtype = raw_vt_lower in _VNA_CFG or bool(vt_criteria.get("required_vna_capable"))
             for override in _VT_OVERRIDES:
                 if override.get("regex") and re.search(override["regex"], text or ""):
                     if override.get("canonical"):
-                        canonical_agv_type = override["canonical"]
+                        canonical_product_type = override["canonical"]
                     if override.get("vna"):
                         is_vna_subtype = True
                     break
 
             vna_label = " (VNA)" if is_vna_subtype else ""
-            log.info("Pass 4a: vehicle_type=%s%s", canonical_agv_type, vna_label)
+            log.info("Pass 4a: vehicle_type=%s%s", canonical_product_type, vna_label)
             # Pre-compute 4c field set now that vehicle type is known; needed for progress total
-            _leaf_scope = _LEGACY_MAP.get(canonical_agv_type, "")
+            _leaf_scope = _LEGACY_MAP.get(canonical_product_type, "")
             _4c_scopes  = frozenset(_RESOLUTION_ORDER.get(_leaf_scope, []))
             _4c_fields = {
                 k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
@@ -812,7 +812,7 @@ async def analyze(file: UploadFile = File(...)):
             }
             _agv_total = 2 + len(_4c_fields)   # 4a(1) + 4b(1) + N×4c
             yield sse("step", {"id": "agv", "status": "running",
-                                "message": f"Fahrzeugtyp: {canonical_agv_type}{vna_label} — Kriterien werden extrahiert…",
+                                "message": f"Fahrzeugtyp: {canonical_product_type}{vna_label} — Kriterien werden extrahiert…",
                                 "done": 1, "total": _agv_total})
             await asyncio.sleep(0)
 
@@ -831,10 +831,10 @@ async def analyze(file: UploadFile = File(...)):
                     )
                 })
 
-            template_4b = _AGV_TYPE_TEMPLATES.get(canonical_agv_type, AGV_USER_TEMPLATE)
+            template_4b = _AGV_TYPE_TEMPLATES.get(canonical_product_type, AGV_USER_TEMPLATE)
             vna_context = _VNA_CONTEXT_HINT if is_vna_subtype else ""
             agv_user_4b = _fill(template_4b, text=text,
-                                vehicle_type=canonical_agv_type, vna_context=vna_context)
+                                vehicle_type=canonical_product_type, vna_context=vna_context)
 
             agv_criteria: dict = {}
             _ap0_warnings: list = []
@@ -904,7 +904,7 @@ async def analyze(file: UploadFile = File(...)):
             # Each numeric KO field gets its own focused LLM call (one field + document).
             # Shorter prompt → more attention budget per field → fewer inference hallucinations.
             # Results override 4b values; source-span enforcement (below) still applies.
-            # canonical_agv_type == AP0 sheet name ("Forklift AGV", "Tugger AGV", "Mobile AMR")
+            # canonical_product_type == AP0 sheet name ("Forklift AGV", "Tugger AGV", "Mobile AMR")
             if _4c_fields:
                 yield sse("step", {"id": "agv", "status": "running",
                                    "message": f"Pass 4c: {len(_4c_fields)} numerische Felder einzeln…",
@@ -918,7 +918,7 @@ async def analyze(file: UploadFile = File(...)):
                     _fhint_full = _fmeta["hint"]
                     _fhint_def  = _fhint_full.split("NULL RULE:")[0].strip()
                     _per_user = (
-                        f"Vehicle type: {canonical_agv_type}. {vna_context}\n\n"
+                        f"Vehicle type: {canonical_product_type}. {vna_context}\n\n"
                         f"Find the value of '{_fk}' in the tender document.\n\n"
                         f"Field meaning: {_fhint_def}\n\n"
                         f"Step 1: Scan the document for any sentence, table cell, or labelled line "
@@ -979,7 +979,7 @@ async def analyze(file: UploadFile = File(...)):
                 yield sse("log", {"message": _msg})
 
             # Merge 4a results into agv_criteria
-            agv_criteria["required_agv_type"] = vt_criteria.get("required_agv_type")
+            agv_criteria["required_product_type"] = vt_criteria.get("required_product_type")
             agv_criteria["required_vna_capable"] = vt_criteria.get("required_vna_capable")
 
             # Single-leaf domain gate (IK): store Pass 4a sub-classification as required_served_categories.
@@ -987,7 +987,7 @@ async def analyze(file: UploadFile = File(...)):
             # AP0-driven: scope_variants comes from scope_registry, no domain name hardcoded.
             _dom_node = _scope_reg["scopes"].get(detected_domain, {})
             if _leaf_scope == detected_domain and _dom_node.get("scope_variants"):
-                agv_criteria["required_served_categories"] = vt_criteria.get("required_agv_type")
+                agv_criteria["required_served_categories"] = vt_criteria.get("required_product_type")
 
         if is_extractable:
             # Validate against AP0 allowed_values — reject values not in the allowed list
@@ -1021,21 +1021,21 @@ async def analyze(file: UploadFile = File(...)):
                     log.info("Field-text-fallback: %s = %s (regex: %s)", _key, _val, _rgx)
 
             # Run matching against SQLite supplier records
-            # canonical_agv_type and is_vna_subtype already set in Pass 4a;
+            # canonical_product_type and is_vna_subtype already set in Pass 4a;
             # re-derive here as safety net (idempotent for valid values).
-            raw_vt = agv_criteria.get("required_agv_type") or ""
+            raw_vt = agv_criteria.get("required_product_type") or ""
             if isinstance(raw_vt, list):
                 raw_vt = next(
                     (item for item in raw_vt if _VT_MAP_CFG.get(str(item).lower().strip())),
                     raw_vt[0] if raw_vt else "",
                 ) or ""
             raw_vt_lower = str(raw_vt).lower().strip()
-            canonical_agv_type = _VT_MAP_CFG.get(raw_vt_lower) or canonical_agv_type
+            canonical_product_type = _VT_MAP_CFG.get(raw_vt_lower) or canonical_product_type
 
             for override in _VT_OVERRIDES:
                 if override.get("regex") and re.search(override["regex"], text or ""):
                     if override.get("canonical"):
-                        canonical_agv_type = override["canonical"]
+                        canonical_product_type = override["canonical"]
                     if override.get("vna"):
                         is_vna_subtype = True
                     break
@@ -1048,7 +1048,7 @@ async def analyze(file: UploadFile = File(...)):
                 agv_criteria["required_vna_capable"] = True
 
             new_req = dict(agv_criteria)
-            new_req["required_agv_type"] = canonical_agv_type
+            new_req["required_product_type"] = canonical_product_type
             new_req["required_navigation_type"] = nav_list
 
             new_req = _to_match_units(new_req)
@@ -1061,7 +1061,7 @@ async def analyze(file: UploadFile = File(...)):
 
             new_req["required_vna_capable"] = (
                 "required"     if is_vna_subtype else
-                "not_required" if canonical_agv_type in _VNA_APPLICABLE else
+                "not_required" if canonical_product_type in _VNA_APPLICABLE else
                 None
             )
             agv_criteria["required_vna_capable"] = new_req["required_vna_capable"]
@@ -1073,7 +1073,7 @@ async def analyze(file: UploadFile = File(...)):
                 new_req      = new_req,
                 agv_criteria = agv_criteria,
                 result       = result,
-                vehicle_type = canonical_agv_type,
+                vehicle_type = canonical_product_type,
                 in_scope     = bool(result.get("in_scope", False)),
             )
             matches_raw, matches_all_raw = match_suppliers_new(
@@ -1098,7 +1098,7 @@ async def analyze(file: UploadFile = File(...)):
         result["agv_criteria"]           = agv_criteria
         result["matches"]                = matches
         result["matches_all"]            = matches_all if matches_all else []
-        result["vehicle_type_canonical"] = canonical_agv_type
+        result["vehicle_type_canonical"] = canonical_product_type
         result["is_vna"]                 = is_vna_subtype
 
         yield sse("log", {"message": f"Gesamt: {total:.1f}s"})
@@ -1166,7 +1166,7 @@ async def rematch_endpoint(request: Request):
 
     old_vt = cached.get("vehicle_type_canonical")
     if new_vt and new_vt in _VALID_VTS:
-        criteria["required_agv_type"] = new_vt
+        criteria["required_product_type"] = new_vt
         cached["vehicle_type_canonical"] = new_vt
 
     if new_vt and new_vt in _VALID_VTS and new_vt != old_vt:
@@ -1315,7 +1315,7 @@ async def suppliers_list():
     # Product dataclass fields that are internal / already in the identity prefix.
     _PROD_SKIP = {
         "company_id", "base_model_id", "is_oem_product", "active",
-        "product_description", "product_id", "company_name", "product_name", "agv_type",
+        "product_description", "product_id", "company_name", "product_name", "product_type",
     }
 
     out = []

@@ -339,7 +339,7 @@ def import_to_sqlite(
     assert _PROD_COLUMNS, "sqlite_schema.json missing 'products_columns' — run generate_all.py"
     _PROD_DEFAULTS = {
         "product_name": "UNKNOWN",
-        "agv_type": "unknown",
+        "product_type": "unknown",
         "active": "true",
         "product_description": "(not specified)",
         "service_coverage": "EU",
@@ -364,15 +364,15 @@ def import_to_sqlite(
         cur.execute(prod_sql, vals)
     print(f"  SQLite products: {len(prods)} rows")
 
-    # Validate agv_type values against scope_registry.json legacy_map
+    # Validate product_type values against scope_registry.json legacy_map
     _sr_path = Path(__file__).parent / "config" / "scope_registry.json"
     if _sr_path.exists():
         _sr = json.loads(_sr_path.read_text())
         _lm = _sr.get("legacy_map", {})
         if _lm:
-            _unknown = {row.get("agv_type") for row in prods if row.get("agv_type") and row.get("agv_type") not in _lm}
+            _unknown = {row.get("product_type") for row in prods if row.get("product_type") and row.get("product_type") not in _lm}
             if _unknown:
-                sys.exit(f"ERROR: agv_type values not in scope_registry legacy_map: {_unknown} — check AP0 or run generate_all.py")
+                sys.exit(f"ERROR: product_type values not in scope_registry legacy_map: {_unknown} — check AP0 or run generate_all.py")
 
     # Extensions
     exts = csv_rows(extensions_csv)

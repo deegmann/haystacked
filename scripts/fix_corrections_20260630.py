@@ -56,7 +56,7 @@ if __name__ == "__main__":
     ext = find_ext("MLR Mayesto")
     if ext:
         patch("extensions", ext["id"], {
-            "agv_type": "Forklift AGV",
+            "product_type": "Forklift AGV",
             "max_payload_kg": 1500,
             "lifting_height_mm": 11000,
             "max_speed_ms": 2.7,

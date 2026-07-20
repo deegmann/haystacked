@@ -18,7 +18,7 @@ import io
 
 from src.data_loader import load_suppliers
 from src.matching import match_suppliers_new
-from src.context_builder import agv_type_keyword_fallback, build_system_context
+from src.context_builder import product_type_keyword_fallback, build_system_context
 
 ROOT = Path(__file__).parent.parent
 
@@ -134,14 +134,14 @@ async def run_one(pdf_path: Path) -> dict:
             print(f"  ⚠ {w}")
 
     # 3. Normalize + build req dict
-    raw_vt = crit.get("required_agv_type") or ""
+    raw_vt = crit.get("required_product_type") or ""
     if isinstance(raw_vt, list):
         raw_vt = next(
             (item for item in raw_vt if _VT_MAP.get(str(item).lower().strip())),
             raw_vt[0] if raw_vt else "",
         ) or ""
     raw_vt_lower = str(raw_vt).lower().strip()
-    canonical    = _VT_MAP.get(raw_vt_lower) or agv_type_keyword_fallback(text)
+    canonical    = _VT_MAP.get(raw_vt_lower) or product_type_keyword_fallback(text)
     is_vna       = raw_vt_lower in _VNA_CFG
     for ovr in _VT_OVR:
         if ovr.get("regex") and re.search(ovr["regex"], text):
@@ -164,7 +164,7 @@ async def run_one(pdf_path: Path) -> dict:
     nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
 
     new_req = dict(crit)
-    new_req["required_agv_type"]          = canonical
+    new_req["required_product_type"]          = canonical
     new_req["required_navigation_type"]   = nav_list
     raw_outdoor = crit.get("required_outdoor_capable")
     if raw_outdoor is not None:
@@ -183,7 +183,7 @@ async def run_one(pdf_path: Path) -> dict:
 
     return {
         "file": name,
-        "canonical_agv_type": canonical,
+        "canonical_product_type": canonical,
         "is_vna": is_vna,
         "extracted": {k: v for k, v in new_req.items() if v is not None and v != [] and not k.startswith("_")},
         "validation_warnings": val_warns,
@@ -198,7 +198,7 @@ def print_result(res: dict):
         print(f"\n  ✗ FEHLER: {res['error']}")
         return
 
-    print(f"\n  AGV-Typ:    {res['canonical_agv_type']}  (VNA: {res['is_vna']})")
+    print(f"\n  AGV-Typ:    {res['canonical_product_type']}  (VNA: {res['is_vna']})")
     print(f"\n  Extrahierte Anforderungen ({len(res['extracted'])} Felder):")
     for k, v in res["extracted"].items():
         print(f"    {k:45s} = {v}")
@@ -243,7 +243,7 @@ async def main():
         else:
             top = res["top_matches"][0] if res["top_matches"] else None
             top_str = f"{top['company']} / {top['product']} (Score {top['score']})" if top else "–"
-            print(f"  {res['file']:20s}  {res['canonical_agv_type']:15s}  Top: {top_str}")
+            print(f"  {res['file']:20s}  {res['canonical_product_type']:15s}  Top: {top_str}")
 
 
 if __name__ == "__main__":

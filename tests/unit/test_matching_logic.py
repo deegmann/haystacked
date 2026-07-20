@@ -13,7 +13,7 @@ from app import _criteria_to_uuid_keyed
 def _make_values(prod: "Product | None" = None, **kwargs) -> dict:
     specs = load_fields()
     defaults = dict(
-        agv_type="Forklift AGV",
+        product_type="Forklift AGV",
         max_payload_kg=2000.0,
         lifting_height_mm=12000,
         min_aisle_width_mm=1600,
@@ -46,7 +46,7 @@ def _make_prod(**kwargs) -> Product:
         company_id="c-1",
         base_model_id="bm-1",
         product_name="TestProduct",
-        agv_type="Forklift AGV",
+        product_type="Forklift AGV",
         company_name="TestCo",
         reference_count=10,
         lead_time_weeks=12,
@@ -81,13 +81,13 @@ def test_U_M_02_ko_payload_null_not_excluded():
     assert not r.disqualified
 
 
-def test_U_M_03_ko_wrong_agv_type():
-    prod = _make_prod(agv_type="Tugger AGV")
+def test_U_M_03_ko_wrong_product_type():
+    prod = _make_prod(product_type="Tugger AGV")
     rec = SupplierRecord(
         product=prod,
-        values=_make_values(prod=prod, agv_type="Tugger AGV"),
+        values=_make_values(prod=prod, product_type="Tugger AGV"),
     )
-    top, _ = matcher.match([rec], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"agv_type": "Forklift AGV"})))
+    top, _ = matcher.match([rec], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"product_type": "Forklift AGV"})))
     assert top[0].disqualified
 
 
@@ -132,14 +132,14 @@ def test_U_M_10_scoring_higher_reference_count_ranks_higher():
     prod_low  = _make_prod(reference_count=2)
     rec_high = SupplierRecord(product=prod_high, values=_make_values(prod=prod_high))
     rec_low  = SupplierRecord(product=prod_low,  values=_make_values(prod=prod_low))
-    top, _ = matcher.match([rec_low, rec_high], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"agv_type": "Forklift AGV"})))
+    top, _ = matcher.match([rec_low, rec_high], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"product_type": "Forklift AGV"})))
     assert top[0].record.product.reference_count == 20
 
 
 def test_U_M_11_scoring_reference_count_null_neutral():
     prod_null = _make_prod(reference_count=None)
     rec_null = SupplierRecord(product=prod_null, values=_make_values(prod=prod_null))
-    top, _ = matcher.match([rec_null], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"agv_type": "Forklift AGV"})))
+    top, _ = matcher.match([rec_null], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"product_type": "Forklift AGV"})))
     assert not top[0].disqualified
 
 
@@ -172,7 +172,7 @@ def test_U_M_15_ranking_3_suppliers():
 
 
 def test_U_M_16_score_details_present():
-    r = _match_one({"agv_type": "Forklift AGV"})
+    r = _match_one({"product_type": "Forklift AGV"})
     assert len(r.score_details) > 0
     for detail in r.score_details:
         assert "field" in detail
@@ -181,7 +181,7 @@ def test_U_M_16_score_details_present():
 
 def test_U_M_17_deterministic_same_input_same_order():
     recs = [_make_record(max_payload_kg=float(i * 500 + 1000)) for i in range(5)]
-    req  = TenderRequirements.from_dict(_criteria_to_uuid_keyed({"agv_type": "Forklift AGV"}))
+    req  = TenderRequirements.from_dict(_criteria_to_uuid_keyed({"product_type": "Forklift AGV"}))
     _, r1 = matcher.match(recs, req)
     _, r2 = matcher.match(recs, req)
     assert [r.product_name for r in r1] == [r.product_name for r in r2]
@@ -282,10 +282,10 @@ def test_OI47_tugger_supplier_not_penalised_for_forklift_field():
     a lift height must NOT accumulate a null_penalty for that field, because
     lifting_height_mm is not in the relevant field set for Tugger AGV suppliers.
     """
-    prod = _make_prod(agv_type="Tugger AGV")
+    prod = _make_prod(product_type="Tugger AGV")
     rec = SupplierRecord(
         product=prod,
-        values=_make_values(prod=prod, agv_type="Tugger AGV", lifting_height_mm=None),
+        values=_make_values(prod=prod, product_type="Tugger AGV", lifting_height_mm=None),
     )
     top, _ = matcher.match(
         [rec],

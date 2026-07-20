@@ -204,7 +204,7 @@ EXT_MULTI = [
 ]
 
 EXT_SINGLE = [
-    "agv_type", "ingress_protection_rating", "cleanroom_class", "floor_flatness_req",
+    "product_type", "ingress_protection_rating", "cleanroom_class", "floor_flatness_req",
     "functional_safety_level", "safety_coverage", "fleet_management_system", "fleet_control_architecture",
     "fork_spread", "mast_type", "drive_type",
     "train_configuration", "route_type", "route_programming",
@@ -264,7 +264,7 @@ def import_base_models(l3_rows):
         f = omit_none({
             "base_model_name": parse_text(row.get("model_name")) or "UNKNOWN",
             "base_model_id":   new_uuid,
-            "agv_type":        parse_text(row.get("agv_type")),
+            "product_type":        parse_text(row.get("product_type")),
             # oem_company_id not in seed → skip; oem_link_public default FALSE (unchecked)
         })
         records.append(f)
@@ -300,7 +300,7 @@ def import_products(l2_rows, company_name_to_id, bm_row_ids):
             "product_id":          new_uuid,
             "company_id":          [co_at_id] if co_at_id else None,
             "base_model_id":       [bm_at_id] if bm_at_id else None,
-            "agv_type":            parse_text(row.get("agv_type")),
+            "product_type":            parse_text(row.get("product_type")),
             "product_description": parse_text(row.get("product_description")),
             "reference_count":     parse_int(row.get("reference_count"), allow_zero=False),
             "min_project_value_eur": parse_int(row.get("min_project_value_eur")),
@@ -403,9 +403,9 @@ def validate(n_companies, n_bm, products, extensions):
 
     agv = {}
     for e in extensions:
-        t = e["fields"].get("agv_type", "missing")
+        t = e["fields"].get("product_type", "missing")
         agv[t] = agv.get(t, 0) + 1
-    print(f"    agv_type distribution: {agv}")
+    print(f"    product_type distribution: {agv}")
     print(f"       (expected ~23 Forklift AGV, ~16 Tugger AGV, ~13 Mobile AMR)")
 
     print(f"\n{'✅ Validation PASSED' if ok else '⚠️  Validation FAILED — see ✗ lines above'}")

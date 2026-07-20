@@ -85,7 +85,7 @@ def _load_agv_keywords() -> dict:
 AGV_KEYWORDS = _load_agv_keywords()
 
 
-def agv_type_keyword_fallback(text: str) -> "str | None":
+def product_type_keyword_fallback(text: str) -> "str | None":
     """Independent from LLM. Checks first 5,000 chars. Per LL-05."""
     excerpt = text[:5000].lower()
     scores  = {

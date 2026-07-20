@@ -44,7 +44,7 @@ def refresh_golden(path: Path, suppliers) -> dict:
     # Inject vehicle type and VNA flag into criteria (same as app.py does)
     criteria_with_vt = dict(agv_criteria)
     if vehicle_type:
-        criteria_with_vt["required_agv_type"] = vehicle_type
+        criteria_with_vt["required_product_type"] = vehicle_type
     if is_vna:
         criteria_with_vt["required_vna_capable"] = "required"
 

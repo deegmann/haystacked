@@ -160,13 +160,13 @@ For matching the *commercial* counterpart, `distribution_model` and the company 
 
 Tenders rarely state the AGV type explicitly. Derive it from the *operational environment and task description*, not from isolated keywords.
 
-**There are exactly three valid values for `required_agv_type`: `Forklift AGV`, `Tugger AGV`, `Mobile AMR`.** Sub-variants (Counterbalanced, Reach Truck, VNA) are properties within the Forklift AGV category — they do not change the type value. Never output a sub-variant as the vehicle type.
+**There are exactly three valid values for `required_product_type`: `Forklift AGV`, `Tugger AGV`, `Mobile AMR`.** Sub-variants (Counterbalanced, Reach Truck, VNA) are properties within the Forklift AGV category — they do not change the type value. Never output a sub-variant as the vehicle type.
 
 ---
 
 ### Step 1 — Tugger AGV (check first, it is the most distinctive)
 
-If the task is towing a **train of trailers or carts along a fixed loop** (milk-run, Routenzug, multiple sequential stops) → `required_agv_type = "Tugger AGV"`.
+If the task is towing a **train of trailers or carts along a fixed loop** (milk-run, Routenzug, multiple sequential stops) → `required_product_type = "Tugger AGV"`.
 
 Tugger AGVs do not carry loads directly; they tow. If the tender mentions a tractor unit pulling trailers / dollies, that is a Tugger — regardless of payload or environment.
 
@@ -174,7 +174,7 @@ Tugger AGVs do not carry loads directly; they tow. If the tender mentions a trac
 
 ### Step 2 — Mobile AMR (only when all three conditions are met)
 
-`required_agv_type = "Mobile AMR"` **only if all of the following are true:**
+`required_product_type = "Mobile AMR"` **only if all of the following are true:**
 
 1. **Light payload:** ≤ 1,500 kg
 2. **Flexible routing / free navigation:** SLAM, Natural Feature, contour navigation — no fixed track or reflectors required
@@ -185,25 +185,25 @@ Standard EUR pallets (800×1200, 1000×1200, 1200×1200) and IBCs sitting direct
 
 **The "filling line" trap:** A filling line tender transporting heavy pallets floor-to-floor fails condition 1 AND condition 3 → `Forklift AGV`, not Mobile AMR. Do not let the production environment override the payload and load interface check. Check: (1) payload, (2) all stations floor-level with standard pallets, (3) no special docking infrastructure mentioned, (4) buyer names forklift suppliers as preferred.
 
-**Worked example — Mobile AMR:** "Autonomous mobile robots for transporting empty containers between assembly workstations, max 300 kg, SLAM navigation, MES dispatching" → `required_agv_type = "Mobile AMR"` (light load, flexible routing, containers on elevated stations).
+**Worked example — Mobile AMR:** "Autonomous mobile robots for transporting empty containers between assembly workstations, max 300 kg, SLAM navigation, MES dispatching" → `required_product_type = "Mobile AMR"` (light load, flexible routing, containers on elevated stations).
 
 ---
 
 ### Step 3 — Forklift AGV (everything else)
 
-If neither Tugger nor Mobile AMR applies → `required_agv_type = "Forklift AGV"`.
+If neither Tugger nor Mobile AMR applies → `required_product_type = "Forklift AGV"`.
 
-This covers all tasks where a fork interface is needed: standard pallet pickup from the floor, racking storage/retrieval, heavy payloads, dock loading. The specific sub-variant (Counterbalanced, Reach Truck, VNA) is a property of the application — it does **not** change the `required_agv_type` value.
+This covers all tasks where a fork interface is needed: standard pallet pickup from the floor, racking storage/retrieval, heavy payloads, dock loading. The specific sub-variant (Counterbalanced, Reach Truck, VNA) is a property of the application — it does **not** change the `required_product_type` value.
 
-**Worked example — Forklift AGV in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → `required_agv_type = "Forklift AGV"` (heavy load, floor-to-floor pallet pickup with forks).
+**Worked example — Forklift AGV in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → `required_product_type = "Forklift AGV"` (heavy load, floor-to-floor pallet pickup with forks).
 
-**Worked example — Forklift AGV in high-bay warehouse:** "Automated storage and retrieval in pallet racking, aisle width 2.5 m, lift height 6 m" → `required_agv_type = "Forklift AGV"`.
+**Worked example — Forklift AGV in high-bay warehouse:** "Automated storage and retrieval in pallet racking, aisle width 2.5 m, lift height 6 m" → `required_product_type = "Forklift AGV"`.
 
 ---
 
 ### VNA flag — additional check for Forklift AGV tenders only
 
-After setting `required_agv_type = "Forklift AGV"`, check whether the application requires Very Narrow Aisle capability:
+After setting `required_product_type = "Forklift AGV"`, check whether the application requires Very Narrow Aisle capability:
 
 If **aisle width < 2 m** OR the keywords "VNA", "Schmalgang", "Schmalgangstapler", or "turret truck" appear → also set `required_vna_capable = true`.
 
@@ -213,7 +213,7 @@ If **aisle width < 2 m** OR the keywords "VNA", "Schmalgang", "Schmalgangstapler
 
 ### Summary table
 
-| Situation | required_agv_type | Additional flag |
+| Situation | required_product_type | Additional flag |
 |---|---|---|
 | Towing train / milk-run / Routenzug | Tugger AGV | — |
 | Light load (≤1,500 kg) + SLAM + no floor pallet pickup | Mobile AMR | grid_required if G2P |

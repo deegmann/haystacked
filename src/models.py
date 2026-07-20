@@ -28,7 +28,7 @@ class Product:
     company_id:            str
     base_model_id:         str
     product_name:          str
-    agv_type:              str
+    product_type:          str
     product_description:   Optional[str]          = None
     reference_count:       Optional[int]          = None
     min_project_value_eur: Optional[int]          = None

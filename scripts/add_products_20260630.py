@@ -79,7 +79,7 @@ def find_base_model_by_name(name: str):
     return recs[0]["id"] if recs else None
 
 
-def create_product(company_rec_id: str, name: str, agv_type: str, ext_fields: dict,
+def create_product(company_rec_id: str, name: str, product_type: str, ext_fields: dict,
                    source_notes: str = "", is_oem: bool = False) -> None:
     print(f"\n  → {name}")
 
@@ -90,7 +90,7 @@ def create_product(company_rec_id: str, name: str, agv_type: str, ext_fields: di
     else:
         bm_id = post("base_models", {
             "base_model_name": name,
-            "agv_type": agv_type,
+            "product_type": product_type,
             "oem_link_public": True,
             "last_updated": "2026-06-30",
         })
@@ -100,7 +100,7 @@ def create_product(company_rec_id: str, name: str, agv_type: str, ext_fields: di
     # 2. Product (linked to company + base_model; no service_coverage — multi-select, set in Airtable UI)
     prod_fields = {
         "product_name": name,
-        "agv_type": agv_type,
+        "product_type": product_type,
         "company_id": [company_rec_id],
         "base_model_id": [bm_id],
         "product_description": source_notes or name,
@@ -114,7 +114,7 @@ def create_product(company_rec_id: str, name: str, agv_type: str, ext_fields: di
     # 3. Extension (spec fields)
     ext = {
         "model_name": name,
-        "agv_type": agv_type,
+        "product_type": product_type,
         "base_model_id": [bm_id],
         "extension_id": str(uuid.uuid4()),
     }
@@ -131,7 +131,7 @@ def create_product(company_rec_id: str, name: str, agv_type: str, ext_fields: di
 OCEANEERING_PRODUCTS = [
     {
         "name": "UniMover D 100",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "source_notes": (
             "oceaneering.com / materialhandling247.com UniMover D 100. "
             "Smallest underride AMR, 100 kg / 220 lb, 1.9 m/s, BlueBotics ANT "
@@ -148,7 +148,7 @@ OCEANEERING_PRODUCTS = [
     },
     {
         "name": "CompactMover FOL U 1200",
-        "agv_type": "Forklift AGV",
+        "product_type": "Forklift AGV",
         "source_notes": (
             "antdriven.com/oceaneering-compactmover-fol-u-1200 (BlueBotics ANT partner mirror). "
             "Fork-over-leg pallet stacker AGV, 1200 kg, lift 1100 mm (mast height), "
@@ -165,7 +165,7 @@ OCEANEERING_PRODUCTS = [
     },
     {
         "name": "CompactMover Conveyor U 400",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "source_notes": (
             "oceaneering.com/compactmover-conveyor-u-400/. Conveyor-deck transfer AMR, "
             "400 kg, 1.9 m/s, BlueBotics ANT natural-feature SLAM. Transfer height "
@@ -191,7 +191,7 @@ def run_oceaneering():
         create_product(
             company_rec_id=OCEANEERING_CO,
             name=p["name"],
-            agv_type=p["agv_type"],
+            product_type=p["product_type"],
             ext_fields=p["ext"],
             source_notes=p["source_notes"],
         )
@@ -255,11 +255,11 @@ def run_idealworks():
                 print(f"    ✗ Product has no base_model_id")
                 continue
             bm_id = bm_ids[0]
-            # Determine agv_type from product
-            agv_type = prod["fields"].get("agv_type", "Mobile AMR")
+            # Determine product_type from product
+            product_type = prod["fields"].get("product_type", "Mobile AMR")
             ext_fields = {
                 "model_name": p["name"],
-                "agv_type": agv_type,
+                "product_type": product_type,
                 "base_model_id": [bm_id],
                 "extension_id": str(uuid.uuid4()),
             }

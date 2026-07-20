@@ -40,7 +40,7 @@
     "required_blast_freeze_capacity_kg_h_source": null,
     "required_pulldown_time_h": null,
     "required_pulldown_time_h_source": null,
-    "required_agv_type": "Cold Store",
+    "required_product_type": "Cold Store",
     "required_vna_capable": null,
     "required_served_categories": "Cold Store",
     "_validation_warnings": []
@@ -70,7 +70,7 @@
         "pulldown_time_h"
       ],
       "score_details": [],
-      "agv_type": "Industrial Refrigeration",
+      "product_type": "Industrial Refrigeration",
       "reasons": [],
       "knockouts": [],
       "website": "",
@@ -195,15 +195,15 @@
       "rank": 2,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -327,15 +327,15 @@
       "rank": 3,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -458,15 +458,15 @@
       "rank": 4,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -590,15 +590,15 @@
       "rank": 5,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -740,7 +740,7 @@
         "pulldown_time_h"
       ],
       "score_details": [],
-      "agv_type": "Industrial Refrigeration",
+      "product_type": "Industrial Refrigeration",
       "reasons": [],
       "knockouts": [],
       "website": "",
@@ -865,15 +865,15 @@
       "rank": 2,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -997,15 +997,15 @@
       "rank": 3,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -1128,15 +1128,15 @@
       "rank": 4,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -1260,15 +1260,15 @@
       "rank": 5,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -1392,15 +1392,15 @@
       "rank": 6,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -1523,15 +1523,15 @@
       "rank": 7,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -1661,15 +1661,15 @@
       "rank": 8,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -1795,15 +1795,15 @@
       "rank": 9,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -1932,15 +1932,15 @@
       "rank": 10,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -2063,15 +2063,15 @@
       "rank": 11,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -2201,15 +2201,15 @@
       "rank": 12,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -2336,15 +2336,15 @@
       "rank": 13,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -2468,15 +2468,15 @@
       "rank": 14,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -2604,15 +2604,15 @@
       "rank": 15,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -2735,15 +2735,15 @@
       "rank": 16,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -2871,15 +2871,15 @@
       "rank": 17,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -3007,15 +3007,15 @@
       "rank": 18,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "??",
@@ -3138,15 +3138,15 @@
       "rank": 19,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -3269,15 +3269,15 @@
       "rank": 20,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -3406,15 +3406,15 @@
       "rank": 21,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -3538,15 +3538,15 @@
       "rank": 22,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -3669,15 +3669,15 @@
       "rank": 23,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "??",
@@ -3800,15 +3800,15 @@
       "rank": 24,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -3932,15 +3932,15 @@
       "rank": 25,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -4069,15 +4069,15 @@
       "rank": 26,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -4203,15 +4203,15 @@
       "rank": 27,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -4335,15 +4335,15 @@
       "rank": 28,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -4466,15 +4466,15 @@
       "rank": 29,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "IT",
@@ -4602,15 +4602,15 @@
       "rank": 30,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -4733,15 +4733,15 @@
       "rank": 31,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -4868,15 +4868,15 @@
       "rank": 32,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -4999,15 +4999,15 @@
       "rank": 33,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -5130,15 +5130,15 @@
       "rank": 34,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -5261,15 +5261,15 @@
       "rank": 35,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -5399,15 +5399,15 @@
       "rank": 36,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -5533,15 +5533,15 @@
       "rank": 37,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -5672,15 +5672,15 @@
       "rank": 38,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -5806,15 +5806,15 @@
       "rank": 39,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -5941,15 +5941,15 @@
       "rank": 40,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -6072,15 +6072,15 @@
       "rank": 41,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -6203,15 +6203,15 @@
       "rank": 42,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -6338,15 +6338,15 @@
       "rank": 43,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -6470,15 +6470,15 @@
       "rank": 44,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -6601,15 +6601,15 @@
       "rank": 45,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -6732,15 +6732,15 @@
       "rank": 46,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -6865,15 +6865,15 @@
       "rank": 47,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -6996,15 +6996,15 @@
       "rank": 48,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -7132,15 +7132,15 @@
       "rank": 49,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -7269,15 +7269,15 @@
       "rank": 50,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -7407,15 +7407,15 @@
       "rank": 51,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -7540,15 +7540,15 @@
       "rank": 52,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -7671,15 +7671,15 @@
       "rank": 53,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -7802,15 +7802,15 @@
       "rank": 54,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "BE",
@@ -7934,15 +7934,15 @@
       "rank": 55,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -8066,15 +8066,15 @@
       "rank": 56,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -8199,15 +8199,15 @@
       "rank": 57,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -8337,15 +8337,15 @@
       "rank": 58,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -8474,15 +8474,15 @@
       "rank": 59,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -8607,15 +8607,15 @@
       "rank": 60,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "BE",
@@ -8743,15 +8743,15 @@
       "rank": 61,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -8874,15 +8874,15 @@
       "rank": 62,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -9007,15 +9007,15 @@
       "rank": 63,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -9138,15 +9138,15 @@
       "rank": 64,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -9271,15 +9271,15 @@
       "rank": 65,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -9403,15 +9403,15 @@
       "rank": 66,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -9536,15 +9536,15 @@
       "rank": 67,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -9667,15 +9667,15 @@
       "rank": 68,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -9798,15 +9798,15 @@
       "rank": 69,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -9935,15 +9935,15 @@
       "rank": 70,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -10071,15 +10071,15 @@
       "rank": 71,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -10203,15 +10203,15 @@
       "rank": 72,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -10335,15 +10335,15 @@
       "rank": 73,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -10470,15 +10470,15 @@
       "rank": 74,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -10601,15 +10601,15 @@
       "rank": 75,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -10733,15 +10733,15 @@
       "rank": 76,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -10866,15 +10866,15 @@
       "rank": 77,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -10998,15 +10998,15 @@
       "rank": 78,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -11134,15 +11134,15 @@
       "rank": 79,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -11265,15 +11265,15 @@
       "rank": 80,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -11396,15 +11396,15 @@
       "rank": 81,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -11533,15 +11533,15 @@
       "rank": 82,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -11665,15 +11665,15 @@
       "rank": 83,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -11798,15 +11798,15 @@
       "rank": 84,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "??",
@@ -11929,15 +11929,15 @@
       "rank": 85,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -12060,15 +12060,15 @@
       "rank": 86,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -12197,15 +12197,15 @@
       "rank": 87,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -12333,15 +12333,15 @@
       "rank": 88,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -12465,15 +12465,15 @@
       "rank": 89,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -12600,15 +12600,15 @@
       "rank": 90,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -12736,15 +12736,15 @@
       "rank": 91,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -12868,15 +12868,15 @@
       "rank": 92,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -13000,15 +13000,15 @@
       "rank": 93,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -13132,15 +13132,15 @@
       "rank": 94,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -13270,15 +13270,15 @@
       "rank": 95,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -13403,15 +13403,15 @@
       "rank": 96,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -13534,15 +13534,15 @@
       "rank": 97,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -13666,15 +13666,15 @@
       "rank": 98,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -13802,15 +13802,15 @@
       "rank": 99,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -13934,15 +13934,15 @@
       "rank": 100,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -14065,15 +14065,15 @@
       "rank": 101,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "BE",
@@ -14197,15 +14197,15 @@
       "rank": 102,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -14331,15 +14331,15 @@
       "rank": 103,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -14464,15 +14464,15 @@
       "rank": 104,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -14599,15 +14599,15 @@
       "rank": 105,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -14731,15 +14731,15 @@
       "rank": 106,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -14867,15 +14867,15 @@
       "rank": 107,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -15002,15 +15002,15 @@
       "rank": 108,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -15137,15 +15137,15 @@
       "rank": 109,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -15274,15 +15274,15 @@
       "rank": 110,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -15405,15 +15405,15 @@
       "rank": 111,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -15538,15 +15538,15 @@
       "rank": 112,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -15671,15 +15671,15 @@
       "rank": 113,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -15810,15 +15810,15 @@
       "rank": 114,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "IT",
@@ -15945,15 +15945,15 @@
       "rank": 115,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -16083,15 +16083,15 @@
       "rank": 116,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -16220,15 +16220,15 @@
       "rank": 117,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -16353,15 +16353,15 @@
       "rank": 118,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "IT",
@@ -16486,15 +16486,15 @@
       "rank": 119,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -16617,15 +16617,15 @@
       "rank": 120,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -16754,15 +16754,15 @@
       "rank": 121,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -16887,15 +16887,15 @@
       "rank": 122,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -17019,15 +17019,15 @@
       "rank": 123,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -17150,15 +17150,15 @@
       "rank": 124,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -17282,15 +17282,15 @@
       "rank": 125,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -17414,15 +17414,15 @@
       "rank": 126,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -17552,15 +17552,15 @@
       "rank": 127,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -17688,15 +17688,15 @@
       "rank": 128,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "BE",
@@ -17824,15 +17824,15 @@
       "rank": 129,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -17959,15 +17959,15 @@
       "rank": 130,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -18091,15 +18091,15 @@
       "rank": 131,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -18222,15 +18222,15 @@
       "rank": 132,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "??",
@@ -18353,15 +18353,15 @@
       "rank": 133,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -18489,15 +18489,15 @@
       "rank": 134,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -18621,15 +18621,15 @@
       "rank": 135,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -18759,15 +18759,15 @@
       "rank": 136,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -18890,15 +18890,15 @@
       "rank": 137,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -19026,15 +19026,15 @@
       "rank": 138,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -19157,15 +19157,15 @@
       "rank": 139,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -19289,15 +19289,15 @@
       "rank": 140,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -19422,15 +19422,15 @@
       "rank": 141,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -19554,15 +19554,15 @@
       "rank": 142,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -19686,15 +19686,15 @@
       "rank": 143,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -19817,15 +19817,15 @@
       "rank": 144,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -19948,15 +19948,15 @@
       "rank": 145,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -20083,15 +20083,15 @@
       "rank": 146,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -20220,15 +20220,15 @@
       "rank": 147,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -20354,15 +20354,15 @@
       "rank": 148,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -20487,15 +20487,15 @@
       "rank": 149,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -20618,15 +20618,15 @@
       "rank": 150,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -20760,7 +20760,7 @@
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Industrial Refrigeration",
+      "product_type": "Industrial Refrigeration",
       "reasons": [],
       "knockouts": [
         "served_categories: ['Process Cooling'] does not cover required: ['cold store']"
@@ -20887,15 +20887,15 @@
       "rank": 152,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -21020,15 +21020,15 @@
       "rank": 153,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -21153,15 +21153,15 @@
       "rank": 154,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -21286,15 +21286,15 @@
       "rank": 155,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "IT",
@@ -21422,15 +21422,15 @@
       "rank": 156,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -21553,15 +21553,15 @@
       "rank": 157,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -21690,15 +21690,15 @@
       "rank": 158,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -21821,15 +21821,15 @@
       "rank": 159,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -21958,15 +21958,15 @@
       "rank": 160,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -22090,15 +22090,15 @@
       "rank": 161,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -22228,15 +22228,15 @@
       "rank": 162,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -22359,15 +22359,15 @@
       "rank": 163,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -22492,15 +22492,15 @@
       "rank": 164,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -22625,15 +22625,15 @@
       "rank": 165,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "IT",
@@ -22758,15 +22758,15 @@
       "rank": 166,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -22891,15 +22891,15 @@
       "rank": 167,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -23028,15 +23028,15 @@
       "rank": 168,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -23165,15 +23165,15 @@
       "rank": 169,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -23301,15 +23301,15 @@
       "rank": 170,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DK",
@@ -23434,15 +23434,15 @@
       "rank": 171,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -23567,15 +23567,15 @@
       "rank": 172,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -23703,15 +23703,15 @@
       "rank": 173,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -23834,15 +23834,15 @@
       "rank": 174,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -23968,15 +23968,15 @@
       "rank": 175,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -24100,15 +24100,15 @@
       "rank": 176,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -24231,15 +24231,15 @@
       "rank": 177,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -24368,15 +24368,15 @@
       "rank": 178,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -24504,15 +24504,15 @@
       "rank": 179,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -24635,15 +24635,15 @@
       "rank": 180,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -24771,15 +24771,15 @@
       "rank": 181,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -24903,15 +24903,15 @@
       "rank": 182,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "SE",
@@ -25036,15 +25036,15 @@
       "rank": 183,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -25168,15 +25168,15 @@
       "rank": 184,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "CN",
@@ -25301,15 +25301,15 @@
       "rank": 185,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -25438,15 +25438,15 @@
       "rank": 186,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "ES",
@@ -25574,15 +25574,15 @@
       "rank": 187,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Industrial Refrigeration"
+        "product_type: Tugger AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -25710,15 +25710,15 @@
       "rank": 188,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "US",
@@ -25841,15 +25841,15 @@
       "rank": 189,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -25973,15 +25973,15 @@
       "rank": 190,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -26105,15 +26105,15 @@
       "rank": 191,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -26242,15 +26242,15 @@
       "rank": 192,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "??",
@@ -26373,15 +26373,15 @@
       "rank": 193,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -26515,7 +26515,7 @@
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Industrial Refrigeration",
+      "product_type": "Industrial Refrigeration",
       "reasons": [],
       "knockouts": [
         "temperature_min_celsius: needs 0.0, only -2 available"
@@ -26642,15 +26642,15 @@
       "rank": 195,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "FR",
@@ -26775,15 +26775,15 @@
       "rank": 196,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "AT",
@@ -26906,15 +26906,15 @@
       "rank": 197,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -27041,15 +27041,15 @@
       "rank": 198,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Industrial Refrigeration"
+        "product_type: Mobile AMR ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "DE",
@@ -27172,15 +27172,15 @@
       "rank": 199,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "null_gap_fields": [],
       "null_pass_fields": [],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Forklift AGV ≠ required Industrial Refrigeration"
+        "product_type: Forklift AGV ≠ required Industrial Refrigeration"
       ],
       "website": "",
       "origin": "IT",

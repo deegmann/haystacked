@@ -29,7 +29,7 @@ def test_U_E_05_null_lift_height_survives_plausibility_filter():
     from app import validate_agv_criteria
 
     criteria = {
-        "required_agv_type": "Forklift AGV",
+        "required_product_type": "Forklift AGV",
         "required_lifting_height_mm": None,
         "required_min_aisle_width_mm": 1.9,
         "required_max_payload_kg": 1000,

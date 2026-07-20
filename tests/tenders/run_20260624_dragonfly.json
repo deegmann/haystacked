@@ -82,7 +82,7 @@
     "required_trailer_unloading": null,
     "required_guidance": null,
     "required_busbar_compatible": null,
-    "required_agv_type": "Forklift AGV",
+    "required_product_type": "Forklift AGV",
     "required_vna_capable": "required",
     "_validation_warnings": [
       "max_payload_kg: Wert 29.0 kg außerhalb plausiblem Bereich [100.0–50000.0 kg] → ignoriert",
@@ -112,7 +112,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -155,7 +155,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -203,7 +203,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -251,7 +251,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -287,7 +287,7 @@
           "value": null
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [],
       "website": "",
@@ -329,7 +329,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -372,7 +372,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -420,7 +420,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -468,7 +468,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -504,7 +504,7 @@
           "value": null
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [],
       "website": "",
@@ -530,13 +530,13 @@
       "rank": 6,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "US",
@@ -564,7 +564,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -592,13 +592,13 @@
       "rank": 8,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -626,7 +626,7 @@
         "min_aisle_width_mm: needs 2686, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 2686, only 1900 available"
@@ -654,13 +654,13 @@
       "rank": 10,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -688,7 +688,7 @@
         "min_aisle_width_mm: needs 2800, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 2800, only 1900 available"
@@ -719,7 +719,7 @@
         "min_aisle_width_mm: needs 2050, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 2050, only 1900 available"
@@ -747,13 +747,13 @@
       "rank": 13,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -778,13 +778,13 @@
       "rank": 14,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -809,13 +809,13 @@
       "rank": 15,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -843,7 +843,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -874,7 +874,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -902,13 +902,13 @@
       "rank": 18,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -933,13 +933,13 @@
       "rank": 19,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "US",
@@ -964,13 +964,13 @@
       "rank": 20,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -995,13 +995,13 @@
       "rank": 21,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1026,13 +1026,13 @@
       "rank": 22,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -1057,13 +1057,13 @@
       "rank": 23,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1088,13 +1088,13 @@
       "rank": 24,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -1122,7 +1122,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -1150,13 +1150,13 @@
       "rank": 26,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1181,13 +1181,13 @@
       "rank": 27,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -1212,13 +1212,13 @@
       "rank": 28,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -1243,13 +1243,13 @@
       "rank": 29,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "BE",
@@ -1277,7 +1277,7 @@
         "min_aisle_width_mm: needs 3000, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 3000, only 1900 available"
@@ -1305,13 +1305,13 @@
       "rank": 31,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -1336,13 +1336,13 @@
       "rank": 32,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "FR",
@@ -1367,13 +1367,13 @@
       "rank": 33,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -1401,7 +1401,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -1429,13 +1429,13 @@
       "rank": 35,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1463,7 +1463,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -1491,13 +1491,13 @@
       "rank": 37,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -1522,13 +1522,13 @@
       "rank": 38,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1553,13 +1553,13 @@
       "rank": 39,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "US",
@@ -1587,7 +1587,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -1618,7 +1618,7 @@
         "min_aisle_width_mm: needs 3000, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 3000, only 1900 available"
@@ -1646,13 +1646,13 @@
       "rank": 42,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -1677,13 +1677,13 @@
       "rank": 43,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1708,13 +1708,13 @@
       "rank": 44,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -1739,13 +1739,13 @@
       "rank": 45,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -1773,7 +1773,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -1801,13 +1801,13 @@
       "rank": 47,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -1832,13 +1832,13 @@
       "rank": 48,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "IT",
@@ -1866,7 +1866,7 @@
         "min_aisle_width_mm: needs 3071, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 3071, only 1900 available"
@@ -1894,13 +1894,13 @@
       "rank": 50,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -1925,13 +1925,13 @@
       "rank": 51,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1956,13 +1956,13 @@
       "rank": 52,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -1987,13 +1987,13 @@
       "rank": 53,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "BE",
@@ -2018,13 +2018,13 @@
       "rank": 54,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -2052,7 +2052,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2080,13 +2080,13 @@
       "rank": 56,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "US",
@@ -2111,13 +2111,13 @@
       "rank": 57,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -2142,13 +2142,13 @@
       "rank": 58,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2176,7 +2176,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2204,13 +2204,13 @@
       "rank": 60,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2238,7 +2238,7 @@
         "min_aisle_width_mm: needs 2900, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 2900, only 1900 available"
@@ -2266,13 +2266,13 @@
       "rank": 62,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2300,7 +2300,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2331,7 +2331,7 @@
         "min_aisle_width_mm: needs 3075, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 3075, only 1900 available"
@@ -2362,7 +2362,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2393,7 +2393,7 @@
         "min_aisle_width_mm: needs 2660, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 2660, only 1900 available"
@@ -2421,13 +2421,13 @@
       "rank": 67,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -2452,13 +2452,13 @@
       "rank": 68,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2486,7 +2486,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2517,7 +2517,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2548,7 +2548,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2576,13 +2576,13 @@
       "rank": 72,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "SE",
@@ -2610,7 +2610,7 @@
         "min_aisle_width_mm: needs 2700, only 1900 available"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "min_aisle_width_mm: needs 2700, only 1900 available"
@@ -2638,13 +2638,13 @@
       "rank": 74,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -2669,13 +2669,13 @@
       "rank": 75,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "FR",
@@ -2703,7 +2703,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2734,7 +2734,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"
@@ -2762,13 +2762,13 @@
       "rank": 78,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2796,7 +2796,7 @@
         "vna_capable: required but not confirmed (value: None)"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: required but not confirmed (value: None)"

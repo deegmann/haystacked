@@ -27,7 +27,7 @@ UI_HINTS = {
     "load_type": (
         "What type of load carriers will be transported? (e.g. Euro pallet, wire mesh box, container)"
     ),
-    "agv_type": (
+    "product_type": (
         "What AGV type is required? (automatically detected from the document)"
     ),
 

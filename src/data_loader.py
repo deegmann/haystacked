@@ -26,7 +26,7 @@ _SCHEMA   = json.loads(_CONFIG.read_text())
 
 JOIN_SQL = """
 SELECT
-    p.product_id, p.company_id, p.base_model_id, p.product_name, p.agv_type,
+    p.product_id, p.company_id, p.base_model_id, p.product_name, p.product_type,
     p.product_description, p.reference_count, p.min_project_value_eur,
     p.max_project_value_eur, p.lead_time_weeks, p.distribution_model,
     p.is_oem_product, p.service_coverage, p.active,
@@ -175,7 +175,7 @@ def load_suppliers(db_path: Path = DB_PATH) -> list[SupplierRecord]:
             company_id            = row_first["company_id"],
             base_model_id         = row_first["base_model_id"],
             product_name          = row_first["product_name"],
-            agv_type              = row_first["agv_type"],
+            product_type          = row_first["product_type"],
             product_description   = row_first.get("product_description"),
             reference_count       = _parse_int(row_first.get("reference_count")),
             min_project_value_eur = _parse_int(row_first.get("min_project_value_eur")),

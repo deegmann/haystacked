@@ -28,7 +28,7 @@ HEADERS = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json
 
 # ---------------------------------------------------------------------------
 # Supplier data  (company → list of products)
-# Each product: {name, agv_type, description?, ext: {spec fields}}
+# Each product: {name, product_type, description?, ext: {spec fields}}
 # ---------------------------------------------------------------------------
 
 SUPPLIERS = [
@@ -40,7 +40,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "MaxMover CB D2000",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "oceaneering.com MaxMover CB D 2000 product page. Counterbalance forklift AGV, 2000kg / 4400lb, lift 5000mm, 2.0 m/s, natural-feature nav.",
                 "ext": {
                     "max_payload_kg": 2000,
@@ -54,7 +54,7 @@ SUPPLIERS = [
             },
             {
                 "name": "UniMover O 600",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "oceaneering.com UniMover O 600. Underride AMR, 600kg / 1322lb, natural-feature nav.",
                 "ext": {
                     "max_payload_kg": 600,
@@ -64,7 +64,7 @@ SUPPLIERS = [
             },
             {
                 "name": "UniMover U 1500",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "oceaneering.com UniMover U 1500. Underride AMR, 1500kg, natural-feature nav.",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -83,7 +83,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "VisionNav VNP15",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "visionnav.com VNP15 product page. Pallet stacker AGV, 1500kg, lift 3000mm std (opt 4500mm), 3D SLAM nav.",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -96,7 +96,7 @@ SUPPLIERS = [
             },
             {
                 "name": "VisionNav VNP20",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "visionnav.com VNP20. Pallet stacker, 1900kg, 3D SLAM.",
                 "ext": {
                     "max_payload_kg": 1900,
@@ -108,7 +108,7 @@ SUPPLIERS = [
             },
             {
                 "name": "VisionNav VNE20",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "visionnav.com VNE20. Counterbalance/reach truck AGV, 1500kg, lift 3000mm, aisle 3760mm (PM-verified). 3D SLAM.",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -131,7 +131,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "OTTO 100",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "ottomotors.com OTTO 100. Compact underride AMR, 150kg payload (model number ≠ payload), 2.0 m/s.",
                 "ext": {
                     "max_payload_kg": 150,
@@ -142,7 +142,7 @@ SUPPLIERS = [
             },
             {
                 "name": "OTTO 600",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "ottomotors.com OTTO 600. Underride AMR, 600kg, 1.4 m/s.",
                 "ext": {
                     "max_payload_kg": 600,
@@ -153,7 +153,7 @@ SUPPLIERS = [
             },
             {
                 "name": "OTTO 1200",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "ottomotors.com OTTO 1200. Heavy-duty tight-space AMR, 1200kg.",
                 "ext": {
                     "max_payload_kg": 1200,
@@ -163,7 +163,7 @@ SUPPLIERS = [
             },
             {
                 "name": "OTTO 1500",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "ottomotors.com OTTO 1500. Large underride AMR. IMPORTANT: actual payload 1900kg (model '1500' ≠ payload). 2.0 m/s.",
                 "ext": {
                     "max_payload_kg": 1900,
@@ -183,7 +183,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "Open Shuttle Fork",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "knapp.com Open Shuttle Fork. AMR pallet forklift, 1300kg, lift 0–1200mm, natural-feature SLAM.",
                 "ext": {
                     "max_payload_kg": 1300,
@@ -196,7 +196,7 @@ SUPPLIERS = [
             },
             {
                 "name": "Open Shuttle",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "knapp.com Open Shuttle container/tote transport AMR. 120kg payload, natural-feature SLAM.",
                 "ext": {
                     "max_payload_kg": 120,
@@ -215,7 +215,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "GreyOrange Ranger Forklift (RF-AP)",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "greyorange.com RF-AP (Ranger Forklift AnyPallet). Forklift AMR, 2000kg, 1.7 m/s, 2D LiDAR SLAM.",
                 "ext": {
                     "max_payload_kg": 2000,
@@ -228,7 +228,7 @@ SUPPLIERS = [
             },
             {
                 "name": "GreyOrange Ranger RIL-H",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "greyorange.com Ranger Intralogistics-H (RIL-H). Tall underride AMR, 1400kg, 1.5 m/s.",
                 "ext": {
                     "max_payload_kg": 1400,
@@ -239,7 +239,7 @@ SUPPLIERS = [
             },
             {
                 "name": "GreyOrange Ranger RU-L",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "greyorange.com Ranger Uplift-L (RU-L). Underride lift AMR, 1000kg, 2.0 m/s.",
                 "ext": {
                     "max_payload_kg": 1000,
@@ -259,7 +259,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "SAFELOG AGV L1",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "safelog.de AGV L1. Underride/tugger AMR, 1500kg carry / 3000kg tow, LiDAR SLAM. MEDIUM confidence (aggregator specs).",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -270,7 +270,7 @@ SUPPLIERS = [
             },
             {
                 "name": "SAFELOG AGV M4",
-                "agv_type": "Tugger AGV",
+                "product_type": "Tugger AGV",
                 "source_notes": "safelog.de AGV M4. Handling/tugger AGV, 200kg own payload, 1500kg towing, 1.6 m/s. MEDIUM.",
                 "ext": {
                     "max_payload_kg": 200,
@@ -282,7 +282,7 @@ SUPPLIERS = [
             },
             {
                 "name": "SAFELOG AGV S3",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "safelog.de AGV S3. Light underride AMR, 150kg, LiDAR SLAM. MEDIUM.",
                 "ext": {
                     "max_payload_kg": 150,
@@ -292,7 +292,7 @@ SUPPLIERS = [
             },
             {
                 "name": "SAFELOG AGV X1",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "safelog.de AGV X1. Low-lift underride AMR, 1200kg, lift 80mm (under-pallet only), LiDAR SLAM. MEDIUM.",
                 "ext": {
                     "max_payload_kg": 1200,
@@ -312,7 +312,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "MAXOLUTION TV015",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "sew-eurodrive.at MAXOLUTION Mobile Assistance Systems TV015. Transport vehicle, 1500kg. Configurable nav (tape/inductive/SLAM). MEDIUM-HIGH.",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -322,7 +322,7 @@ SUPPLIERS = [
             },
             {
                 "name": "MAXOLUTION LA015",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "sew-eurodrive.at MAXOLUTION LA015. Logistics assistant, 1500kg. Configurable nav. MEDIUM-HIGH.",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -340,7 +340,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "Stäubli FL1500",
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "source_notes": "staubli.com FL1500 automated counterbalance forklift, 1500kg. Lift/speed: datasheet 403-blocked. MEDIUM.",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -361,7 +361,7 @@ SUPPLIERS = [
         "products": [
             {
                 "name": "MLR Mayesto",
-                "agv_type": "Mobile AMR",
+                "product_type": "Mobile AMR",
                 "source_notes": "mlr.de / mobile-robots.com directory. Transport AGV, 1500kg, 2.7 m/s. MEDIUM confidence (directory source).",
                 "ext": {
                     "max_payload_kg": 1500,
@@ -411,13 +411,13 @@ def run_import():
             continue
 
         for prod in supplier["products"]:
-            print(f"  → {prod['name']} ({prod['agv_type']})")
+            print(f"  → {prod['name']} ({prod['product_type']})")
 
             # 2. Create base_model
             try:
                 bm_fields = {
                     "base_model_name": prod["name"],
-                    "agv_type": prod["agv_type"],
+                    "product_type": prod["product_type"],
                     "base_model_id": str(uuid.uuid4()),
                 }
                 bm_rec = post_record("base_models", bm_fields)
@@ -432,7 +432,7 @@ def run_import():
             try:
                 pr_fields = {
                     "product_name": prod["name"],
-                    "agv_type": prod["agv_type"],
+                    "product_type": prod["product_type"],
                     "active": True,
                     "company_id": [co_rec],
                     "base_model_id": [bm_rec],
@@ -453,7 +453,7 @@ def run_import():
                 ext = prod.get("ext", {})
                 ext_fields = {
                     "model_name": prod["name"],
-                    "agv_type": prod["agv_type"],
+                    "product_type": prod["product_type"],
                     "base_model_id": [bm_rec],
                     "extension_id": str(uuid.uuid4()),
                 }

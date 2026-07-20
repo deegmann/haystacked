@@ -215,7 +215,7 @@ function renderCell(key, val) {
   if (typeof val==='boolean') return val ? '<span class="bool-yes">✓</span>' : '<span class="bool-no">✗</span>';
   if (Array.isArray(val)) return val.length ? val.join(', ') : '<span class="cell-na">–</span>';
   if (key==='country')   return `<span class="country-badge">${val}</span>`;
-  if (key==='agv_type')  return `<span class="type-pill type-pill-sm">${val}</span>`;
+  if (key==='product_type')  return `<span class="type-pill type-pill-sm">${val}</span>`;
   if (key.endsWith('_eur') && typeof val==='number') return '€'+val.toLocaleString();
   return val;
 }
@@ -284,7 +284,7 @@ function renderRows(data) {
   empty.classList.add('hidden');
 
   data.forEach((r, idx) => {
-    const rowType = r.agv_type;
+    const rowType = r.product_type;
     let cells = `<td class="sc-0" style="color:var(--steel);text-align:center;font-size:11px">${idx+1}</td>`;
 
     for (const c of cols) {
@@ -316,7 +316,7 @@ function filterRows() {
   // Reset horizontal scroll so narrower column sets don't leave the table off-screen
   document.querySelector('.db-wrap').scrollLeft = 0;
   renderRows(_allSuppliers.filter(r => {
-    if (typ && r.agv_type  !== typ) return false;
+    if (typ && r.product_type  !== typ) return false;
     if (cty && r.country   !== cty) return false;
     if (q && !(String(r.company_name||'')+' '+String(r.product_name||'')).toLowerCase().includes(q)) return false;
     return true;
@@ -372,7 +372,7 @@ function buildTable(suppliers, meta) {
     });
 
   // Populate AGV type filter
-  const types = [...new Set(suppliers.map(r => r.agv_type).filter(Boolean))].sort();
+  const types = [...new Set(suppliers.map(r => r.product_type).filter(Boolean))].sort();
   const typeEl = document.getElementById('typeFilter');
   types.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; typeEl.appendChild(o); });
 

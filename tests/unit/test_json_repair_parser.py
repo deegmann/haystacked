@@ -8,28 +8,28 @@ from src.json_repair import repair_and_parse
 
 
 def test_U_J_01_clean_json():
-    raw = '{"agv_type": "Forklift AGV", "payload": 1500}'
+    raw = '{"product_type": "Forklift AGV", "payload": 1500}'
     result = repair_and_parse(raw)
-    assert result["agv_type"] == "Forklift AGV"
+    assert result["product_type"] == "Forklift AGV"
     assert result["payload"] == 1500
 
 
 def test_U_J_02_markdown_fence():
-    raw = '```json\n{"agv_type": "Tugger AGV"}\n```'
+    raw = '```json\n{"product_type": "Tugger AGV"}\n```'
     result = repair_and_parse(raw)
-    assert result["agv_type"] == "Tugger AGV"
+    assert result["product_type"] == "Tugger AGV"
 
 
 def test_U_J_03_prose_before_json():
-    raw = 'Here is the extracted data:\n{"agv_type": "Mobile AMR"}'
+    raw = 'Here is the extracted data:\n{"product_type": "Mobile AMR"}'
     result = repair_and_parse(raw)
-    assert result["agv_type"] == "Mobile AMR"
+    assert result["product_type"] == "Mobile AMR"
 
 
 def test_U_J_04_string_null_field_survives():
-    raw = '{"agv_type": "Forklift AGV", "payload": "null"}'
+    raw = '{"product_type": "Forklift AGV", "payload": "null"}'
     result = repair_and_parse(raw)
-    assert "agv_type" in result and "payload" in result, (
+    assert "product_type" in result and "payload" in result, (
         "Both fields must be present after parsing"
     )
 
@@ -43,17 +43,17 @@ def test_U_J_05_string_bool_fields_survive():
 
 
 def test_U_J_06_truncated_json():
-    raw = '{"agv_type": "Forklift AGV", "payload": 1500, "incomplete'
+    raw = '{"product_type": "Forklift AGV", "payload": 1500, "incomplete'
     result = repair_and_parse(raw)
-    assert result.get("agv_type") == "Forklift AGV", (
+    assert result.get("product_type") == "Forklift AGV", (
         "Complete field before truncation point must survive repair"
     )
 
 
 def test_U_J_07_unescaped_newlines():
-    raw = '{"summary": "Line one\nLine two", "agv_type": "Mobile AMR"}'
+    raw = '{"summary": "Line one\nLine two", "product_type": "Mobile AMR"}'
     result = repair_and_parse(raw)
-    assert "agv_type" in result
+    assert "product_type" in result
 
 
 def test_U_J_08_completely_unparseable():
@@ -64,9 +64,9 @@ def test_U_J_08_completely_unparseable():
 
 def test_U_J_09_stray_brace_after_json():
     # Stage 0 brace-balance: trailing } in prose must not extend the candidate
-    raw = '{"agv_type": "Forklift AGV"} and then some prose with a stray }'
+    raw = '{"product_type": "Forklift AGV"} and then some prose with a stray }'
     result = repair_and_parse(raw)
-    assert result["agv_type"] == "Forklift AGV"
+    assert result["product_type"] == "Forklift AGV"
     assert len(result) == 1
 
 

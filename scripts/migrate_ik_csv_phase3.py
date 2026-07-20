@@ -1,19 +1,19 @@
 """migrate_ik_csv_phase3.py — Phase 3 IK Sprint: CSV data migration.
 
-Corrects IK records in local CSVs from pre-Option-D (agv_type = sub-type)
-to Option-D (agv_type = "Industrial Refrigeration" + served_categories).
+Corrects IK records in local CSVs from pre-Option-D (product_type = sub-type)
+to Option-D (product_type = "Industrial Refrigeration" + served_categories).
 
 Changes:
   base_model_extensions.csv:
-    - IK records: agv_type → "Industrial Refrigeration"
-    - adds served_categories column (maps from old agv_type value)
+    - IK records: product_type → "Industrial Refrigeration"
+    - adds served_categories column (maps from old product_type value)
     - BITZER COSS record: served_categories = "Cold Store|Deep Freeze"
 
   products.csv:
-    - IK records: agv_type → "Industrial Refrigeration"
+    - IK records: product_type → "Industrial Refrigeration"
 
   base_models.csv:
-    - IK records: agv_type → "Industrial Refrigeration"
+    - IK records: product_type → "Industrial Refrigeration"
 """
 
 import csv
@@ -67,7 +67,7 @@ def migrate_base_model_extensions():
 
     updated = 0
     for row in rows:
-        old_type = row.get("agv_type", "")
+        old_type = row.get("product_type", "")
         if old_type not in IK_SUB_TYPES:
             continue
 
@@ -75,12 +75,12 @@ def migrate_base_model_extensions():
         if _is_bitzer(row):
             served = "Cold Store|Deep Freeze"
             print(f"  BITZER record (cooling_capacity_kw={row.get('cooling_capacity_kw')}): "
-                  f"agv_type '{old_type}' → '{NEW_AGV_TYPE}', served_categories='{served}'")
+                  f"product_type '{old_type}' → '{NEW_AGV_TYPE}', served_categories='{served}'")
         else:
             served = old_type  # e.g. "Process Cooling" stays as-is
-            print(f"  agv_type '{old_type}' → '{NEW_AGV_TYPE}', served_categories='{served}'")
+            print(f"  product_type '{old_type}' → '{NEW_AGV_TYPE}', served_categories='{served}'")
 
-        row["agv_type"] = NEW_AGV_TYPE
+        row["product_type"] = NEW_AGV_TYPE
         row["served_categories"] = served
         updated += 1
 
@@ -96,10 +96,10 @@ def migrate_products():
 
     updated = 0
     for row in rows:
-        old_type = row.get("agv_type", "")
+        old_type = row.get("product_type", "")
         if old_type in IK_SUB_TYPES:
-            print(f"  agv_type '{old_type}' → '{NEW_AGV_TYPE}' (product: {row.get('product_name', '?')})")
-            row["agv_type"] = NEW_AGV_TYPE
+            print(f"  product_type '{old_type}' → '{NEW_AGV_TYPE}' (product: {row.get('product_name', '?')})")
+            row["product_type"] = NEW_AGV_TYPE
             updated += 1
 
     print(f"  Updated {updated} IK records in products.csv")
@@ -114,10 +114,10 @@ def migrate_base_models():
 
     updated = 0
     for row in rows:
-        old_type = row.get("agv_type", "")
+        old_type = row.get("product_type", "")
         if old_type in IK_SUB_TYPES:
-            print(f"  agv_type '{old_type}' → '{NEW_AGV_TYPE}' (model: {row.get('base_model_name', '?')})")
-            row["agv_type"] = NEW_AGV_TYPE
+            print(f"  product_type '{old_type}' → '{NEW_AGV_TYPE}' (model: {row.get('base_model_name', '?')})")
+            row["product_type"] = NEW_AGV_TYPE
             updated += 1
 
     print(f"  Updated {updated} IK records in base_models.csv")

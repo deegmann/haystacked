@@ -3,7 +3,7 @@
   "description": "Dragonfly -- VNA Forklift AGV, high-bay VNA pallet racking, WMS Reflex integration",
   "source_file": "Dragonfly.pdf",
   "requirements": {
-    "agv_type": "Forklift AGV",
+    "product_type": "Forklift AGV",
     "lifting_height_mm": 10000,
     "min_aisle_width_mm": 1800,
     "navigation_type": ["Natural Feature", "Laser"],

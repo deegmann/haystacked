@@ -140,7 +140,7 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
     # Extract vehicle type: top-level result key (set by app.py after Pass 4a)
     vehicle_type = (
         result.get("vehicle_type_canonical")
-        or agv_criteria.get("required_agv_type")
+        or agv_criteria.get("required_product_type")
         or "unknown"
     )
 

@@ -82,7 +82,7 @@
     "required_trailer_unloading": null,
     "required_guidance": null,
     "required_busbar_compatible": null,
-    "required_agv_type": "Forklift AGV",
+    "required_product_type": "Forklift AGV",
     "required_vna_capable": "not_required",
     "_validation_warnings": [
       "lifting_height_mm: 10000.0 mm → 10 m (automatisch konvertiert)",
@@ -112,7 +112,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -175,7 +175,7 @@
           "value": true
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts",
@@ -234,7 +234,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -266,7 +266,7 @@
         "max_payload_kg: 60.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 60.0 < required 1200.0"
@@ -298,7 +298,7 @@
         "lifting_height_mm: 5500 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -343,7 +343,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -406,7 +406,7 @@
           "value": true
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts",
@@ -465,7 +465,7 @@
           ]
         }
       ],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [
         "autonomous_charging: +6 pts",
         "safety_standard: +5 pts"
@@ -497,7 +497,7 @@
         "max_payload_kg: 60.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 60.0 < required 1200.0"
@@ -529,7 +529,7 @@
         "lifting_height_mm: 5500 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -561,7 +561,7 @@
         "max_payload_kg: 250.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 250.0 < required 1200.0"
@@ -592,7 +592,7 @@
         "lifting_height_mm: 4700 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 4700 < required 10000"
@@ -620,13 +620,13 @@
       "rank": 8,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -654,7 +654,7 @@
         "lifting_height_mm: 1200 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 1200 < required 10000"
@@ -685,7 +685,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -713,13 +713,13 @@
       "rank": 11,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -744,13 +744,13 @@
       "rank": 12,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -778,7 +778,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -809,7 +809,7 @@
         "lifting_height_mm: 5000 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 5000 < required 10000"
@@ -841,7 +841,7 @@
         "lifting_height_mm: 9000 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -873,7 +873,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -904,7 +904,7 @@
         "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
@@ -932,13 +932,13 @@
       "rank": 18,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "US",
@@ -966,7 +966,7 @@
         "max_payload_kg: 600.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 600.0 < required 1200.0"
@@ -997,7 +997,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -1029,7 +1029,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Contour', 'Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
@@ -1061,7 +1061,7 @@
         "max_payload_kg: 600.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 600.0 < required 1200.0"
@@ -1090,14 +1090,14 @@
       "disqualified": true,
       "disqualified_by": [
         "navigation_type: ['Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Magnetic Tape'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -1125,7 +1125,7 @@
         "lifting_height_mm: 4400 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 4400 < required 10000"
@@ -1153,13 +1153,13 @@
       "rank": 25,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1187,7 +1187,7 @@
         "max_payload_kg: 800.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 800.0 < required 1200.0"
@@ -1218,7 +1218,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -1249,7 +1249,7 @@
         "max_payload_kg: 600.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 600.0 < required 1200.0"
@@ -1280,7 +1280,7 @@
         "lifting_height_mm: 9800 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 9800 < required 10000"
@@ -1308,13 +1308,13 @@
       "rank": 30,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -1339,13 +1339,13 @@
       "rank": 31,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "FR",
@@ -1373,7 +1373,7 @@
         "max_payload_kg: 500.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 500.0 < required 1200.0"
@@ -1404,7 +1404,7 @@
         "max_payload_kg: 250.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 250.0 < required 1200.0"
@@ -1436,7 +1436,7 @@
         "max_payload_kg: 500.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Contour', 'Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -1465,13 +1465,13 @@
       "rank": 35,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DK",
@@ -1497,14 +1497,14 @@
       "disqualified": true,
       "disqualified_by": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1532,7 +1532,7 @@
         "max_payload_kg: 250.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 250.0 < required 1200.0"
@@ -1563,7 +1563,7 @@
         "lifting_height_mm: 200 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 200 < required 10000"
@@ -1594,7 +1594,7 @@
         "lifting_height_mm: 5400 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 5400 < required 10000"
@@ -1622,13 +1622,13 @@
       "rank": 40,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -1653,13 +1653,13 @@
       "rank": 41,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1687,7 +1687,7 @@
         "max_payload_kg: 300.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 300.0 < required 1200.0"
@@ -1715,13 +1715,13 @@
       "rank": 43,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -1749,7 +1749,7 @@
         "lifting_height_mm: 125 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 125 < required 10000"
@@ -1780,7 +1780,7 @@
         "max_payload_kg: 250.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 250.0 < required 1200.0"
@@ -1809,14 +1809,14 @@
       "disqualified": true,
       "disqualified_by": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "IT",
@@ -1844,7 +1844,7 @@
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
@@ -1875,7 +1875,7 @@
         "max_payload_kg: 250.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 250.0 < required 1200.0"
@@ -1903,13 +1903,13 @@
       "rank": 49,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -1938,7 +1938,7 @@
         "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector', 'QR/DM Code', 'Inductive Loop'] does not include any of ['Natural Feature (SLAM)']",
@@ -1967,13 +1967,13 @@
       "rank": 51,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -1998,13 +1998,13 @@
       "rank": 52,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "BE",
@@ -2032,7 +2032,7 @@
         "max_payload_kg: 100.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 100.0 < required 1200.0"
@@ -2063,7 +2063,7 @@
         "lifting_height_mm: 3244 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 3244 < required 10000"
@@ -2094,7 +2094,7 @@
         "max_payload_kg: 90.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 90.0 < required 1200.0"
@@ -2123,14 +2123,14 @@
       "disqualified": true,
       "disqualified_by": [
         "navigation_type: ['Laser Reflector', 'Contour'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector', 'Contour'] does not include any of ['Natural Feature (SLAM)']",
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "AT",
@@ -2155,13 +2155,13 @@
       "rank": 57,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2189,7 +2189,7 @@
         "lifting_height_mm: 8500 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 8500 < required 10000"
@@ -2220,7 +2220,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -2251,7 +2251,7 @@
         "max_payload_kg: 1000.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
         "max_payload_kg: 1000.0 < required 1200.0"
@@ -2283,7 +2283,7 @@
         "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -2315,7 +2315,7 @@
         "lifting_height_mm: 2800 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 2800 < required 10000"
@@ -2347,7 +2347,7 @@
         "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector', 'Wire'] does not include any of ['Natural Feature (SLAM)']",
@@ -2379,7 +2379,7 @@
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
@@ -2410,7 +2410,7 @@
         "lifting_height_mm: 2800 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 2800 < required 10000"
@@ -2442,7 +2442,7 @@
         "lifting_height_mm: 120 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -2471,13 +2471,13 @@
       "rank": 67,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "CN",
@@ -2502,13 +2502,13 @@
       "rank": 68,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2537,7 +2537,7 @@
         "vna_capable: not required — VNA equipment unsuitable for standard-aisle tender"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -2570,7 +2570,7 @@
         "max_payload_kg: 700.0 < required 1200.0"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']",
@@ -2602,7 +2602,7 @@
         "lifting_height_mm: 1600 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 1600 < required 10000"
@@ -2630,13 +2630,13 @@
       "rank": 72,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "SE",
@@ -2664,7 +2664,7 @@
         "lifting_height_mm: 3000 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 3000 < required 10000"
@@ -2692,13 +2692,13 @@
       "rank": 74,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "ES",
@@ -2723,13 +2723,13 @@
       "rank": 75,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Tugger AGV",
+      "product_type": "Tugger AGV",
       "reasons": [],
       "knockouts": [
-        "agv_type: Tugger AGV ≠ required Forklift AGV"
+        "product_type: Tugger AGV ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "FR",
@@ -2757,7 +2757,7 @@
         "lifting_height_mm: 4000 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 4000 < required 10000"
@@ -2788,7 +2788,7 @@
         "lifting_height_mm: 60 < required 10000"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "lifting_height_mm: 60 < required 10000"
@@ -2816,13 +2816,13 @@
       "rank": 78,
       "disqualified": true,
       "disqualified_by": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "score_details": [],
-      "agv_type": "Mobile AMR",
+      "product_type": "Mobile AMR",
       "reasons": [],
       "knockouts": [
-        "agv_type: Mobile AMR ≠ required Forklift AGV"
+        "product_type: Mobile AMR ≠ required Forklift AGV"
       ],
       "website": "",
       "origin": "DE",
@@ -2850,7 +2850,7 @@
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"
       ],
       "score_details": [],
-      "agv_type": "Forklift AGV",
+      "product_type": "Forklift AGV",
       "reasons": [],
       "knockouts": [
         "navigation_type: ['Laser Reflector'] does not include any of ['Natural Feature (SLAM)']"

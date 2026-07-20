@@ -851,7 +851,7 @@ function renderSupplierCards(allResults) {
     const productRows = c.qualified_products.map((p, pi) => {
       const ppct = maxScore > 0 ? Math.max(0, Math.round(p.score / maxScore * 100)) : 0;
       return `<div class="sc-product-row${pi > 0 ? ' sc-product-secondary' : ''}">
-        <span class="type-pill">${p.agv_type || '–'}</span>
+        <span class="type-pill">${p.product_type || '–'}</span>
         <span class="sc-product-name">${p.product}</span>
         <span class="sc-score-pct">${ppct}%</span>
       </div>`;
@@ -904,7 +904,7 @@ function renderSupplierCards(allResults) {
       const productRows = c.qualified_products.map((p, pi) => {
         const ppct = maxScore > 0 ? Math.max(0, Math.round(p.score / maxScore * 100)) : 0;
         return `<div class="sc-product-row${pi > 0 ? ' sc-product-secondary' : ''}">
-          <span class="type-pill">${p.agv_type || '–'}</span>
+          <span class="type-pill">${p.product_type || '–'}</span>
           <span class="sc-product-name">${p.product}</span>
           <span class="sc-score-pct">${ppct}%</span>
         </div>`;
@@ -948,7 +948,7 @@ function renderSupplierCards(allResults) {
   const excludedCompanies = [];
   for (const c of companies) {
     const matchingDisq = c.products.filter(p =>
-      p.disqualified && (!tenderVT || p.agv_type === tenderVT)
+      p.disqualified && (!tenderVT || p.product_type === tenderVT)
     );
     if (!matchingDisq.length) continue;
     const vtBest = matchingDisq.reduce((a, b) => (b.score > a.score ? b : a));
@@ -970,7 +970,7 @@ function renderSupplierCards(allResults) {
         .filter(p => p.disqualified)
         .slice(0, 2)
         .map((p, pi) => `<div class="sc-product-row${pi > 0 ? ' sc-product-secondary' : ''}">
-          <span class="type-pill">${p.agv_type || '–'}</span>
+          <span class="type-pill">${p.product_type || '–'}</span>
           <span class="sc-product-name">${p.product}</span>
         </div>`).join('');
 

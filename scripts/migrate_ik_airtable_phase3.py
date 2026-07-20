@@ -5,10 +5,10 @@ One-shot Airtable migration: Option D fixup for IK records.
 What this does:
   1. Add 'served_categories' MultiSelect field to Base Model Extensions (if missing)
   2. Update existing IK extension records:
-     - agv_type: "Process Cooling"/"Cold Store"/"Deep Freeze" → "Industrial Refrigeration"
-     - served_categories: set to original agv_type value (or "Cold Store|Deep Freeze" for BITZER)
-  3. Update existing IK base_model records: same agv_type fix
-  4. Update existing IK product records: same agv_type fix
+     - product_type: "Process Cooling"/"Cold Store"/"Deep Freeze" → "Industrial Refrigeration"
+     - served_categories: set to original product_type value (or "Cold Store|Deep Freeze" for BITZER)
+  3. Update existing IK base_model records: same product_type fix
+  4. Update existing IK product records: same product_type fix
   5. Re-run sync_airtable.py to regenerate local CSVs and DB
 
 Run once after airtable_ik_migration.py was already run (pre-Option-D records exist).
@@ -100,19 +100,19 @@ def get_table_schema():
     return {t["name"]: t for t in data["tables"]}
 
 
-def step0_add_agv_type_option(schema):
-    """Add 'Industrial Refrigeration' as a valid choice to agv_type Single Select in all three tables."""
-    print("\nStep 0: Adding 'Industrial Refrigeration' option to agv_type field...")
+def step0_add_product_type_option(schema):
+    """Add 'Industrial Refrigeration' as a valid choice to product_type Single Select in all three tables."""
+    print("\nStep 0: Adding 'Industrial Refrigeration' option to product_type field...")
     for table_name in ("Base Model Extensions", "Base Models", "Products"):
         t   = schema.get(table_name)
         if not t:
             print(f"  {table_name}: not found in schema — skip")
             continue
         tid = t["id"]
-        # Find the agv_type field
-        agv_field = next((f for f in t["fields"] if f["name"] == "agv_type"), None)
+        # Find the product_type field
+        agv_field = next((f for f in t["fields"] if f["name"] == "product_type"), None)
         if not agv_field:
-            print(f"  {table_name}: agv_type field not found — skip")
+            print(f"  {table_name}: product_type field not found — skip")
             continue
         existing_choices = [c["name"] for c in agv_field.get("options", {}).get("choices", [])]
         if "Industrial Refrigeration" in existing_choices:
@@ -130,7 +130,7 @@ def step0_add_agv_type_option(schema):
         if not r.ok:
             print(f"  {table_name}: PATCH error {r.status_code}: {r.text[:400]}")
             r.raise_for_status()
-        print(f"  {table_name}: added 'Industrial Refrigeration' to agv_type choices")
+        print(f"  {table_name}: added 'Industrial Refrigeration' to product_type choices")
         time.sleep(0.3)
 
 
@@ -168,15 +168,15 @@ def _is_bitzer(fields: dict) -> bool:
 
 
 def step2_fix_extensions(schema):
-    """Fix agv_type + set served_categories on IK extension records."""
+    """Fix product_type + set served_categories on IK extension records."""
     print("\nStep 2: Fixing IK extension records...")
     records = _fetch_all("extensions")
-    ik_recs = [r for r in records if r["fields"].get("agv_type") in IK_SUBTYPES]
+    ik_recs = [r for r in records if r["fields"].get("product_type") in IK_SUBTYPES]
     print(f"  Found {len(ik_recs)} IK extension records to fix")
     for rec in ik_recs:
         rec_id      = rec["id"]
         fields      = rec["fields"]
-        old_subtype = fields["agv_type"]
+        old_subtype = fields["product_type"]
         # Dual-capability check for BITZER
         if _is_bitzer(fields):
             served = ["Cold Store", "Deep Freeze"]
@@ -184,38 +184,38 @@ def step2_fix_extensions(schema):
             served = [old_subtype]
         url = f"{DATA_URL}/{TABLE_IDS['extensions']}/{rec_id}"
         _patch(url, {"fields": {
-            "agv_type":         "Industrial Refrigeration",
+            "product_type":         "Industrial Refrigeration",
             "served_categories": served,
         }}, typecast=True)
-        print(f"  {rec_id}: agv_type {old_subtype!r} → 'Industrial Refrigeration', served_categories={served}")
+        print(f"  {rec_id}: product_type {old_subtype!r} → 'Industrial Refrigeration', served_categories={served}")
 
 
 def step3_fix_base_models():
-    """Fix agv_type on IK base_model records."""
+    """Fix product_type on IK base_model records."""
     print("\nStep 3: Fixing IK base_model records...")
     records = _fetch_all("base_models")
-    ik_recs = [r for r in records if r["fields"].get("agv_type") in IK_SUBTYPES]
+    ik_recs = [r for r in records if r["fields"].get("product_type") in IK_SUBTYPES]
     print(f"  Found {len(ik_recs)} IK base_model records to fix")
     for rec in ik_recs:
         rec_id      = rec["id"]
-        old_subtype = rec["fields"]["agv_type"]
+        old_subtype = rec["fields"]["product_type"]
         url = f"{DATA_URL}/{TABLE_IDS['base_models']}/{rec_id}"
-        _patch(url, {"fields": {"agv_type": "Industrial Refrigeration"}}, typecast=True)
-        print(f"  {rec_id}: agv_type {old_subtype!r} → 'Industrial Refrigeration'")
+        _patch(url, {"fields": {"product_type": "Industrial Refrigeration"}}, typecast=True)
+        print(f"  {rec_id}: product_type {old_subtype!r} → 'Industrial Refrigeration'")
 
 
 def step4_fix_products():
-    """Fix agv_type on IK product records."""
+    """Fix product_type on IK product records."""
     print("\nStep 4: Fixing IK product records...")
     records = _fetch_all("products")
-    ik_recs = [r for r in records if r["fields"].get("agv_type") in IK_SUBTYPES]
+    ik_recs = [r for r in records if r["fields"].get("product_type") in IK_SUBTYPES]
     print(f"  Found {len(ik_recs)} IK product records to fix")
     for rec in ik_recs:
         rec_id      = rec["id"]
-        old_subtype = rec["fields"]["agv_type"]
+        old_subtype = rec["fields"]["product_type"]
         url = f"{DATA_URL}/{TABLE_IDS['products']}/{rec_id}"
-        _patch(url, {"fields": {"agv_type": "Industrial Refrigeration"}}, typecast=True)
-        print(f"  {rec_id}: agv_type {old_subtype!r} → 'Industrial Refrigeration'")
+        _patch(url, {"fields": {"product_type": "Industrial Refrigeration"}}, typecast=True)
+        print(f"  {rec_id}: product_type {old_subtype!r} → 'Industrial Refrigeration'")
 
 
 def main():

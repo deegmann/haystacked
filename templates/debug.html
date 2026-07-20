@@ -194,7 +194,7 @@ function renderRankTable(all) {
       <td class="debug-rank">${r.rank||''}</td>
       <td><strong>${r.product}</strong></td>
       <td>${r.company}</td>
-      <td><span class="type-pill type-pill-sm">${r.agv_type||'–'}</span></td>
+      <td><span class="type-pill type-pill-sm">${r.product_type||'–'}</span></td>
       <td><span class="score-pill score-${cls}">${pct}%<span class="score-max"> ${r.score}/${maxScore}</span></span></td>
       <td>${payload}</td><td>${lift}</td><td>${aisle}</td>
       <td class="debug-reasons">${ko || (r.disqualified ? '' : '<span class="no-match">scored</span>')}</td>`;

@@ -3,7 +3,7 @@
   "description": "Mama -- Counterbalanced Forklift AGV, floor-to-floor pallet transport, 10 filling lines, 2000 kg max payload",
   "source_file": "Mama.pdf",
   "requirements": {
-    "agv_type": "Forklift AGV",
+    "product_type": "Forklift AGV",
     "max_payload_kg": 2000,
     "outdoor_capable": "not_required",
     "vda5050_compatible": "preferred",

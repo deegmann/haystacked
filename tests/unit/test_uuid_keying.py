@@ -53,7 +53,7 @@ def test_T_UUID_04_tender_requirements_from_run_resolves_via_uuid_primary():
     run = build_tender_run(
         run_id="test-uuid-04",
         source_file="test.pdf",
-        new_req={"required_max_payload_kg": 2000.0, "required_agv_type": "Forklift AGV"},
+        new_req={"required_max_payload_kg": 2000.0, "required_product_type": "Forklift AGV"},
         agv_criteria={},
         result={"buyer": "Test", "in_scope": True},
         vehicle_type="Forklift AGV",
@@ -64,6 +64,6 @@ def test_T_UUID_04_tender_requirements_from_run_resolves_via_uuid_primary():
     assert req.get("max_payload_kg") == 2000.0, (
         "TenderRequirements(TenderRun) must resolve max_payload_kg via UUID primary path"
     )
-    assert req.get("agv_type") == "Forklift AGV", (
-        "TenderRequirements(TenderRun) must resolve agv_type via UUID primary path"
+    assert req.get("product_type") == "Forklift AGV", (
+        "TenderRequirements(TenderRun) must resolve product_type via UUID primary path"
     )

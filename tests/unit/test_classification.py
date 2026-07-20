@@ -62,10 +62,10 @@ def test_U_CL_05_variant_map_values_subset_of_legacy_map():
 
 
 def test_U_CL_06_agv_keyword_fallback_returns_correct_type():
-    from src.context_builder import agv_type_keyword_fallback
-    assert agv_type_keyword_fallback("VNA schmalgangstapler hochregal") == "Forklift AGV"
-    assert agv_type_keyword_fallback("tugger schlepper routenzug milk run") == "Tugger AGV"
-    assert agv_type_keyword_fallback("autonomous mobile robot AMR SLAM navigation") == "Mobile AMR"
+    from src.context_builder import product_type_keyword_fallback
+    assert product_type_keyword_fallback("VNA schmalgangstapler hochregal") == "Forklift AGV"
+    assert product_type_keyword_fallback("tugger schlepper routenzug milk run") == "Tugger AGV"
+    assert product_type_keyword_fallback("autonomous mobile robot AMR SLAM navigation") == "Mobile AMR"
 
 
 def test_U_CL_07_agv_system_contains_conservative_value_extraction():

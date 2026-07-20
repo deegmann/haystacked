@@ -227,8 +227,8 @@
   },
   "325dd61d-f828-4639-a128-fd5e1a1a3728": {
     "uuid": "325dd61d-f828-4639-a128-fd5e1a1a3728",
-    "field_name": "agv_type",
-    "tender_key": "required_agv_type",
+    "field_name": "product_type",
+    "tender_key": "required_product_type",
     "entity": "Product",
     "scope": "*",
     "level": "KO",
@@ -1666,7 +1666,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Total towed load in kg. [TUGGER ONLY] — output null unless required_agv_type is 'Tugger AGV'. Source: 'Schleppkraft / towing capacity'.",
+    "hint": "Total towed load in kg. [TUGGER ONLY] — output null unless required_product_type is 'Tugger AGV'. Source: 'Schleppkraft / towing capacity'.",
     "user_description": "What is the maximum total weight of the train? (kg; sum of all trailers including load; e.g. 5,000 kg)",
     "display_mode": null,
     "value_if_null": null

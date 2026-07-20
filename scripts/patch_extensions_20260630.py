@@ -78,7 +78,7 @@ def patch_record(table_name: str, record_id: str, fields: dict) -> None:
 MISSING_EXTENSIONS = [
     {
         "name": "VisionNav VNQ50",
-        "agv_type": "Tugger AGV",
+        "product_type": "Tugger AGV",
         "ext": {
             "max_payload_kg": 5000,
             "towing_capacity_kg": 19958,
@@ -90,7 +90,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "MiR100",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 100,
             "max_speed_ms": 1.5,
@@ -101,7 +101,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "MiR200",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 200,
             "max_speed_ms": 1.5,
@@ -112,7 +112,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "MiR500",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 500,
             "max_speed_ms": 2.0,
@@ -123,7 +123,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "MiR1000",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 1000,
             "max_speed_ms": 2.0,
@@ -134,7 +134,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "OTTO 750",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 750,
             "max_speed_ms": 2.0,
@@ -144,7 +144,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "Omron LD-130CT",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 130,
             "max_speed_ms": 0.9,
@@ -154,7 +154,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "Omron MD-650",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 650,
             "max_speed_ms": 2.2,
@@ -165,7 +165,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "Omron MD-900",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 900,
             "max_speed_ms": 1.8,
@@ -176,7 +176,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "Jungheinrich ERE 225a",
-        "agv_type": "Forklift AGV",
+        "product_type": "Forklift AGV",
         "ext": {
             "max_payload_kg": 2500,
             "lifting_height_mm": 125,
@@ -189,7 +189,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "STILL ACH 06 iGo",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 600,
             "lifting_height_mm": 55,
@@ -201,7 +201,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "STILL ACH 10 iGo",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 1000,
             "lifting_height_mm": 60,
@@ -213,7 +213,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "STILL ACH 15 iGo",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 1500,
             "lifting_height_mm": 60,
@@ -225,7 +225,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "STILL AXH 10 iGo",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 1000,
             "lifting_height_mm": 40,
@@ -237,7 +237,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "KNAPP Open Shuttle 100",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 120,
             "max_speed_ms": 1.5,
@@ -248,7 +248,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "KNAPP Open Shuttle Boxgrip",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 25,
             "max_speed_ms": 1.5,
@@ -259,7 +259,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "KNAPP Open Shuttle 50 ASG",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 50,
             "max_speed_ms": 1.5,
@@ -270,7 +270,7 @@ MISSING_EXTENSIONS = [
     },
     {
         "name": "Grenzebach L600",
-        "agv_type": "Mobile AMR",
+        "product_type": "Mobile AMR",
         "ext": {
             "max_payload_kg": 600,
             "lifting_height_mm": 60,
@@ -312,9 +312,9 @@ def apply_corrections():
         # 1. MLR Mayesto: Mobile AMR → Forklift AGV
         {
             "product_name": "MLR Mayesto",
-            "product_fields": {"agv_type": "Forklift AGV"},
+            "product_fields": {"product_type": "Forklift AGV"},
             "ext_fields": {
-                "agv_type": "Forklift AGV",
+                "product_type": "Forklift AGV",
                 "max_payload_kg": 1500,
                 "lifting_height_mm": 11000,
                 "max_speed_ms": 2.7,
@@ -409,7 +409,7 @@ def run():
 
     for item in MISSING_EXTENSIONS:
         name  = item["name"]
-        atype = item["agv_type"]
+        atype = item["product_type"]
         print(f"\n→ {name}")
 
         bm_rec = find_base_model_by_name(name)
@@ -423,7 +423,7 @@ def run():
             ext = item["ext"]
             ext_fields = {
                 "model_name": name,
-                "agv_type": atype,
+                "product_type": atype,
                 "base_model_id": [bm_rec],
                 "extension_id": str(uuid.uuid4()),
             }

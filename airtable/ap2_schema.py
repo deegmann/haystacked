@@ -114,7 +114,7 @@ COMPANIES_FIELDS = [
 BASE_MODELS_FIELDS = [
     # oem_company_id (link) added after Companies table exists
     text("base_model_id"),
-    ss("agv_type", AGV_TYPES),
+    ss("product_type", AGV_TYPES),
     check("oem_link_public"),
     date_f("last_updated"),
 ]
@@ -122,7 +122,7 @@ BASE_MODELS_FIELDS = [
 PRODUCTS_FIELDS = [
     # company_id (link) and base_model_id (link) added after other tables exist
     text("product_id"),
-    ss("agv_type", AGV_TYPES),
+    ss("product_type", AGV_TYPES),
     longtext("product_description"),
     num_int("reference_count"),
     num_int("min_project_value_eur"),
@@ -138,7 +138,7 @@ PRODUCTS_FIELDS = [
 EXTENSIONS_FIELDS = [
     # base_model_id (link) added after Base Models table exists
     text("extension_id"),
-    ss("agv_type", AGV_TYPES),
+    ss("product_type", AGV_TYPES),
     # SHARED — Navigation & Infrastructure
     ms("navigation_type", [
         "Laser Reflector", "Natural Feature (SLAM)", "Magnetic Tape",

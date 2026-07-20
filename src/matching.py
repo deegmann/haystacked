@@ -13,7 +13,7 @@ To add a new field or change a K.O. condition:
 Operator semantics:
     KO_IF_LT         K.O. if supplier < tender  (e.g. payload, lifting height)
     KO_IF_GT         K.O. if supplier > tender  (e.g. aisle width, turning radius)
-    KO_IF_NEQ        K.O. if supplier ≠ tender  (e.g. agv_type, route_type)
+    KO_IF_NEQ        K.O. if supplier ≠ tender  (e.g. product_type, route_type)
     KO_BOOL_REQUIRED K.O. if tender=required and supplier≠True
     KO_BOOL_EXCLUSIVE Bidirectional: required→must=True; not_required→must≠True (e.g. vna_capable)
     KO_SUBSET        K.O. if no overlap between tender list and supplier list
@@ -82,7 +82,7 @@ def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
     warnings = []
 
     # Fields that are normalized by app.py after extraction — skip AP0 filter for them
-    _SKIP_FILTER = {"required_agv_type", "required_vna_capable", "required_outdoor_capable"}
+    _SKIP_FILTER = {"required_product_type", "required_vna_capable", "required_outdoor_capable"}
 
     for field_spec in _fields.values():
         allowed = field_spec.allowed_values
@@ -348,7 +348,7 @@ class MatchResult:
             "null_gap_fields":  self.null_gap_fields,
             "null_pass_fields": self.null_pass_fields,
             "score_details":   self.score_details,
-            "agv_type":        prod.agv_type,
+            "product_type":    prod.product_type,
             "reasons":         [f"{d['field']}: +{d['points']} pts" for d in self.score_details if d['points'] > 0],
             "knockouts":       self.disqualified_by,
             "website":         prod.website if hasattr(prod, "website") and prod.website else "",
@@ -441,11 +441,11 @@ class Matcher:
             r.max_score += pts
 
         # ── OI-47: only SHARED + VT-specific fields of the supplier ──────────
-        vt_scope = _LEGACY_MAP.get(prod.agv_type)
+        vt_scope = _LEGACY_MAP.get(prod.product_type)
         if not vt_scope:
-            log.error("agv_type %r not in legacy_map — supplier %s skipped", prod.agv_type, prod.product_id)
+            log.error("product_type %r not in legacy_map — supplier %s skipped", prod.product_type, prod.product_id)
             r.disqualified = True
-            r.disqualified_by.append(f"agv_type '{prod.agv_type}' not in scope_registry legacy_map")
+            r.disqualified_by.append(f"product_type '{prod.product_type}' not in scope_registry legacy_map")
             return r
         resolution = _scope_registry["resolution_order"].get(vt_scope, [])
         relevant = [f for f in _fields.values() if f.scope in resolution]

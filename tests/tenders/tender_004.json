@@ -4,7 +4,7 @@
   "source_file": "Beispielausschreibung_AGV_Nordlicht.pdf",
   "in_scope": true,
   "requirements": {
-    "agv_type": "Forklift AGV",
+    "product_type": "Forklift AGV",
     "required_max_payload_kg": 1200,
     "required_lifting_height_mm": 10,
     "required_min_aisle_width_mm": 3.4,

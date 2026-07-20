@@ -28,7 +28,7 @@ Generated files:
 
 tender_key is derived as "required_" + field_name (no separate "Tender JSON Key" column).
     All extraction fields are anchored in AP0 via field_name:
-      required_agv_type          ← agv_type (SHARED, K.O.)
+      required_product_type          ← product_type (SHARED, K.O.)
       required_navigation_type   ← navigation_type (SHARED, Cond. K.O.)
       required_max_payload_kg    ← max_payload_kg (SHARED, K.O.)
       required_lifting_height_mm ← lifting_height_mm (Forklift, K.O.)
@@ -918,11 +918,11 @@ def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -
             names = [n["canonical_name"] for n in leaf_scopes]
             lines.append(f"  IMPORTANT: Only {len(names)} values are valid: {', '.join(repr(n) for n in names)}.")
             lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
+            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_product_type='Tugger AGV'.")
+            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_product_type='Forklift AGV'.")
             lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m → required_product_type='Forklift AGV' AND required_vna_capable=true.")
             lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
             lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
             lines.append("")
@@ -943,24 +943,24 @@ def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -
             lines.append("  THINK STEP BY STEP:")
             lines.append("  IMPORTANT: Only three values are valid: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
             lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
+            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_product_type='Tugger AGV'.")
+            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_product_type='Forklift AGV'.")
             lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m → required_product_type='Forklift AGV' AND required_vna_capable=true.")
             lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
             lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
             lines.append("")
     lines += [
         "Fields:",
-        "- required_agv_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
-        "- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_agv_type='Forklift AGV'.",
+        "- required_product_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
+        "- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_product_type='Forklift AGV'.",
         "",
         "DOCUMENT:",
         "{text}",
         "",
         "JSON:",
-        '{"required_agv_type":null,"required_vna_capable":null}',
+        '{"required_product_type":null,"required_vna_capable":null}',
     ]
     return "\n".join(lines)
 
@@ -1009,28 +1009,28 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
         lines.append(f"  IMPORTANT: Only {len(names)} values are valid: {', '.join(repr(n) for n in names)}.")
         if has_vna_types:
             lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_agv_type='Forklift AGV'.")
+            lines.append("  (1) Towing / tugger / milk run / trailer train / Routenzug? → required_product_type='Tugger AGV'.")
+            lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
+            lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_product_type='Forklift AGV'.")
             lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+            lines.append("      If VNA / very narrow aisle / aisle<2m → required_product_type='Forklift AGV' AND required_vna_capable=true.")
             lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured.")
             lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
             lines.append("")
     _valid_values = ", ".join(repr(n) for n in names) if names else "null"
     lines += [
         "Fields:",
-        f"- required_agv_type: MANDATORY — exactly one of: {_valid_values}.",
+        f"- required_product_type: MANDATORY — exactly one of: {_valid_values}.",
     ]
     if has_vna_types:
-        lines.append("- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_agv_type='Forklift AGV'.")
+        lines.append("- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_product_type='Forklift AGV'.")
     lines += [
         "",
         "DOCUMENT:",
         "{text}",
         "",
         "JSON:",
-        '{"required_agv_type":null,"required_vna_capable":null}',
+        '{"required_product_type":null,"required_vna_capable":null}',
     ]
     content = "\n".join(lines)
     if dom_variant_guides:
@@ -1045,7 +1045,7 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
 
 
 # Fields determined in Pass 4a — excluded from Pass 4b templates
-_4A_FIELDS = {"required_agv_type", "required_vna_capable", "required_served_categories"}
+_4A_FIELDS = {"required_product_type", "required_vna_capable", "required_served_categories"}
 
 
 _OPERATOR_DIRECTION = {
@@ -1090,26 +1090,26 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
         if scope_nodes:
             leaf_scopes = [n for n in scope_nodes.values() if n.get("canonical_name") and n.get("classification_guide")]
             if leaf_scopes:
-                lines += ["Vehicle type classification guide (for required_agv_type):"]
+                lines += ["Vehicle type classification guide (for required_product_type):"]
                 for scope in leaf_scopes:
                     lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
                 lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
                 lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
                 lines.append("")
-                lines.append("  THINK STEP BY STEP when classifying required_agv_type:")
-                lines.append("  IMPORTANT: Only three values are valid for required_agv_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+                lines.append("  THINK STEP BY STEP when classifying required_product_type:")
+                lines.append("  IMPORTANT: Only three values are valid for required_product_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
                 lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-                lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-                lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-                lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_agv_type='Forklift AGV'.")
+                lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_product_type='Tugger AGV'.")
+                lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
+                lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_product_type='Forklift AGV'.")
                 lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
-                lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+                lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_product_type='Forklift AGV' AND required_vna_capable=true.")
                 lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
                 lines.append("")
         else:
             guide = vehicle_types.get("llm_guide", [])
             if guide:
-                lines += ["Vehicle type classification guide (for required_agv_type):"]
+                lines += ["Vehicle type classification guide (for required_product_type):"]
                 seen_names = set()
                 for vt in guide:
                     if vt["name"] in seen_names: continue
@@ -1121,14 +1121,14 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
                 lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
                 lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
                 lines.append("")
-                lines.append("  THINK STEP BY STEP when classifying required_agv_type:")
-                lines.append("  IMPORTANT: Only three values are valid for required_agv_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
+                lines.append("  THINK STEP BY STEP when classifying required_product_type:")
+                lines.append("  IMPORTANT: Only three values are valid for required_product_type: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.")
                 lines.append("  Sub-variants (Counterbalanced, Reach Truck, VNA) are NOT valid outputs — they are internal properties, not types.")
-                lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_agv_type='Tugger AGV'.")
-                lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_agv_type='Mobile AMR'.")
-                lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_agv_type='Forklift AGV'.")
+                lines.append("  (1) Does the doc mention towing / tugger / milk run / trailer train / Routenzug? → required_product_type='Tugger AGV'.")
+                lines.append("  (2) Is this light load (<1000 kg) with flexible SLAM navigation and no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
+                lines.append("  (3) Everything else (pallets, IBCs, drums, racking, forks required, heavy load) → required_product_type='Forklift AGV'.")
                 lines.append("      This includes Counterbalanced, Reach Truck, AND VNA applications — they are all 'Forklift AGV'.")
-                lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_agv_type='Forklift AGV' AND required_vna_capable=true.")
+                lines.append("      If VNA / very narrow aisle / aisle<2m is detected → required_product_type='Forklift AGV' AND required_vna_capable=true.")
                 lines.append("  Do NOT output 'Counterbalanced', 'Reach Truck', 'VNA', or any other sub-variant as the vehicle type.")
                 lines.append("")
 
@@ -1193,7 +1193,7 @@ def build_retry_template(extraction_schema: list) -> str:
         "",
         "Key interpretation rules:",
         "- If a handling point table lists \"Conveyor belt picking/delivery\" as the handling method, set required_conveyor_integration to \"yes\".",
-        "- Tugger AGVs tow trailer trains and CANNOT interface with conveyor belts without manual reloading — if conveyors are present, required_agv_type should NOT be Tugger.",
+        "- Tugger AGVs tow trailer trains and CANNOT interface with conveyor belts without manual reloading — if conveyors are present, required_product_type should NOT be Tugger.",
         "- If most stations use floor delivery but at least one uses conveyor belt, the system needs BOTH floor transport AND conveyor integration.",
         "",
         "DOCUMENT:",
