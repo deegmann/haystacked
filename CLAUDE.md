@@ -24,7 +24,7 @@ After alignment with the user on what to build:
 
 **f) Optional: background E2E check** — if matching or extraction logic was touched, run `backend-llm-tester` in background.
 
-**g) Optional: commit** — only when user explicitly requests.
+**g) Commit after DoD sign-off** — immediately after SA sign-off (or DoD verified by Tech Lead): commit all phase changes. Never end a session with approved, tested work uncommitted — uncommitted AP0/config changes are lost on `git checkout`. One commit per phase; message format: `IK Sprint Phase N: <description> (<tag>)`. Staged files: all modified tracked files + new spec/config/test files; exclude run-once migration scripts unless they have lasting reference value.
 
 ### 3. Continuous Improvement
 Flag architectural drift, redundancy, and improvement opportunities proactively — not just when asked.
@@ -164,11 +164,11 @@ VNA detection sets `required_vna_capable = "required"` which triggers `KO_BOOL_E
 ### Context Builder (`src/context_builder.py`)
 
 Builds the LLM system prompt for AGV extraction by concatenating:
-- `config/industry_readme.md` (domain knowledge — synced from `Spec/haystacked_industry_readme.md`)
+- `config/industry_readme_{slug}.md` per domain (synced from `Spec/haystacked_industry_readme_{slug}.md`)
 - K.O. field names and levels from `config/fields.json` via `src/field_spec.py`
 - Critical matching rules
 
-The industry README is the primary domain knowledge source. Edit `Spec/haystacked_industry_readme.md`; `generate_all.py` syncs it to `config/`.
+The industry README is the primary domain knowledge source. Edit `Spec/haystacked_industry_readme_{slug}.md` for each domain; `generate_all.py` syncs to `config/`.
 
 ### Prompts
 

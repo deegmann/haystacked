@@ -1,0 +1,277 @@
+# haystacked — Industry Read Me (AGV / Intralogistik)
+
+**Purpose.** This document gives an AI model the *domain context* needed to populate and match the haystacked AGV (Automated Guided Vehicle) supplier database correctly. The field specification (AP0) defines *what* to capture; this document explains the *non-obvious relationships* behind those fields — the things a model cannot infer from a datasheet alone. Read this before interpreting product specs or buyer tenders.
+
+**Core principle: trust properties, not labels.** Vendors name the same machine in many ways for marketing reasons. The category a product belongs to should be *derived from its properties*, never taken from the vendor's label. Every section below exists to help you do that derivation.
+
+**Format convention.** Abbreviations are spelled out on first use.
+
+---
+
+## 1. The category labels are deliberately fuzzy
+
+AGV (Automated Guided Vehicle), AMR (Autonomous Mobile Robot), "transport robot", "picking robot" — these terms overlap heavily and are applied inconsistently across vendors. The same physical chassis is often sold as several "types". **Do not classify by the product name.** Classify by the underlying properties (navigation, lift, rotation, grid dependency, payload). The type is an *output* of the properties, not an input.
+
+---
+
+## 2. AGV vs. AMR — navigation is the real tell
+
+The marketing distinction ("AGV = old/guided, AMR = new/smart") is unreliable. The meaningful technical difference is **infrastructure dependence**, visible in `navigation_type`:
+
+- **Infrastructure-bound (classic AGV):** magnetic tape, inductive wire, QR/DataMatrix floor codes, laser reflectors. Needs floor/wall modification. Deterministic, cheap to scale densely.
+- **Free-navigating (classic AMR):** Natural-Feature / SLAM (Simultaneous Localization and Mapping), contour, vision. No floor changes. Flexible, easier to re-route.
+
+Edge case: some vendors (e.g. Balyo) do reflector-free geo-guidance yet are not marketed as AMRs. **Resolve this via `navigation_type` + `infrastructure_required`, not the badge.**
+
+---
+
+## 3. Goods-to-Person (G2P) vs. transport AMR — same hardware, different workflow
+
+This is the single most confusing distinction in the catalogue. A latent-lift / undercarriage robot that drives under a rack and lifts it can serve **either** role; the hardware is often identical. The difference is the *workflow it is embedded in*:
+
+- **Transport AMR:** moves a load/rack point-to-point. Defined by the movement. (`rotation_capable` usually false, `grid_required` usually false.)
+- **Goods-to-Person:** runs a continuous loop bringing racks/pods to a fixed picking station, where a human (or arm) picks, then returns them. Defined by the picking process. (`rotation_capable` true — it turns the pod to present the right face; `grid_required` true — it operates on a structured storage field.)
+
+**Worked example:** Geek+ M-series (transport) and P-series (picking) are near-identical latent-lift robots. The datasheets look almost the same; the workflow and surrounding system (picking station, pick-by-light, WMS logic) differ. **Derive the role from `rotation_capable` + `grid_required`, not from the series name.**
+
+---
+
+## 4. Goods-to-Person vs. Person-to-Goods (picking AMRs) — opposite directions
+
+Easy to conflate with §3 but the opposite flow:
+
+- **Goods-to-Person (G2P):** the human stays still; robots bring goods to them.
+- **Person-to-Goods (picking AMR / "cart follower", e.g. Locus Origin, 6 River Chuck):** the human walks the aisles; the robot accompanies/leads them, carries the totes, and guides the pick path. The goods stay on the shelf.
+
+Both raise picking productivity but imply completely different warehouse layouts and labour models. A "picking robot" could be either — check `picking_mechanism` and whether goods move to a station (G2P) or the worker moves to the goods (person-to-goods).
+
+---
+
+## 5. When VNA (Very Narrow Aisle) capability is needed
+
+VNA trucks operate in aisles roughly 1.5–1.8 m wide (vs. ~2.5–3.5 m for standard reach trucks) by not needing to turn the chassis to stack — only the fork/turret rotates. They are more expensive and often rail/wire-guided in-aisle. Signals in a tender that VNA is required:
+
+- Stated aisle width below ~1.9 m, or the word "Schmalgang" / "narrow aisle".
+- High storage density / land-cost pressure ("maximise pallet positions per m²").
+- Retrofitting an **existing** high-bay narrow-aisle warehouse (the racking is fixed; the truck must fit it).
+- High lift heights (often >8–10 m) combined with tight aisles.
+- "Man-up" picking references (operator cab rises with the forks).
+
+If none of these is present, VNA is usually *not* required and demanding it would over-spec the tender. Conversely, a wide-aisle site never needs VNA. (`vna_capable`, `min_aisle_width_mm`, `guidance`.)
+
+**Important implication for extraction:** VNA always implies rack operations. If `required_vna_capable = true`, the facility has racking — `required_station_types` must include at least one rack type (e.g. "Standard rack") even if the tender does not explicitly name the rack model. Note: a VNA drive type does not exclude floor or conveyor stations — a VNA truck can also serve floor-level or conveyor pick/drop points in narrow aisles alongside rack operations.
+
+---
+
+## 6. Counterbalance vs. reach vs. straddle — the closed-pallet & closed-conveyor problem
+
+Forklift drive types differ in how the load sits relative to the support legs (straddle arms), and that determines whether they can handle closed-bottom pallets and closed floor conveyors:
+
+- **Counterbalanced:** rear counterweight, no front legs. Free front face. Picks a **closed-bottom pallet standing on the floor** and mates with **closed conveyors** — nothing protrudes underneath.
+- **Reach truck:** has straddle legs, **but** the forks reach forward *beyond* the legs, so the load is picked/placed in front of the legs. A reach truck **can** therefore handle closed-bottom and wider pallets — that is exactly what the reach is for. The legs are not under the load during the transfer.
+- **Straddle stacker / Pallet mover (arms under the load):** the support legs must sit *under* the pallet. Here the legs **collide** with closed-bottom pallets (some CHEP/plastic pallets, mesh boxes) and with closed floor conveyors.
+
+So the knockout for closed-bottom pallets / closed floor conveyors applies to straddle-under-load designs, **not** to reach trucks or counterbalanced trucks. The field that captures the "free front, nothing under the load" property is `forks_free_floating`. (`drive_type`, `forks_free_floating`, `station_applications`.)
+
+**Detail (not needed for the PoC, but worth knowing):** with a reach truck, if the pallet fits *between* the load arms there is nothing special to consider when picking from a rack. But if the load carrier is **wider than the load arms** (typically >800 mm), then picking from a rack at marginal aisle width requires lifting the load *over* the arms first, retracting the reach, then driving out — which means extra vertical clearance is needed between the top of the load and the underside of the next rack level. So very wide carriers can impose a hidden height/clearance constraint in narrow aisles.
+
+---
+
+## 7. OEM rebadging — one machine, many brands
+
+A large share of products are the **same physical machine sold under different brands** through OEM / distribution deals. The "manufacturer" on a datasheet is often *not* the engineering owner.
+
+Verified examples:
+- **Quicktron** (Shanghai) AMRs are distributed by **KION** brands — sold as **Linde Material Handling "M60"/"M100"**, and via **STILL** and **Dematic**.
+- **Balyo** technology underpins **Linde "K-MATIC"/"L-MATIC"** and **STILL** automated trucks.
+- **Idealworks** "iw.hub" is distributed via **Linde Material Handling**.
+
+Implications for the database:
+- Intrinsic technical specs belong to the **OEM base model** and are shared by every rebadge (`oem_base_model_id`). Learn a spec for one brand → it holds for all siblings.
+- The commercial counterpart (price, service, lead time) differs per brand and belongs to the product/company layer.
+- A datasheet's claimed "manufacturer" may be a reseller; check `oem_technology` for the real capability owner.
+
+---
+
+## 8. Food & Beverage (F&B) and cold chain — environmental gates that are often implicit
+
+F&B and beverage tenders frequently imply hard environmental requirements that are **not stated as explicit specs** but follow from the environment:
+
+- **Washdown / wet areas:** require high ingress protection (IP54–IP65+). Standard warehouse AMRs are ~IP20 and will not survive. (`ingress_protection_rating`, `operating_humidity_max_pct`.)
+- **Cold store / freezer:** standard units are rated only to ~0–5 °C; freezer operation (down to −25 °C) needs a special cold-store variant. (`operating_temp_min_c`.)
+- **Hygiene / cleanroom (dairy, pharma-adjacent food):** may need a cleanroom class. (`cleanroom_class`.)
+
+When a tender names an F&B sub-sector, infer the likely environmental gate even if the buyer did not spell it out, and flag it. These are typically Conditional K.O. fields that become hard filters precisely in this market.
+
+---
+
+## 9. Tugger trains — trailer steering drives the real aisle requirement
+
+For tugger / tractor trains, the **trailer** technology, not just the tractor, determines how much aisle width is actually needed:
+
+- **Passive caster carts** "off-track" (the trailers cut corners / snake), so the train sweeps a wider path and needs wider aisles.
+- **Self-steering / tracking carts** (quad-steer, tracking drawbar / virtual coupling, forced axle steer) follow the tractor's exact path with little deviation, allowing tighter aisles and safer operation.
+
+So a tugger's own `min_aisle_width_mm` can be optimistic if paired with passive carts. Read `trailer_steering_technology` and `trailer_compatibility` together with the aisle figure. (Also: `auto_hitch` lets a train drop and collect carts without an operator — a throughput multiplier, not just a convenience.)
+
+**Conveyor incompatibility:** Tugger AGVs tow trailer trains and cannot interface with conveyor belts without manual reloading. If a tender requires direct conveyor integration (goods transferred automatically from/to a belt conveyor), a Tugger AGV is not appropriate — a Forklift AGV or AMR with a conveyor interface is needed instead.
+
+---
+
+## 10. VDA 5050 — interoperability, trending from optional to mandatory
+
+VDA 5050 is an open interface standard between AGVs/AMRs and a master control / fleet manager. It lets a buyer run a **mixed-vendor fleet** under one controller instead of being locked to one brand. Today it is often a scoring plus, but large European buyers increasingly make it a hard requirement — treat it as a Conditional K.O. that is rising in weight. A vendor stating "not VDA 5050 compatible" is a genuine differentiator against such buyers. (`vda5050_compatible`, `fleet_management_system`, `multi_fleet_capable`.)
+
+---
+
+## 11. Battery technology has downstream consequences
+
+`battery_type` implies more than runtime:
+
+- **Lithium (Li-Ion / LiFePO4):** supports opportunity charging (top-ups during natural idle), no dedicated battery-swap room, enables 24/7 operation with less floor space.
+- **Lead-Acid:** longer charge cycles, often needs a ventilated battery-change room and spare batteries — consumes floor space and labour.
+
+So a Li-Ion + autonomous-charging combination implies near-continuous uptime; lead-acid implies shift planning and infrastructure. Read `battery_type`, `autonomous_charging`, `charge_time_min`, and `battery_swap_capable` together when judging true availability.
+
+---
+
+## 12. Read spec sheets critically
+
+- **Per-station vs. per-robot:** throughput numbers (e.g. picks/hour) may be quoted per workstation *or* per robot. They are not comparable across vendors without checking which. (`picks_per_hour_per_station`, `picks_per_hour`.)
+- **Vendor claims:** "2–3× productivity", "2.5× storage density", "99.99% accuracy" are marketing figures — record them as vendor claims, not verified facts. (`storage_density_factor`.)
+- **Rated vs. peak:** payload and speed are sometimes peak/unloaded; prefer rated values and note when unsure.
+- **Blank ≠ zero:** a missing value means *unknown*, never 0. Never infer a capability is absent just because a field is empty. (Especially `reference_count`.)
+
+---
+
+## 13. Who the buyer actually contracts — manufacturer vs. integrator vs. OEM
+
+Three different roles can sit behind one offering:
+
+- **OEM / technology owner:** built the machine (may be invisible to the buyer — see §7).
+- **Manufacturer/brand:** the name on the product.
+- **System integrator / dealer:** designs the installation, integrates with WMS, provides service — often the buyer's actual counterpart, especially for complex systems (ASRS is almost always sold via integrators).
+
+For matching the *commercial* counterpart, `distribution_model` and the company layer matter; for matching *technical capability*, the OEM base model matters. Keep the two questions separate.
+
+---
+
+## 15. Reading tender context to derive the required AGV type
+
+Tenders rarely state the AGV type explicitly. Derive it from the *operational environment and task description*, not from isolated keywords.
+
+**There are exactly three valid values for `required_agv_type`: `Forklift AGV`, `Tugger AGV`, `Mobile AMR`.** Sub-variants (Counterbalanced, Reach Truck, VNA) are properties within the Forklift AGV category — they do not change the type value. Never output a sub-variant as the vehicle type.
+
+---
+
+### Step 1 — Tugger AGV (check first, it is the most distinctive)
+
+If the task is towing a **train of trailers or carts along a fixed loop** (milk-run, Routenzug, multiple sequential stops) → `required_agv_type = "Tugger AGV"`.
+
+Tugger AGVs do not carry loads directly; they tow. If the tender mentions a tractor unit pulling trailers / dollies, that is a Tugger — regardless of payload or environment.
+
+---
+
+### Step 2 — Mobile AMR (only when all three conditions are met)
+
+`required_agv_type = "Mobile AMR"` **only if all of the following are true:**
+
+1. **Light payload:** ≤ 1,500 kg
+2. **Flexible routing / free navigation:** SLAM, Natural Feature, contour navigation — no fixed track or reflectors required
+3. **No standard floor-level pallet pickup:** loads are on roller tops, belt conveyors, elevated docking stations, or carts — NOT standard EUR pallets sitting on the floor
+
+**Critical: standard pallets on the floor require forks — AMRs cannot pick them up.**
+Standard EUR pallets (800×1200, 1000×1200, 1200×1200) and IBCs sitting directly on the floor need a fork interface. An underride AMR (e.g. iw.hub, MiR, arculee) can only handle loads on special elevated docking stations. If the tender says "floor delivery" for pallet stations with **no mention of special docking infrastructure**, condition 3 is NOT met → classify as Forklift AGV. The only exceptions are dedicated pallet-jack AMRs (e.g. MiR1350 Pallet Jack, AGILOX OCF with free-lift).
+
+**The "filling line" trap:** A filling line tender transporting heavy pallets floor-to-floor fails condition 1 AND condition 3 → `Forklift AGV`, not Mobile AMR. Do not let the production environment override the payload and load interface check. Check: (1) payload, (2) all stations floor-level with standard pallets, (3) no special docking infrastructure mentioned, (4) buyer names forklift suppliers as preferred.
+
+**Worked example — Mobile AMR:** "Autonomous mobile robots for transporting empty containers between assembly workstations, max 300 kg, SLAM navigation, MES dispatching" → `required_agv_type = "Mobile AMR"` (light load, flexible routing, containers on elevated stations).
+
+---
+
+### Step 3 — Forklift AGV (everything else)
+
+If neither Tugger nor Mobile AMR applies → `required_agv_type = "Forklift AGV"`.
+
+This covers all tasks where a fork interface is needed: standard pallet pickup from the floor, racking storage/retrieval, heavy payloads, dock loading. The specific sub-variant (Counterbalanced, Reach Truck, VNA) is a property of the application — it does **not** change the `required_agv_type` value.
+
+**Worked example — Forklift AGV in production:** "AGV system for supplying 10 filling lines, 2,000 kg max load, all floor delivery stations, preferred suppliers: Jungheinrich and Linde" → `required_agv_type = "Forklift AGV"` (heavy load, floor-to-floor pallet pickup with forks).
+
+**Worked example — Forklift AGV in high-bay warehouse:** "Automated storage and retrieval in pallet racking, aisle width 2.5 m, lift height 6 m" → `required_agv_type = "Forklift AGV"`.
+
+---
+
+### VNA flag — additional check for Forklift AGV tenders only
+
+After setting `required_agv_type = "Forklift AGV"`, check whether the application requires Very Narrow Aisle capability:
+
+If **aisle width < 2 m** OR the keywords "VNA", "Schmalgang", "Schmalgangstapler", or "turret truck" appear → also set `required_vna_capable = true`.
+
+`required_vna_capable` is a separate Boolean flag — it narrows the Forklift AGV pool to VNA-capable suppliers. It does not create a fourth vehicle type.
+
+---
+
+### Summary table
+
+| Situation | required_agv_type | Additional flag |
+|---|---|---|
+| Towing train / milk-run / Routenzug | Tugger AGV | — |
+| Light load (≤1,500 kg) + SLAM + no floor pallet pickup | Mobile AMR | grid_required if G2P |
+| Standard pallet on floor, any payload | Forklift AGV | — |
+| Racking / storage–retrieval, any aisle width | Forklift AGV | required_vna_capable = true if aisle < 2 m |
+| Dock loading / cross-docking, individual pallets | Forklift AGV | — |
+| Dock loading / cross-docking, train route | Tugger AGV | auto_hitch |
+| Goods-to-Person picking | Mobile AMR | grid_required = true |
+
+---
+
+## 14. Out of scope for the PoC (context, so you don't misclassify)
+
+- **ASRS (Automated Storage and Retrieval System)** — fixed storage automation (shuttles, cube-storage like AutoStore, vertical lift modules, crane/RBG systems). Different buyer journey, different tender logic, usually sold as a whole system via integrators. Tracked as its own future main category, **not** mixed into the AGV PoC.
+- **Sorter / sortation robots** — borderline with conveyor technology; excluded from the AGV PoC because buyers usually tender these as material-handling/conveyor systems, not AGVs.
+
+If a product is clearly one of these, flag it as out-of-scope rather than forcing it into an AGV subtype.
+
+---
+
+*haystacked · Industry Read Me · companion to the AP0 field specification · confidential*
+
+## Industrial Refrigeration (FoodBev:Refrigeration)
+
+### Domain Overview
+Industrial refrigeration systems in the Food & Beverage sector are purpose-engineered
+systems procured through formal B2B tender processes. They are never off-the-shelf
+products — each installation is engineered to the buyer's specific requirements.
+
+### Subcategory Classification
+- **Process Cooling**: Active cooling of production media (fermentation tanks, milk cooling,
+  glycol circuits, process water). Operates above freezing, typically +2°C to +15°C.
+  Buyer signals: Brauerei, Molkerei, process water, Prozesskühlung.
+- **Cold Store**: Refrigerated warehouse or room for fresh product storage.
+  Operates near freezing, typically 0°C to +8°C.
+  Buyer signals: Kühlhaus, Kühllager, fresh produce, Frischwarenlager.
+- **Deep Freeze**: Freezing or frozen-storage systems for temperatures well below freezing.
+  Operates -18°C to -40°C. Includes blast freezers.
+  Buyer signals: Tiefkühlung, Schockfrostung, blast freezer, Tiefkühlhaus.
+
+### Key Technical Concepts
+- **COP (Coefficient of Performance)**: Energy efficiency ratio. Higher COP = less energy per kW of cooling.
+- **Refrigerants**: R744 (CO₂, natural, low GWP), R290 (propane, natural), R717 (ammonia, high efficiency,
+  requires safety zones), R134a and R32 (HFCs, being phased out under EU F-Gas regulation).
+- **PED (Pressure Equipment Directive)**: EU mandatory certification for refrigeration pressure vessels.
+- **ATEX**: Required for installations in explosive atmospheres (e.g. near alcohol distillation).
+- **EN 378**: European safety standard specific to refrigeration systems.
+- **F-Gas Regulation**: EU law restricting high-GWP refrigerants; natural refrigerants (R744, R290, R717)
+  are compliant and increasingly preferred.
+- **Temperature stability**: How tightly the system holds its setpoint (e.g. ±0.5 K for dairy).
+- **Pulldown time**: How long it takes to cool from ambient to target temperature after loading.
+- **Blast freezing**: Rapid freezing using high-velocity cold air; measured in kg/h throughput.
+
+### Matching Rules
+- Blank ≠ Zero: A supplier not listing a refrigerant type does NOT mean they cannot use it.
+  Null = unknown, never absent capability.
+- temperature_min_celsius uses KO_IF_GT: tender requires at least as cold as X °C.
+  A supplier achieving -25°C satisfies a tender requiring -18°C (supplier value < tender value).
+- Negative °C values are valid and must not be treated as errors.
+- certifications_ik uses KO_SUBSET: tender may require a subset of certifications.
+  A supplier with PED+EN 378 satisfies a tender requiring only PED.
