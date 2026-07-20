@@ -755,16 +755,15 @@ async def analyze(file: UploadFile = File(...)):
                         if v in ("null", "NULL", "None", "none", "N/A", "n/a", ""):
                             vt_criteria[k] = None
 
-                    # Only validate required_agv_type in 4a
-                    _all_violations = _find_invalid_ap0_fields(vt_criteria)
-                    _ap0_violations_4a = {k: v for k, v in _all_violations.items()
-                                          if k == "required_agv_type"}
-                    # Domain-context guard: AP0 enum spans all domains — reject cross-domain values
-                    if not _ap0_violations_4a:
-                        _raw_4a = vt_criteria.get("required_agv_type")
-                        _domain_vals = _DOMAIN_CLASSIF_VALUES.get(result.get("detected_domain"), frozenset())
-                        if _raw_4a and _domain_vals and _raw_4a not in _domain_vals:
-                            _ap0_violations_4a = {"required_agv_type": (_raw_4a, sorted(_domain_vals))}
+                    # Only validate required_agv_type in 4a — use domain-specific values, not AP0 enum.
+                    # AP0 allowed_values for agv_type = @SCOPE_CANONICAL_NAMES (excludes IK scope_variants
+                    # like "Process Cooling"). _DOMAIN_CLASSIF_VALUES is correct for all domains.
+                    _raw_4a = vt_criteria.get("required_agv_type")
+                    _domain_vals = _DOMAIN_CLASSIF_VALUES.get(result.get("detected_domain"), frozenset())
+                    if _raw_4a and _domain_vals and _raw_4a not in _domain_vals:
+                        _ap0_violations_4a = {"required_agv_type": (_raw_4a, sorted(_domain_vals))}
+                    else:
+                        _ap0_violations_4a = {}
                     if not _ap0_violations_4a:
                         break
 
