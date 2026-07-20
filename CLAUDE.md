@@ -26,15 +26,15 @@ After alignment with the user on what to build:
 
 **g) Commit after DoD sign-off** — immediately after SA sign-off (or DoD verified by Tech Lead): commit all phase changes. Never end a session with approved, tested work uncommitted — uncommitted AP0/config changes are lost on `git checkout`. One commit per phase; message format: `IK Sprint Phase N: <description> (<tag>)`. Staged files: all modified tracked files + new spec/config/test files; exclude run-once migration scripts unless they have lasting reference value.
 
-**AP0 Safety Rule — before any `git checkout HEAD -- <file>` or destructive revert:** push the current state of the file to a safety branch first, even if its purpose is unclear:
+**Safety Rule — before any `git checkout HEAD -- <file>`, `git reset --hard`, or other destructive revert:** if there are uncommitted changes anywhere in the working tree, push the entire current state to a safety branch first, even if the purpose of those changes is unclear:
 ```bash
-git checkout -b safety/ap0-YYYY-MM-DD-<reason>
-git add Spec/haystacked_AP0_field_spec_v0_10.xlsx
-git commit -m "Safety: AP0 state before revert — <reason>"
+git checkout -b safety/YYYY-MM-DD-<reason>
+git add -A
+git commit -m "Safety: working tree before revert — <reason>"
 git checkout main
 # now safe to revert
 ```
-This applies to AP0 xlsx, scope_registry.json, and any other SSoT file with uncommitted changes. Never destroy uncommitted SSoT changes without first preserving them on a safety branch.
+Never destroy uncommitted changes without first preserving them. This is especially critical for the AP0 xlsx and any generated config, but applies to all files.
 
 ### 3. Continuous Improvement
 Flag architectural drift, redundancy, and improvement opportunities proactively — not just when asked.
