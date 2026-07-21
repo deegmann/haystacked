@@ -113,6 +113,13 @@ def parse_bool(val):
     if s == "FALSE": return False
     return None  # blank = unknown → omit key
 
+def parse_bool_ss(val):
+    """For singleSelect["True","False"] fields — returns string or None."""
+    b = parse_bool(val)
+    if b is True:  return "True"
+    if b is False: return "False"
+    return None
+
 def parse_int(val, allow_zero=True):
     try:
         v = int(float(str(val).strip()))
@@ -162,17 +169,27 @@ def read_sheet(wb, name):
 # ── Field lists for L3 → Extensions ──────────────────────────────────────────
 
 EXT_BOOL = [
+    # Checkbox fields (bool) — not KO operators, no explicit False needed
     # infrastructure_free handled separately below (inversion of infrastructure_required)
     "autonomous_obstacle_bypass", "omnidirectional_movement",
-    "multi_load_compatibility", "outdoor_capable", "autonomous_charging", "battery_swap_capable",
-    "vda5050_compatible", "multi_fleet_capable", "manual_usage",
-    "vna_capable", "forks_free_floating", "stacking_capability",
-    "barcode_readers", "stock_line_scanning", "trailer_loading", "trailer_unloading", "busbar_compatible",
-    "auto_hitch", "intersection_management",
-    "grid_required", "rotation_capable", "rack_pin_compatible", "free_lift_open_closed_pallet",
+    "autonomous_charging", "battery_swap_capable",
+    "multi_fleet_capable", "manual_usage",
+    "stock_line_scanning", "busbar_compatible",
+    "intersection_management",
+    "rotation_capable",
     "task_interleaving", "onboard_ui",
     # AP0 v0.6 additions
     "ergonomic_height_adjustable", "multi_language_display", "gamification",
+]
+
+# KO bool fields migrated to singleSelect["True","False"] — write strings, not Python bools
+EXT_BOOL_SS = [
+    "vna_capable", "stacking_capability", "vda5050_compatible",
+    # infrastructure_free handled separately below (inversion + string)
+    "forks_free_floating", "multi_load_compatibility",
+    "auto_hitch", "free_lift_open_closed_pallet", "grid_required",
+    "outdoor_capable", "trailer_loading", "trailer_unloading",
+    "barcode_readers", "humidity_control_capable", "rack_pin_compatible",
 ]
 
 EXT_INT = [
@@ -344,10 +361,14 @@ def import_extensions(l3_rows, bm_row_ids):
             v = parse_bool(row.get(field))
             if v is not None: f[field] = v
 
+        for field in EXT_BOOL_SS:
+            v = parse_bool_ss(row.get(field))
+            if v is not None: f[field] = v
+
         # infrastructure_free = NOT infrastructure_required; NULL stays NULL (NULL ≠ False)
         _infra_req = parse_bool(row.get("infrastructure_required"))
         if _infra_req is not None:
-            f["infrastructure_free"] = not _infra_req
+            f["infrastructure_free"] = "False" if _infra_req else "True"
 
         for field in EXT_INT:
             v = parse_int(row.get(field))
