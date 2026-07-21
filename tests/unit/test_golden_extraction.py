@@ -49,10 +49,10 @@ def _fixture_files():
 
 def test_fixture_collection_floor():
     """Guard against a silent orphaning regression: this suite must keep collecting
-    at least 5 fixtures (001, 002, 003, 004, 005 as of 2026-06-17 including the
-    out-of-scope tender_003). A drop below this floor must fail loudly.
+    at least 8 fixtures (001–005 AGV + 006–008 IK as of 2026-07-21). A drop
+    below this floor must fail loudly.
     """
-    assert len(_fixture_files()) >= 5
+    assert len(_fixture_files()) >= 8
 
 
 def _golden_run_path(fixture: dict):
