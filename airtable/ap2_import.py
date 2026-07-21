@@ -162,7 +162,8 @@ def read_sheet(wb, name):
 # ── Field lists for L3 → Extensions ──────────────────────────────────────────
 
 EXT_BOOL = [
-    "infrastructure_required", "autonomous_obstacle_bypass", "omnidirectional_movement",
+    # infrastructure_free handled separately below (inversion of infrastructure_required)
+    "autonomous_obstacle_bypass", "omnidirectional_movement",
     "multi_load_compatibility", "outdoor_capable", "autonomous_charging", "battery_swap_capable",
     "vda5050_compatible", "multi_fleet_capable", "manual_usage",
     "vna_capable", "forks_free_floating", "stacking_capability",
@@ -342,6 +343,11 @@ def import_extensions(l3_rows, bm_row_ids):
         for field in EXT_BOOL:
             v = parse_bool(row.get(field))
             if v is not None: f[field] = v
+
+        # infrastructure_free = NOT infrastructure_required; NULL stays NULL (NULL ≠ False)
+        _infra_req = parse_bool(row.get("infrastructure_required"))
+        if _infra_req is not None:
+            f["infrastructure_free"] = not _infra_req
 
         for field in EXT_INT:
             v = parse_int(row.get(field))

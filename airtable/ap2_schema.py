@@ -144,14 +144,14 @@ EXTENSIONS_FIELDS = [
         "Laser Reflector", "Natural Feature (SLAM)", "Magnetic Tape",
         "QR/DM Code", "Contour", "Inductive Loop", "Vision",
     ]),
-    check("infrastructure_required"),
+    check("infrastructure_free"),
     check("autonomous_obstacle_bypass"),
     check("omnidirectional_movement"),
     # SHARED — Load Handling
     num_dec("max_payload_kg"),
     ms("load_type", [
         "Pallet EUR", "Pallet ISO", "Half-Euro", "UK Pallet",
-        "Plastic (closed)", "Tote", "Roll Container", "Custom Carrier", "None",
+        "Plastic Bin", "Bulk Bin", "Medium Euro", "Tote", "Roll Container", "Custom Carrier", "None",
     ]),
     check("multi_load_compatibility"),
     # SHARED — Dimensions & Environment
