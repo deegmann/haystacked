@@ -154,7 +154,6 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
         "contact":        result.get("contact"),
         "summary":        result.get("summary"),
         "detected_domain": result.get("detected_domain"),
-        "detected_domain": result.get("detected_domain"),
         "in_scope":       result.get("in_scope", True),
         "nace_code":      result.get("nace_code"),
         "nace_label":     result.get("nace_label"),

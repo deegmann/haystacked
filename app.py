@@ -530,10 +530,7 @@ async def analyze(file: UploadFile = File(...)):
             text               = ""
             parse_method       = "replay"
             result             = {
-                "detected_domain": (
-                    cached.get("detected_domain")
-                    or cached.get("detected_domain")
-                ),
+                "detected_domain": cached.get("detected_domain"),
                 "in_scope":    cached.get("in_scope", True),
                 "buyer":       cached.get("buyer"),
                 "project":     cached.get("project"),

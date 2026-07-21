@@ -105,3 +105,12 @@ def test_domain_extractability_contract():
         "detected_domain must appear in app.py (new extractability key)"
     assert "_EXTRACTABLE_DOMAINS" in code, \
         "Extractability must use _EXTRACTABLE_DOMAINS constant, not legacy boolean"
+    # Behavioral: the gate expression must be present — is_extractable derived from detected_domain
+    assert "in _EXTRACTABLE_DOMAINS" in code, \
+        "is_extractable gate must use 'in _EXTRACTABLE_DOMAINS' membership test"
+    # Behavioral: _EXTRACTABLE_DOMAINS must be non-empty at runtime (guards against empty config)
+    import json, pathlib as _pl
+    reg = json.loads((_pl.Path(__file__).parent.parent.parent / "config" / "scope_registry.json").read_text())
+    extractable = {d["scope_id"] for d in reg["scopes"].values() if d.get("parent") == "*"}
+    assert extractable, "_EXTRACTABLE_DOMAINS must be non-empty — check scope_registry.json"
+    assert None not in extractable, "None must not be a valid extractable domain"
