@@ -4,7 +4,7 @@ Generate 3 realistic IK tender PDFs that challenge LLM extraction.
 Each document mimics a human-authored procurement inquiry with specs buried
 in narrative prose, different formatting styles, and realistic noise.
 
-Output: tests/tenders/
+Output: tenders/
   - tender_ik_process_cooling.pdf
   - tender_ik_cold_store.pdf
   - tender_ik_deep_freeze.pdf
@@ -21,7 +21,7 @@ from reportlab.platypus import (
 )
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT, TA_JUSTIFY
 
-OUTPUT_DIR = Path(__file__).parent.parent / "tests" / "tenders"
+OUTPUT_DIR = Path(__file__).parent.parent / "tenders"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 W, H = A4
