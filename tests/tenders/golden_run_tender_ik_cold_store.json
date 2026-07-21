@@ -40,7 +40,7 @@
     "required_blast_freeze_capacity_kg_h_source": null,
     "required_pulldown_time_h": null,
     "required_pulldown_time_h_source": null,
-    "required_product_type": "Cold Store",
+    "required_product_type": "Industrial Refrigeration",
     "required_vna_capable": null,
     "required_served_categories": "Cold Store",
     "_validation_warnings": []

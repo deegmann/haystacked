@@ -716,7 +716,7 @@ async def analyze(file: UploadFile = File(...)):
 
         if is_extractable and not is_replay:
             yield sse("step", {"id": "agv", "status": "running",
-                                "message": "Fahrzeugtyp wird klassifiziert…"})
+                                "message": "Produktkategorie wird klassifiziert…"})
             await asyncio.sleep(0)
 
             # ── Pass 4a: classify vehicle type only ───────────────────────────
@@ -812,7 +812,7 @@ async def analyze(file: UploadFile = File(...)):
             }
             _agv_total = 2 + len(_4c_fields)   # 4a(1) + 4b(1) + N×4c
             yield sse("step", {"id": "agv", "status": "running",
-                                "message": f"Fahrzeugtyp: {canonical_product_type}{vna_label} — Kriterien werden extrahiert…",
+                                "message": f"Kategorie: {canonical_product_type}{vna_label} — Kriterien werden extrahiert…",
                                 "done": 1, "total": _agv_total})
             await asyncio.sleep(0)
 
@@ -1049,6 +1049,8 @@ async def analyze(file: UploadFile = File(...)):
 
             new_req = dict(agv_criteria)
             new_req["required_product_type"] = canonical_product_type
+            # write canonical value back so result["agv_criteria"] JSON is consistent
+            agv_criteria["required_product_type"] = canonical_product_type
             new_req["required_navigation_type"] = nav_list
 
             new_req = _to_match_units(new_req)
@@ -1211,7 +1213,8 @@ async def field_meta():
     _UNITS = {"_kg":"kg","_mm":"mm","_pct":"%","_h":"h","_ms":"m/s",
               "_c":"°C","_eur":"EUR","_min":"min","_m":"m","_deg":"°"}
     _ABBR = {"Agv":"AGV","Amr":"AMR","Vda":"VDA","Vda5050":"VDA 5050","Wms":"WMS","Oem":"OEM",
-             "Ko":"KO","Ui":"UI","Id":"ID","Ip":"IP","Fps":"FPS","Roi":"ROI"}
+             "Ko":"KO","Ui":"UI","Id":"ID","Ip":"IP","Fps":"FPS","Roi":"ROI",
+             "Cop":"COP","Ik":"IK","Ped":"PED","Atex":"ATEX"}
     def _label(key: str, ap0_unit=None) -> str:
         k = key
         # Prefer AP0 unit over suffix heuristic — avoids "_mm" label when storage is actually "m"

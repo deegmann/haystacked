@@ -23,7 +23,7 @@
       <span class="hs-wordmark">haystacked</span>
     </a>
     <div style="display:flex;align-items:center;gap:16px">
-      <span class="topbar-tagline">Tender Analysis · AGV / AMR</span>
+      <span class="topbar-tagline">Tender Analysis</span>
       <a href="/db" target="_blank" class="topbar-link">DB Browser</a>
     </div>
   </div>
@@ -33,7 +33,7 @@
 
   <!-- ── Upload ── -->
   <section id="uploadSection">
-    <p class="upload-eyebrow">AGV · AMR · Intralogistik</p>
+    <p class="upload-eyebrow">Intralogistik · Kältetechnik</p>
     <h1 class="upload-heading">From haystack to <em>shortlist.</em></h1>
     <p class="upload-sub">Lade eine Ausschreibung hoch — wir analysieren automatisch und liefern die passende Supplier-Shortlist.</p>
     <div class="upload-box" id="dropzone">
@@ -126,7 +126,7 @@
             <text class="step-ring-num" x="18" y="22" text-anchor="middle">05</text>
           </svg>
           <div class="step-body">
-            <div class="step-label">AGV Matching</div>
+            <div class="step-label">Matching</div>
             <div class="step-msg" id="msg-agv">Waiting…</div>
             <div class="step-progress-count hidden" id="progress-count-agv"></div>
           </div>
@@ -223,7 +223,7 @@
 
     <!-- AGV Section -->
     <div id="agvSection" class="hidden">
-      <div class="section-divider"><span>AGV / AMR Matching</span></div>
+      <div class="section-divider"><span>Matching Results</span></div>
 
       <div class="grid">
         <div class="card card-full">
@@ -475,7 +475,7 @@ function showResult(d) {
   document.getElementById('missingList').innerHTML = missing.map(m => `<li>${m}</li>`).join('');
   document.getElementById('missingCard').style.display = missing.length ? '' : 'none';
 
-  if (d.is_agv_amr && d.agv_criteria) {
+  if (d.detected_domain && d.agv_criteria) {
     show('agvSection');
     renderAgvRequirements(d.agv_criteria);
     renderSupplierCards(d.matches_all || d.matches || []);
@@ -576,7 +576,7 @@ function renderAgvRequirements(crit) {
   }
 
   if (!count) {
-    container.innerHTML = '<span style="color:var(--steel);font-size:13px">Keine AGV-Anforderungen extrahiert.</span>';
+    container.innerHTML = '<span style="color:var(--steel);font-size:13px">Keine Anforderungen extrahiert.</span>';
   }
 
   // Picker wrap always hidden in read-only mode

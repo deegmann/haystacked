@@ -40,7 +40,7 @@
     "required_blast_freeze_capacity_kg_h_source": "Der Schockfroster muss einen Durchsatz von 0,65 t/h (sechshundertfünfzig Kilogramm pro Stunde) bei einem Produktgewicht von 350–600 g je Portion gewährleisten.",
     "required_pulldown_time_h": null,
     "required_pulldown_time_h_source": "Der Kerntemperatur der Produkte muss innerhalb einer Absenkzeit von vier Stunden ab Einlauf sicher auf -18 °C oder kälter gebracht werden.",
-    "required_product_type": "Deep Freeze",
+    "required_product_type": "Industrial Refrigeration",
     "required_vna_capable": null,
     "required_served_categories": "Deep Freeze",
     "_validation_warnings": []

@@ -40,7 +40,7 @@
     "required_blast_freeze_capacity_kg_h_source": null,
     "required_pulldown_time_h": null,
     "required_pulldown_time_h_source": "Die neue Anlage muss die bestehende Kälteversorgung ergänzen und im Verbund betrieben werden können; eine vollständige Ablösung der Bestandsanlage ist nicht vorgesehen.",
-    "required_product_type": "Process Cooling",
+    "required_product_type": "Industrial Refrigeration",
     "required_vna_capable": null,
     "required_served_categories": "Process Cooling",
     "_validation_warnings": []

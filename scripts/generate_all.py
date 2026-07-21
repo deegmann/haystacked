@@ -989,6 +989,12 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
     # Check if this is a single-leaf domain with per-variant guides (e.g. IK)
     dom_node = scope_nodes.get(domain_scope_id, {}) if domain_scope_id else {}
     dom_variant_guides = dom_node.get("variant_guides", {})
+    dom_scope_variants = dom_node.get("scope_variants", [])
+    if dom_scope_variants and not dom_variant_guides:
+        raise ValueError(
+            f"Scope node '{domain_scope_id}' has non-empty scope_variants "
+            f"({dom_scope_variants}) but no variant_guides — cannot build classification template."
+        )
 
     if dom_variant_guides:
         # Single-leaf domain (e.g. FoodBev:Refrigeration): present scope_variants as valid outputs

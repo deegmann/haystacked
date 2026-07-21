@@ -604,3 +604,45 @@ def test_U_M_53_context_info_in_to_dict():
     for k, v in ctx.items():
         assert v is not None, f"context_info must not contain null values (got {k}=None)"
         assert k in context_field_names, f"{k} in context_info is not a CONTEXT-level field"
+
+
+# ---------------------------------------------------------------------------
+# IK: temperature KO direction (KO_IF_GT)
+# ---------------------------------------------------------------------------
+
+def test_temperature_ko_direction():
+    """KO_IF_GT: supplier temperature_min_celsius must be <= tender requirement.
+
+    Cold store tender requires -2 °C minimum temperature.
+    Supplier that can only go to 0.0 °C is warmer than required → disqualified.
+    Supplier that reaches -25.0 °C is colder than required → not disqualified.
+    """
+    prod_warm = _make_prod(product_type="Industrial Refrigeration")
+    rec_warm = SupplierRecord(
+        product=prod_warm,
+        values=_make_values(prod=prod_warm, product_type="Industrial Refrigeration",
+                            temperature_min_celsius=0.0),
+    )
+
+    prod_cold = _make_prod(product_type="Industrial Refrigeration")
+    rec_cold = SupplierRecord(
+        product=prod_cold,
+        values=_make_values(prod=prod_cold, product_type="Industrial Refrigeration",
+                            temperature_min_celsius=-25.0),
+    )
+
+    req = TenderRequirements.from_dict(
+        _criteria_to_uuid_keyed({"temperature_min_celsius": -2})
+    )
+
+    top_warm, _ = matcher.match([rec_warm], req, top_n=1)
+    assert top_warm[0].disqualified, (
+        "Supplier with temperature_min_celsius=0.0 must be disqualified for a "
+        "-2 °C cold store tender (0.0 > -2 triggers KO_IF_GT)"
+    )
+
+    top_cold, _ = matcher.match([rec_cold], req, top_n=1)
+    assert not top_cold[0].disqualified, (
+        "Supplier with temperature_min_celsius=-25.0 must NOT be disqualified for a "
+        "-2 °C cold store tender (-25.0 <= -2, KO_IF_GT does not fire)"
+    )

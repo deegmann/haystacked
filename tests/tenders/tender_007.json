@@ -1,0 +1,8 @@
+{
+  "tender_id": "tender_007",
+  "golden_run_file": "golden_run_tender_ik_deep_freeze.json",
+  "golden_extraction": {
+    "required_product_type": "Industrial Refrigeration",
+    "required_served_categories": "Deep Freeze"
+  }
+}

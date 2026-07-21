@@ -135,7 +135,7 @@ def _op_gt(tender, supplier) -> tuple[bool, str]:
         return False, ""
     try:
         if float(supplier) > float(tender):
-            return True, f"needs {supplier}, only {tender} available"
+            return True, f"{supplier} > required {tender}"
     except (TypeError, ValueError):
         return False, ""
     return False, ""

@@ -1,0 +1,8 @@
+{
+  "tender_id": "tender_006",
+  "golden_run_file": "golden_run_tender_ik_cold_store.json",
+  "golden_extraction": {
+    "required_product_type": "Industrial Refrigeration",
+    "required_served_categories": "Cold Store"
+  }
+}
