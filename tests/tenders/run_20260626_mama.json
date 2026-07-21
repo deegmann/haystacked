@@ -5,7 +5,6 @@
   "project": null,
   "contact": null,
   "summary": "Mama is building a new production site requiring an AGV system to transport finished goods and packaging material.",
-  "is_agv_amr": true,
   "in_scope": true,
   "nace_code": null,
   "nace_label": null,

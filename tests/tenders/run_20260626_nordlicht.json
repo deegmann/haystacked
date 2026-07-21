@@ -5,7 +5,6 @@
   "project": null,
   "contact": null,
   "summary": "Nordlicht Kaffeemanufaktur GmbH is seeking a partner to plan, deliver, install and commission an automated transport system (FTS) based on AGV or AMR at their new logistics center in Bremen-Hemelingen. The FTS will connect four functional zones: production exit, optional wrapper station, high-rack warehouse, and staging/shipment area.",
-  "is_agv_amr": true,
   "in_scope": true,
   "nace_code": null,
   "nace_label": null,

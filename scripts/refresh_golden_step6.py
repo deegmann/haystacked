@@ -30,11 +30,11 @@ def refresh_golden(path: Path, suppliers) -> dict:
     agv_criteria = doc.get("agv_criteria", {})
     vehicle_type = doc.get("vehicle_type", "")
     is_vna = doc.get("is_vna", False)
-    is_agv_amr = doc.get("is_agv_amr", True)
+    detected_domain = doc.get("detected_domain") or "Logistics:AGV"  # default: AGV (all golden files are extractable)
     in_scope = doc.get("in_scope", True)
 
     # Out-of-scope tenders have no match results — preserve empty state
-    if not is_agv_amr or not in_scope:
+    if not in_scope:
         old_matches = doc.get("match_results", [])
         doc["match_results"] = []
         doc["matches_all"] = []

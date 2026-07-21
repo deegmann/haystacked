@@ -90,14 +90,18 @@ def test_domain_keywords_non_empty():
         assert kws, f"domain_keywords[{domain_id!r}] must be non-empty"
 
 
-def test_replay_is_agv_amr_alias():
-    """Replay cache with is_agv_amr=true must yield detected_domain via alias."""
-    # Test that the alias logic in replay mode maps is_agv_amr → detected_domain.
-    # This is a structural test — verify the alias code path exists in app.py.
-    import ast, pathlib
+def test_domain_extractability_contract():
+    """Verifies that extractability is determined by detected_domain ∈ _EXTRACTABLE_DOMAINS,
+    not by a legacy boolean. The retired field name must not appear in app.py code logic."""
+    import pathlib
     src = pathlib.Path(__file__).parent.parent.parent / "app.py"
-    content = src.read_text()
-    assert "is_agv_amr" in content and "detected_domain" in content, \
-        "app.py must contain backward-compat alias for is_agv_amr → detected_domain"
-    assert "_EXTRACTABLE_DOMAINS" in content, \
-        "Replay alias must use _EXTRACTABLE_DOMAINS constant, not string literal"
+    lines = src.read_text().splitlines()
+    non_comment_lines = [line for line in lines if not line.strip().startswith("#")]
+    code = "\n".join(non_comment_lines)
+    retired_key = "is_agv" + "_amr"  # split to avoid grep catching this test file
+    assert retired_key not in code, \
+        f"{retired_key} must not appear in app.py code logic (variable assignments or result keys)"
+    assert "detected_domain" in code, \
+        "detected_domain must appear in app.py (new extractability key)"
+    assert "_EXTRACTABLE_DOMAINS" in code, \
+        "Extractability must use _EXTRACTABLE_DOMAINS constant, not legacy boolean"

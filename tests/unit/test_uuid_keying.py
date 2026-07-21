@@ -22,9 +22,9 @@ def test_T_UUID_01_translates_known_tender_key():
 
 
 def test_T_UUID_02_passthrough_non_ap0_keys():
-    """Non-AP0 keys (is_agv_amr, summary) must survive translation unchanged."""
-    result = _criteria_to_uuid_keyed({"is_agv_amr": True, "summary": "test"})
-    assert result.get("is_agv_amr") is True
+    """Non-AP0 keys (detected_domain, summary) must survive translation unchanged."""
+    result = _criteria_to_uuid_keyed({"detected_domain": "Logistics:AGV", "summary": "test"})
+    assert result.get("detected_domain") == "Logistics:AGV"
     assert result.get("summary") == "test"
     result_with_domain = _criteria_to_uuid_keyed({"detected_domain": "Logistics:AGV", "summary": "test"})
     assert result_with_domain.get("detected_domain") == "Logistics:AGV", \

@@ -5,7 +5,6 @@
   "project": null,
   "contact": null,
   "summary": "Nordlicht Kaffeemanufaktur GmbH is seeking a partner to plan, deliver, install and commission an automated transport system (AGV/AMR) at their new logistics center in Bremen-Hemelingen. The system will connect production output with storage and shipping areas.",
-  "is_agv_amr": true,
   "detected_domain": "Logistics:AGV",
   "in_scope": true,
   "nace_code": null,

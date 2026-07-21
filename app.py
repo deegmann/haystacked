@@ -104,7 +104,7 @@ for _spec in load_fields().values():
 
 def _criteria_to_uuid_keyed(criteria: dict) -> dict:
     """Translate tender_key → uuid at the AP0 boundary.
-    Non-AP0 keys (is_agv_amr, summary, etc.) pass through unchanged.
+    Non-AP0 keys (detected_domain, summary, etc.) pass through unchanged.
     Multi-sheet fields (e.g. min_aisle_width_mm) are broadcast to all matching UUIDs."""
     result = {}
     for k, v in criteria.items():
@@ -271,7 +271,7 @@ _VNA_APPLICABLE = {                                            # types where VNA
     for node in _scope_reg["scopes"].values()
     if node.get("vna_applicable")
 }
-_AGV_DETECT_KWS = _scope_reg.get("agv_detection_keywords", [])  # is_agv_amr fallback keywords (Step 7)
+_AGV_DETECT_KWS = _scope_reg.get("agv_detection_keywords", [])  # domain detection fallback keywords (Step 7)
 _VALID_VTS = {                                                 # canonical types with scoring bucket (Step 7)
     node["canonical_name"]
     for node in _scope_reg["scopes"].values()

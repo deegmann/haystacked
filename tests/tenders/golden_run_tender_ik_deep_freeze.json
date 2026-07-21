@@ -5,7 +5,6 @@
   "project": null,
   "contact": null,
   "summary": "Tiefkühlkost Franken AG is procuring a shock freezer for their new production line (PL-7) to meet EU food safety standards. The system must cool products from +70°C to -18°C within four hours, with a minimum COP of 2.3 at -22°C and +35°C.",
-  "is_agv_amr": true,
   "detected_domain": "FoodBev:Refrigeration",
   "in_scope": false,
   "nace_code": null,

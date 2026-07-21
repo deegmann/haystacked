@@ -5,7 +5,6 @@
   "project": null,
   "contact": null,
   "summary": "The tender concerns the installation of automation at a warehouse operated by Firefly for its customer. The aim is to reduce operational costs and provide a resilient solution.",
-  "is_agv_amr": true,
   "detected_domain": "Logistics:AGV",
   "in_scope": true,
   "nace_code": null,

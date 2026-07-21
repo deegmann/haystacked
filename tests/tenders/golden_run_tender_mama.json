@@ -5,7 +5,6 @@
   "project": null,
   "contact": null,
   "summary": "Mama is building a new production site requiring an AGV system to transport finished goods and packaging material between filling lines, warehouses, and dispatch areas. The system must operate in a non-Ex atmosphere with up to three shifts per day.",
-  "is_agv_amr": true,
   "detected_domain": "Logistics:AGV",
   "in_scope": true,
   "nace_code": null,
