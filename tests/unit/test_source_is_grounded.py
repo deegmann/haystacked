@@ -169,3 +169,34 @@ def test_U_SG_12_non_numeric_value_passes_through():
     grounded since the anchor/co-location logic does not apply to them.
     """
     assert source_is_grounded("Forklift AGV", "some quote", "some document") is True
+
+
+def test_U_SG_13_single_digit_anchor_substring_colocation_rejected():
+    """OI-83 regression: LLM hallucinated lifting_height_mm=3.0 with source
+    'The AGVs must be able to lift pallets up to a height of 3 meters.'
+    The digit '3' appears in 'Hall 3' in the document; 'lift' in the source
+    matched as substring inside 'forklift' in the window around 'Hall 3'.
+    After the word-boundary co-location fix, 'lift' must not match 'forklift'.
+    """
+    document = _pdf_text("CompanyX.pdf")
+    assert "3" in document, "test assumption: single digit '3' must appear in document"
+    quote = "The AGVs must be able to lift pallets up to a height of 3 meters."
+    assert source_is_grounded(3.0, quote, document) is False, (
+        "lifting_height=3.0 must be rejected: fabricated source not grounded "
+        "(word 'lift' must not match as substring of 'forklift')"
+    )
+
+
+def test_U_SG_14_single_digit_anchor_aisle_width_rejected():
+    """OI-83 regression: LLM hallucinated min_aisle_width_mm=2.0 with source
+    'The minimum working aisle width available in the facility is 2 meters.'
+    The digit '2' appears many times in the document (data tables).
+    After the word-boundary co-location fix, co-location must not produce
+    a false positive from incidental table values.
+    """
+    document = _pdf_text("CompanyX.pdf")
+    assert "2" in document, "test assumption: digit '2' must appear in document"
+    quote = "The minimum working aisle width available in the facility is 2 meters."
+    assert source_is_grounded(2.0, quote, document) is False, (
+        "min_aisle_width=2.0 must be rejected: fabricated source not grounded"
+    )

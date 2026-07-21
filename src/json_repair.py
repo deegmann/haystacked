@@ -215,6 +215,38 @@ def _content_words(text: str) -> set:
     }
 
 
+def _phrase_words_around_value(source: str, targets: set, word_radius: int = 3) -> set:
+    """Content words within `word_radius` words of the value's number in source.
+
+    Narrows the co-location check to the specific phrase around the number
+    (e.g. 'height of 3 meters') rather than the whole sentence (which can
+    contain domain-plausible words like 'pallets' that coincidentally appear
+    near any number in a pallet-AGV tender document).
+
+    Uses word-based radius (not character-based) to avoid splitting words at
+    phrase boundaries.  Returns an empty set when the value's number is not
+    found in source or the phrase yields no content words; callers fall back
+    to the full-source content words in that case.
+    """
+    src = str(source)
+    word_spans = list(re.finditer(r"\S+", src))
+    for num_m in re.finditer(r"\d[\d,\.]*", src):
+        if not (_interpret_number_token(num_m.group()) & targets):
+            continue
+        # Identify which word-token contains this numeric match
+        val_word_idx = next(
+            (i for i, ws in enumerate(word_spans) if ws.start() <= num_m.start() < ws.end()),
+            None,
+        )
+        if val_word_idx is None:
+            continue
+        start_i = max(0, val_word_idx - word_radius)
+        end_i = min(len(word_spans), val_word_idx + word_radius + 1)
+        phrase = " ".join(ws.group() for ws in word_spans[start_i:end_i])
+        return _content_words(phrase)
+    return set()
+
+
 def source_is_grounded(value, source: str, document: str, window: int = _GROUNDING_WINDOW_CHARS) -> bool:
     """Return True if `source` (the LLM's self-reported quote) is actually grounded in
     `document` (the real extracted PDF text) — not just numerically self-consistent
@@ -224,8 +256,11 @@ def source_is_grounded(value, source: str, document: str, window: int = _GROUNDI
       1. Anchor: value's digit-string (locale + x1000/x0.001 unit-scale tolerance,
          via the same `_interpret_number_token` used elsewhere in this module) must
          occur somewhere in the real document — not just in the LLM's own quote.
-      2. Co-location: at least one distinctive word from `source` must appear within
+      2. Co-location: at least one distinctive word from the ±25-char phrase around
+         the value's number in `source` must appear (word-boundary match) within
          `window` chars of at least one anchor occurrence in the document.
+         Falls back to full-source content words when no qualifying phrase words exist
+         (e.g. value surrounded only by units and prepositions in the quote).
 
     Zero values always pass (LL-06: a deliberate zero is not an inference hallucination).
     """
@@ -248,13 +283,17 @@ def source_is_grounded(value, source: str, document: str, window: int = _GROUNDI
     if not positions:
         return False
 
-    quote_words = _content_words(str(source))
+    # Narrow co-location check to words adjacent to the value in the source,
+    # falling back to full source when the local phrase yields no content words.
+    phrase_words = _phrase_words_around_value(str(source), targets)
+    quote_words = phrase_words if phrase_words else _content_words(str(source))
     if not quote_words:
         return False
 
     for pos in positions:
         window_text = document[max(0, pos - window): pos + window].lower()
-        if any(w in window_text for w in quote_words):
+        # Word-boundary match: prevents "lift" in source matching "forklift" in document
+        if any(re.search(r'\b' + re.escape(w) + r'\b', window_text) for w in quote_words):
             return True
     return False
 
