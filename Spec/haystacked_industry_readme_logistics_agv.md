@@ -77,6 +77,24 @@ So the knockout for closed-bottom pallets / closed floor conveyors applies to st
 
 ---
 
+## 6a. `stacking_capability` — pallets on top of each other, not rack placement
+
+**Definition:** `stacking_capability = true` means the vehicle can place one pallet **directly on top of another pallet** (block stacking / floor-level stack). It does **not** mean "can place pallets into racking" — that is a separate concept covered by `lifting_height_mm` and `station_applications`.
+
+Almost all reach trucks and counterbalanced forklifts serve racks, but only a subset support true block stacking. The distinction matters because some load types, floor loadings, or yard operations specifically require stacking pallets floor-to-floor rather than putting them into racking.
+
+**Setting the value:**
+
+- **True only if explicitly confirmed:** the manufacturer's datasheet or product page explicitly states "block stacking", "floor stacking", "pallets-on-pallets", or shows the vehicle lifting a pallet that sits on top of another pallet. Do not infer from rack capability alone.
+- **False if lift height makes it physically impossible:** a standard EUR pallet (including load) is typically 1,440 mm tall. To place a second pallet on top, the vehicle must lift to at least ~1,500 mm free-lift height. Any product with `lifting_height_mm` well below that cannot stack pallets regardless of stated capability.
+  - Mobile AMRs and Tugger AGVs → always **False** (structurally impossible — no mast/fork mechanism for stacking).
+  - Low-lift Forklift AGVs (pallet jacks, floor transporters with lift < ~500 mm) → always **False**.
+- **Null if uncertain:** a Forklift AGV with sufficient lift height but no explicit stacking reference should be left **null**, not forced to False. Rack capability alone does not imply block stacking. Blank ≠ False — an unknown value is always better than a wrong False that would cause incorrect K.O. filtering.
+
+**Quick test:** "Does this vehicle pick up a loaded pallet and set it down on top of another loaded pallet that sits on the floor?" If yes and sourced → True. If the physics prevent it → False. Otherwise → null.
+
+---
+
 ## 7. OEM rebadging — one machine, many brands
 
 A large share of products are the **same physical machine sold under different brands** through OEM / distribution deals. The "manufacturer" on a datasheet is often *not* the engineering owner.
