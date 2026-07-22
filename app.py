@@ -1225,6 +1225,18 @@ async def field_meta():
         words = [_ABBR.get(w.capitalize(), w.capitalize()) for w in k.replace("_", " ").split()]
         label = " ".join(words)
         return f"{label} ({unit})" if unit else label
+    # scope → sheet: canonical_name for leaf nodes, tab_name for domain-shared nodes, None for Global ("*")
+    scope_to_sheet: dict[str, str | None] = {
+        sid: None if sid == "*" else (node.get("canonical_name") or node.get("tab_name"))
+        for sid, node in _scope_reg["scopes"].items()
+    }
+    # shared_sheet_name: tab_name of the domain-shared node (child of "*" with no canonical_name)
+    shared_sheet_name: str = next(
+        (n.get("tab_name", "") for n in _scope_reg["scopes"].values()
+         if n.get("parent") == "*" and not n.get("canonical_name")),
+        "",
+    )
+
     meta = {}
     clones = {}
     seen_field_names: set = set()
@@ -1243,6 +1255,7 @@ async def field_meta():
             "operator":       spec.operator,
             "allowed_values": spec.allowed_values,
             "scope":          spec.scope,
+            "sheet":          scope_to_sheet.get(spec.scope),
             "display_mode":      spec.display_mode or "editable",
             "user_description":  spec.user_description,
         }
@@ -1251,11 +1264,49 @@ async def field_meta():
             # Clone entry keyed by tender_key — used for label lookups by tender_key in the frontend.
             clones[tender_key] = {**entry, "label": _label(tender_key, spec.unit)}
     meta.update(clones)
+
+    # Build per-domain descriptor for the DB browser domain filter
+    _domains: list[dict] = []
+    for _sid, _node in _scope_reg["scopes"].items():
+        if _node.get("parent") != "*":
+            continue
+        # Short label: canonical_name if present, else strip "_Shared" from tab_name
+        if _node.get("canonical_name"):
+            _label_dom = _node["canonical_name"]
+        elif _node.get("tab_name", "").endswith("_Shared"):
+            _label_dom = _node["tab_name"][:-len("_Shared")]
+        else:
+            _label_dom = _sid.split(":")[-1]
+        # Child leaves → VT names / product_type values
+        _children = sorted(
+            n["canonical_name"]
+            for n in _scope_reg["scopes"].values()
+            if n.get("parent") == _sid and n.get("canonical_name")
+        )
+        _pt = _children if _children else ([_node["canonical_name"]] if _node.get("canonical_name") else [])
+        # All sheets for this domain (shared + leaf sheets)
+        _dom_sheets = [s for s in [scope_to_sheet.get(_sid)] if s]
+        for _cs, _cn in _scope_reg["scopes"].items():
+            if _cn.get("parent") == _sid:
+                _s = scope_to_sheet.get(_cs)
+                if _s:
+                    _dom_sheets.append(_s)
+        _domains.append({
+            "id":            _sid,
+            "label":         _label_dom,
+            "product_types": _pt,
+            "vt_names":      _children,
+            "shared_sheet":  scope_to_sheet.get(_sid) if _children else None,
+            "sheets":        _dom_sheets,
+        })
+
     # VT config for frontend column grouping — read entirely from generated config files
     meta["__vt_config__"] = {
         "extractable_domains": sorted(_EXTRACTABLE_DOMAINS),
         "legacy_map":    _LEGACY_MAP,
         "vehicle_types": list(_VALID_VTS),
+        "shared_sheet_name": shared_sheet_name,
+        "domains":       _domains,
     }
     return meta
 

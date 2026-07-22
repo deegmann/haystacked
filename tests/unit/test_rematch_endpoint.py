@@ -349,6 +349,49 @@ def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
     assert shared["scope"] in extractable_domains
 
 
+def test_field_meta_sheet_and_shared_sheet_name():
+    """GET /api/field-meta must return a 'sheet' property per field and 'shared_sheet_name'
+    in __vt_config__ so db.html column grouping and VT filter work correctly (OI-87)."""
+    response = client.get("/api/field-meta")
+    assert response.status_code == 200
+    meta = response.json()
+
+    vt_config = meta["__vt_config__"]
+    shared = vt_config.get("shared_sheet_name", "")
+    assert shared, "__vt_config__.shared_sheet_name must be a non-empty string"
+
+    # Shared KO field → sheet == shared_sheet_name
+    payload = meta.get("max_payload_kg")
+    assert payload is not None
+    assert payload.get("sheet") == shared, (
+        f"max_payload_kg should have sheet='{shared}', got {payload.get('sheet')!r}"
+    )
+
+    # Forklift-only field → sheet == canonical VT name, not shared
+    lift = meta.get("lifting_height_mm")
+    assert lift is not None
+    assert lift.get("sheet") not in (None, shared), (
+        f"lifting_height_mm should have a VT-specific sheet, got {lift.get('sheet')!r}"
+    )
+
+    # Tugger-only field → sheet == canonical VT name, not shared
+    tow = meta.get("towing_capacity_kg")
+    assert tow is not None
+    assert tow.get("sheet") not in (None, shared), (
+        f"towing_capacity_kg should have a VT-specific sheet, got {tow.get('sheet')!r}"
+    )
+    assert tow.get("sheet") != lift.get("sheet"), (
+        "towing_capacity_kg and lifting_height_mm must belong to different sheets"
+    )
+
+    # Global field → sheet == None
+    product_type = meta.get("product_type")
+    assert product_type is not None
+    assert product_type.get("sheet") is None, (
+        f"product_type (Global scope) should have sheet=null, got {product_type.get('sheet')!r}"
+    )
+
+
 def test_replay_endpoint_golden_companyx():
     """POST /analyze with a golden JSON file must return a valid result SSE event
     without making any LLM calls (parse_method == 'replay').

@@ -20,7 +20,7 @@
     .db-table th:last-child, .db-table td:last-child { border-right: none; }
     .db-table tr:last-child td { border-bottom: none; }
 
-    /* Two-row sticky header: group row at top:0, field row at top:26px */
+    /* Two-row sticky header */
     .db-table thead th {
       font-family: var(--font-mono); font-size: 9px;
       text-transform: uppercase; letter-spacing: 0.07em;
@@ -30,47 +30,117 @@
     #dbGroupHead th { top: 0; height: 26px; padding: 0 12px; }
     #dbHead th     { top: 26px; }
 
-    /* Sticky identity columns: #, Company, Product
-       Widths are explicit and offsets must match exactly:
-       sc-0 = 40px, sc-1 starts at 40px with 200px width, sc-2 starts at 240px */
-    .sc-0 { position: sticky; left: 0px;  z-index: 4 !important; width: 40px;  min-width: 40px;  max-width: 40px; }
-    .sc-1 { position: sticky; left: 40px; z-index: 4 !important; width: 200px; min-width: 200px; max-width: 200px;
-             overflow: hidden; text-overflow: ellipsis; }
-    .sc-2 { position: sticky; left: 240px;z-index: 4 !important; width: 180px; min-width: 180px; max-width: 180px;
-             overflow: hidden; text-overflow: ellipsis;
-             box-shadow: 3px 0 6px -3px rgba(11,20,24,0.12); }
-    /* Sticky identity headers must be above group and field rows */
-    thead th.sc-0, thead th.sc-1, thead th.sc-2 { z-index: 6 !important; }
+    /* Sticky identity columns */
+    .sc-0 { position:sticky; left:0px;  z-index:4!important; width:40px;  min-width:40px;  max-width:40px; }
+    .sc-1 { position:sticky; left:40px; z-index:4!important; width:200px; min-width:200px; max-width:200px;
+             overflow:hidden; text-overflow:ellipsis; }
+    .sc-2 { position:sticky; left:240px;z-index:4!important; width:180px; min-width:180px; max-width:180px;
+             overflow:hidden; text-overflow:ellipsis;
+             box-shadow:3px 0 6px -3px rgba(11,20,24,0.12); }
+    thead th.sc-0, thead th.sc-1, thead th.sc-2 { z-index:6!important; }
 
-    .db-table tr:hover td { background: rgba(0,91,105,0.03); }
-    /* Sticky cells always have opaque background */
-    .db-table td.sc-0,
-    .db-table td.sc-1,
-    .db-table td.sc-2 { background: var(--hs-paper) !important; }
+    .db-table tr:hover td { background:rgba(0,91,105,0.03); }
+    .db-table td.sc-0,.db-table td.sc-1,.db-table td.sc-2 { background:var(--hs-paper)!important; }
     .db-table tr:hover td.sc-0,
     .db-table tr:hover td.sc-1,
-    .db-table tr:hover td.sc-2 { background: var(--hs-teal-tint) !important; }
+    .db-table tr:hover td.sc-2 { background:var(--hs-teal-tint)!important; }
 
-    /* Group header row styling */
-    .group-hd {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.09em;
-      text-align: center; text-transform: uppercase;
-    }
-    /* Non-sticky group headers have colored bottom border and tinted bg (set via inline style vars) */
+    /* Group header */
+    .group-hd { font-size:9px; font-weight:700; letter-spacing:0.09em; text-align:center; text-transform:uppercase; }
     #dbGroupHead th:not(.sc-0):not(.sc-1):not(.sc-2) {
-      border-bottom: 2px solid var(--gc, var(--mist));
-      background: var(--gbg, var(--sand2)) !important;
-      color: var(--gc, var(--steel));
+      border-bottom:2px solid var(--gc,var(--mist));
+      background:var(--gbg,var(--sand2))!important;
+      color:var(--gc,var(--steel));
     }
-    /* Field headers inherit a thin top accent strip via inline border-top */
-    #dbHead th { background: var(--sand2) !important; }
+    #dbHead th { background:var(--sand2)!important; }
 
-    /* VT-not-applicable cell: distinct from "missing data" */
-    .cell-na-vt {
-      color: var(--hs-mist); font-family: var(--font-mono);
-      font-size: 9px; letter-spacing: 0.04em;
+    /* Sortable field headers */
+    #dbHead th { cursor:pointer; user-select:none; }
+    #dbHead th:hover { background:var(--hs-teal-tint)!important; }
+    .th-inner { display:flex; align-items:center; gap:3px; min-width:0; }
+    .th-label  { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+
+    /* Sort indicator — always visible, bright when active */
+    .th-sort-ind {
+      font-size:9px; min-width:9px; line-height:1; flex-shrink:0;
+      color:rgba(92,107,115,0.65);
     }
+    .th-sort-ind.asc, .th-sort-ind.desc { color:var(--hs-teal); }
 
+    /* Filter button — always present, subtle, bright on hover/active */
+    .th-flt-btn {
+      font-size:10px; flex-shrink:0; padding:0 2px; line-height:1;
+      border:none; background:none; cursor:pointer;
+      color:rgba(92,107,115,0.35); transition:color 0.1s;
+    }
+    #dbHead th:hover .th-flt-btn { color:var(--hs-steel); }
+    .th-flt-btn.active { color:var(--hs-teal)!important; }
+
+    /* Filtered column header tint */
+    .th-filtered { background:rgba(0,91,105,0.07)!important; }
+    /* Mini filter-value pill below label */
+    .th-flt-val {
+      font-size:8px; color:var(--hs-teal);
+      background:rgba(0,91,105,0.13); border-radius:2px;
+      padding:1px 5px; margin-top:2px; cursor:pointer;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
+    }
+    .th-flt-val:hover { background:rgba(0,91,105,0.24); }
+
+    /* Floating column filter popover */
+    .col-filter-pop {
+      position:fixed; z-index:9999;
+      background:var(--hs-paper); border:1px solid var(--hs-line-strong);
+      border-radius:var(--radius-md); padding:8px 10px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.15);
+      display:flex; gap:8px; align-items:center;
+    }
+    .col-filter-pop.hidden { display:none; }
+
+    /* Filter controls inside popover */
+    .flt-inp {
+      border:1px solid var(--hs-line-strong); border-radius:var(--radius-md);
+      padding:4px 8px; font-size:12px; font-family:inherit;
+      background:var(--hs-paper); color:var(--hs-ink); width:160px;
+    }
+    .flt-inp:focus { outline:none; border-color:var(--hs-teal); }
+    .flt-num {
+      border:1px solid var(--hs-line-strong); border-radius:var(--radius-md);
+      padding:4px 6px; font-size:12px; font-family:inherit;
+      background:var(--hs-paper); color:var(--hs-ink); width:72px;
+    }
+    .flt-num:focus { outline:none; border-color:var(--hs-teal); }
+    .flt-sel {
+      border:1px solid var(--hs-line-strong); border-radius:var(--radius-md);
+      padding:4px 8px; font-size:12px; font-family:inherit;
+      background:var(--hs-paper); color:var(--hs-ink); min-width:140px; cursor:pointer;
+    }
+    .flt-sel:focus { outline:none; border-color:var(--hs-teal); }
+    /* Bool toggle buttons */
+    .flt-bool-grp { display:flex; gap:3px; }
+    .flt-bool-btn {
+      font-size:11px; padding:3px 9px; border-radius:var(--radius-sm);
+      border:1px solid var(--hs-line-strong);
+      background:var(--hs-paper); color:var(--hs-ink);
+      cursor:pointer; font-family:inherit; transition:all 0.1s;
+    }
+    .flt-bool-btn:hover  { border-color:var(--hs-teal); color:var(--hs-teal); }
+    .flt-bool-btn.on     { background:var(--hs-teal); border-color:var(--hs-teal); color:#fff; }
+
+    /* Range separator */
+    .flt-range-sep { font-size:11px; color:var(--hs-steel); }
+
+    /* Clear button inside popover */
+    .col-flt-clear {
+      font-size:13px; color:var(--hs-mist); border:none; background:none;
+      cursor:pointer; padding:1px 3px; border-radius:var(--radius-sm); line-height:1; flex-shrink:0;
+    }
+    .col-flt-clear:hover { color:var(--hs-signal,#c0392b); }
+
+    /* VT-not-applicable */
+    .cell-na-vt { color:var(--hs-mist); font-family:var(--font-mono); font-size:9px; letter-spacing:0.04em; }
+
+    /* Toolbar */
     .db-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
     .db-search {
       flex:1; min-width:200px; max-width:320px;
@@ -100,13 +170,20 @@
     .cell-na  { color:var(--hs-mist); }
     .db-empty { text-align:center; padding:60px 0; color:var(--hs-steel); font-size:14px; }
 
-    /* VT legend chips in toolbar */
+    /* VT legend chips */
     .vt-legend { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
     .vt-chip {
       font-family:var(--font-mono); font-size:8px; letter-spacing:0.07em;
       text-transform:uppercase; padding:3px 7px; border-radius:var(--radius-sm);
       border-left:3px solid var(--gc); background:var(--gbg); color:var(--gc);
     }
+    /* Active column-filter badges */
+    .filter-badge {
+      font-family:var(--font-mono); font-size:9px; color:var(--hs-teal);
+      background:rgba(0,91,105,0.08); border-radius:var(--radius-sm);
+      padding:2px 7px; cursor:pointer;
+    }
+    .filter-badge:hover { background:rgba(0,91,105,0.16); }
   </style>
 </head>
 <body>
@@ -129,21 +206,20 @@
 </header>
 
 <div class="container">
-
   <div id="loadingState" style="text-align:center;padding:80px 0;color:var(--hs-steel)">
     <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase">Loading supplier database…</p>
   </div>
 
   <div id="dbContent" class="hidden">
-    <div class="result-header" style="margin-bottom:20px">
-      <h2>Supplier Database</h2>
-    </div>
+    <div class="result-header" style="margin-bottom:20px"><h2>Supplier Database</h2></div>
 
     <div class="db-toolbar">
       <input type="search" id="searchInput" class="db-search" placeholder="Search company or product…">
-      <select id="typeFilter" class="db-filter"><option value="">All AGV types</option></select>
+      <select id="domainFilter" class="db-filter"><option value="">All industries</option></select>
+      <select id="typeFilter"   class="db-filter"><option value="">All product types</option></select>
       <select id="countryFilter" class="db-filter"><option value="">All countries</option></select>
       <div id="vtLegend" class="vt-legend"></div>
+      <div id="colFilterBadges" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       <span class="db-count" id="dbCount"></span>
     </div>
 
@@ -158,54 +234,65 @@
       <div id="dbEmpty" class="db-empty hidden">No results found.</div>
     </div>
   </div>
+</div>
 
+<!-- Floating column filter popover (content built dynamically) -->
+<div id="colFilterPop" class="col-filter-pop hidden">
+  <div id="colFilterContent"></div>
+  <button class="col-flt-clear" onclick="clearColFilter()" title="Clear filter">✕</button>
 </div>
 
 <script>
-// ── VT color palette (UI constants — VT names themselves come from the API) ───
+// ── Color palette ─────────────────────────────────────────────────────────────
 const _VT_PALETTE = [
-  { color: '#6E55A0', bg: 'rgba(110,85,160,0.06)' },  // orchiddeep – Forklift
-  { color: '#B45309', bg: 'rgba(180,83,9,0.06)'    },  // amber      – Tugger
-  { color: '#2F855A', bg: 'rgba(47,133,90,0.06)'   },  // green      – AMR
-  { color: '#1A6FAA', bg: 'rgba(26,111,170,0.06)'  },  // blue       – extra
+  { color:'#6E55A0', bg:'rgba(110,85,160,0.06)' },
+  { color:'#B45309', bg:'rgba(180,83,9,0.06)'   },
+  { color:'#2F855A', bg:'rgba(47,133,90,0.06)'  },
+  { color:'#1A6FAA', bg:'rgba(26,111,170,0.06)' },
 ];
-const _SHARED_STYLE  = { color: '#005B69', bg: 'rgba(0,91,105,0.06)'   };
-const _CONTEXT_STYLE = { color: '#5C6B73', bg: 'rgba(92,107,115,0.04)' };
+const _SHARED_STYLE  = { color:'#005B69', bg:'rgba(0,91,105,0.06)'  };
+const _CONTEXT_STYLE = { color:'#5C6B73', bg:'rgba(92,107,115,0.04)'};
 
-let _sharedSheet = '';
-let _vtNames     = [];   // ordered list of canonical VT names from AP0
+// ── State ─────────────────────────────────────────────────────────────────────
+let _sharedSheet  = '';
+let _vtNames      = [];
+let _domains      = [];
+let _activeDomain = null;
+let _allSuppliers = [];
+let _fieldMeta    = {};
+let _columns      = [];
+let _sortKey      = null;
+let _sortDir      = 1;       // 1=ASC -1=DESC
+let _colFilters   = {};      // key → {type, value} | {type:'range', gte, lte}
+let _filterKey    = null;
 
+// ── Sheet style ───────────────────────────────────────────────────────────────
 function _sheetStyle(sheet) {
-  if (!sheet)             return _CONTEXT_STYLE;
+  if (!sheet)               return _CONTEXT_STYLE;
   if (sheet===_sharedSheet) return _SHARED_STYLE;
   const i = _vtNames.indexOf(sheet);
   return i >= 0 ? _VT_PALETTE[i % _VT_PALETTE.length] : _CONTEXT_STYLE;
 }
 
-// ── Column layout constants (UI decisions, not domain) ────────────────────────
-const SKIP_COLS   = new Set(['product_id', 'description']);
-const STICKY_KEYS = ['company_name', 'product_name'];
-const STICKY_LABELS = { company_name: 'Company', product_name: 'Product' };
+// ── Column constants ──────────────────────────────────────────────────────────
+const SKIP_COLS    = new Set(['product_id','description']);
+const STICKY_KEYS  = ['company_name','product_name'];
+const STICKY_LABELS = { company_name:'Company', product_name:'Product' };
 
-let _allSuppliers = [];
-let _fieldMeta    = {};
-let _columns      = [];   // [{key, label, sheet, stickyClass}]
-
-// Sheet rank for column sort: sticky=-1, shared=0, VT1=1, VT2=2…, context=last
 function _sheetRank(sheet) {
   if (!sheet)               return _vtNames.length + 1;
   if (sheet===_sharedSheet) return 0;
   const i = _vtNames.indexOf(sheet);
-  return i >= 0 ? i + 1 : _vtNames.length + 2;
+  return i >= 0 ? i+1 : _vtNames.length+2;
 }
 
-// Filter columns based on active VT type (hide other-VT-specific columns)
 function _activeCols(activeType) {
-  if (!activeType) return _columns;
   return _columns.filter(c => {
-    if (c.stickyClass)                    return true;  // always show identity
-    if (!c.sheet || c.sheet===_sharedSheet) return true;  // shared / context
-    return c.sheet === activeType;
+    if (c.stickyClass) return true;
+    if (_activeDomain && c.sheet && !_activeDomain.sheets.includes(c.sheet)) return false;
+    if (!activeType) return true;
+    if (!c.sheet || c.sheet===_sharedSheet) return true;
+    return c.sheet===activeType;
   });
 }
 
@@ -214,13 +301,12 @@ function renderCell(key, val) {
   if (val===null||val===undefined||val==='') return '<span class="cell-na">–</span>';
   if (typeof val==='boolean') return val ? '<span class="bool-yes">✓</span>' : '<span class="bool-no">✗</span>';
   if (Array.isArray(val)) return val.length ? val.join(', ') : '<span class="cell-na">–</span>';
-  if (key==='country')   return `<span class="country-badge">${val}</span>`;
-  if (key==='product_type')  return `<span class="type-pill type-pill-sm">${val}</span>`;
+  if (key==='country')      return `<span class="country-badge">${val}</span>`;
+  if (key==='product_type') return `<span class="type-pill type-pill-sm">${val}</span>`;
   if (key.endsWith('_eur') && typeof val==='number') return '€'+val.toLocaleString();
   return val;
 }
 
-// Auto-label for fields not in AP0 field-meta
 const _UNIT_SUFF = {_kg:'kg',_mm:'mm',_pct:'%',_h:'h',_ms:'m/s',_c:'°C',_eur:'EUR',_min:'min',_m:'m'};
 function autoLabel(key) {
   let k=key, unit=null;
@@ -231,42 +317,213 @@ function autoLabel(key) {
   return unit ? `${label} (${unit})` : label;
 }
 
+// ── Sort ──────────────────────────────────────────────────────────────────────
+function sortByCol(key) {
+  closeColFilter();
+  if (_sortKey===key) {
+    if (_sortDir===1) _sortDir=-1;
+    else { _sortKey=null; _sortDir=1; }
+  } else {
+    _sortKey=key; _sortDir=1;
+  }
+  filterRows();
+}
+
+// ── Column filter popover ─────────────────────────────────────────────────────
+function openColFilter(evt, key) {
+  evt.stopPropagation();
+  const pop = document.getElementById('colFilterPop');
+  if (_filterKey===key && !pop.classList.contains('hidden')) { closeColFilter(); return; }
+  _filterKey = key;
+
+  const m   = _fieldMeta[key] || {};
+  const dt  = m.data_type || '';
+  const av  = m.allowed_values || [];
+  const cur = _colFilters[key];
+  const content = document.getElementById('colFilterContent');
+
+  if (dt === 'Boolean') {
+    const v = cur ? cur.value : '';
+    content.innerHTML =
+      `<div class="flt-bool-grp">` +
+      `<button class="flt-bool-btn${v==='' ?' on':''}" onclick="setBoolFilter('${key}','')">Any</button>` +
+      `<button class="flt-bool-btn${v==='true' ?' on':''}" onclick="setBoolFilter('${key}','true')">✓ Yes</button>` +
+      `<button class="flt-bool-btn${v==='false'?' on':''}" onclick="setBoolFilter('${key}','false')">✗ No</button>` +
+      `</div>`;
+
+  } else if ((dt==='SingleSelect'||dt==='MultiSelect') && av && av.length && av.length<=40) {
+    const cv = cur ? cur.value : '';
+    const opts = av.map(v=>`<option value="${v}"${v===cv?' selected':''}>${v}</option>`).join('');
+    content.innerHTML =
+      `<select class="flt-sel" onchange="setSelectFilter('${key}',this.value)">` +
+      `<option value="">Any</option>${opts}</select>`;
+
+  } else if (dt==='Integer' || dt==='Float') {
+    const gte = cur && cur.type==='range' ? (cur.gte ?? '') : '';
+    const lte = cur && cur.type==='range' ? (cur.lte ?? '') : '';
+    content.innerHTML =
+      `<input class="flt-num" type="number" placeholder="≥" value="${gte}" ` +
+      `onchange="setRangeFilter('${key}','gte',this.value)" title="Minimum">` +
+      `<span class="flt-range-sep">–</span>` +
+      `<input class="flt-num" type="number" placeholder="≤" value="${lte}" ` +
+      `onchange="setRangeFilter('${key}','lte',this.value)" title="Maximum">`;
+
+  } else {
+    const cv = cur ? (cur.value||'') : '';
+    content.innerHTML =
+      `<input class="flt-inp" type="text" placeholder="Contains…" value="${cv}" ` +
+      `oninput="setTextFilter('${key}',this.value)" autocomplete="off">`;
+    setTimeout(()=>content.querySelector('input')?.focus(), 0);
+  }
+
+  const rect = evt.currentTarget.getBoundingClientRect();
+  pop.style.top  = (rect.bottom+4)+'px';
+  pop.style.left = Math.max(4, rect.left-100)+'px';
+  pop.classList.remove('hidden');
+}
+
+function closeColFilter() {
+  document.getElementById('colFilterPop').classList.add('hidden');
+  _filterKey = null;
+}
+
+function clearColFilter() {
+  if (!_filterKey) return;
+  delete _colFilters[_filterKey];
+  _refreshAfterFilter();
+  closeColFilter();
+}
+
+// ── Filter setters ────────────────────────────────────────────────────────────
+function setBoolFilter(key, value) {
+  if (value==='') delete _colFilters[key];
+  else            _colFilters[key] = {type:'bool', value};
+  // Update button states in popover
+  document.querySelectorAll('#colFilterContent .flt-bool-btn').forEach(b => {
+    b.classList.toggle('on', b.textContent.trim()===
+      (value==='' ? 'Any' : value==='true' ? '✓ Yes' : '✗ No'));
+  });
+  _refreshAfterFilter();
+}
+
+function setSelectFilter(key, value) {
+  if (!value) delete _colFilters[key];
+  else        _colFilters[key] = {type:'select', value};
+  _refreshAfterFilter();
+}
+
+function setTextFilter(key, value) {
+  if (!value.trim()) delete _colFilters[key];
+  else               _colFilters[key] = {type:'text', value: value.trim()};
+  _refreshAfterFilter();
+}
+
+function setRangeFilter(key, bound, rawVal) {
+  const num = rawVal==='' ? null : parseFloat(rawVal);
+  if (!_colFilters[key] || _colFilters[key].type!=='range')
+    _colFilters[key] = {type:'range', gte:null, lte:null};
+  _colFilters[key][bound] = isNaN(num) ? null : num;
+  if (_colFilters[key].gte===null && _colFilters[key].lte===null)
+    delete _colFilters[key];
+  _refreshAfterFilter();
+}
+
+function _refreshAfterFilter() {
+  updateFilterBadges();
+  filterRows();
+}
+
+function removeBadge(key) {
+  delete _colFilters[key];
+  _refreshAfterFilter();
+}
+
+function updateFilterBadges() {
+  const container = document.getElementById('colFilterBadges');
+  container.innerHTML = Object.entries(_colFilters).map(([k]) => {
+    const lbl = (_fieldMeta[k]||{}).label || autoLabel(k);
+    return `<span class="filter-badge" onclick="removeBadge('${k}')" title="Remove filter">${lbl}: ${_filterValLabel(k)} ✕</span>`;
+  }).join('');
+  // Sync active state on header buttons
+  document.querySelectorAll('#dbHead .th-flt-btn').forEach(btn => {
+    const key = btn.closest('th')?.dataset.key;
+    btn.classList.toggle('active', !!key && !!_colFilters[key]);
+  });
+}
+
+// Close popover on outside click
+document.addEventListener('click', e => {
+  const pop = document.getElementById('colFilterPop');
+  if (!pop.classList.contains('hidden') && !pop.contains(e.target)) closeColFilter();
+});
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') closeColFilter();
+});
+
+// ── Filter value label (for header pill and badges) ───────────────────────────
+function _filterValLabel(key) {
+  const f = _colFilters[key];
+  if (!f) return '';
+  if (f.type==='bool') return f.value==='true' ? '✓ Yes' : '✗ No';
+  if (f.type==='range') {
+    if (f.gte!==null && f.lte!==null) return `${f.gte}–${f.lte}`;
+    if (f.gte!==null) return `≥ ${f.gte}`;
+    return `≤ ${f.lte}`;
+  }
+  return f.value;
+}
+
 // ── Header rendering ──────────────────────────────────────────────────────────
 function renderHead(cols) {
   const nonSticky = cols.filter(c => !c.stickyClass);
-
-  // Build consecutive groups of non-sticky columns by sheet
   const groups = [];
-  let i = 0;
-  while (i < nonSticky.length) {
-    const sheet = nonSticky[i].sheet;
-    let n = 0;
-    while (i < nonSticky.length && nonSticky[i].sheet===sheet) { n++; i++; }
-    groups.push({ sheet, n });
+  let i=0;
+  while (i<nonSticky.length) {
+    const sheet=nonSticky[i].sheet; let n=0;
+    while (i<nonSticky.length && nonSticky[i].sheet===sheet) { n++; i++; }
+    groups.push({sheet,n});
   }
 
-  // Row 1: sticky identity (rowspan=2) + group span headers
   const stickyHds = STICKY_KEYS
-    .filter(k => cols.some(c => c.key===k))
-    .map((k,si) => {
-      const sc  = `sc-${si+1}`;
-      const lbl = STICKY_LABELS[k] || autoLabel(k);
-      return `<th class="group-hd ${sc}" rowspan="2">${lbl}</th>`;
+    .filter(k=>cols.some(c=>c.key===k))
+    .map((k,si)=>{
+      const sc      = `sc-${si+1}`;
+      const lbl     = STICKY_LABELS[k] || autoLabel(k);
+      const isSorted = _sortKey===k;
+      const indCls  = isSorted ? (_sortDir===1?'asc':'desc') : '';
+      const indChar = isSorted ? (_sortDir===1?'↑':'↓') : '↕';
+      return `<th class="group-hd ${sc}" rowspan="2" style="cursor:pointer;user-select:none" onclick="sortByCol('${k}')">` +
+        `<div class="th-inner" style="justify-content:center">` +
+        `<span>${lbl}</span>` +
+        `<span class="th-sort-ind ${indCls}">${indChar}</span>` +
+        `</div></th>`;
     }).join('');
 
-  const groupHds = groups.map(g => {
-    const s   = _sheetStyle(g.sheet);
-    const lbl = g.sheet || 'General';
+  const groupHds = groups.map(g=>{
+    const s=_sheetStyle(g.sheet), lbl=g.sheet||'General';
     return `<th colspan="${g.n}" class="group-hd" style="--gc:${s.color};--gbg:${s.bg}">${lbl}</th>`;
   }).join('');
 
   document.getElementById('dbGroupHead').innerHTML =
     `<th class="group-hd sc-0" rowspan="2">#</th>${stickyHds}${groupHds}`;
 
-  // Row 2: individual field headers (non-sticky only; sticky cells span row 1+2)
-  document.getElementById('dbHead').innerHTML = nonSticky.map(c => {
-    const s = _sheetStyle(c.sheet);
-    return `<th style="border-top:2px solid ${s.color}">${c.label}</th>`;
+  document.getElementById('dbHead').innerHTML = nonSticky.map(c=>{
+    const s        = _sheetStyle(c.sheet);
+    const isSorted = _sortKey===c.key;
+    const indCls   = isSorted ? (_sortDir===1?'asc':'desc') : '';
+    const indChar  = isSorted ? (_sortDir===1?'↑':'↓') : '↕';
+    const flt      = _colFilters[c.key];
+    const fltAct   = flt ? ' active' : '';
+    const fltPill  = flt
+      ? `<div class="th-flt-val" onclick="event.stopPropagation();removeBadge('${c.key}')" title="Remove filter">` +
+        `${_filterValLabel(c.key)} ✕</div>`
+      : '';
+    return `<th class="${flt?'th-filtered':''}" style="border-top:2px solid ${s.color}" data-key="${c.key}" onclick="sortByCol('${c.key}')">` +
+      `<div class="th-inner">` +
+      `<span class="th-label">${c.label}</span>` +
+      `<span class="th-sort-ind ${indCls}">${indChar}</span>` +
+      `<button class="th-flt-btn${fltAct}" onclick="openColFilter(event,'${c.key}')" title="Filter">▾</button>` +
+      `</div>${fltPill}</th>`;
   }).join('');
 }
 
@@ -276,130 +533,173 @@ function renderRows(data) {
   const cols = _activeCols(activeType);
   renderHead(cols);
 
-  const tbody = document.getElementById('dbBody');
-  const empty = document.getElementById('dbEmpty');
-  document.getElementById('dbCount').textContent = `${data.length} products`;
-  tbody.innerHTML = '';
+  const tbody=document.getElementById('dbBody');
+  const empty=document.getElementById('dbEmpty');
+  document.getElementById('dbCount').textContent=`${data.length} products`;
+  tbody.innerHTML='';
   if (!data.length) { empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
 
-  data.forEach((r, idx) => {
-    const rowType = r.product_type;
-    let cells = `<td class="sc-0" style="color:var(--steel);text-align:center;font-size:11px">${idx+1}</td>`;
-
+  data.forEach((r,idx)=>{
+    const rowType=r.product_type;
+    let cells=`<td class="sc-0" style="color:var(--steel);text-align:center;font-size:11px">${idx+1}</td>`;
     for (const c of cols) {
       if (c.stickyClass) {
-        cells += `<td class="${c.stickyClass}" style="font-weight:600">${renderCell(c.key, r[c.key])}</td>`;
+        cells+=`<td class="${c.stickyClass}" style="font-weight:600">${renderCell(c.key,r[c.key])}</td>`;
         continue;
       }
-      // A column is "not applicable" for this row when it belongs to a different VT's sheet
       const isOtherVt = c.sheet && c.sheet!==_sharedSheet && rowType && c.sheet!==rowType;
       const bgStyle   = isOtherVt ? 'background:rgba(0,0,0,0.025);' : '';
-      const isEmpty   = r[c.key]===null || r[c.key]===undefined || r[c.key]==='';
-      const content   = isOtherVt && isEmpty
-        ? '<span class="cell-na-vt">n/a</span>'
-        : renderCell(c.key, r[c.key]);
-      cells += `<td style="${bgStyle}">${content}</td>`;
+      const isEmpty   = r[c.key]===null||r[c.key]===undefined||r[c.key]==='';
+      const content   = isOtherVt&&isEmpty ? '<span class="cell-na-vt">n/a</span>' : renderCell(c.key,r[c.key]);
+      cells+=`<td style="${bgStyle}">${content}</td>`;
     }
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = cells;
+    const tr=document.createElement('tr');
+    tr.innerHTML=cells;
     tbody.appendChild(tr);
   });
 }
 
-// ── Filter ────────────────────────────────────────────────────────────────────
+// ── Filter + sort ─────────────────────────────────────────────────────────────
+function _matchesColFilter(r, key, f) {
+  const val = r[key];
+  if (f.type==='bool') {
+    if (f.value==='') return true;
+    const isTrue = val===true || val===1 || String(val).toLowerCase()==='true';
+    return isTrue === (f.value==='true');
+  }
+  if (f.type==='text'||f.type==='select') {
+    if (!f.value) return true;
+    return String(val??'').toLowerCase().includes(f.value.toLowerCase());
+  }
+  if (f.type==='range') {
+    const num = typeof val==='number' ? val : parseFloat(val);
+    if (f.gte!==null && (isNaN(num)||num<f.gte)) return false;
+    if (f.lte!==null && (isNaN(num)||num>f.lte)) return false;
+    return true;
+  }
+  return true;
+}
+
 function filterRows() {
   const q   = document.getElementById('searchInput').value.toLowerCase();
   const typ = document.getElementById('typeFilter').value;
   const cty = document.getElementById('countryFilter').value;
-  // Reset horizontal scroll so narrower column sets don't leave the table off-screen
-  document.querySelector('.db-wrap').scrollLeft = 0;
-  renderRows(_allSuppliers.filter(r => {
-    if (typ && r.product_type  !== typ) return false;
-    if (cty && r.country   !== cty) return false;
+
+  let data = _allSuppliers.filter(r => {
+    if (_activeDomain && r.product_type && !_activeDomain.product_types.includes(r.product_type)) return false;
+    if (typ && r.product_type!==typ) return false;
+    if (cty && r.country!==cty)      return false;
     if (q && !(String(r.company_name||'')+' '+String(r.product_name||'')).toLowerCase().includes(q)) return false;
+    for (const [key,f] of Object.entries(_colFilters)) {
+      if (!_matchesColFilter(r,key,f)) return false;
+    }
     return true;
-  }));
+  });
+
+  if (_sortKey) {
+    data=[...data].sort((a,b)=>{
+      const av=a[_sortKey]??'', bv=b[_sortKey]??'';
+      if (av<bv) return -_sortDir;
+      if (av>bv) return  _sortDir;
+      return 0;
+    });
+  }
+
+  renderRows(data);
 }
 
-// ── Build VT legend chips ─────────────────────────────────────────────────────
+// ── Domain switch ─────────────────────────────────────────────────────────────
+function setDomain(domainId) {
+  _activeDomain = domainId ? _domains.find(d=>d.id===domainId)||null : null;
+
+  if (_activeDomain) {
+    _sharedSheet = _activeDomain.shared_sheet||'';
+    _vtNames     = _activeDomain.vt_names;
+  } else {
+    const agvDom = _domains.find(d=>d.vt_names.length>1);
+    _sharedSheet = agvDom ? agvDom.shared_sheet||'' : '';
+    _vtNames     = agvDom ? agvDom.vt_names : [];
+  }
+
+  const typeEl=document.getElementById('typeFilter');
+  typeEl.innerHTML='<option value="">All product types</option>';
+  const relevantTypes = _activeDomain
+    ? [...new Set(_allSuppliers.filter(r=>_activeDomain.product_types.includes(r.product_type)).map(r=>r.product_type).filter(Boolean))].sort()
+    : [...new Set(_allSuppliers.map(r=>r.product_type).filter(Boolean))].sort();
+  relevantTypes.forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; typeEl.appendChild(o); });
+  typeEl.style.display = relevantTypes.length<=1 ? 'none' : '';
+
+  buildLegend();
+  document.querySelector('.db-wrap').scrollLeft = 0;
+  filterRows();
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
 function buildLegend() {
-  const el = document.getElementById('vtLegend');
-  const entries = [
-    { label: _sharedSheet || 'Shared', style: _SHARED_STYLE },
-    ..._vtNames.map((vt,i) => ({ label: vt, style: _VT_PALETTE[i%_VT_PALETTE.length] })),
-    { label: 'General', style: _CONTEXT_STYLE },
-  ];
-  el.innerHTML = entries.map(e =>
+  const el=document.getElementById('vtLegend');
+  const entries=[];
+  if (_sharedSheet) entries.push({label:_sharedSheet, style:_SHARED_STYLE});
+  _vtNames.forEach((vt,i)=>entries.push({label:vt, style:_VT_PALETTE[i%_VT_PALETTE.length]}));
+  entries.push({label:'General', style:_CONTEXT_STYLE});
+  el.innerHTML=entries.map(e=>
     `<span class="vt-chip" style="--gc:${e.style.color};--gbg:${e.style.bg}">${e.label}</span>`
   ).join('');
 }
 
 // ── Build table ───────────────────────────────────────────────────────────────
 function buildTable(suppliers, meta) {
-  _allSuppliers = suppliers;
-  _fieldMeta    = meta;
+  _allSuppliers=suppliers; _fieldMeta=meta;
 
-  const vtCfg  = meta['__vt_config__'] || {};
-  _sharedSheet = vtCfg.shared_sheet_name || '';
-  _vtNames     = vtCfg.vehicle_types || [];
+  const vtCfg  = meta['__vt_config__']||{};
+  _domains     = vtCfg.domains||[];
+  _sharedSheet = vtCfg.shared_sheet_name||'';
+  _vtNames     = vtCfg.vehicle_types||[];
 
   if (!suppliers.length) return;
 
-  const allKeys = Object.keys(suppliers[0]).filter(k => !SKIP_COLS.has(k));
+  const allKeys=Object.keys(suppliers[0]).filter(k=>!SKIP_COLS.has(k));
+  _columns=allKeys.map(key=>{
+    const m=meta[key]||{}, stickyIdx=STICKY_KEYS.indexOf(key);
+    return {
+      key, label:m.label||autoLabel(key), sheet:m.sheet||null,
+      stickyClass: stickyIdx>=0 ? `sc-${stickyIdx+1}` : '',
+      _rank: stickyIdx>=0 ? -1 : _sheetRank(m.sheet||null),
+      _origIdx: allKeys.indexOf(key),
+    };
+  }).sort((a,b)=>{
+    if (a.stickyClass&&b.stickyClass) return STICKY_KEYS.indexOf(a.key)-STICKY_KEYS.indexOf(b.key);
+    if (a.stickyClass) return -1; if (b.stickyClass) return 1;
+    if (a._rank!==b._rank) return a._rank-b._rank;
+    return a._origIdx-b._origIdx;
+  });
 
-  // Build column descriptors and sort by sheet group
-  _columns = allKeys
-    .map(key => {
-      const m        = meta[key] || {};
-      const stickyIdx = STICKY_KEYS.indexOf(key);
-      return {
-        key,
-        label:       m.label || autoLabel(key),
-        sheet:       m.sheet || null,
-        stickyClass: stickyIdx >= 0 ? `sc-${stickyIdx+1}` : '',
-        _rank:       stickyIdx >= 0 ? -1 : _sheetRank(m.sheet || null),
-        _origIdx:    allKeys.indexOf(key),
-      };
-    })
-    .sort((a, b) => {
-      if (a.stickyClass && b.stickyClass) return STICKY_KEYS.indexOf(a.key) - STICKY_KEYS.indexOf(b.key);
-      if (a.stickyClass) return -1;
-      if (b.stickyClass) return  1;
-      if (a._rank !== b._rank) return a._rank - b._rank;
-      return a._origIdx - b._origIdx;  // stable within group
-    });
+  const domEl=document.getElementById('domainFilter');
+  _domains.forEach(d=>{ const o=document.createElement('option'); o.value=d.id; o.textContent=d.label; domEl.appendChild(o); });
+  if (_domains.length>1) { domEl.value=_domains[0].id; setDomain(_domains[0].id); }
+  else setDomain(null);
 
-  // Populate AGV type filter
-  const types = [...new Set(suppliers.map(r => r.product_type).filter(Boolean))].sort();
-  const typeEl = document.getElementById('typeFilter');
-  types.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; typeEl.appendChild(o); });
-
-  // Populate country filter
-  const countries = [...new Set(suppliers.map(r => r.country).filter(Boolean))].sort();
-  const ctyEl = document.getElementById('countryFilter');
-  countries.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; ctyEl.appendChild(o); });
-
-  buildLegend();
-  renderRows(suppliers);
+  const countries=[...new Set(suppliers.map(r=>r.country).filter(Boolean))].sort();
+  const ctyEl=document.getElementById('countryFilter');
+  countries.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; ctyEl.appendChild(o); });
 
   document.getElementById('loadingState').classList.add('hidden');
   document.getElementById('dbContent').classList.remove('hidden');
 }
 
-// ── Fetch both APIs in parallel ───────────────────────────────────────────────
+// ── Fetch ─────────────────────────────────────────────────────────────────────
 Promise.all([
-  fetch('/api/field-meta').then(r => r.ok ? r.json() : {}),
-  fetch('/api/suppliers').then(r => { if (!r.ok) throw new Error(); return r.json(); }),
+  fetch('/api/field-meta').then(r=>r.ok?r.json():{}),
+  fetch('/api/suppliers').then(r=>{ if(!r.ok) throw new Error(); return r.json(); }),
 ])
-.then(([meta, suppliers]) => buildTable(suppliers, meta))
-.catch(() => {
-  document.getElementById('loadingState').innerHTML =
+.then(([meta,suppliers])=>buildTable(suppliers,meta))
+.catch(()=>{
+  document.getElementById('loadingState').innerHTML=
     '<p style="color:var(--signal);font-size:14px">Database unavailable — run sync_airtable.py first.</p>';
 });
 
 document.getElementById('searchInput').addEventListener('input', filterRows);
+document.getElementById('domainFilter').addEventListener('change', e=>setDomain(e.target.value));
 document.getElementById('typeFilter').addEventListener('change', filterRows);
 document.getElementById('countryFilter').addEventListener('change', filterRows);
 </script>
