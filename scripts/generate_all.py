@@ -899,6 +899,22 @@ def read_platform(wb, platform_path: Path) -> dict:
 
 # ── Prompt builders ───────────────────────────────────────────────────────────
 
+def _render_leaf_scope_lines(scope: dict, indent: str = "  ") -> list:
+    """Render a leaf scope node as prompt guide lines.
+
+    If the scope has variant_guides (sub-variant aliases), output the canonical
+    description first, then each alias as an indented sub-bullet.
+    Otherwise output a single line: * "canonical_name" → classification_guide.
+    """
+    cname = scope["canonical_name"]
+    guide = scope.get("classification_guide", "")
+    leaf_variants = scope.get("variant_guides", {})
+    result = [f'{indent}* "{cname}" → {guide}']
+    for alias, alias_desc in leaf_variants.items():
+        result.append(f'{indent}  * "{alias}" → {alias_desc}')
+    return result
+
+
 def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -> str:
     """Pass 4a template — classify vehicle type and VNA flag only."""
     lines = [
@@ -911,7 +927,7 @@ def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -
         if leaf_scopes:
             lines.append("Vehicle type classification guide:")
             for scope in leaf_scopes:
-                lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
+                lines.extend(_render_leaf_scope_lines(scope))
             lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
             lines.append("")
             lines.append("  THINK STEP BY STEP:")
@@ -1007,7 +1023,7 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
         has_vna_types = any(n.get("vna_applicable") for n in leaf_scopes)
         lines.append("Product sub-type classification guide:")
         for scope in leaf_scopes:
-            lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
+            lines.extend(_render_leaf_scope_lines(scope))
         if has_vna_types:
             lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
             lines.append("")
@@ -1098,7 +1114,7 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
             if leaf_scopes:
                 lines += ["Vehicle type classification guide (for required_product_type):"]
                 for scope in leaf_scopes:
-                    lines.append(f'  * "{scope["canonical_name"]}" → {scope["classification_guide"]}')
+                    lines.extend(_render_leaf_scope_lines(scope))
                 lines.append("  Key: PAYLOAD AND LOAD TYPE determine the vehicle — not the environment alone.")
                 lines.append("  Filling lines + pallet transport = Forklift AGV. Filling lines + light totes/boxes = Mobile AMR.")
                 lines.append("")
