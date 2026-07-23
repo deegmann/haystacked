@@ -94,7 +94,7 @@
       "parent": "*",
       "tab_name": "FoodBev_Refrigeration",
       "canonical_name": "Industrial Refrigeration",
-      "classification_guide": "* \"Industrial Refrigeration\" → Industrial refrigeration system for food & beverage: process cooling, cold storage, or deep-freeze applications. Keywords: Kälteanlage, Kältetechnik, refrigeration, industrial cooling, cold store, deep freeze, blast freezer.",
+      "classification_guide": "Industrial refrigeration system for food & beverage: process cooling, cold storage, or deep-freeze applications. Keywords: Kälteanlage, Kältetechnik, refrigeration, industrial cooling, cold store, deep freeze, blast freezer.",
       "scope_variants": [
         "Process Cooling",
         "Cold Store",
