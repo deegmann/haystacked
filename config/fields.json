@@ -616,7 +616,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Max ramp gradient the loaded unit handles. Source: spec 'gradeability' — must appear as an explicit % value. The value represents the steepest ramp gradient (%) the loaded vehicle must climb: 10 % ≈ 5.7° incline; most flat indoor warehouse floors have 0 % gradient and this field should be null. Cond. K.O.: binds only where the site has ramps/dock inclines. NULL RULE: null unless a slope or gradient percentage is explicitly stated in the document. Do NOT apply typical industry values (e.g. '5%') when the document is silent on gradients.",
+    "hint": "Max ramp gradient the loaded unit handles. Source: spec 'gradeability' — must appear as an explicit % value. The value represents the steepest ramp gradient (%) the loaded vehicle must climb. Cond. K.O.: binds only where the site has ramps/dock inclines. NULL RULE: null unless a slope or gradient percentage is explicitly stated in the document. An approximate value (e.g. 'approximately X%') counts as explicit — do not null it solely because the document qualifies the figure. Do NOT infer or apply typical values when the document is silent on gradients.",
     "user_description": "How steep is the steepest driving route in the operating area? (% gradient; e.g. 1.5 for a 1.5% ramp)",
     "display_mode": null,
     "value_if_null": null

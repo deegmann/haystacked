@@ -11,7 +11,9 @@
     "required_operating_humidity_max_pct": null,
     "required_max_gradient_pct": 1.5,
     "required_min_total_height_mm": null,
-    "required_min_aisle_width_mm": null
+    "required_min_aisle_width_mm": null,
+    "required_vna_capable": "not_required",
+    "required_product_type": "Forklift AGV"
   },
   "golden_run_file": "golden_run_tender_companyx.json",
   "known_issues": [
