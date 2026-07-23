@@ -529,8 +529,16 @@ async def analyze(file: UploadFile = File(...)):
             agv_criteria       = dict(replay_criteria)
             text               = ""
             parse_method       = "replay"
+            # Derive detected_domain from VT scope if not present (old captured files pre-date this field)
+            _replay_domain = cached.get("detected_domain")
+            if not _replay_domain and canonical_product_type:
+                _leaf = _LEGACY_MAP.get(canonical_product_type, "")
+                for _dom in _EXTRACTABLE_DOMAINS:
+                    if _leaf.startswith(_dom):
+                        _replay_domain = _dom
+                        break
             result             = {
-                "detected_domain": cached.get("detected_domain"),
+                "detected_domain": _replay_domain,
                 "in_scope":    cached.get("in_scope", True),
                 "buyer":       cached.get("buyer"),
                 "project":     cached.get("project"),
