@@ -389,7 +389,6 @@
     "data_type": "Multi-Select",
     "unit": null,
     "allowed_values": [
-      "None",
       "Pallet EUR",
       "Pallet ISO",
       "Half-Euro",

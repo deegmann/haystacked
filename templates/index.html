@@ -671,9 +671,9 @@ function _buildFieldRow(key, info, val) {
 
 // Build "Feld hinzufügen" picker — shows VT-relevant fields not already displayed
 function buildAddFieldPicker(crit, renderedKeys) {
-  const sharedScope = _fieldMeta.__vt_config__?.shared_scope ?? '';
   const legacyMap   = _fieldMeta.__vt_config__?.legacy_map ?? {};
   const currentVt = _lastResult?.vehicle_type_canonical;
+  const sharedScope = ((_fieldMeta.__vt_config__?.domains ?? []).find(d => (d.vt_names ?? []).includes(currentVt)) ?? {}).id ?? '';
   const pickerSeen = new Set();
   const candidates = Object.entries(_fieldMeta)
     .filter(([k, v]) =>
@@ -1021,7 +1021,7 @@ function renderSupplierCards(allResults) {
 // INVARIANT: all field selection driven by _fieldMeta (AP0-sourced).
 // No hardcoded field names or vehicle type strings.
 function buildClarificationFields(crit, currentVt) {
-  const sharedScope = _fieldMeta.__vt_config__?.shared_scope ?? '';
+  const sharedScope = ((_fieldMeta.__vt_config__?.domains ?? []).find(d => (d.vt_names ?? []).includes(currentVt)) ?? {}).id ?? '';
   const legacyMap   = _fieldMeta.__vt_config__?.legacy_map ?? {};
   const seen = new Set();
   return Object.entries(_fieldMeta)
@@ -1043,7 +1043,7 @@ function buildClarificationFields(crit, currentVt) {
 
 // buildEditFields: selects fields to show in the post-matching edit dialog.
 function buildEditFields(crit, currentVt) {
-  const sharedScope = _fieldMeta.__vt_config__?.shared_scope ?? '';
+  const sharedScope = ((_fieldMeta.__vt_config__?.domains ?? []).find(d => (d.vt_names ?? []).includes(currentVt)) ?? {}).id ?? '';
   const legacyMap   = _fieldMeta.__vt_config__?.legacy_map ?? {};
   const seen = new Set();
   return Object.entries(_fieldMeta)
