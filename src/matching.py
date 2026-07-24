@@ -82,7 +82,7 @@ def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
     warnings = []
 
     # Fields that are normalized by app.py after extraction — skip AP0 filter for them
-    _SKIP_FILTER = {"required_product_type", "required_vna_capable", "required_outdoor_capable"}
+    _SKIP_FILTER = {"required_product_type"}
 
     for field_spec in _fields.values():
         allowed = field_spec.allowed_values
@@ -176,6 +176,8 @@ def _op_bool_exclusive(tender, supplier) -> tuple[bool, str]:
     Closed-world assumption is declared per-field via value_if_null in AP0, not here.
     """
     t = str(tender).lower() if tender is not None else None
+    if t in ("true", "yes"):   t = "required"      # normalise LLM boolean output
+    elif t in ("false", "no"): t = "not_required"
     # None supplier_val → no constraint (LL-06).
     # Closed-world assumption is declared per-field via value_if_null in AP0, not here.
     if supplier is None:

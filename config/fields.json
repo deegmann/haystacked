@@ -1306,7 +1306,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "VNA / very narrow aisle operation required. true/false. Source: 'VNA', aisle < 2 m with high-bay racking. If true, required_drive_type must be 'VNA Turret'.",
+    "hint": "Set to true ONLY if this tender explicitly mandates VNA (Very Narrow Aisle) capability — aisle widths below 1.8 m requiring turret or side-loader technology. Set to false if VNA is not mentioned or standard aisles are assumed — this is the default for standard Forklift AGV tenders. Do NOT set to true if VNA is mentioned only as existing warehouse context, historical infrastructure, or areas outside this procurement scope. Null only if aisle requirements are genuinely ambiguous.",
     "user_description": "Is VNA (Very Narrow Aisle) capability required — or explicitly not desired?",
     "display_mode": "display",
     "value_if_null": false

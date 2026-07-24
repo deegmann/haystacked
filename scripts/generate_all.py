@@ -938,9 +938,6 @@ def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -
             lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
             lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_product_type='Forklift AGV'.")
             lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m → required_product_type='Forklift AGV' AND required_vna_capable=true.")
-            lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
-            lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
             lines.append("")
     else:
         guide = vehicle_types.get("llm_guide", [])
@@ -963,20 +960,16 @@ def build_vehicle_type_template(vehicle_types: dict, scope_nodes: dict = None) -
             lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
             lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_product_type='Forklift AGV'.")
             lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m → required_product_type='Forklift AGV' AND required_vna_capable=true.")
-            lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured in this tender.")
-            lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
             lines.append("")
     lines += [
         "Fields:",
         "- required_product_type: MANDATORY — exactly one of: 'Forklift AGV', 'Tugger AGV', 'Mobile AMR'.",
-        "- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_product_type='Forklift AGV'.",
         "",
         "DOCUMENT:",
         "{text}",
         "",
         "JSON:",
-        '{"required_product_type":null,"required_vna_capable":null}',
+        '{"required_product_type":null}',
     ]
     return "\n".join(lines)
 
@@ -1035,24 +1028,17 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
             lines.append("  (2) Light load (<1000 kg) + flexible SLAM navigation + no standard floor-pallet pickup? → required_product_type='Mobile AMR'.")
             lines.append("  (3) Everything else (pallets, IBCs, forks required, racking, heavy load) → required_product_type='Forklift AGV'.")
             lines.append("      Counterbalanced, Reach Truck, AND VNA are all 'Forklift AGV'.")
-            lines.append("      If VNA / very narrow aisle / aisle<2m → required_product_type='Forklift AGV' AND required_vna_capable=true.")
-            lines.append("      IMPORTANT: required_vna_capable=true ONLY if VNA is explicitly REQUIRED for the AGVs being procured.")
-            lines.append("      If VNA racking is mentioned as existing infrastructure, historical context, or operations in OTHER aisles NOT covered by this tender → required_vna_capable=false.")
             lines.append("")
     _valid_values = ", ".join(repr(n) for n in names) if names else "null"
     lines += [
         "Fields:",
         f"- required_product_type: MANDATORY — exactly one of: {_valid_values}.",
-    ]
-    if has_vna_types:
-        lines.append("- required_vna_capable: true ONLY if the tender explicitly requires VNA capability for the AGVs being procured (narrow aisle <2m, high-bay racking required for this project). false if VNA is merely mentioned as existing warehouse infrastructure, historical context, or out-of-scope areas. Only applicable when required_product_type='Forklift AGV'.")
-    lines += [
         "",
         "DOCUMENT:",
         "{text}",
         "",
         "JSON:",
-        '{"required_product_type":null,"required_vna_capable":null}',
+        '{"required_product_type":null}',
     ]
     content = "\n".join(lines)
     if dom_variant_guides:
@@ -1067,7 +1053,7 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
 
 
 # Fields determined in Pass 4a — excluded from Pass 4b templates
-_4A_FIELDS = {"required_product_type", "required_vna_capable", "required_served_categories"}
+_4A_FIELDS = {"required_product_type", "required_served_categories"}
 
 
 _OPERATOR_DIRECTION = {
@@ -1086,7 +1072,7 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
     scope_filter=None  → full combined template (backward compat / JSON-retry fallback).
     scope_filter=<scope_id> → Pass 4b type-specific template; includes shared scope + that scope only,
                               excludes fields already determined in Pass 4a.
-                              Placeholders {vehicle_type} and {vna_context} filled by app.py at runtime.
+                              Placeholder {vehicle_type} filled by app.py at runtime.
     """
     if scope_filter:
         # Pass 4b: fields for this vehicle type (shared + type-specific + global if resolution given)
@@ -1097,7 +1083,7 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
             and f["key"] not in _4A_FIELDS
         ]
         lines = [
-            "The vehicle type for this tender has been determined: {vehicle_type}. {vna_context}",
+            "The vehicle type for this tender has been determined: {vehicle_type}.",
             "Extract the technical requirements listed below from the tender document.",
             "Values may appear in running text OR in tables — extract from both.",
             "Output ONLY the JSON object shown at the end — nothing else.",

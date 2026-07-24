@@ -121,10 +121,7 @@ def _criteria_to_uuid_keyed(criteria: dict) -> dict:
 # field that has an allowed_values list.  Used by the generalised LLM retry loop.
 # Fields in _AP0_SKIP_VALIDATION are handled by downstream normalisation in app.py
 # and must not be double-checked here.
-_AP0_SKIP_VALIDATION: frozenset = frozenset({
-    "required_vna_capable",    # derived from vehicle_type / text_overrides
-    "required_outdoor_capable", # boolean coerced separately
-})
+_AP0_SKIP_VALIDATION: frozenset = frozenset()
 _AP0_CONSTRAINED_FIELDS: dict = {}   # tender_key → {"allowed": set, "allowed_list": list}
 # Startup assertion: all multi-VT specs for the same tender_key must agree on allowed_values.
 for _tk, _specs in _FIELDS_BY_TENDER_KEY.items():
@@ -245,8 +242,7 @@ def _build_correction_prompt(violations: dict, original_text: str) -> str:
         original_text[:4000],
     ]
     return "\n".join(lines)
-_VNA_CFG        = set(_vehicle_cfg.get("vna_subtypes", []))   # set of vna llm outputs
-_VT_OVERRIDES   = _vehicle_cfg.get("text_overrides", [])      # [{regex, canonical, vna}]
+_VT_OVERRIDES   = _vehicle_cfg.get("text_overrides", [])      # [{regex, canonical}]
 
 _FIELD_TEXT_FALLBACKS = _vehicle_cfg.get("field_text_fallbacks", [])  # [{tender_key, regex, value, only_if_null}]
 _scope_reg        = json.loads((_CONFIG_DIR / "scope_registry.json").read_text())
@@ -266,21 +262,12 @@ assert set(_LEGACY_MAP.values()) <= set(_RESOLUTION_ORDER), (
     f"leaf scopes without resolution_order entry: {set(_LEGACY_MAP.values()) - set(_RESOLUTION_ORDER)}"
 )
 _VT_MAP_CFG     = _scope_reg.get("variant_map", {})           # variant_lower → canonical (Step 7)
-_VNA_APPLICABLE = {                                            # types where VNA gate applies (Step 7)
-    node["canonical_name"]
-    for node in _scope_reg["scopes"].values()
-    if node.get("vna_applicable")
-}
 _AGV_DETECT_KWS = _scope_reg.get("agv_detection_keywords", [])  # domain detection fallback keywords (Step 7)
 _VALID_VTS = {                                                 # canonical types with scoring bucket (Step 7)
     node["canonical_name"]
     for node in _scope_reg["scopes"].values()
     if node.get("scoring_bucket")
 }
-_VNA_CONTEXT_HINT = next(                                      # VNA context string for 4b prompt (Step 7)
-    (node.get("vna_hint", "") for node in _scope_reg["scopes"].values() if node.get("vna_applicable")),
-    ""
-)
 assert set(_VT_MAP_CFG.values()) <= set(_LEGACY_MAP), (
     f"variant_map values without legacy_map entry: {set(_VT_MAP_CFG.values()) - set(_LEGACY_MAP)}"
 )
@@ -525,7 +512,6 @@ async def analyze(file: UploadFile = File(...)):
                                           f"{len(replay_criteria)} criteria fields"})
 
             canonical_product_type = _VT_MAP_CFG.get(replay_vt.lower().strip()) or replay_vt
-            is_vna_subtype     = bool(cached.get("is_vna", False))
             agv_criteria       = dict(replay_criteria)
             text               = ""
             parse_method       = "replay"
@@ -709,7 +695,6 @@ async def analyze(file: UploadFile = File(...)):
             matches = []
             matches_all = []
             canonical_product_type = None
-            is_vna_subtype = False
             analysis_id = str(uuid.uuid4())
 
         else:
@@ -796,18 +781,13 @@ async def analyze(file: UploadFile = File(...)):
             raw_vt_lower = str(raw_vt_str).lower().strip()
             canonical_product_type = _VT_MAP_CFG.get(raw_vt_lower) or product_type_keyword_fallback(text or "")
 
-            # VNA detection: LLM output from 4a + text_overrides
-            is_vna_subtype = raw_vt_lower in _VNA_CFG or bool(vt_criteria.get("required_vna_capable"))
             for override in _VT_OVERRIDES:
                 if override.get("regex") and re.search(override["regex"], text or ""):
                     if override.get("canonical"):
                         canonical_product_type = override["canonical"]
-                    if override.get("vna"):
-                        is_vna_subtype = True
                     break
 
-            vna_label = " (VNA)" if is_vna_subtype else ""
-            log.info("Pass 4a: vehicle_type=%s%s", canonical_product_type, vna_label)
+            log.info("Pass 4a: vehicle_type=%s", canonical_product_type)
             # Pre-compute 4c field set now that vehicle type is known; needed for progress total
             _leaf_scope = _LEGACY_MAP.get(canonical_product_type, "")
             _4c_scopes  = frozenset(_RESOLUTION_ORDER.get(_leaf_scope, []))
@@ -817,7 +797,7 @@ async def analyze(file: UploadFile = File(...)):
             }
             _agv_total = 2 + len(_4c_fields)   # 4a(1) + 4b(1) + N×4c
             yield sse("step", {"id": "agv", "status": "running",
-                                "message": f"Kategorie: {canonical_product_type}{vna_label} — Kriterien werden extrahiert…",
+                                "message": f"Kategorie: {canonical_product_type} — Kriterien werden extrahiert…",
                                 "done": 1, "total": _agv_total})
             await asyncio.sleep(0)
 
@@ -837,9 +817,8 @@ async def analyze(file: UploadFile = File(...)):
                 })
 
             template_4b = _AGV_TYPE_TEMPLATES.get(canonical_product_type, AGV_USER_TEMPLATE)
-            vna_context = _VNA_CONTEXT_HINT if is_vna_subtype else ""
             agv_user_4b = _fill(template_4b, text=text,
-                                vehicle_type=canonical_product_type, vna_context=vna_context)
+                                vehicle_type=canonical_product_type)
 
             agv_criteria: dict = {}
             _ap0_warnings: list = []
@@ -923,7 +902,7 @@ async def analyze(file: UploadFile = File(...)):
                     _fhint_full = _fmeta["hint"]
                     _fhint_def  = _fhint_full.split("NULL RULE:")[0].strip()
                     _per_user = (
-                        f"Vehicle type: {canonical_product_type}. {vna_context}\n\n"
+                        f"Vehicle type: {canonical_product_type}.\n\n"
                         f"Find the value of '{_fk}' in the tender document.\n\n"
                         f"Field meaning: {_fhint_def}\n\n"
                         f"Step 1: Scan the document for any sentence, table cell, or labelled line "
@@ -985,7 +964,6 @@ async def analyze(file: UploadFile = File(...)):
 
             # Merge 4a results into agv_criteria
             agv_criteria["required_product_type"] = vt_criteria.get("required_product_type")
-            agv_criteria["required_vna_capable"] = vt_criteria.get("required_vna_capable")
 
             # Single-leaf domain gate (IK): store Pass 4a sub-classification as required_served_categories.
             # Detected by: _leaf_scope == detected_domain (no sub-leaves) and domain has scope_variants.
@@ -1026,7 +1004,7 @@ async def analyze(file: UploadFile = File(...)):
                     log.info("Field-text-fallback: %s = %s (regex: %s)", _key, _val, _rgx)
 
             # Run matching against SQLite supplier records
-            # canonical_product_type and is_vna_subtype already set in Pass 4a;
+            # canonical_product_type already set in Pass 4a;
             # re-derive here as safety net (idempotent for valid values).
             raw_vt = agv_criteria.get("required_product_type") or ""
             if isinstance(raw_vt, list):
@@ -1041,16 +1019,11 @@ async def analyze(file: UploadFile = File(...)):
                 if override.get("regex") and re.search(override["regex"], text or ""):
                     if override.get("canonical"):
                         canonical_product_type = override["canonical"]
-                    if override.get("vna"):
-                        is_vna_subtype = True
                     break
 
             # Split navigation string into list (e.g. "SLAM, QR Code" → ["SLAM", "QR Code"])
             raw_nav = agv_criteria.get("required_navigation_type") or ""
             nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
-
-            if is_vna_subtype and not agv_criteria.get("required_vna_capable"):
-                agv_criteria["required_vna_capable"] = True
 
             new_req = dict(agv_criteria)
             new_req["required_product_type"] = canonical_product_type
@@ -1059,19 +1032,6 @@ async def analyze(file: UploadFile = File(...)):
             new_req["required_navigation_type"] = nav_list
 
             new_req = _to_match_units(new_req)
-
-            raw_outdoor = agv_criteria.get("required_outdoor_capable")
-            if raw_outdoor is not None:
-                new_req["required_outdoor_capable"] = (
-                    "required" if str(raw_outdoor).lower() in ("yes", "true", "required") else "not_required"
-                )
-
-            new_req["required_vna_capable"] = (
-                "required"     if is_vna_subtype else
-                "not_required" if canonical_product_type in _VNA_APPLICABLE else
-                None
-            )
-            agv_criteria["required_vna_capable"] = new_req["required_vna_capable"]
 
             # Phase 3: persist extraction run
             _tender_run = build_tender_run(
@@ -1106,7 +1066,6 @@ async def analyze(file: UploadFile = File(...)):
         result["matches"]                = matches
         result["matches_all"]            = matches_all if matches_all else []
         result["vehicle_type_canonical"] = canonical_product_type
-        result["is_vna"]                 = is_vna_subtype
 
         yield sse("log", {"message": f"Gesamt: {total:.1f}s"})
         result["analysis_id"] = analysis_id
@@ -1180,16 +1139,11 @@ async def rematch_endpoint(request: Request):
         for tender_key in list(criteria.keys()):
             if tender_key.startswith('_') or tender_key.endswith('_source'):
                 continue  # never touch match-mechanics keys
-            if tender_key == 'required_vna_capable':
-                continue  # always recomputed below — do not clear via loop
             _tk_specs = _FIELDS_BY_TENDER_KEY.get(tender_key, [])
             scope     = _tk_specs[0].scope if _tk_specs else None
             old_scope = _LEGACY_MAP.get(old_vt, "")
             if scope and old_scope and scope == old_scope:
                 del criteria[tender_key]
-        # required_vna_capable: set to None — VNA status cannot be determined without re-running Pass 4a.
-        # Setting "not_required" would wrongly suppress VNA suppliers from a potentially-VNA tender.
-        criteria["required_vna_capable"] = None
 
     # Apply same unit-conversion + plausibility logic as main flow — handles mm→m input from dialog
     criteria, _ = validate_agv_criteria(criteria)
