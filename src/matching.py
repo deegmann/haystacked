@@ -184,7 +184,7 @@ def _op_bool_exclusive(tender, supplier) -> tuple[bool, str]:
     if t == "required" and not s:
         return True, f"required but not confirmed (value: {supplier})"
     if t == "not_required" and s:
-        return True, "not required — VNA equipment unsuitable for standard-aisle tender"
+        return True, f"not required but supplier confirms support (value: {supplier})"
     return False, ""
 
 
