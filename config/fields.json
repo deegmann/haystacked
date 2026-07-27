@@ -2700,7 +2700,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Extract ALL categories of refrigeration applications this supplier can serve. Do NOT assume from product name alone — extract only if stated explicitly. NULL RULE: if not explicitly stated, return null.",
+    "hint": "Which refrigeration application categor(ies) does this tender require? Output only values from the classification guide above, comma-separated if the tender requires more than one. Match on meaning in any document language, not on the English wording. NULL RULE: if the document gives no indication of the application category, return null.",
     "user_description": null,
     "display_mode": null,
     "value_if_null": null

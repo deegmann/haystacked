@@ -412,8 +412,9 @@ def read_extraction_schema(wb, data_sheets, tab_scope_map: dict = None) -> list:
         rows = _rows(wb[sheet])
         hi, cols = _find_header(rows)
         if hi is None: continue
-        c_field = cols.get("Field Name", 0)
-        c_hint  = cols.get("LLM Hint")
+        c_field   = cols.get("Field Name", 0)
+        c_hint    = cols.get("LLM Hint")
+        c_allowed = cols.get("Allowed Values")
 
         for row in rows[hi+1:]:
             if not row or not row[c_field]: continue
@@ -425,7 +426,11 @@ def read_extraction_schema(wb, data_sheets, tab_scope_map: dict = None) -> list:
             if not hint:
                 continue  # fields without LLM Hint are not extracted by the LLM
             seen.add(jk)
-            schema.append({"key": jk, "db_field": fname, "mandatory": False, "hint": hint, "scope": tab_scope_map.get(sheet, sheet)})
+            entry = {"key": jk, "db_field": fname, "mandatory": False, "hint": hint, "scope": tab_scope_map.get(sheet, sheet)}
+            raw_av = str(row[c_allowed]).strip() if c_allowed is not None and c_allowed < len(row) and row[c_allowed] else ""
+            if raw_av.startswith("@SCOPE_VARIANTS:"):
+                entry["variant_scope"] = raw_av.split(":", 1)[1].strip()
+            schema.append(entry)
 
     return schema
 
@@ -1053,7 +1058,7 @@ def build_scope_classification_template(scope_nodes: dict, domain_scope_id: str 
 
 
 # Fields determined in Pass 4a — excluded from Pass 4b templates
-_4A_FIELDS = {"required_product_type", "required_served_categories"}
+_4A_FIELDS = {"required_product_type"}
 
 
 _OPERATOR_DIRECTION = {
@@ -1156,6 +1161,10 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
                 hint = hint + " " + _OPERATOR_DIRECTION[op]
                 needs_source = True
         lines.append(f'- {field["key"]}:{mand} {hint}')
+        if field.get("variant_scope") and scope_nodes:
+            _variant_guides = scope_nodes.get(field["variant_scope"], {}).get("variant_guides", {})
+            for variant, guide in _variant_guides.items():
+                lines.append(f'  * "{variant}" → {guide}')
         if needs_source:
             _source_instrumented.add(field["key"])
             lines.append(

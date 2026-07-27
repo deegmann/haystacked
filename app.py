@@ -965,13 +965,6 @@ async def analyze(file: UploadFile = File(...)):
             # Merge 4a results into agv_criteria
             agv_criteria["required_product_type"] = vt_criteria.get("required_product_type")
 
-            # Single-leaf domain gate (IK): store Pass 4a sub-classification as required_served_categories.
-            # Detected by: _leaf_scope == detected_domain (no sub-leaves) and domain has scope_variants.
-            # AP0-driven: scope_variants comes from scope_registry, no domain name hardcoded.
-            _dom_node = _scope_reg["scopes"].get(detected_domain, {})
-            if _leaf_scope == detected_domain and _dom_node.get("scope_variants"):
-                agv_criteria["required_served_categories"] = vt_criteria.get("required_product_type")
-
         if is_extractable:
             # Validate against AP0 allowed_values — reject values not in the allowed list
             from src.matching import validate_tender_values
