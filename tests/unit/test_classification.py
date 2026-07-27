@@ -114,3 +114,71 @@ def test_domain_extractability_contract():
     extractable = {d["scope_id"] for d in reg["scopes"].values() if d.get("parent") == "*"}
     assert extractable, "_EXTRACTABLE_DOMAINS must be non-empty — check scope_registry.json"
     assert None not in extractable, "None must not be a valid extractable domain"
+
+
+def test_U_CL_09_single_leaf_domains_match_scope_registry_structure():
+    """OI-107: app._SINGLE_LEAF_DOMAINS / _DOMAIN_CLASSIF_VALUES must exactly reflect
+    which extractable domains have zero vs. one-or-more child scopes in scope_registry.json.
+    Computed directly from the JSON — no hardcoded domain-name literals."""
+    from app import _SINGLE_LEAF_DOMAINS, _DOMAIN_CLASSIF_VALUES, _EXTRACTABLE_DOMAINS
+
+    reg = json.loads((CONFIG / "scope_registry.json").read_text())
+    scopes = reg["scopes"]
+    domain_children: dict = {}
+    for dom in _EXTRACTABLE_DOMAINS:
+        children = [
+            n["canonical_name"]
+            for n in scopes.values()
+            if n.get("parent") == dom and n.get("canonical_name")
+        ]
+        domain_children[dom] = children
+
+    expected_single_leaf = {dom for dom, ch in domain_children.items() if not ch}
+    expected_multi_leaf = {dom for dom, ch in domain_children.items() if ch}
+
+    assert _SINGLE_LEAF_DOMAINS == expected_single_leaf, (
+        f"_SINGLE_LEAF_DOMAINS mismatch: expected {expected_single_leaf}, got {_SINGLE_LEAF_DOMAINS}"
+    )
+    assert set(_DOMAIN_CLASSIF_VALUES) == expected_multi_leaf, (
+        f"_DOMAIN_CLASSIF_VALUES keys mismatch: expected {expected_multi_leaf}, "
+        f"got {set(_DOMAIN_CLASSIF_VALUES)}"
+    )
+    for dom in expected_multi_leaf:
+        assert _DOMAIN_CLASSIF_VALUES[dom] == frozenset(domain_children[dom]), (
+            f"_DOMAIN_CLASSIF_VALUES[{dom!r}] mismatch: "
+            f"expected {frozenset(domain_children[dom])}, got {_DOMAIN_CLASSIF_VALUES[dom]}"
+        )
+
+
+def test_U_CL_10_single_leaf_domain_contract():
+    """OI-107: for every single-leaf domain, the derived canonical_name must resolve to a
+    usable leaf scope with a Pass 4b template and a non-empty Pass 4c field set — guards
+    against a future AP0 edit silently producing an empty 4c field set for a single-leaf
+    domain once Pass 4a is skipped for it."""
+    from app import (
+        _SINGLE_LEAF_DOMAINS,
+        _LEGACY_MAP,
+        _AGV_TYPE_TEMPLATES,
+        _RESOLUTION_ORDER,
+    )
+
+    reg = json.loads((CONFIG / "scope_registry.json").read_text())
+    scopes = reg["scopes"]
+
+    for domain in _SINGLE_LEAF_DOMAINS:
+        canonical_name = scopes[domain]["canonical_name"]
+
+        leaf_scope_id = _LEGACY_MAP.get(canonical_name)
+        assert leaf_scope_id, (
+            f"_LEGACY_MAP missing entry for {canonical_name!r} (single-leaf domain {domain!r})"
+        )
+
+        assert canonical_name in _AGV_TYPE_TEMPLATES, (
+            f"_AGV_TYPE_TEMPLATES missing entry for {canonical_name!r} "
+            f"(single-leaf domain {domain!r}) — Pass 4b template unresolved"
+        )
+
+        assert _RESOLUTION_ORDER.get(leaf_scope_id), (
+            f"_RESOLUTION_ORDER has no/empty entry for leaf scope {leaf_scope_id!r} "
+            f"(single-leaf domain {domain!r}) — Pass 4c field set would be empty"
+        )

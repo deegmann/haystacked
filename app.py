@@ -273,9 +273,11 @@ assert set(_VT_MAP_CFG.values()) <= set(_LEGACY_MAP), (
 )
 _DOMAIN_KWS: dict = _scope_reg.get("domain_keywords", {})
 # Domain-scoped valid Pass 4a output values (derived, not hardcoded).
-# Multi-leaf domains (AGV): valid outputs = canonical_names of child leaves.
-# Single-leaf domains (IK): valid outputs = scope_variants of the domain node.
+# Only multi-leaf domains need Pass 4a classification: valid outputs = canonical_names
+# of child leaves. Single-leaf domains skip Pass 4a entirely (OI-107) — their sole
+# canonical_name is deterministic, so they never enter this dict.
 _DOMAIN_CLASSIF_VALUES: dict = {}
+_single_leaf_domains: set = set()
 for _dom in _EXTRACTABLE_DOMAINS:
     _children = [
         n["canonical_name"]
@@ -285,11 +287,15 @@ for _dom in _EXTRACTABLE_DOMAINS:
     if _children:
         _DOMAIN_CLASSIF_VALUES[_dom] = frozenset(_children)
     else:
-        _dom_node = _scope_reg["scopes"].get(_dom, {})
-        _DOMAIN_CLASSIF_VALUES[_dom] = frozenset(_dom_node.get("scope_variants", []))
+        _single_leaf_domains.add(_dom)
+_SINGLE_LEAF_DOMAINS = frozenset(_single_leaf_domains)
 assert all(_DOMAIN_CLASSIF_VALUES.values()), (
     f"_DOMAIN_CLASSIF_VALUES has empty entry — check scope_registry.json: {_DOMAIN_CLASSIF_VALUES}"
 )
+assert _SINGLE_LEAF_DOMAINS | set(_DOMAIN_CLASSIF_VALUES) == _EXTRACTABLE_DOMAINS
+assert all(
+    _scope_reg["scopes"][_d].get("canonical_name") for _d in _SINGLE_LEAF_DOMAINS
+), f"single-leaf domain missing canonical_name in scope_registry.json: {_SINGLE_LEAF_DOMAINS}"
 # Phase 3 TODO: replace break-on-first with score-based selection
 
 # ── NACE — loaded from generated config ───────────────────────────────────────
@@ -709,83 +715,95 @@ async def analyze(file: UploadFile = File(...)):
                                 "message": "Produktkategorie wird klassifiziert…"})
             await asyncio.sleep(0)
 
-            # ── Pass 4a: classify vehicle type only ───────────────────────────
-            _classif_tmpl = _DOMAIN_CLASSIF_TEMPLATES.get(
-                result.get("detected_domain"), SCOPE_CLASSIFICATION_TEMPLATE
-            )
-            vt_user = _fill(_classif_tmpl, text=text)
-            vt_criteria: dict = {}
-            _ap0_violations_4a: dict = {}
-            try:
-                for _attempt in range(3):
-                    if _attempt == 0:
-                        raw_vt = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], vt_user, "agv_4a")
-                        try:
-                            vt_criteria = repair_and_parse(raw_vt)
-                        except ValueError:
-                            log.warning("4a-Antwort kein JSON — Retry")
-                            yield sse("log", {"message": "4a: Kein JSON → Retry…"})
-                            raw_vt2 = await call_ollama(AGV_RETRY_SYSTEM,
-                                                        _fill(AGV_RETRY_TEMPLATE, text=text), "agv_4a_retry")
-                            vt_criteria = repair_and_parse(raw_vt2)
-                    else:
-                        correction_user = _build_correction_prompt(_ap0_violations_4a, text)
-                        raw_vt = await call_ollama(AGV_RETRY_SYSTEM, correction_user,
-                                                   f"agv_4a_correction{_attempt}")
-                        try:
-                            correction = repair_and_parse(raw_vt)
-                        except ValueError:
-                            correction = {}
-                        for _tk in _ap0_violations_4a:
-                            if _tk in correction:
-                                vt_criteria[_tk] = correction[_tk]
+            _domain = result.get("detected_domain")
+            _is_single_leaf = _domain in _SINGLE_LEAF_DOMAINS
 
-                    vt_criteria.pop("_parse_method", None)
-                    for k, v in list(vt_criteria.items()):
-                        if v in ("null", "NULL", "None", "none", "N/A", "n/a", ""):
-                            vt_criteria[k] = None
+            if _is_single_leaf:
+                # Single-leaf domain: every scope_variant maps to the same canonical_name/leaf
+                # (verified via scope_registry.json variant_map/legacy_map) — Pass 4a's LLM
+                # call can never change the outcome, so skip it entirely (OI-107).
+                canonical_product_type = _scope_reg["scopes"][_domain]["canonical_name"]
+                vt_criteria = {"required_product_type": canonical_product_type}
+                log.info("Pass 4a skipped (single-leaf domain %s): vehicle_type=%s",
+                          _domain, canonical_product_type)
+            else:
+                # ── Pass 4a: classify vehicle type only ───────────────────────────
+                _classif_tmpl = _DOMAIN_CLASSIF_TEMPLATES.get(
+                    result.get("detected_domain"), SCOPE_CLASSIFICATION_TEMPLATE
+                )
+                vt_user = _fill(_classif_tmpl, text=text)
+                vt_criteria: dict = {}
+                _ap0_violations_4a: dict = {}
+                try:
+                    for _attempt in range(3):
+                        if _attempt == 0:
+                            raw_vt = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], vt_user, "agv_4a")
+                            try:
+                                vt_criteria = repair_and_parse(raw_vt)
+                            except ValueError:
+                                log.warning("4a-Antwort kein JSON — Retry")
+                                yield sse("log", {"message": "4a: Kein JSON → Retry…"})
+                                raw_vt2 = await call_ollama(AGV_RETRY_SYSTEM,
+                                                            _fill(AGV_RETRY_TEMPLATE, text=text), "agv_4a_retry")
+                                vt_criteria = repair_and_parse(raw_vt2)
+                        else:
+                            correction_user = _build_correction_prompt(_ap0_violations_4a, text)
+                            raw_vt = await call_ollama(AGV_RETRY_SYSTEM, correction_user,
+                                                       f"agv_4a_correction{_attempt}")
+                            try:
+                                correction = repair_and_parse(raw_vt)
+                            except ValueError:
+                                correction = {}
+                            for _tk in _ap0_violations_4a:
+                                if _tk in correction:
+                                    vt_criteria[_tk] = correction[_tk]
 
-                    # Only validate required_product_type in 4a — use domain-specific values, not AP0 enum.
-                    # AP0 allowed_values for product_type = @SCOPE_CANONICAL_NAMES (excludes IK scope_variants
-                    # like "Process Cooling"). _DOMAIN_CLASSIF_VALUES is correct for all domains.
-                    _raw_4a = vt_criteria.get("required_product_type")
-                    _domain_vals = _DOMAIN_CLASSIF_VALUES.get(result.get("detected_domain"), frozenset())
-                    if _raw_4a and _domain_vals and _raw_4a not in _domain_vals:
-                        _ap0_violations_4a = {"required_product_type": (_raw_4a, sorted(_domain_vals))}
-                    else:
-                        _ap0_violations_4a = {}
-                    if not _ap0_violations_4a:
+                        vt_criteria.pop("_parse_method", None)
+                        for k, v in list(vt_criteria.items()):
+                            if v in ("null", "NULL", "None", "none", "N/A", "n/a", ""):
+                                vt_criteria[k] = None
+
+                        # Only validate required_product_type in 4a — use domain-specific values, not AP0 enum.
+                        # AP0 allowed_values for product_type = @SCOPE_CANONICAL_NAMES (excludes IK scope_variants
+                        # like "Process Cooling"). _DOMAIN_CLASSIF_VALUES is correct for all domains.
+                        _raw_4a = vt_criteria.get("required_product_type")
+                        _domain_vals = _DOMAIN_CLASSIF_VALUES.get(result.get("detected_domain"), frozenset())
+                        if _raw_4a and _domain_vals and _raw_4a not in _domain_vals:
+                            _ap0_violations_4a = {"required_product_type": (_raw_4a, sorted(_domain_vals))}
+                        else:
+                            _ap0_violations_4a = {}
+                        if not _ap0_violations_4a:
+                            break
+
+                        _bad = list(_ap0_violations_4a.values())[0][0]
+                        _allowed = list(_ap0_violations_4a.values())[0][1]
+                        _msg = (f"required_product_type='{_bad}' invalid "
+                                f"(allowed: {' / '.join(_allowed)}) — attempt {_attempt + 1}/3")
+                        log.warning(_msg)
+                        yield sse("log", {"message": f"⚠ {_msg}"})
+                        if _attempt == 2:
+                            yield sse("warning", {"field": "required_product_type",
+                                                  "message": f"{_msg} — keyword fallback used"})
+
+                except Exception as e:
+                    log.exception("Pass 4a fehlgeschlagen")
+                    yield sse("log", {"message": f"⚠ 4a error: {e} — keyword fallback"})
+
+                # Normalize vehicle type from 4a result
+                raw_vt_str = vt_criteria.get("required_product_type") or ""
+                if isinstance(raw_vt_str, list):
+                    raw_vt_str = next(
+                        (item for item in raw_vt_str if _VT_MAP_CFG.get(str(item).lower().strip())),
+                        raw_vt_str[0] if raw_vt_str else ""
+                    ) or ""
+                raw_vt_lower = str(raw_vt_str).lower().strip()
+                canonical_product_type = _VT_MAP_CFG.get(raw_vt_lower) or product_type_keyword_fallback(text or "")
+
+                for override in _VT_OVERRIDES:
+                    if override.get("regex") and re.search(override["regex"], text or ""):
+                        if override.get("canonical"):
+                            canonical_product_type = override["canonical"]
                         break
-
-                    _bad = list(_ap0_violations_4a.values())[0][0]
-                    _allowed = list(_ap0_violations_4a.values())[0][1]
-                    _msg = (f"required_product_type='{_bad}' invalid "
-                            f"(allowed: {' / '.join(_allowed)}) — attempt {_attempt + 1}/3")
-                    log.warning(_msg)
-                    yield sse("log", {"message": f"⚠ {_msg}"})
-                    if _attempt == 2:
-                        yield sse("warning", {"field": "required_product_type",
-                                              "message": f"{_msg} — keyword fallback used"})
-
-            except Exception as e:
-                log.exception("Pass 4a fehlgeschlagen")
-                yield sse("log", {"message": f"⚠ 4a error: {e} — keyword fallback"})
-
-            # Normalize vehicle type from 4a result
-            raw_vt_str = vt_criteria.get("required_product_type") or ""
-            if isinstance(raw_vt_str, list):
-                raw_vt_str = next(
-                    (item for item in raw_vt_str if _VT_MAP_CFG.get(str(item).lower().strip())),
-                    raw_vt_str[0] if raw_vt_str else ""
-                ) or ""
-            raw_vt_lower = str(raw_vt_str).lower().strip()
-            canonical_product_type = _VT_MAP_CFG.get(raw_vt_lower) or product_type_keyword_fallback(text or "")
-
-            for override in _VT_OVERRIDES:
-                if override.get("regex") and re.search(override["regex"], text or ""):
-                    if override.get("canonical"):
-                        canonical_product_type = override["canonical"]
-                    break
 
             log.info("Pass 4a: vehicle_type=%s", canonical_product_type)
             # Pre-compute 4c field set now that vehicle type is known; needed for progress total
@@ -795,10 +813,11 @@ async def analyze(file: UploadFile = File(...)):
                 k: v for k, v in _NUMERIC_KO_FIELD_HINTS.items()
                 if v["scope"] in _4c_scopes
             }
-            _agv_total = 2 + len(_4c_fields)   # 4a(1) + 4b(1) + N×4c
+            _4a_calls = 0 if _is_single_leaf else 1
+            _agv_total = 1 + _4a_calls + len(_4c_fields)   # 4a(0 or 1) + 4b(1) + N×4c
             yield sse("step", {"id": "agv", "status": "running",
                                 "message": f"Kategorie: {canonical_product_type} — Kriterien werden extrahiert…",
-                                "done": 1, "total": _agv_total})
+                                "done": _4a_calls, "total": _agv_total})
             await asyncio.sleep(0)
 
             # ── Pass 4b: extract type-specific fields ─────────────────────────
@@ -881,7 +900,7 @@ async def analyze(file: UploadFile = File(...)):
 
             yield sse("step", {"id": "agv", "status": "running",
                                 "message": "Pass 4b: Batch-Extraktion abgeschlossen",
-                                "done": 2, "total": _agv_total})
+                                "done": _4a_calls + 1, "total": _agv_total})
             await asyncio.sleep(0)
 
             # ── Pass 4c: per-field extraction for numeric KO fields ──────────────
@@ -892,7 +911,7 @@ async def analyze(file: UploadFile = File(...)):
             if _4c_fields:
                 yield sse("step", {"id": "agv", "status": "running",
                                    "message": f"Pass 4c: {len(_4c_fields)} numerische Felder einzeln…",
-                                   "done": 2, "total": _agv_total})
+                                   "done": _4a_calls + 1, "total": _agv_total})
                 await asyncio.sleep(0)
                 _4c_count    = 0
                 _4c_abstained: set = set()   # fields where 4c returned null (used in enforcement below)
@@ -942,7 +961,7 @@ async def analyze(file: UploadFile = File(...)):
                         log.warning("4c '%s' fehlgeschlagen (→ abstained): %s", _fk, _pe)
                     yield sse("step", {"id": "agv", "status": "running",
                                        "message": f"Pass 4c ({_4c_i}/{len(_4c_fields)})",
-                                       "done": 2 + _4c_i, "total": _agv_total})
+                                       "done": _4a_calls + 1 + _4c_i, "total": _agv_total})
                     await asyncio.sleep(0)
                 log.info("Pass 4c: %d Felder neu extrahiert, %d abstained",
                          _4c_count, len(_4c_abstained))
@@ -1008,11 +1027,13 @@ async def analyze(file: UploadFile = File(...)):
             raw_vt_lower = str(raw_vt).lower().strip()
             canonical_product_type = _VT_MAP_CFG.get(raw_vt_lower) or canonical_product_type
 
-            for override in _VT_OVERRIDES:
-                if override.get("regex") and re.search(override["regex"], text or ""):
-                    if override.get("canonical"):
-                        canonical_product_type = override["canonical"]
-                    break
+            _domain_for_override = result.get("detected_domain") if is_extractable else None
+            if _domain_for_override not in _SINGLE_LEAF_DOMAINS:
+                for override in _VT_OVERRIDES:
+                    if override.get("regex") and re.search(override["regex"], text or ""):
+                        if override.get("canonical"):
+                            canonical_product_type = override["canonical"]
+                        break
 
             # Split navigation string into list (e.g. "SLAM, QR Code" → ["SLAM", "QR Code"])
             raw_nav = agv_criteria.get("required_navigation_type") or ""
