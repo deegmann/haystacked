@@ -30,6 +30,10 @@ _BASIC_INFO_KEYS = frozenset({
 # validation/matching *step* (e.g. a future pipeline pass). A hypothetical entry
 # named after a field or domain concept (e.g. "vna_check") would be an
 # AP0-boundary violation — do not add one.
+# "dialog" is reserved for future /rematch-driven user corrections — not yet
+# wired; /rematch does not currently call build_tender_run()/persist_tender_run()
+# at all (separate backlog item, OI-54). Do not treat its presence here as an
+# indication that dialog-sourced provenance is already tracked.
 _PRODUCED_BY_VALUES = frozenset({"4a", "4b", "4c", "fallback", "replay", "dialog"})
 _NULLED_BY_VALUES = frozenset({"L0", "L1", "L2", "allowed_values", "plausibility"})
 
@@ -53,8 +57,9 @@ CREATE TABLE IF NOT EXISTS tender_extraction_values (
     spec_json        TEXT,      -- JSON snapshot of FieldSpec at time of run; NULL for pre-Phase-3b rows
     produced_by      TEXT,      -- D1: which pass produced this value; see _PRODUCED_BY_VALUES. NULL = untracked (pre-D1 rows).
     nulled_by        TEXT,      -- D1: which guard/validation layer nulled this value, if any; see _NULLED_BY_VALUES. NULL = not nulled or untracked.
-    provenance_json  TEXT,      -- D1: loose diagnostic dict (raw_value, raw_source, pass_4c_state, notes). "notes" is
-                                 -- write-only — no pipeline code may ever read, parse, or branch on it. NULL for pre-D1 rows.
+    provenance_json  TEXT,      -- D1/D1a: loose diagnostic dict (raw_value, raw_source, pre_4c_value,
+                                 -- pre_4c_source, pass_4c_state, notes). "notes" is write-only — no pipeline
+                                 -- code may ever read, parse, or branch on it. NULL for pre-D1 rows.
     PRIMARY KEY (run_id, field_uuid),
     FOREIGN KEY (run_id) REFERENCES tender_runs(run_id)
 )
@@ -115,13 +120,23 @@ def build_tender_run(
         raw_val = new_req.get(tender_key)
         source  = agv_criteria.get(f"{tender_key}_source")
         _prov   = field_provenance.get(tender_key) or {}
+        _produced_by_val = _prov.get("produced_by")
+        _nulled_by_val   = _prov.get("nulled_by")
+        assert _produced_by_val is None or _produced_by_val in _PRODUCED_BY_VALUES, (
+            f"build_tender_run: produced_by={_produced_by_val!r} for field "
+            f"{tender_key!r} not in _PRODUCED_BY_VALUES {sorted(_PRODUCED_BY_VALUES)}"
+        )
+        assert _nulled_by_val is None or _nulled_by_val in _NULLED_BY_VALUES, (
+            f"build_tender_run: nulled_by={_nulled_by_val!r} for field "
+            f"{tender_key!r} not in _NULLED_BY_VALUES {sorted(_NULLED_BY_VALUES)}"
+        )
         for spec in specs:
             values[spec.uuid] = ExtractionValue(
                 spec        = spec,
                 value       = raw_val,
                 source      = source,
-                produced_by = _prov.get("produced_by"),
-                nulled_by   = _prov.get("nulled_by"),
+                produced_by = _produced_by_val,
+                nulled_by   = _nulled_by_val,
                 provenance  = _prov.get("provenance"),
             )
 
@@ -245,6 +260,13 @@ def load_tender_run(run_id: str, db_path: Path = DB_PATH) -> Optional[TenderRun]
                     spec = FieldSpec(**json.loads(ev_row["spec_json"]))
                 except Exception:
                     pass  # malformed snapshot — treat as orphaned
+            provenance = None
+            if ev_row["provenance_json"]:
+                try:
+                    provenance = json.loads(ev_row["provenance_json"])
+                except Exception:
+                    pass  # malformed provenance blob — treat as absent
+
             values[uuid] = ExtractionValue(
                 spec        = spec,
                 value       = json.loads(ev_row["value_json"]) if ev_row["value_json"] is not None else None,
@@ -252,7 +274,7 @@ def load_tender_run(run_id: str, db_path: Path = DB_PATH) -> Optional[TenderRun]
                 produced_by = ev_row["produced_by"],
                 nulled_by   = ev_row["nulled_by"],
                 # loose dict — never reconstructed into a typed object (see rationale above)
-                provenance  = json.loads(ev_row["provenance_json"]) if ev_row["provenance_json"] else None,
+                provenance  = provenance,
             )
 
         return TenderRun(

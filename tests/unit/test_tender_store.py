@@ -1,11 +1,15 @@
 """Tests for src/tender_store — round-trip integrity and contract validation."""
 import json
+import sys
 import tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 import pytest
 from src.tender_store import init_db, build_tender_run, persist_tender_run, load_tender_run
 from src.field_spec import load_fields, fields_by_tender_key
 from src.json_repair import enforce_source_spans
+from app import _assemble_field_provenance, _attribute_nulls
 
 # --- T-TR-01: Round-trip integrity ---
 def test_T_TR_01_round_trip():
@@ -170,23 +174,16 @@ def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
     assert agv_criteria[tender_key] is None, "L2 must null the fabricated value in this fixture"
     assert len(events) == 1 and events[0].field == tender_key and events[0].layer == "L2"
 
-    # D1 step (c): attribute the null to its guard layer.
+    # D1 step (c): attribute the null to its guard layer, and (D1a/F3) capture
+    # the actually-rejected (value, source) pair from the same SpanEvent.
     nulled_by = {ev.field: ev.layer for ev in events}
+    rejected = {ev.field: (ev.value, ev.source) for ev in events}
 
-    # D1 step (e): assemble the per-field provenance dict as app.py does.
-    raw_value, raw_source = pre_4c_snapshot[tender_key]
-    field_provenance = {
-        tender_key: {
-            "produced_by": produced_by.get(tender_key),
-            "nulled_by": nulled_by.get(tender_key),
-            "provenance": {
-                "raw_value": raw_value,
-                "raw_source": raw_source,
-                "pass_4c_state": four_c_state.get(tender_key),
-                "notes": None,
-            },
-        }
-    }
+    # D1a step (e): assemble the per-field provenance dict via the real,
+    # module-level production function — no longer reimplemented inline here.
+    field_provenance = _assemble_field_provenance(
+        produced_by, nulled_by, rejected, pre_4c_snapshot, four_c_state
+    )
 
     with tempfile.TemporaryDirectory() as tmpdir:
         db = Path(tmpdir) / "test.db"
@@ -211,6 +208,230 @@ def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
         assert ev.produced_by == "4b"
         assert ev.nulled_by == "L2"
         assert ev.provenance is not None
+        # 4c abstained (never produced a value) in this fixture, so raw_value/raw_source
+        # still equal the 4b snapshot — same numbers as pre_4c_value/pre_4c_source below.
         assert ev.provenance["raw_value"] == fabricated_value
         assert ev.provenance["raw_source"] == hint_echo_source
+        assert ev.provenance["pre_4c_value"] == fabricated_value
+        assert ev.provenance["pre_4c_source"] == hint_echo_source
         assert ev.provenance["pass_4c_state"] == "explicit_null"
+
+
+# ── D1a: closed-vocabulary runtime enforcement (F1 / DoD 1) ──────────────────
+def test_T_TR_07_build_tender_run_rejects_invalid_produced_by():
+    """build_tender_run() must raise AssertionError for an out-of-vocabulary
+    produced_by value — a typo must never silently persist (F1)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        specs = fields_by_tender_key()
+        first_tk = next(iter(specs))
+        field_provenance = {first_tk: {"produced_by": "typo_stage"}}
+        with pytest.raises(AssertionError):
+            build_tender_run(
+                "run-bad-produced-by", "test.pdf", {}, {}, {}, "Forklift AGV", True,
+                field_provenance=field_provenance,
+            )
+
+
+def test_T_TR_07b_build_tender_run_rejects_invalid_nulled_by():
+    """build_tender_run() must raise AssertionError for an out-of-vocabulary
+    nulled_by value (F1)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        specs = fields_by_tender_key()
+        first_tk = next(iter(specs))
+        field_provenance = {first_tk: {"nulled_by": "L99"}}
+        with pytest.raises(AssertionError):
+            build_tender_run(
+                "run-bad-nulled-by", "test.pdf", {}, {}, {}, "Forklift AGV", True,
+                field_provenance=field_provenance,
+            )
+
+
+def test_T_TR_07c_build_tender_run_accepts_existing_call_sites():
+    """Confirms the new assertion does not break existing call sites: omitted
+    field_provenance (→ None values) and in-vocabulary values must both pass."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        specs = fields_by_tender_key()
+        first_tk = next(iter(specs))
+        # No field_provenance at all — must not raise.
+        build_tender_run("run-ok-1", "test.pdf", {}, {}, {}, "Forklift AGV", True)
+        # In-vocabulary values — must not raise.
+        build_tender_run(
+            "run-ok-2", "test.pdf", {}, {}, {}, "Forklift AGV", True,
+            field_provenance={first_tk: {"produced_by": "4b", "nulled_by": "L2"}},
+        )
+
+
+# ── D1a: "4a" and "replay" round-trip through persistence (F2 / DoD 2, 3) ────
+def test_T_TR_08_produced_by_4a_round_trip():
+    """A field tagged produced_by='4a' (required_product_type merge point, either
+    the LLM-classification or the OI-107 single-leaf-shortcut sub-path) must
+    round-trip through build_tender_run → persist_tender_run → load_tender_run."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        specs = fields_by_tender_key()
+        first_tk = next(iter(specs))
+        field_provenance = _assemble_field_provenance(
+            produced_by={first_tk: "4a"}, nulled_by={}, rejected={},
+            pre_4c_snapshot={}, four_c_state={},
+        )
+        run = build_tender_run(
+            "run-4a", "test.pdf", {first_tk: "Forklift AGV"}, {}, {}, "Forklift AGV", True,
+            field_provenance=field_provenance,
+        )
+        persist_tender_run(run, db_path=db)
+        loaded = load_tender_run("run-4a", db)
+        uuid = specs[first_tk][0].uuid
+        assert loaded.values[uuid].produced_by == "4a"
+
+
+def test_T_TR_09_produced_by_replay_round_trip():
+    """A replayed run's fields must persist produced_by='replay' end to end."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        specs = fields_by_tender_key()
+        first_tk = next(iter(specs))
+        field_provenance = _assemble_field_provenance(
+            produced_by={first_tk: "replay"}, nulled_by={}, rejected={},
+            pre_4c_snapshot={}, four_c_state={},
+        )
+        run = build_tender_run(
+            "run-replay", "cached.json", {first_tk: "Forklift AGV"}, {}, {}, "Forklift AGV", True,
+            field_provenance=field_provenance,
+        )
+        persist_tender_run(run, db_path=db)
+        loaded = load_tender_run("run-replay", db)
+        uuid = specs[first_tk][0].uuid
+        assert loaded.values[uuid].produced_by == "replay"
+
+
+# ── D1a: malformed provenance_json must not crash load_tender_run (F4 / DoD 7) ─
+def test_T_TR_10_load_tender_run_malformed_provenance_json():
+    """A malformed provenance_json blob must not raise — provenance falls back to None."""
+    import sqlite3
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        con = sqlite3.connect(db)
+        con.execute(
+            "INSERT INTO tender_runs "
+            "(run_id, source_file, captured_at, vehicle_type, in_scope, basic_info_json) "
+            "VALUES (?,?,?,?,?,?)",
+            ("run-bad-prov", "f.pdf", "2026-01-01T00:00:00+00:00", None, 0, "{}"))
+        con.execute(
+            "INSERT INTO tender_extraction_values "
+            "(run_id, field_uuid, value_json, source, spec_json, provenance_json) "
+            "VALUES (?,?,?,?,?,?)",
+            ("run-bad-prov", "deadbeef-0000-0000-0000-000000000001", "1.0", None, None, "{not valid json"))
+        con.commit()
+        con.close()
+        loaded = load_tender_run("run-bad-prov", db)
+        assert loaded is not None
+        assert loaded.values["deadbeef-0000-0000-0000-000000000001"].provenance is None
+
+
+# ── D1a: _attribute_nulls() direct unit tests (test-coverage fix) ────────────
+def test_T_TR_11_attribute_nulls_populates_sink_and_rejected():
+    """A key that goes non-null → None is attributed in both sink and rejected,
+    with rejected capturing (value, None) since neither validator has a source
+    concept (F3)."""
+    before = {"required_navigation_type": "BadValue"}
+    after = {"required_navigation_type": None}
+    sink: dict = {}
+    rejected: dict = {}
+    _attribute_nulls(before, after, "allowed_values", sink, rejected)
+    assert sink == {"required_navigation_type": "allowed_values"}
+    assert rejected == {"required_navigation_type": ("BadValue", None)}
+
+
+def test_T_TR_12_attribute_nulls_excludes_source_and_underscore_prefixed_keys():
+    """Keys ending in _source or starting with _ must never be attributed (F5)."""
+    before = {
+        "required_max_payload_kg_source": "some quote",
+        "_internal_flag": "x",
+        "required_max_payload_kg": 1000,
+    }
+    after = {
+        "required_max_payload_kg_source": None,
+        "_internal_flag": None,
+        "required_max_payload_kg": None,
+    }
+    sink: dict = {}
+    rejected: dict = {}
+    _attribute_nulls(before, after, "plausibility", sink, rejected)
+    assert sink == {"required_max_payload_kg": "plausibility"}
+    assert rejected == {"required_max_payload_kg": (1000, None)}
+
+
+def test_T_TR_13_attribute_nulls_setdefault_does_not_overwrite():
+    """An earlier attribution for the same key must never be overwritten (both
+    sink and rejected use setdefault semantics)."""
+    before = {"required_max_payload_kg": 1000}
+    after = {"required_max_payload_kg": None}
+    sink = {"required_max_payload_kg": "L2"}
+    rejected = {"required_max_payload_kg": (999, "earlier source")}
+    _attribute_nulls(before, after, "plausibility", sink, rejected)
+    assert sink == {"required_max_payload_kg": "L2"}
+    assert rejected == {"required_max_payload_kg": (999, "earlier source")}
+
+
+# ── D1a: _assemble_field_provenance() direct unit tests (test-coverage fix) ──
+def test_T_TR_14_assemble_provenance_4c_override_then_rejected():
+    """(a) 4c overrode 4b, then the guard rejected the 4c-produced value:
+    raw_value/raw_source must reflect the 4c-rejected pair while
+    pre_4c_value/pre_4c_source still show the original 4b data."""
+    tk = "required_max_payload_kg"
+    produced_by = {tk: "4c"}
+    nulled_by = {tk: "L0"}
+    rejected = {tk: (950, "4c fabricated quote")}
+    pre_4c_snapshot = {tk: (1000, "4b original quote")}
+    four_c_state = {tk: "returned_value"}
+
+    result = _assemble_field_provenance(produced_by, nulled_by, rejected, pre_4c_snapshot, four_c_state)
+
+    prov = result[tk]["provenance"]
+    assert result[tk]["produced_by"] == "4c"
+    assert result[tk]["nulled_by"] == "L0"
+    assert prov["raw_value"] == 950
+    assert prov["raw_source"] == "4c fabricated quote"
+    assert prov["pre_4c_value"] == 1000
+    assert prov["pre_4c_source"] == "4b original quote"
+    assert prov["pass_4c_state"] == "returned_value"
+
+
+def test_T_TR_15_assemble_provenance_allowed_values_rejection_populates_raw_value():
+    """(b) A Dropdown/Multi-Select-style field rejected via 'allowed_values'
+    (no numeric-KO pre_4c_snapshot entry, no source concept): raw_value must
+    now be populated — previously (pre-D1a) it was always None for this path."""
+    tk = "required_navigation_type"
+    produced_by = {tk: "4b"}
+    nulled_by = {tk: "allowed_values"}
+    rejected = {tk: ("Teleporter", None)}   # no source concept for this validator
+    pre_4c_snapshot: dict = {}               # not a numeric KO field — never snapshotted
+    four_c_state: dict = {}
+
+    result = _assemble_field_provenance(produced_by, nulled_by, rejected, pre_4c_snapshot, four_c_state)
+
+    prov = result[tk]["provenance"]
+    assert prov["raw_value"] == "Teleporter"
+    assert prov["raw_source"] is None
+    assert prov["pre_4c_value"] is None
+    assert prov["pre_4c_source"] is None
+
+
+def test_T_TR_16_assemble_provenance_replay_produced_by():
+    """(c) A replay-sourced field must show produced_by == 'replay'."""
+    tk = "required_max_payload_kg"
+    produced_by = {tk: "replay"}
+
+    result = _assemble_field_provenance(produced_by, nulled_by={}, rejected={},
+                                         pre_4c_snapshot={}, four_c_state={})
+
+    assert result[tk]["produced_by"] == "replay"

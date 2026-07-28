@@ -481,15 +481,61 @@ def sse(event: str, data: dict) -> str:
 
 
 # ── D1 provenance helper ───────────────────────────────────────────────────────
-def _attribute_nulls(before: dict, after: dict, cause: str, sink: dict) -> None:
+def _attribute_nulls(before: dict, after: dict, cause: str, sink: dict, rejected: dict = None) -> None:
     """Record `cause` in `sink` for any key that had a non-null value in `before`
     and became None in `after` (dict-diff attribution for validate_tender_values()/
     validate_agv_criteria(), neither of which is modified by this — see D1 plan).
     `sink.setdefault` so an earlier attribution for the same key is never overwritten.
+    If `rejected` is given, also captures the rejected (value, None) pair — these two
+    validators have no source concept, so the source half is always None (F3).
     """
     for k, v in before.items():
-        if v is not None and not str(k).endswith("_source") and after.get(k) is None:
+        if v is not None and not str(k).endswith("_source") and not str(k).startswith("_") and after.get(k) is None:
             sink.setdefault(k, cause)
+            if rejected is not None:
+                rejected.setdefault(k, (v, None))
+
+
+def _assemble_field_provenance(
+    produced_by: dict, nulled_by: dict, rejected: dict,
+    pre_4c_snapshot: dict, four_c_state: dict,
+) -> dict:
+    """D1a (F3, test-coverage fix): assemble per-field provenance, keyed by tender_key,
+    for build_tender_run(). Pure function of its 5 arguments — does not touch
+    agv_criteria/new_req or any other analyze() scope.
+
+    `raw_value`/`raw_source` reflect the actually-rejected (value, source) pair
+    (from `rejected`) when present — the true point-of-rejection data, which is
+    the POST-4c state if Pass 4c overrode Pass 4b before the guard rejected it.
+    Falls back to `pre_4c_snapshot` only when nothing was captured in `rejected`
+    (e.g. a field that was never nulled, or nulled before any guard ran).
+
+    `pre_4c_value`/`pre_4c_source` always reflect `pre_4c_snapshot`, regardless
+    of what `rejected` holds — so when 4c overrode 4b and was itself rejected,
+    the persisted record shows BOTH what 4b originally said AND what was
+    actually rejected.
+    """
+    field_provenance: dict = {}
+    for _tk in set(produced_by) | set(nulled_by) | set(pre_4c_snapshot) | set(rejected):
+        _pre_4c_value, _pre_4c_source = pre_4c_snapshot.get(_tk, (None, None))
+        if _tk in rejected:
+            _raw_value, _raw_source = rejected[_tk]
+        else:
+            _raw_value, _raw_source = _pre_4c_value, _pre_4c_source
+        field_provenance[_tk] = {
+            "produced_by": produced_by.get(_tk),
+            "nulled_by":   nulled_by.get(_tk),
+            "provenance": {
+                "raw_value":      _raw_value,
+                "raw_source":     _raw_source,
+                "pre_4c_value":   _pre_4c_value,
+                "pre_4c_source":  _pre_4c_source,
+                "pass_4c_state":  four_c_state.get(_tk),
+                # write-only: human-diagnostic only, never read/parsed by pipeline code.
+                "notes":          None,
+            },
+        }
+    return field_provenance
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -516,6 +562,9 @@ async def analyze(file: UploadFile = File(...)):
         _nulled_by: dict = {}
         _4c_state: dict = {}
         _pre_4c_snapshot: dict = {}
+        # D1a (F3): actually-rejected (value, source) pair at the point the guard/
+        # validator nulled it — reflects POST-4c state when 4c overrode 4b first.
+        _rejected: dict = {}
 
         is_replay = filename.lower().endswith(".json")
 
@@ -539,6 +588,13 @@ async def analyze(file: UploadFile = File(...)):
 
             canonical_product_type = _VT_MAP_CFG.get(replay_vt.lower().strip()) or replay_vt
             agv_criteria       = dict(replay_criteria)
+            # D1a: every non-null field taken from the replayed source is attributed
+            # to "replay" — mutually exclusive with the "4a"/4b/4c branches below
+            # (this is the `if is_replay:` branch; those live in the `else:` path).
+            _produced_by = {
+                _k: "replay" for _k, _v in agv_criteria.items()
+                if _v is not None and not str(_k).endswith("_source") and not str(_k).startswith("_")
+            }
             text               = ""
             parse_method       = "replay"
             # Derive detected_domain from VT scope if not present (old captured files pre-date this field)
@@ -1019,18 +1075,29 @@ async def analyze(file: UploadFile = File(...)):
             for _msg in _span_messages:
                 yield sse("log", {"message": _msg})
             # D1: attribute each nulled field to the guard layer that nulled it.
+            # D1a (F3): also capture the actually-rejected (value, source) pair —
+            # this is the POST-4c state if 4c overrode 4b before the guard ran.
             for _ev in _span_events:
                 _nulled_by[_ev.field] = _ev.layer
+                _rejected[_ev.field] = (_ev.value, _ev.source)
 
             # Merge 4a results into agv_criteria
-            agv_criteria["required_product_type"] = vt_criteria.get("required_product_type")
+            # D1a (F2): "4a" is a pipeline-STAGE tag, not "LLM was called" — it
+            # covers both the Pass-4a LLM-classification sub-path and the OI-107
+            # single-leaf-domain shortcut sub-path (_is_single_leaf, no LLM call).
+            # The finer LLM-vs-shortcut distinction is preserved separately in the
+            # debug log ("Pass 4a skipped (single-leaf domain %s)...").
+            _merged_product_type = vt_criteria.get("required_product_type")
+            agv_criteria["required_product_type"] = _merged_product_type
+            if _merged_product_type is not None:
+                _produced_by["required_product_type"] = "4a"
 
         if is_extractable:
             # Validate against AP0 allowed_values — reject values not in the allowed list
             from src.matching import validate_tender_values
             _before_av = dict(agv_criteria)
             agv_criteria, av_warnings = validate_tender_values(agv_criteria)
-            _attribute_nulls(_before_av, agv_criteria, "allowed_values", _nulled_by)
+            _attribute_nulls(_before_av, agv_criteria, "allowed_values", _nulled_by, _rejected)
             for w in av_warnings:
                 log.info("AP0 allowed_values filter: %s", w)
                 yield sse("log", {"message": f"⚠ AP0-Filter: {w}"})
@@ -1038,7 +1105,7 @@ async def analyze(file: UploadFile = File(...)):
             # Validate plausibility — set implausible values to null
             _before_pl = dict(agv_criteria)
             agv_criteria, val_warnings = validate_agv_criteria(agv_criteria)
-            _attribute_nulls(_before_pl, agv_criteria, "plausibility", _nulled_by)
+            _attribute_nulls(_before_pl, agv_criteria, "plausibility", _nulled_by, _rejected)
             if val_warnings:
                 for w in val_warnings:
                     yield sse("log", {"message": f"⚠ Plausibility: {w}"})
@@ -1097,20 +1164,9 @@ async def analyze(file: UploadFile = File(...)):
             new_req = _to_match_units(new_req)
 
             # D1: assemble per-field provenance, keyed by tender_key, for build_tender_run().
-            _field_provenance: dict = {}
-            for _tk in set(_produced_by) | set(_nulled_by) | set(_pre_4c_snapshot):
-                _raw_value, _raw_source = _pre_4c_snapshot.get(_tk, (None, None))
-                _field_provenance[_tk] = {
-                    "produced_by": _produced_by.get(_tk),
-                    "nulled_by":   _nulled_by.get(_tk),
-                    "provenance": {
-                        "raw_value":      _raw_value,
-                        "raw_source":     _raw_source,
-                        "pass_4c_state":  _4c_state.get(_tk),
-                        # write-only: human-diagnostic only, never read/parsed by pipeline code.
-                        "notes":          None,
-                    },
-                }
+            _field_provenance = _assemble_field_provenance(
+                _produced_by, _nulled_by, _rejected, _pre_4c_snapshot, _4c_state
+            )
 
             # Phase 3: persist extraction run
             _tender_run = build_tender_run(
