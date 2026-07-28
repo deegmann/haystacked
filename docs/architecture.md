@@ -325,12 +325,13 @@ Implemented in `src/json_repair.py::enforce_source_spans()`. Runs after Pass 4c 
 1. The value's digit-string (with locale and x1000/÷1000 scale tolerance) must occur somewhere in the real document
 2. At least one distinctive content word from the source quote must appear within 80 chars of an anchor occurrence in the document
 
-**Layer 2 (4c abstentions only):** 4c returned null AND `source_confirms_value(value, source)` returns False for the 4b source -> null. Catches cases where 4b extracted a value but 4c disagreed (abstained) and the 4b source quote does not numerically match the 4b value.
+**Layer 2 (4c abstentions only):** 4c returned null AND `source_confirms_value(value, source)` returns False for the 4b source -> null. Catches cases where 4b extracted a value but 4c disagreed (abstained) and the 4b source quote does not numerically match the 4b value. **Unless rescued (D0, 2026-07-28):** before nulling, `document_supports_value_with_unit(value, unit, document)` checks whether the value's digit-string occurs in the real document with its unit token adjacent (bidirectional window, `_UNIT_GROUNDING_WINDOW_CHARS=80`, independent from `_GROUNDING_WINDOW_CHARS`). If so, the value is kept instead of nulled and a `SpanEvent(layer="L2_RESCUED", ...)` is recorded. This addresses the case where Pass 4b's `_source` echoes the AP0 field hint text (breaking the citation channel) for a value that is otherwise genuinely present in the document — a broken citation is not proof the value is wrong. Single-character alphabetic units (e.g. `m`, `K`, `h`) never trigger a rescue (too many unrelated collisions, e.g. unit `m` matching `"58,000 m²"`). The rescue is monotone — it can only convert a would-be-null into a kept value, never the reverse, so it cannot regress precision relative to not having it. `enforce_source_spans()` takes an optional `units: dict` (tender_key -> unit string) parameter for this; app.py builds it as `_NUMERIC_KO_FIELD_UNITS`. A rescue is filtered out of `_nulled_by`/`_rejected` in app.py (it is not a null) and instead adds a diagnostic note to the field's `notes` provenance key.
 
 **Invariants:**
-- Both `source_confirms_value()` and `source_is_grounded()` are completely field-agnostic. They contain no field names, no AP0 allowed-values lists, no domain knowledge.
-- 4c abstention (null) does not unconditionally override 4b — only Layer 2 can do that, and it requires `source_confirms_value()` to also fail.
+- `source_confirms_value()`, `source_is_grounded()`, and `document_supports_value_with_unit()` are all completely field-agnostic. They contain no field names, no AP0 allowed-values lists, no domain knowledge.
+- 4c abstention (null) does not unconditionally override 4b — only Layer 2 can do that, and it requires `source_confirms_value()` to also fail (and, since D0, the rescue check to also fail).
 - Zero values always pass all three layers (deliberate zero is not an inference hallucination).
+- `document_supports_value_with_unit()` deliberately does NOT apply the ×1000/÷1000 scale tolerance that `source_confirms_value()`/`source_is_grounded()` use — an exact digit-string match only, so it cannot rescue a fabricated value that happens to be a scaled match of an unrelated real number (see `test_T_TR_06_d1_l2_hint_echo_provenance_persists` in `tests/unit/test_tender_store.py`).
 
 ---
 

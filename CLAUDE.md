@@ -114,7 +114,8 @@ PDF upload
       — source-span enforcement (not an LLM call — enforce_source_spans() in src/json_repair.py) —
       Layer 1: null value if <field>_source is absent (no citation = inference)
       Layer 0: null value if source not grounded in real document (source_is_grounded())
-      Layer 2: null value if 4c abstained AND source_confirms_value() fails
+      Layer 2: null value if 4c abstained AND source_confirms_value() fails,
+        UNLESS rescued (D0): value+unit found adjacent in the real document
   → validate_tender_values(): AP0 allowed_values filter (rejects LLM hallucinations)
   → validate_agv_criteria(): plausibility ranges + mm→m auto-conversion
   → field_text_fallbacks: regex-driven overrides (from vehicle_types.json)
@@ -131,9 +132,11 @@ PDF upload
 **Source-span guard** — three layers run after 4c, implemented in `enforce_source_spans()` in `src/json_repair.py`. First match nulls the value and stops:
 - **Layer 1 (always):** if `<field>_source` is absent or null → null the value. No citation = inference.
 - **Layer 0 (always):** if source is present but NOT grounded in the real document text → null the value. Catches fabricated value+quote pairs where the LLM invented a self-consistent but document-absent citation. Implemented by `source_is_grounded()`.
-- **Layer 2 (4c abstentions only):** if 4c returned null AND `source_confirms_value()` returns False for the 4b source → null the 4b value.
+- **Layer 2 (4c abstentions only):** if 4c returned null AND `source_confirms_value()` returns False for the 4b source → null the 4b value, **unless a rescue fires first (D0)**: if the value's digit-string occurs in the real document with its unit token adjacent (bidirectional window, `document_supports_value_with_unit()`), the value is kept instead — recorded as `SpanEvent(layer="L2_RESCUED", ...)`. This handles Pass 4b echoing the AP0 field hint as `_source` for an otherwise-genuine value. Single-character alphabetic units (e.g. `m`, `K`, `h`) never trigger a rescue — they collide with unrelated text too often. Monotone: can only convert a would-be-null into a kept value, never the reverse.
 
 `source_confirms_value()` (`src/json_repair.py`) is a pure numeric function: strips thousands separators, tests direct match and ×1000/÷1000 unit scale. No field names, no domain logic.
+
+`document_supports_value_with_unit()` (`src/json_repair.py`) is the Layer 2 rescue's pure function: requires an EXACT digit-string match (no ×1000/÷1000 scale tolerance — deliberately, to avoid rescuing a fabricated value that happens to scale-match a real number elsewhere) plus the unit token within `_UNIT_GROUNDING_WINDOW_CHARS` (80, independently tunable from `_GROUNDING_WINDOW_CHARS`). No field names, no domain logic.
 
 `source_is_grounded(value, source, document)` (`src/json_repair.py`) checks whether the LLM's self-reported quote is actually anchored in the real extracted PDF text. Two binary conditions must both hold: (1) the value's digit-string must occur somewhere in the real document (anchor), and (2) at least one distinctive content word from the quote must appear within 80 characters of an anchor occurrence (co-location). Pure function — no domain knowledge, no field names.
 

@@ -169,6 +169,27 @@ assert _NUMERIC_KO_FIELD_HINTS, (
     "fields.json has no numeric KO field hints — run generate_all.py"
 )
 
+# ── Layer-2 rescue: per-field unit strings — built from fields.json ──────────
+# Maps tender_key → unit string — used only by enforce_source_spans()'s Layer 2
+# rescue check (D0 fix). Requires _spec.unit truthy (not just hint/scope) — a
+# tender_key shared across scopes (e.g. required_min_aisle_width_mm under both
+# Forklift and Tugger) must not let an empty-unit scope entry shadow a real unit
+# populated under a different scope for the same key.
+_NUMERIC_KO_FIELD_UNITS: dict = {}
+for _tk in _NUMERIC_KO_TENDER_KEYS:
+    for _spec in _FIELDS_BY_TENDER_KEY.get(_tk, []):
+        if _spec.hint and _spec.scope and _spec.unit:
+            _NUMERIC_KO_FIELD_UNITS[_tk] = _spec.unit
+            break
+assert _NUMERIC_KO_FIELD_UNITS, (
+    "fields.json has no numeric KO field units — run generate_all.py"
+)
+for _tk in _NUMERIC_KO_TENDER_KEYS:
+    assert _tk in _NUMERIC_KO_FIELD_UNITS and _NUMERIC_KO_FIELD_UNITS[_tk], (
+        f"Numeric KO field {_tk!r} has no unit in fields.json — "
+        f"L2 rescue will never fire for it. Populate the AP0 Unit column."
+    )
+
 # Operator-driven extraction direction for Pass 4c prompts — derived from fields.json.
 # KO_IF_LT means the supplier must meet or exceed the tender's threshold → extract MAXIMUM.
 # KO_IF_GT means the supplier must not exceed the tender's limit → extract MINIMUM.
@@ -499,9 +520,10 @@ def _attribute_nulls(before: dict, after: dict, cause: str, sink: dict, rejected
 def _assemble_field_provenance(
     produced_by: dict, nulled_by: dict, rejected: dict,
     pre_4c_snapshot: dict, four_c_state: dict,
+    rescued_fields: set = frozenset(),
 ) -> dict:
     """D1a (F3, test-coverage fix): assemble per-field provenance, keyed by tender_key,
-    for build_tender_run(). Pure function of its 5 arguments — does not touch
+    for build_tender_run(). Pure function of its arguments — does not touch
     agv_criteria/new_req or any other analyze() scope.
 
     `raw_value`/`raw_source` reflect the actually-rejected (value, source) pair
@@ -514,14 +536,25 @@ def _assemble_field_provenance(
     of what `rejected` holds — so when 4c overrode 4b and was itself rejected,
     the persisted record shows BOTH what 4b originally said AND what was
     actually rejected.
+
+    `rescued_fields` (D0): tender_keys whose Layer-2 null was rescued by the
+    source-span guard's value+unit adjacency check — these fields were NOT
+    nulled (they don't appear in `nulled_by`/`rejected` at all), so this only
+    adds a diagnostic note into the field's write-only `notes` key.
     """
     field_provenance: dict = {}
-    for _tk in set(produced_by) | set(nulled_by) | set(pre_4c_snapshot) | set(rejected):
+    for _tk in set(produced_by) | set(nulled_by) | set(pre_4c_snapshot) | set(rejected) | set(rescued_fields):
         _pre_4c_value, _pre_4c_source = pre_4c_snapshot.get(_tk, (None, None))
         if _tk in rejected:
             _raw_value, _raw_source = rejected[_tk]
         else:
             _raw_value, _raw_source = _pre_4c_value, _pre_4c_source
+        _notes = None
+        if _tk in rescued_fields:
+            _notes = (
+                "L2 rescue: citation was hint-echoed/unconfirmed but value+unit "
+                "pair found in document text"
+            )
         field_provenance[_tk] = {
             "produced_by": produced_by.get(_tk),
             "nulled_by":   nulled_by.get(_tk),
@@ -532,7 +565,7 @@ def _assemble_field_provenance(
                 "pre_4c_source":  _pre_4c_source,
                 "pass_4c_state":  four_c_state.get(_tk),
                 # write-only: human-diagnostic only, never read/parsed by pipeline code.
-                "notes":          None,
+                "notes":          _notes,
             },
         }
     return field_provenance
@@ -565,6 +598,10 @@ async def analyze(file: UploadFile = File(...)):
         # D1a (F3): actually-rejected (value, source) pair at the point the guard/
         # validator nulled it — reflects POST-4c state when 4c overrode 4b first.
         _rejected: dict = {}
+        # D0: fields whose Layer-2 null was rescued (value+unit found in document
+        # despite an unconfirmed citation) — defaulted here for the same reason
+        # as the dicts above (replay mode never populates it).
+        _l2_rescued_fields: set = set()
 
         is_replay = filename.lower().endswith(".json")
 
@@ -1066,18 +1103,30 @@ async def analyze(file: UploadFile = File(...)):
             #   (catches a fabricated value with a fabricated-but-self-consistent
             #   quote; runs unconditionally, not scoped to 4c abstention).
             # Layer 2 (scoped to 4c abstentions): 4c said null AND 4b source doesn't
-            #   numerically confirm the value → 4b was likely hallucinating → null value.
+            #   numerically confirm the value → 4b was likely hallucinating → null value,
+            #   UNLESS the value's digit-string occurs in the real document adjacent to
+            #   its unit token (D0 fix) — that rescues values whose citation channel is
+            #   broken (e.g. Pass 4b echoing the AP0 hint as `_source`) but which are
+            #   otherwise genuinely present in the document.
             # See src/json_repair.py::enforce_source_spans for the full logic.
             _4c_abstained_ref = _4c_abstained if _4c_fields else set()
             agv_criteria, _span_messages, _span_events = enforce_source_spans(
-                agv_criteria, text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained_ref
+                agv_criteria, text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained_ref, units=_NUMERIC_KO_FIELD_UNITS
             )
             for _msg in _span_messages:
                 yield sse("log", {"message": _msg})
             # D1: attribute each nulled field to the guard layer that nulled it.
             # D1a (F3): also capture the actually-rejected (value, source) pair —
             # this is the POST-4c state if 4c overrode 4b before the guard ran.
+            # D0: a rescue is NOT a null — filter it out here so it never enters
+            # _nulled_by (which build_tender_run() asserts against the closed
+            # _NULLED_BY_VALUES vocabulary in src/tender_store.py) or _rejected
+            # (the value was kept, not rejected). Track rescued fields separately
+            # for the provenance "notes" annotation below.
             for _ev in _span_events:
+                if _ev.layer == "L2_RESCUED":
+                    _l2_rescued_fields.add(_ev.field)
+                    continue
                 _nulled_by[_ev.field] = _ev.layer
                 _rejected[_ev.field] = (_ev.value, _ev.source)
 
@@ -1165,7 +1214,7 @@ async def analyze(file: UploadFile = File(...)):
 
             # D1: assemble per-field provenance, keyed by tender_key, for build_tender_run().
             _field_provenance = _assemble_field_provenance(
-                _produced_by, _nulled_by, _rejected, _pre_4c_snapshot, _4c_state
+                _produced_by, _nulled_by, _rejected, _pre_4c_snapshot, _4c_state, _l2_rescued_fields
             )
 
             # Phase 3: persist extraction run

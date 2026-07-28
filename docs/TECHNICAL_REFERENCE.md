@@ -389,16 +389,17 @@ def enforce_source_spans(
     document_text: str,
     numeric_ko_keys,       # frozenset of tender_keys subject to the guard
     four_c_abstained: set, # tender_keys where Pass 4c returned null
-) -> tuple[dict, list[str]]:
+    units: dict = None,    # tender_key -> unit string, for the Layer 2 rescue check (D0). Defaults to {}.
+) -> tuple[dict, list[str], list[SpanEvent]]:
 ```
 
-For each key in `numeric_ko_keys` with a non-null value in `agv_criteria`, applies three layers in order. Returns `(agv_criteria, messages)`.
+For each key in `numeric_ko_keys` with a non-null value in `agv_criteria`, applies three layers in order. Returns `(agv_criteria, messages, events)` — `events` is a `list[SpanEvent(field, layer, value, source)]`, one per field actually nulled OR rescued, consumed by app.py for D1 provenance attribution and (since D0) filtered for `layer == "L2_RESCUED"` before feeding `_nulled_by`.
 
 **Layer 1:** `agv_criteria.get(f"{key}_source")` is falsy -> null value, add message.
 
 **Layer 0:** `source_is_grounded(value, source, document_text)` returns False -> null value, add message.
 
-**Layer 2 (scoped to abstentions):** `key in four_c_abstained` AND `source_confirms_value(value, source)` returns False -> null value, add message.
+**Layer 2 (scoped to abstentions):** `key in four_c_abstained` AND `source_confirms_value(value, source)` returns False -> null value, add message, **unless a rescue fires first (D0, 2026-07-28):** if `document_supports_value_with_unit(value, units.get(key, ""), document_text)` returns True, the value is kept instead — recorded as `SpanEvent(layer="L2_RESCUED", ...)`, not a null. This addresses Pass 4b echoing the AP0 field hint as `_source` (breaking the citation channel) for a value that is otherwise genuinely present in the document.
 
 ### 10.2 source_is_grounded(value, source, document)
 
@@ -421,7 +422,17 @@ Checks whether the source text contains a number matching the value within unit-
 
 ### 10.4 _interpret_number_token(raw)
 
-Returns the set of all plausible float interpretations of a raw number string, handling both locale conventions without choosing one. Used by both source_confirms_value() and source_is_grounded().
+Returns the set of all plausible float interpretations of a raw number string, handling both locale conventions without choosing one. Used by source_confirms_value(), source_is_grounded(), and document_supports_value_with_unit().
+
+### 10.4a document_supports_value_with_unit(value, unit, document, window=_UNIT_GROUNDING_WINDOW_CHARS)
+
+D0 fix (2026-07-28): the Layer 2 rescue check. Returns True if the value's digit-string occurs in `document` with `unit` as a token within `window` chars, bidirectionally (unit may precede or follow the number in real document layouts).
+
+- Requires an EXACT digit-string match (locale-normalized via `_interpret_number_token()` only) — deliberately does NOT apply the ×1000/÷1000 scale tolerance used by `source_confirms_value()`/`source_is_grounded()`, to avoid rescuing a fabricated value that happens to be a scaled match of an unrelated real number elsewhere in the document.
+- Returns False unconditionally if `unit` is empty/falsy or a single alphabetic character (e.g. `m`, `K`, `h`) — these collide with unrelated document text too often (e.g. unit `m` matching `"58,000 m²"`) to be a reliable signal.
+- Zero values always return True (same convention as `source_confirms_value()`/`source_is_grounded()`).
+- Field-agnostic, pure function — no field names, no AP0 value lists, no domain knowledge.
+- Uses `_UNIT_GROUNDING_WINDOW_CHARS = 80`, a constant independent from `_GROUNDING_WINDOW_CHARS` (different question: tight unit-token adjacency vs. fuzzy word co-location) — do not merge these constants.
 
 ### 10.5 repair_and_parse(raw)
 
