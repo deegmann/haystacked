@@ -504,7 +504,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Lowest rated operating temperature the vehicle must sustain, in °C. NULL RULE — READ FIRST: this field is null by default. Only fill it if the tender document explicitly states a minimum operating or ambient temperature (with a °C or K unit). If not stated, output null. Do NOT supply any default, typical, or example value. Do NOT copy numbers from this description or from rule notes. Do NOT confuse temperatures with dates, year/revision numbers, quantities, or project metadata. Source: a temperature range or operating condition in the document's environment, site requirements, or technical specification section. For a range (e.g. 'X to Y °C'), this field holds the lower bound (X).",
+    "hint": "Lowest rated operating temperature the vehicle must sustain, in °C. Source: a temperature range or operating condition in the document's environment, site requirements, or technical specification section. For a range (e.g. 'X to Y °C'), this field holds the lower bound (X). NULL RULE — READ FIRST: this field is null by default. Only fill it if the tender document explicitly states a minimum operating or ambient temperature (with a °C or K unit). If not stated, output null. Do NOT supply any default, typical, or example value. Do NOT copy numbers from this description or from rule notes. Do NOT confuse temperatures with dates, year/revision numbers, quantities, or project metadata.",
     "user_description": "What is the minimum temperature at the operating site? (°C; e.g. -20°C for cold storage)",
     "display_mode": null,
     "value_if_null": null
@@ -524,7 +524,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Highest rated operating temperature the vehicle must sustain, in °C. NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a maximum operating or ambient temperature (with a °C or K unit). If not stated, output null. Do NOT supply a default, typical, or example value. Do NOT copy numbers from this description or from rule notes. Do NOT confuse temperatures with dates, year numbers, or version codes. Source: a temperature range or operating condition in the document's environment, site requirements, or technical specification section. For a range (e.g. 'X to Y °C'), this field holds the upper bound (Y).",
+    "hint": "Highest rated operating temperature the vehicle must sustain, in °C. Source: a temperature range or operating condition in the document's environment, site requirements, or technical specification section. For a range (e.g. 'X to Y °C'), this field holds the upper bound (Y). NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a maximum operating or ambient temperature (with a °C or K unit). If not stated, output null. Do NOT supply a default, typical, or example value. Do NOT copy numbers from this description or from rule notes. Do NOT confuse temperatures with dates, year numbers, or version codes.",
     "user_description": "What is the maximum temperature at the operating site? (°C; e.g. 30°C for production hall)",
     "display_mode": null,
     "value_if_null": null
@@ -544,7 +544,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Maximum rated relative humidity the vehicle must tolerate, as a percentage. NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a relative-humidity value as a % figure in an environment or technical-specification section. If no humidity percentage is stated, output null. Do NOT supply a default, typical, or example value, and do NOT copy numbers from this description or from rule/domain notes. Do NOT infer humidity from warehouse type, food/beverage context, washdown wording, or cold-storage environment. Source: an explicit relative-humidity % figure in the environment specification.",
+    "hint": "Maximum rated relative humidity the vehicle must tolerate, as a percentage. Source: an explicit relative-humidity % figure in the environment specification. NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a relative-humidity value as a % figure in an environment or technical-specification section. If no humidity percentage is stated, output null. Do NOT supply a default, typical, or example value, and do NOT copy numbers from this description or from rule/domain notes. Do NOT infer humidity from warehouse type, food/beverage context, washdown wording, or cold-storage environment.",
     "user_description": "What is the maximum relative humidity at the operating site? (%)",
     "display_mode": null,
     "value_if_null": null
@@ -1217,7 +1217,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Non-standard fork or attachment type required by the tender. NULL RULE — READ FIRST: null by default. Only output a value if the tender document EXPLICITLY names a non-standard attachment type — i.e. 'telescopic forks', 'side-shift', or 'clamp'. Standard forks are the default for all forklifts and must NOT be extracted as a requirement. Rotating forks are the default for VNA/narrow-aisle turret trucks and are resolved from the vehicle classification, not from this field. If the document does not explicitly name Telescopic, Side-Shift, or Clamp — output null. A null value never disqualifies any supplier; a wrong value eliminates qualified suppliers.",
+    "hint": "Non-standard fork or attachment type required by the tender. Standard forks are the default for all forklifts and must NOT be extracted as a requirement. Rotating forks are the default for VNA/narrow-aisle turret trucks and are resolved from the vehicle classification, not from this field. NULL RULE — READ FIRST: null by default. Only output a value if the tender document EXPLICITLY names a non-standard attachment type — i.e. 'telescopic forks', 'side-shift', or 'clamp'. If the document does not explicitly name Telescopic, Side-Shift, or Clamp — output null. A null value never disqualifies any supplier; a wrong value eliminates qualified suppliers.",
     "user_description": "Is a special fork attachment required? (e.g. side-shift, clamp)",
     "display_mode": null,
     "value_if_null": null

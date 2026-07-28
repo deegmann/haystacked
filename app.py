@@ -14,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 import io
 from src.json_repair import repair_and_parse, enforce_source_spans
 from src.field_spec import load_fields, fields_by_tender_key, fields_by_field_name
+from src.prompt_markers import strip_null_rule
 
 # ── New structured matching engine (AP-I1) ────────────────────────────────────
 from src.data_loader import load_suppliers
@@ -1045,7 +1046,7 @@ async def analyze(file: UploadFile = File(...)):
                     # Semantic definition only — NULL RULE / CONSERVATIVE EXTRACTION prose stripped
                     # to avoid tripling the null-bias already present in the system prompt.
                     _fhint_full = _fmeta["hint"]
-                    _fhint_def  = _fhint_full.split("NULL RULE:")[0].strip()
+                    _fhint_def  = strip_null_rule(_fhint_full)
                     _per_user = (
                         f"Vehicle type: {canonical_product_type}.\n\n"
                         f"Find the value of '{_fk}' in the tender document.\n\n"

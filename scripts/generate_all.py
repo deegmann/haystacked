@@ -61,6 +61,9 @@ DEFAULT_DB       = ROOT / "data" / "haystacked.db"
 CONFIG_DIR   = ROOT / "config"
 PROMPTS_DIR  = CONFIG_DIR / "prompts"
 
+sys.path.insert(0, str(ROOT))
+from src.prompt_markers import NULL_RULE_PATTERN
+
 LEVEL_MAP = {"K.O.": "KO", "Cond. K.O.": "COND_KO", "Scoring": "SCORING", "Context": "CONTEXT"}
 VALID_OPS  = {"KO_IF_LT","KO_IF_GT","KO_IF_NEQ","KO_BOOL_REQUIRED","KO_BOOL_EXCLUSIVE","KO_SUBSET"}
 
@@ -1377,6 +1380,19 @@ def validate_vs_sqlite(field_levels: dict, db_path: Path) -> list:
 
 # ── Fields JSON + field_spec.py ───────────────────────────────────────────────
 
+def _check_null_rule_marker(fname, hint) -> None:
+    """Fail loud if `hint` contains the substring 'NULL RULE' in a spelling that
+    does not match the canonical marker pattern (src.prompt_markers.NULL_RULE_PATTERN).
+    An unrecognised marker variant would silently leak null-bias prose into Pass 4c's
+    prompt undiluted — see OI-109 D2."""
+    if hint and "NULL RULE" in hint and not NULL_RULE_PATTERN.search(hint):
+        sys.exit(
+            f"[FEHLER] emit_fields_json: Feld '{fname}' enthält 'NULL RULE' in einer "
+            "nicht erkannten Marker-Form (erwartet z.B. 'NULL RULE:' oder "
+            "'NULL RULE — READ FIRST:'). Siehe src/prompt_markers.NULL_RULE_PATTERN."
+        )
+
+
 def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict = None, scope_nodes: dict = None) -> None:
     """Read all sheets from data_sheets and write config/fields.json + src/field_spec.py.
 
@@ -1471,6 +1487,7 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             tb = _nullable_float(row[col_tb] if col_tb is not None and col_tb < len(row) else None)
             weight = _nullable_int(row[col_weight] if col_weight is not None and col_weight < len(row) else None)
             hint = str(row[col_hint]).strip() if col_hint is not None and col_hint < len(row) and row[col_hint] else None
+            _check_null_rule_marker(fname, hint)
             display = str(row[col_display]).strip() if col_display is not None and col_display < len(row) and row[col_display] else None
             client_exp = str(row[col_client]).strip() if col_client is not None and col_client < len(row) and row[col_client] else None
 
