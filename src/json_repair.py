@@ -7,8 +7,13 @@ All stages are field-name-agnostic. Do not add field-specific logic here.
 import json
 import re
 import logging
+from collections import namedtuple
 
 log = logging.getLogger("haystacked.json_repair")
+
+# Internal to enforce_source_spans()'s contract only — not a shared cross-module
+# class. One event per field actually nulled by the guard.
+SpanEvent = namedtuple("SpanEvent", ["field", "layer", "value", "source"])
 
 
 def repair_and_parse(raw: str) -> dict:
@@ -298,6 +303,21 @@ def source_is_grounded(value, source: str, document: str, window: int = _GROUNDI
     return False
 
 
+def _messages_from_events(events: list) -> list:
+    """Derive human-readable log lines purely from SpanEvent fields — no field-name
+    branches, no domain vocabulary. Single source of truth for "event -> text" so
+    the log.warning() calls and the returned `messages` list can't drift apart.
+    """
+    messages = []
+    for ev in events:
+        snippet = str(ev.source or "")[:60]
+        messages.append(
+            f"⚠ Source-span {ev.layer}: {ev.field}={ev.value} → null "
+            f"(rejected source: \"{snippet}\")"
+        )
+    return messages
+
+
 def enforce_source_spans(
     agv_criteria: dict,
     document_text: str,
@@ -317,10 +337,14 @@ def enforce_source_spans(
     Pure function — no async, no I/O — so tests can import and call it directly
     instead of replicating this logic inline.
 
-    Returns (agv_criteria, messages) where messages is a list of human-readable
-    log lines for each field nulled, for the caller to surface (e.g. via SSE).
+    Returns (agv_criteria, messages, events):
+      - messages: human-readable log lines for each field nulled, for the caller
+        to surface (e.g. via SSE). Derived generically from `events`.
+      - events: list of SpanEvent(field, layer, value, source) — one per field
+        actually nulled by this call, for callers that need structured data
+        (e.g. D1 provenance attribution) rather than the display strings.
     """
-    messages = []
+    events: list = []
     for key in numeric_ko_keys:
         if agv_criteria.get(key) is None:
             continue
@@ -328,14 +352,15 @@ def enforce_source_spans(
         src_val = agv_criteria.get(f"{key}_source")
         if not src_val:
             log.warning("Source-span L1: %s=%s -> null (kein Quellenbeleg)", key, value)
-            messages.append(f"⚠ Kein Quellenbeleg: {key}={value} → null")
+            events.append(SpanEvent(field=key, layer="L1", value=value, source=src_val))
             agv_criteria[key] = None
         elif not source_is_grounded(value, str(src_val), document_text):
             log.warning("Source-span L0: %s=%s -> null (Zitat nicht im Dokument verankert)", key, value)
-            messages.append(f"⚠ Quelle nicht im Dokument verankert: {key}={value} → null")
+            events.append(SpanEvent(field=key, layer="L0", value=value, source=src_val))
             agv_criteria[key] = None
         elif key in four_c_abstained and not source_confirms_value(value, str(src_val)):
             log.warning("Source-span L2: %s=%s — 4c abstained, Quelle bestätigt Wert nicht -> null", key, value)
-            messages.append(f"⚠ 4c Abstention: {key}={value} → null")
+            events.append(SpanEvent(field=key, layer="L2", value=value, source=src_val))
             agv_criteria[key] = None
-    return agv_criteria, messages
+    messages = _messages_from_events(events)
+    return agv_criteria, messages, events

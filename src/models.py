@@ -59,6 +59,17 @@ class ExtractionValue:
     spec: Optional[FieldSpec]  # None only for orphaned UUIDs (AP0 field removed after run)
     value: Any
     source: Optional[str]
+    # D1 provenance (all optional — None for pre-D1 runs and any run where the
+    # producing/nulling step wasn't tracked). produced_by/nulled_by are flat TEXT
+    # values drawn from the closed vocabularies in src/tender_store.py.
+    produced_by: Optional[str] = None
+    nulled_by: Optional[str] = None
+    # Loose diagnostic dict (raw_value, raw_source, pass_4c_state, notes, ...) —
+    # deliberately NOT a dataclass so old stored blobs stay readable across shape
+    # changes (see src/tender_store.py for rationale). Never reconstructed into a
+    # typed object; read back with .get(key) only. "notes" (if present) is
+    # write-only — no pipeline code may ever read, parse, or branch on it.
+    provenance: Optional[dict] = None
 
 @dataclass
 class TenderRun:

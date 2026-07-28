@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from src.tender_store import init_db, build_tender_run, persist_tender_run, load_tender_run
 from src.field_spec import load_fields, fields_by_tender_key
+from src.json_repair import enforce_source_spans
 
 # --- T-TR-01: Round-trip integrity ---
 def test_T_TR_01_round_trip():
@@ -40,10 +41,16 @@ def test_T_TR_02_orphaned_uuid_loads_gracefully():
         init_db(db)
         import sqlite3
         con = sqlite3.connect(db)
-        con.execute("INSERT INTO tender_runs VALUES (?,?,?,?,?,?)",
-                    ("run-orphan", "f.pdf", "2026-01-01T00:00:00+00:00", None, 0, "{}"))
-        con.execute("INSERT INTO tender_extraction_values VALUES (?,?,?,?,?)",
-                    ("run-orphan", "deadbeef-0000-0000-0000-000000000000", "99.0", None, None))
+        con.execute(
+            "INSERT INTO tender_runs "
+            "(run_id, source_file, captured_at, vehicle_type, in_scope, basic_info_json) "
+            "VALUES (?,?,?,?,?,?)",
+            ("run-orphan", "f.pdf", "2026-01-01T00:00:00+00:00", None, 0, "{}"))
+        con.execute(
+            "INSERT INTO tender_extraction_values "
+            "(run_id, field_uuid, value_json, source, spec_json) "
+            "VALUES (?,?,?,?,?)",
+            ("run-orphan", "deadbeef-0000-0000-0000-000000000000", "99.0", None, None))
         con.commit()
         con.close()
         loaded = load_tender_run("run-orphan", db)
@@ -111,3 +118,99 @@ def test_T_TR_05_match_results_persist():
         assert row is not None
         assert row[1] == "prod-1"
         assert row[3] == 42
+
+
+# --- T-TR-06 (D1 acceptance): 4b hint-echo source, 4c abstains, L2 nulls it —
+# full pipeline-mechanics path persists produced_by="4b", nulled_by="L2", and
+# provenance_json with the pre-null raw value/source. ---
+def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
+    """Fixture reproduces the CompanyX-style failure mode: Pass 4b fabricates a
+    field's source by echoing generic descriptive prose (not a real document
+    quote) instead of citing the document; Pass 4c abstains on the same field;
+    Layer 2 then nulls the value because the fabricated source contains no
+    digit confirming it numerically. This drives the exact same production
+    functions (enforce_source_spans, build_tender_run, persist_tender_run,
+    load_tender_run) the live pipeline uses — only the Ollama calls are
+    replaced by fixture data, per the D1 acceptance-test allowance.
+    """
+    tender_key = "required_max_payload_kg"
+
+    # Real document text: the actual number appears, unrelated to the fabricated quote.
+    document_text = "Maximum payload 4800 kg specified for heavy duty operation onsite."
+
+    # Pass 4b's fabricated value + hint-echoed source (generic descriptive prose,
+    # not a verbatim document quote — no digit anywhere in it).
+    fabricated_value = 4.8
+    hint_echo_source = (
+        "The maximum permissible payload capacity of the vehicle, expressed in "
+        "kilograms, describing the heaviest load the AGV can carry during operation."
+    )
+
+    agv_criteria = {
+        tender_key: fabricated_value,
+        f"{tender_key}_source": hint_echo_source,
+    }
+
+    # D1 step (a): pre-4c snapshot (what 4b produced, before 4c/guard can touch it).
+    pre_4c_snapshot = {
+        tender_key: (agv_criteria[tender_key], agv_criteria[f"{tender_key}_source"]),
+    }
+    produced_by = {tender_key: "4b"}
+
+    # D1 step (b): Pass 4c abstains explicitly (returned null for this field).
+    four_c_abstained = {tender_key}
+    four_c_state = {tender_key: "explicit_null"}
+
+    # Source-span guard: L1 (source present) and L0 (grounded — "payload"/"operation"/
+    # "maximum" co-locate with the anchored "4800" in the document) both pass; L2 fires
+    # because the fabricated source has no digit confirming 4.8/4800/0.0048.
+    agv_criteria, messages, events = enforce_source_spans(
+        dict(agv_criteria), document_text, {tender_key}, four_c_abstained
+    )
+    assert agv_criteria[tender_key] is None, "L2 must null the fabricated value in this fixture"
+    assert len(events) == 1 and events[0].field == tender_key and events[0].layer == "L2"
+
+    # D1 step (c): attribute the null to its guard layer.
+    nulled_by = {ev.field: ev.layer for ev in events}
+
+    # D1 step (e): assemble the per-field provenance dict as app.py does.
+    raw_value, raw_source = pre_4c_snapshot[tender_key]
+    field_provenance = {
+        tender_key: {
+            "produced_by": produced_by.get(tender_key),
+            "nulled_by": nulled_by.get(tender_key),
+            "provenance": {
+                "raw_value": raw_value,
+                "raw_source": raw_source,
+                "pass_4c_state": four_c_state.get(tender_key),
+                "notes": None,
+            },
+        }
+    }
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        new_req = dict(agv_criteria)
+        run = build_tender_run(
+            run_id="run-d1-acceptance",
+            source_file="CompanyX.pdf",
+            new_req=new_req,
+            agv_criteria=agv_criteria,
+            result={"buyer": "CompanyX", "in_scope": True},
+            vehicle_type="Forklift AGV",
+            in_scope=True,
+            field_provenance=field_provenance,
+        )
+        persist_tender_run(run, db_path=db)
+        loaded = load_tender_run("run-d1-acceptance", db)
+
+        uuid = fields_by_tender_key()[tender_key][0].uuid
+        ev = loaded.values[uuid]
+        assert ev.value is None, "the field itself is null after L2 (matching engine sees blank, not zero)"
+        assert ev.produced_by == "4b"
+        assert ev.nulled_by == "L2"
+        assert ev.provenance is not None
+        assert ev.provenance["raw_value"] == fabricated_value
+        assert ev.provenance["raw_source"] == hint_echo_source
+        assert ev.provenance["pass_4c_state"] == "explicit_null"

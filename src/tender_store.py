@@ -25,6 +25,14 @@ _BASIC_INFO_KEYS = frozenset({
     "nace_tender", "in_scope",
 })
 
+# D1 provenance vocabularies — CLOSED and APPEND-ONLY. Both describe pipeline
+# STAGES, never fields or vehicle types. A new entry must name a new extraction/
+# validation/matching *step* (e.g. a future pipeline pass). A hypothetical entry
+# named after a field or domain concept (e.g. "vna_check") would be an
+# AP0-boundary violation — do not add one.
+_PRODUCED_BY_VALUES = frozenset({"4a", "4b", "4c", "fallback", "replay", "dialog"})
+_NULLED_BY_VALUES = frozenset({"L0", "L1", "L2", "allowed_values", "plausibility"})
+
 _CREATE_RUNS = """
 CREATE TABLE IF NOT EXISTS tender_runs (
     run_id           TEXT PRIMARY KEY,
@@ -38,11 +46,15 @@ CREATE TABLE IF NOT EXISTS tender_runs (
 
 _CREATE_VALUES = """
 CREATE TABLE IF NOT EXISTS tender_extraction_values (
-    run_id      TEXT NOT NULL,
-    field_uuid  TEXT NOT NULL,
-    value_json  TEXT,      -- JSON-encoded; "null" (string) = explicitly null, not absent
-    source      TEXT,
-    spec_json   TEXT,      -- JSON snapshot of FieldSpec at time of run; NULL for pre-Phase-3b rows
+    run_id           TEXT NOT NULL,
+    field_uuid       TEXT NOT NULL,
+    value_json       TEXT,      -- JSON-encoded; "null" (string) = explicitly null, not absent
+    source           TEXT,
+    spec_json        TEXT,      -- JSON snapshot of FieldSpec at time of run; NULL for pre-Phase-3b rows
+    produced_by      TEXT,      -- D1: which pass produced this value; see _PRODUCED_BY_VALUES. NULL = untracked (pre-D1 rows).
+    nulled_by        TEXT,      -- D1: which guard/validation layer nulled this value, if any; see _NULLED_BY_VALUES. NULL = not nulled or untracked.
+    provenance_json  TEXT,      -- D1: loose diagnostic dict (raw_value, raw_source, pass_4c_state, notes). "notes" is
+                                 -- write-only — no pipeline code may ever read, parse, or branch on it. NULL for pre-D1 rows.
     PRIMARY KEY (run_id, field_uuid),
     FOREIGN KEY (run_id) REFERENCES tender_runs(run_id)
 )
@@ -65,7 +77,8 @@ CREATE TABLE IF NOT EXISTS tender_run_match_results (
 
 def init_db(db_path: Path = DB_PATH) -> None:
     """Create tender tables if they don't exist. Idempotent.
-    Migrates pre-Phase-3b rows: adds spec_json column if absent."""
+    Migrates pre-Phase-3b rows: adds spec_json column if absent.
+    Migrates pre-D1 rows: adds produced_by/nulled_by/provenance_json columns if absent."""
     con = sqlite3.connect(db_path)
     con.execute(_CREATE_RUNS)
     con.execute(_CREATE_VALUES)
@@ -74,6 +87,11 @@ def init_db(db_path: Path = DB_PATH) -> None:
     existing_cols = {row[1] for row in con.execute("PRAGMA table_info(tender_extraction_values)")}
     if "spec_json" not in existing_cols:
         con.execute("ALTER TABLE tender_extraction_values ADD COLUMN spec_json TEXT")
+    # Migration: add D1 provenance columns to existing tables (pre-D1 DBs lack them)
+    existing_cols = {row[1] for row in con.execute("PRAGMA table_info(tender_extraction_values)")}
+    for _col in ("produced_by", "nulled_by", "provenance_json"):
+        if _col not in existing_cols:
+            con.execute(f"ALTER TABLE tender_extraction_values ADD COLUMN {_col} TEXT")
     con.commit()
     con.close()
 
@@ -86,19 +104,25 @@ def build_tender_run(
     result: dict,          # full pipeline result dict — allowlisted keys go into basic_info
     vehicle_type: Optional[str],
     in_scope: bool,
+    field_provenance: Optional[dict] = None,  # D1: tender_key -> {produced_by, nulled_by, provenance}
 ) -> TenderRun:
     """Build a TenderRun from the pipeline output at the matching boundary."""
     tk_to_specs = fields_by_tender_key()  # tender_key → list[FieldSpec]
     values: dict[str, ExtractionValue] = {}
+    field_provenance = field_provenance or {}
 
     for tender_key, specs in tk_to_specs.items():
         raw_val = new_req.get(tender_key)
         source  = agv_criteria.get(f"{tender_key}_source")
+        _prov   = field_provenance.get(tender_key) or {}
         for spec in specs:
             values[spec.uuid] = ExtractionValue(
-                spec   = spec,
-                value  = raw_val,
-                source = source,
+                spec        = spec,
+                value       = raw_val,
+                source      = source,
+                produced_by = _prov.get("produced_by"),
+                nulled_by   = _prov.get("nulled_by"),
+                provenance  = _prov.get("provenance"),
             )
 
     basic_info = {k: result.get(k) for k in _BASIC_INFO_KEYS if k in result}
@@ -123,43 +147,68 @@ def persist_tender_run(
     con = sqlite3.connect(db_path)
     try:
         con.execute(
-            "INSERT OR REPLACE INTO tender_runs VALUES (?,?,?,?,?,?)",
-            (
-                run.run_id, run.source_file, run.captured_at,
-                run.vehicle_type, int(run.in_scope),
-                json.dumps(run.basic_info, ensure_ascii=False),
-            ),
+            """
+            INSERT OR REPLACE INTO tender_runs
+                (run_id, source_file, captured_at, vehicle_type, in_scope, basic_info_json)
+            VALUES
+                (:run_id, :source_file, :captured_at, :vehicle_type, :in_scope, :basic_info_json)
+            """,
+            {
+                "run_id": run.run_id,
+                "source_file": run.source_file,
+                "captured_at": run.captured_at,
+                "vehicle_type": run.vehicle_type,
+                "in_scope": int(run.in_scope),
+                "basic_info_json": json.dumps(run.basic_info, ensure_ascii=False),
+            },
         )
         con.execute(
             "DELETE FROM tender_extraction_values WHERE run_id = ?", (run.run_id,)
         )
         con.executemany(
-            "INSERT INTO tender_extraction_values VALUES (?,?,?,?,?)",
+            """
+            INSERT INTO tender_extraction_values
+                (run_id, field_uuid, value_json, source, spec_json,
+                 produced_by, nulled_by, provenance_json)
+            VALUES
+                (:run_id, :field_uuid, :value_json, :source, :spec_json,
+                 :produced_by, :nulled_by, :provenance_json)
+            """,
             [
-                (
-                    run.run_id,
-                    ev.spec.uuid if ev.spec else uuid_key,
-                    json.dumps(ev.value, ensure_ascii=False),
-                    ev.source,
-                    json.dumps(dataclasses.asdict(ev.spec), ensure_ascii=False) if ev.spec else None,
-                )
+                {
+                    "run_id": run.run_id,
+                    "field_uuid": ev.spec.uuid if ev.spec else uuid_key,
+                    "value_json": json.dumps(ev.value, ensure_ascii=False),
+                    "source": ev.source,
+                    "spec_json": json.dumps(dataclasses.asdict(ev.spec), ensure_ascii=False) if ev.spec else None,
+                    "produced_by": ev.produced_by,
+                    "nulled_by": ev.nulled_by,
+                    "provenance_json": json.dumps(ev.provenance, ensure_ascii=False) if ev.provenance is not None else None,
+                }
                 for uuid_key, ev in run.values.items()
             ],
         )
         if match_results:
             con.execute("DELETE FROM tender_run_match_results WHERE run_id = ?", (run.run_id,))
             con.executemany(
-                "INSERT INTO tender_run_match_results VALUES (?,?,?,?,?,?,?)",
+                """
+                INSERT INTO tender_run_match_results
+                    (run_id, product_id, product_name, score,
+                     disqualified, disqualified_by, score_details)
+                VALUES
+                    (:run_id, :product_id, :product_name, :score,
+                     :disqualified, :disqualified_by, :score_details)
+                """,
                 [
-                    (
-                        run.run_id,
-                        mr.record.product.product_id,
-                        mr.record.product.product_name,
-                        mr.score,
-                        int(mr.disqualified),
-                        json.dumps(mr.disqualified_by, ensure_ascii=False),
-                        json.dumps(mr.score_details, ensure_ascii=False),
-                    )
+                    {
+                        "run_id": run.run_id,
+                        "product_id": mr.record.product.product_id,
+                        "product_name": mr.record.product.product_name,
+                        "score": mr.score,
+                        "disqualified": int(mr.disqualified),
+                        "disqualified_by": json.dumps(mr.disqualified_by, ensure_ascii=False),
+                        "score_details": json.dumps(mr.score_details, ensure_ascii=False),
+                    }
                     for mr in match_results
                 ],
             )
@@ -181,7 +230,9 @@ def load_tender_run(run_id: str, db_path: Path = DB_PATH) -> Optional[TenderRun]
             return None
 
         ev_rows = con.execute(
-            "SELECT field_uuid, value_json, source, spec_json FROM tender_extraction_values WHERE run_id = ?",
+            "SELECT field_uuid, value_json, source, spec_json, "
+            "produced_by, nulled_by, provenance_json "
+            "FROM tender_extraction_values WHERE run_id = ?",
             (run_id,)
         ).fetchall()
 
@@ -195,9 +246,13 @@ def load_tender_run(run_id: str, db_path: Path = DB_PATH) -> Optional[TenderRun]
                 except Exception:
                     pass  # malformed snapshot — treat as orphaned
             values[uuid] = ExtractionValue(
-                spec   = spec,
-                value  = json.loads(ev_row["value_json"]) if ev_row["value_json"] is not None else None,
-                source = ev_row["source"],
+                spec        = spec,
+                value       = json.loads(ev_row["value_json"]) if ev_row["value_json"] is not None else None,
+                source      = ev_row["source"],
+                produced_by = ev_row["produced_by"],
+                nulled_by   = ev_row["nulled_by"],
+                # loose dict — never reconstructed into a typed object (see rationale above)
+                provenance  = json.loads(ev_row["provenance_json"]) if ev_row["provenance_json"] else None,
             )
 
         return TenderRun(

@@ -24,14 +24,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from app import _NUMERIC_KO_TENDER_KEYS
-from src.json_repair import enforce_source_spans, source_confirms_value
+from src.json_repair import enforce_source_spans, source_confirms_value, SpanEvent, _messages_from_events
 
 
 def _apply(criteria: dict, document_text: str, four_c_abstained: set = frozenset()) -> dict:
     """Thin call-site adapter — not a reimplementation. Discards the messages
     list (app.py turns those into SSE events; tests only need the resulting dict).
     """
-    result, _messages = enforce_source_spans(
+    result, _messages, _events = enforce_source_spans(
         dict(criteria), document_text, _NUMERIC_KO_TENDER_KEYS, set(four_c_abstained)
     )
     return result
@@ -248,3 +248,51 @@ def test_U_SS_11_documented_residual_gradient_collision_case():
         "documented residual collision risk has materialized and needs a real fix, "
         "not a threshold nudge"
     )
+
+
+# ---------------------------------------------------------------------------
+# D1: enforce_source_spans() returns a 3-tuple; events + messages are generic
+# ---------------------------------------------------------------------------
+
+def test_D1_returns_events_alongside_messages():
+    """enforce_source_spans() returns (agv_criteria, messages, events). One
+    SpanEvent per field actually nulled, carrying field/layer/value/source —
+    this is what D1 provenance attribution in app.py consumes.
+    """
+    key = "required_max_payload_kg"
+    criteria = {key: 1000, f"{key}_source": None}
+    result, messages, events = enforce_source_spans(
+        dict(criteria), "", _NUMERIC_KO_TENDER_KEYS, set()
+    )
+    assert result[key] is None
+    assert len(events) == 1
+    assert events[0] == SpanEvent(field=key, layer="L1", value=1000, source=None)
+    assert len(messages) == 1
+
+
+def test_D1_messages_are_generically_derived_from_events_not_field_names():
+    """The enriched messages must be constructable purely from SpanEvent-shaped
+    data — no per-field-name text branches, no domain vocabulary. Proven here by
+    feeding a made-up field name (not any real AP0 tender_key) through the same
+    generic helper used by enforce_source_spans() and getting a well-formed
+    message back, with no special-casing anywhere.
+    """
+    fake_events = [
+        SpanEvent(field="totally_made_up_field_zzz", layer="L0",
+                  value=42, source="some fabricated quote text here"),
+    ]
+    messages = _messages_from_events(fake_events)
+    assert len(messages) == 1
+    assert "totally_made_up_field_zzz" in messages[0]
+    assert "L0" in messages[0]
+    assert "42" in messages[0]
+    assert "some fabricated quote text here"[:60] in messages[0]
+
+    # And the real enforce_source_spans() call site produces messages using the
+    # exact same helper — single source of truth, not two independent code paths.
+    key = "required_max_payload_kg"
+    criteria = {key: 4.8, f"{key}_source": "The maximum lift height of the AGVs is up to 4.8 m."}
+    _, messages_from_call, events_from_call = enforce_source_spans(
+        dict(criteria), "", _NUMERIC_KO_TENDER_KEYS, set()
+    )
+    assert messages_from_call == _messages_from_events(events_from_call)

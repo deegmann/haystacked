@@ -480,6 +480,18 @@ def sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+# ── D1 provenance helper ───────────────────────────────────────────────────────
+def _attribute_nulls(before: dict, after: dict, cause: str, sink: dict) -> None:
+    """Record `cause` in `sink` for any key that had a non-null value in `before`
+    and became None in `after` (dict-diff attribution for validate_tender_values()/
+    validate_agv_criteria(), neither of which is modified by this — see D1 plan).
+    `sink.setdefault` so an earlier attribution for the same key is never overwritten.
+    """
+    for k, v in before.items():
+        if v is not None and not str(k).endswith("_source") and after.get(k) is None:
+            sink.setdefault(k, cause)
+
+
 # ── Routes ────────────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -496,6 +508,14 @@ async def analyze(file: UploadFile = File(...)):
         log.info("=== Neue Analyse: %s ===", filename)
 
         yield sse("step", {"id": "upload", "status": "done", "message": f"'{filename}' received"})
+
+        # D1: per-field extraction provenance — defaulted here so build_tender_run()
+        # always receives well-formed data regardless of which branch below runs
+        # (e.g. replay mode never populates these; they stay empty → all-None provenance).
+        _produced_by: dict = {}
+        _nulled_by: dict = {}
+        _4c_state: dict = {}
+        _pre_4c_snapshot: dict = {}
 
         is_replay = filename.lower().endswith(".json")
 
@@ -898,6 +918,19 @@ async def analyze(file: UploadFile = File(...)):
                 log.exception("Pass 4b fehlgeschlagen")
                 yield sse("log", {"message": f"⚠ 4b Fehler: {e}"})
 
+            # D1: snapshot numeric-KO fields as 4b left them, before Pass 4c / the
+            # source-span guard can overwrite or null them — recoverable for forensics.
+            _pre_4c_snapshot = {
+                _k: (agv_criteria.get(_k), agv_criteria.get(f"{_k}_source"))
+                for _k in _NUMERIC_KO_TENDER_KEYS
+            }
+            # D1: every non-null field present after 4b is (so far) attributed to 4b;
+            # Pass 4c below overrides individual entries when it returns a value.
+            _produced_by = {
+                _k: "4b" for _k, _v in agv_criteria.items()
+                if _v is not None and not str(_k).endswith("_source") and not str(_k).startswith("_")
+            }
+
             yield sse("step", {"id": "agv", "status": "running",
                                 "message": "Pass 4b: Batch-Extraktion abgeschlossen",
                                 "done": _4a_calls + 1, "total": _agv_total})
@@ -946,18 +979,23 @@ async def analyze(file: UploadFile = File(...)):
                                 agv_criteria[_fk]              = _4c_val
                                 agv_criteria[f"{_fk}_source"]  = _4c_src
                                 _4c_count += 1
+                                _4c_state[_fk] = "returned_value"
+                                _produced_by[_fk] = "4c"
                             else:
                                 # 4c explicitly returned null → abstained
                                 _4c_abstained.add(_fk)
+                                _4c_state[_fk] = "explicit_null"
                             log.debug("4c %s: %s (src: %s)", _fk, _4c_val,
                                       str(_4c_src or "")[:60])
                         else:
                             # Field key absent from parsed dict (regex-fallback path) → abstained
                             _4c_abstained.add(_fk)
+                            _4c_state[_fk] = "key_absent"
                             log.debug("4c %s: field absent in parse result → abstained", _fk)
                     except Exception as _pe:
                         # Parse or call failure → abstained so L2 can still check 4b value
                         _4c_abstained.add(_fk)
+                        _4c_state[_fk] = "parse_error"
                         log.warning("4c '%s' fehlgeschlagen (→ abstained): %s", _fk, _pe)
                     yield sse("step", {"id": "agv", "status": "running",
                                        "message": f"Pass 4c ({_4c_i}/{len(_4c_fields)})",
@@ -975,11 +1013,14 @@ async def analyze(file: UploadFile = File(...)):
             #   numerically confirm the value → 4b was likely hallucinating → null value.
             # See src/json_repair.py::enforce_source_spans for the full logic.
             _4c_abstained_ref = _4c_abstained if _4c_fields else set()
-            agv_criteria, _span_messages = enforce_source_spans(
+            agv_criteria, _span_messages, _span_events = enforce_source_spans(
                 agv_criteria, text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained_ref
             )
             for _msg in _span_messages:
                 yield sse("log", {"message": _msg})
+            # D1: attribute each nulled field to the guard layer that nulled it.
+            for _ev in _span_events:
+                _nulled_by[_ev.field] = _ev.layer
 
             # Merge 4a results into agv_criteria
             agv_criteria["required_product_type"] = vt_criteria.get("required_product_type")
@@ -987,13 +1028,17 @@ async def analyze(file: UploadFile = File(...)):
         if is_extractable:
             # Validate against AP0 allowed_values — reject values not in the allowed list
             from src.matching import validate_tender_values
+            _before_av = dict(agv_criteria)
             agv_criteria, av_warnings = validate_tender_values(agv_criteria)
+            _attribute_nulls(_before_av, agv_criteria, "allowed_values", _nulled_by)
             for w in av_warnings:
                 log.info("AP0 allowed_values filter: %s", w)
                 yield sse("log", {"message": f"⚠ AP0-Filter: {w}"})
 
             # Validate plausibility — set implausible values to null
+            _before_pl = dict(agv_criteria)
             agv_criteria, val_warnings = validate_agv_criteria(agv_criteria)
+            _attribute_nulls(_before_pl, agv_criteria, "plausibility", _nulled_by)
             if val_warnings:
                 for w in val_warnings:
                     yield sse("log", {"message": f"⚠ Plausibility: {w}"})
@@ -1013,6 +1058,10 @@ async def analyze(file: UploadFile = File(...)):
                     continue
                 if re.search(_rgx, text or ""):
                     agv_criteria[_key] = _val
+                    # D1: fallback re-produced this field — it's no longer "nulled" by
+                    # whatever guard/validation nulled it earlier.
+                    _produced_by[_key] = "fallback"
+                    _nulled_by.pop(_key, None)
                     log.info("Field-text-fallback: %s = %s (regex: %s)", _key, _val, _rgx)
 
             # Run matching against SQLite supplier records
@@ -1047,6 +1096,22 @@ async def analyze(file: UploadFile = File(...)):
 
             new_req = _to_match_units(new_req)
 
+            # D1: assemble per-field provenance, keyed by tender_key, for build_tender_run().
+            _field_provenance: dict = {}
+            for _tk in set(_produced_by) | set(_nulled_by) | set(_pre_4c_snapshot):
+                _raw_value, _raw_source = _pre_4c_snapshot.get(_tk, (None, None))
+                _field_provenance[_tk] = {
+                    "produced_by": _produced_by.get(_tk),
+                    "nulled_by":   _nulled_by.get(_tk),
+                    "provenance": {
+                        "raw_value":      _raw_value,
+                        "raw_source":     _raw_source,
+                        "pass_4c_state":  _4c_state.get(_tk),
+                        # write-only: human-diagnostic only, never read/parsed by pipeline code.
+                        "notes":          None,
+                    },
+                }
+
             # Phase 3: persist extraction run
             _tender_run = build_tender_run(
                 run_id       = analysis_id,
@@ -1056,6 +1121,7 @@ async def analyze(file: UploadFile = File(...)):
                 result       = result,
                 vehicle_type = canonical_product_type,
                 in_scope     = bool(result.get("in_scope", False)),
+                field_provenance = _field_provenance,
             )
             matches_raw, matches_all_raw = match_suppliers_new(
                 TenderRequirements(_tender_run), _SUPPLIERS, top_n=5
