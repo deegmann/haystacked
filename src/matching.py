@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.models import FieldValue, Product, SupplierRecord
-from src.field_spec import FieldSpec, load_fields, fields_by_field_name, fields_by_tender_key
+from src.field_spec import FieldSpec, load_fields, fields_by_field_name
 
 log = logging.getLogger(__name__)
 
@@ -64,26 +64,6 @@ assert _canon_names <= set(_LEGACY_MAP), (
     f"canonical_names without legacy_map entry: {_canon_names - set(_LEGACY_MAP)}"
 )
 
-# OI-95: fields normalized by app.py after extraction — skip AP0 allowed-values
-# filter for them. Derived from AP0 xlsx (post_extraction_derived column), not
-# hardcoded. See validate_tender_values() below.
-_TK_TO_SPECS = fields_by_tender_key()
-_SKIP_FILTER: frozenset = frozenset(
-    tk for tk, specs in _TK_TO_SPECS.items()
-    if any(s.post_extraction_derived for s in specs)
-)
-assert _SKIP_FILTER, (
-    "no field has post_extraction_derived=True in fields.json — check AP0 xlsx / generate_all.py"
-)
-_orphaned_pe_fields = {
-    f.field_name for f in load_fields().values()
-    if f.post_extraction_derived and not f.tender_key
-}
-assert not _orphaned_pe_fields, (
-    f"post_extraction_derived=True but no tender_key: {_orphaned_pe_fields} — "
-    "check AP0 xlsx (Global tab, Post Extraction Derived column)"
-)
-
 
 def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
     """Validate LLM-extracted tender values against AP0 allowed_values.
@@ -104,7 +84,7 @@ def validate_tender_values(raw: dict) -> tuple[dict, list[str]]:
     for field_spec in _fields.values():
         allowed = field_spec.allowed_values
         tender_key = field_spec.tender_key
-        if not allowed or not tender_key or tender_key in _SKIP_FILTER:
+        if not allowed or not tender_key:
             continue
         val = cleaned.get(tender_key)
         if val is None:

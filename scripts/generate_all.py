@@ -1458,7 +1458,6 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
         col_hint          = cols.get("LLM Hint")
         col_display       = cols.get("Display Mode")
         col_client        = cols.get("UI Hint")
-        col_post_extraction_derived = cols.get("Post Extraction Derived")
         col_display_label = cols.get("Display Label")
         col_value_if_null = cols_snake.get("value_if_null")
 
@@ -1498,12 +1497,6 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             _check_null_rule_marker(fname, hint)
             display = str(row[col_display]).strip() if col_display is not None and col_display < len(row) and row[col_display] else None
             client_exp = str(row[col_client]).strip() if col_client is not None and col_client < len(row) and row[col_client] else None
-            post_extraction_derived = bool(
-                col_post_extraction_derived is not None
-                and col_post_extraction_derived < len(row)
-                and row[col_post_extraction_derived]
-                and str(row[col_post_extraction_derived]).strip().lower() in ("true", "yes")
-            )
             display_label = str(row[col_display_label]).strip() if col_display_label is not None and col_display_label < len(row) and row[col_display_label] else None
 
             # Parse allowed_values only for Dropdown/Multi-Select — numeric fields
@@ -1581,7 +1574,6 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
                 "hint":             hint,
                 "user_description": client_exp,
                 "display_mode":     display,
-                "post_extraction_derived": post_extraction_derived,
                 "display_label":    display_label,
                 "value_if_null":    value_if_null,
             }
@@ -1663,7 +1655,6 @@ class FieldSpec:
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
-    post_extraction_derived: bool = False
     display_label: Optional[str] = None
     value_if_null: object = None
 

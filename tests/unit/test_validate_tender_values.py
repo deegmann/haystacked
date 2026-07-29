@@ -189,33 +189,41 @@ def test_U_V_09_slash_compound_split_into_valid_parts():
 
 
 # ---------------------------------------------------------------------------
-# U-V-10: OI-95 — required_product_type is exempted from AP0 allowed-values
-# filtering via the AP0-derived post_extraction_derived flag (_SKIP_FILTER).
+# U-V-11: the AP0 allowed-values filter correctly nulls a disallowed value
 # ---------------------------------------------------------------------------
 
-def test_U_V_10_required_product_type_exempted_from_filter():
-    """required_product_type is normalized by app.py (vehicle-type classification
-    pipeline) after extraction — it must pass through validate_tender_values()
-    unfiltered even when the raw LLM output is not a literal AP0 allowed value.
-    """
-    result, warnings = validate_tender_values(
-        {"required_product_type": "vna forklift (not a canonical AP0 value)"}
-    )
-    assert result.get("required_product_type") == "vna forklift (not a canonical AP0 value)", (
-        "required_product_type must be exempted from AP0 allowed-values filtering "
-        "(post_extraction_derived=True in AP0 xlsx)"
-    )
-    assert not warnings, f"Unexpected warnings for exempted field: {warnings}"
-
-
 def test_U_V_11_negative_control_other_dropdown_still_filtered():
-    """Negative control: a field NOT flagged post_extraction_derived is still
-    subject to normal AP0 allowed-values filtering (i.e. the skip is scoped
-    to the flagged field only, not a blanket bypass)."""
+    """Confirms the AP0 allowed-values filter still works: a Dropdown field with
+    a genuinely invalid value gets correctly nulled by validate_tender_values()."""
     result, warnings = validate_tender_values(
         {"required_load_type": "Floor delivery & picking"}
     )
     assert result.get("required_load_type") is None, (
-        "Fields without post_extraction_derived=True must still be filtered normally"
+        "Disallowed values must still be filtered by the AP0 allowed-values check"
     )
-    assert warnings, "Expected a warning for the disallowed value on a non-exempted field"
+    assert warnings, "Expected a warning for the disallowed value"
+
+
+# ---------------------------------------------------------------------------
+# U-V-12: OI-95 revert — variant_map targets must all be valid product types.
+# This is the structural invariant that makes the AP0 allowed-values filter
+# harmless for required_product_type (see app.py Fix 1 / OI-95 revert): the
+# value merged into domain_criteria is always canonical_product_type, which
+# always comes from this same variant_map/scope_registry source.
+# ---------------------------------------------------------------------------
+
+def test_U_V_12_variant_map_targets_are_valid_product_types():
+    """Every variant_map canonical target must be an AP0-allowed required_product_type
+    value — this is the invariant that makes validate_tender_values()'s allowed-values
+    filter structurally harmless for this field (see OI-95 revert): the value merged
+    into domain_criteria is always canonical_product_type, which always comes from
+    this same variant_map/scope_registry source."""
+    import json
+    from src.field_spec import load_fields
+    scope_reg = json.loads((Path(__file__).parent.parent.parent / "config" / "scope_registry.json").read_text())
+    variant_map = scope_reg.get("variant_map", {})
+    assert variant_map, "scope_registry.json has no variant_map — check generate_all.py"
+    product_type_spec = next(f for f in load_fields().values() if f.tender_key == "required_product_type")
+    allowed = set(product_type_spec.allowed_values or [])
+    invalid = {v for v in variant_map.values() if v not in allowed}
+    assert not invalid, f"variant_map targets not in required_product_type allowed_values: {invalid}"
