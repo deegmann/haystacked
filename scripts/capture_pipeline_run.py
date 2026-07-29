@@ -2,7 +2,7 @@
 """Capture a live pipeline run against the running FastAPI server.
 
 Posts a PDF to the /analyze endpoint, parses the SSE stream, extracts the
-agv_criteria, match_results, and vehicle_type from the JSON payload, and saves
+domain_criteria, match_results, and vehicle_type from the JSON payload, and saves
 a structured JSON to tests/tenders/golden_run_tender_XXX.json.
 
 Usage:
@@ -20,7 +20,7 @@ Output file format:
       "buyer": "...", "project": "...", "contact": "...", "summary": "...",
       "detected_domain": "Logistics:AGV", "in_scope": true,
       "nace_code": "...", "nace_label": "...", "is_vna": false,
-      "agv_criteria": { ... },
+      "domain_criteria": { ... },
       "match_results": [ ... ],
       "captured_at": "2026-06-04T12:34:56",
       "duration_s": 330.1
@@ -133,14 +133,14 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
 
     result = _parse_sse_stream(response.text)
 
-    agv_criteria = result.get("agv_criteria") or {}
+    domain_criteria = result.get("domain_criteria") or {}
     match_results = result.get("matches") or []
     matches_all   = result.get("matches_all") or []
 
     # Extract vehicle type: top-level result key (set by app.py after Pass 4a)
     vehicle_type = (
         result.get("vehicle_type_canonical")
-        or agv_criteria.get("required_product_type")
+        or domain_criteria.get("required_product_type")
         or "unknown"
     )
 
@@ -159,7 +159,7 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
         "nace_label":     result.get("nace_label"),
         "is_vna":         result.get("is_vna", False),
         # Extraction + matching
-        "agv_criteria":   agv_criteria,
+        "domain_criteria": domain_criteria,
         "match_results":  match_results,
         "matches_all":    matches_all,
         # Provenance
@@ -168,7 +168,7 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
     }
 
     # Summary
-    non_null = {k: v for k, v in agv_criteria.items()
+    non_null = {k: v for k, v in domain_criteria.items()
                 if v is not None and not k.startswith("_") and not k.endswith("_source")}
     print(f"\n=== Extraction summary ===")
     print(f"Vehicle type : {vehicle_type}")

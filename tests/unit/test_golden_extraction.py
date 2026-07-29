@@ -26,6 +26,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from src.tender_store import read_run_criteria
+
 _TENDER_DIR = Path(__file__).parent.parent / "tenders"
 
 
@@ -89,7 +91,7 @@ def test_golden_extraction(fixture_path: Path):
     # vehicle_type must be present (positive sign the pipeline ran to completion)
     # and must not be a known AGV/AMR type.
     if fixture.get("expected_out_of_scope"):
-        agv_criteria = golden_run.get("agv_criteria", {})
+        agv_criteria = read_run_criteria(golden_run)
         match_results = golden_run.get("match_results", [])
         vehicle_type = golden_run.get("vehicle_type")
         _AGV_TYPES = {"Forklift AGV", "Tugger AGV", "Mobile AMR"}
@@ -111,7 +113,7 @@ def test_golden_extraction(fixture_path: Path):
         )
         return
 
-    agv_criteria = golden_run.get("agv_criteria", {})
+    agv_criteria = read_run_criteria(golden_run)
     golden_extraction = fixture["golden_extraction"]
 
     mismatches = []

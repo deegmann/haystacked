@@ -700,8 +700,8 @@ input[type=number]::placeholder { color: var(--hs-mist); font-style: italic; }
   white-space: pre-wrap; word-break: break-all;
 }
 
-/* ── AGV Requirement chips ── */
-.agv-req-grid {
+/* ── Domain Requirement chips ── */
+.domain-req-grid {
   display: flex; flex-wrap: wrap; gap: 8px;
 }
 .req-chip {

@@ -6,7 +6,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import pytest
-from src.tender_store import init_db, build_tender_run, persist_tender_run, load_tender_run, _BASIC_INFO_KEYS
+from src.tender_store import (
+    init_db, build_tender_run, persist_tender_run, load_tender_run, _BASIC_INFO_KEYS,
+    read_run_criteria,
+)
 from src.field_spec import load_fields, fields_by_tender_key
 from src.json_repair import enforce_source_spans
 from app import _assemble_field_provenance, _attribute_nulls
@@ -455,3 +458,17 @@ def test_T_TR_16_assemble_provenance_replay_produced_by():
                                          pre_4c_snapshot={}, four_c_state={})
 
     assert result[tk]["produced_by"] == "replay"
+
+
+# --- T-TR-17 (OI-102): read_run_criteria old/new key alias ---
+def test_T_TR_17_read_run_criteria_old_and_new_key_alias():
+    """Old-format doc (agv_criteria) and new-format doc (domain_criteria) must
+    replay to identical criteria via read_run_criteria()."""
+    criteria = {"required_max_payload_kg": 500.0, "required_product_type": "Forklift AGV"}
+    old_doc = {"agv_criteria": criteria}
+    new_doc = {"domain_criteria": criteria}
+
+    assert read_run_criteria(old_doc) == criteria
+    assert read_run_criteria(new_doc) == criteria
+    assert read_run_criteria(old_doc) == read_run_criteria(new_doc)
+    assert read_run_criteria({}) == {}

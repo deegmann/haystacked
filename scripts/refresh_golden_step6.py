@@ -1,7 +1,7 @@
 """Step 6 Golden Refresh: re-runs matching (no LLM) against current DB + config.
 
 For each golden_run_tender_*.json file:
-1. Reads existing agv_criteria (extraction unchanged)
+1. Reads existing domain_criteria (extraction unchanged)
 2. Re-runs matching with current matching engine + supplier DB
 3. Updates match_results and matches_all in-place
 4. Adds step6_refreshed_at timestamp
@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 from app import _criteria_to_uuid_keyed, _to_match_units
 from src.matching import match_suppliers_new, TenderRequirements, validate_tender_values
 from src.data_loader import load_suppliers
+from src.tender_store import read_run_criteria
 
 GOLDEN_DIR = ROOT / "tests" / "tenders"
 
@@ -27,7 +28,7 @@ def refresh_golden(path: Path, suppliers) -> dict:
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
 
-    agv_criteria = doc.get("agv_criteria", {})
+    domain_criteria = read_run_criteria(doc)
     vehicle_type = doc.get("vehicle_type", "")
     is_vna = doc.get("is_vna", False)
     in_scope = doc.get("in_scope", True)
@@ -41,7 +42,7 @@ def refresh_golden(path: Path, suppliers) -> dict:
         return doc, old_matches != [], 0, 0, [], []
 
     # Inject vehicle type and VNA flag into criteria (same as app.py does)
-    criteria_with_vt = dict(agv_criteria)
+    criteria_with_vt = dict(domain_criteria)
     if vehicle_type:
         criteria_with_vt["required_product_type"] = vehicle_type
     if is_vna:

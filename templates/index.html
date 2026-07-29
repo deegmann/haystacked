@@ -117,18 +117,18 @@
             <div class="step-msg" id="msg-parse">Waiting…</div>
           </div>
         </div>
-        <div class="step-line agv-line"></div>
-        <div class="step" id="step-agv">
+        <div class="step-line"></div>
+        <div class="step" id="step-domain">
           <svg class="step-icon" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true">
             <circle class="step-ring-bg"   cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/>
-            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-agv"/>
+            <circle class="step-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" id="ring-fill-domain"/>
             <circle class="step-ring-inner" cx="18" cy="18" r="12"/>
             <text class="step-ring-num" x="18" y="22" text-anchor="middle">05</text>
           </svg>
           <div class="step-body">
             <div class="step-label">Matching</div>
-            <div class="step-msg" id="msg-agv">Waiting…</div>
-            <div class="step-progress-count hidden" id="progress-count-agv"></div>
+            <div class="step-msg" id="msg-domain">Waiting…</div>
+            <div class="step-progress-count hidden" id="progress-count-domain"></div>
           </div>
         </div>
       </div>
@@ -221,8 +221,8 @@
       </div>
     </div>
 
-    <!-- AGV Section -->
-    <div id="agvSection" class="hidden">
+    <!-- Domain Section -->
+    <div id="domainSection" class="hidden">
       <div class="section-divider"><span>Matching Results</span></div>
 
       <div class="grid">
@@ -233,7 +233,7 @@
               <button id="btnEdit" class="btn-secondary-small" onclick="openEditDialog()">Bearbeiten</button>
             </div>
           </div>
-          <div id="agvRequirements" class="agv-req-grid"></div>
+          <div id="domainRequirements" class="domain-req-grid"></div>
           <div id="addFieldPickerWrap" class="hidden" style="margin-top:12px"></div>
         </div>
       </div>
@@ -393,7 +393,7 @@ async function handleFile(file) {
   hide('uploadSection'); hide('resultSection'); hide('errorSection');
   show('progressSection');
   document.getElementById('logOutput').textContent = '';
-  ['upload','extract','llm','parse','agv'].forEach(id => setStep(id, 'pending', 'Waiting…'));
+  ['upload','extract','llm','parse','domain'].forEach(id => setStep(id, 'pending', 'Waiting…'));
   addLog(`File: ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
 
   const form = new FormData();
@@ -434,7 +434,7 @@ async function handleFile(file) {
       } else if (eventType === 'result') {
         addLog('Done — rendering result.');
         // Mark all remaining running steps as done before showing result
-        ['upload','extract','llm','parse','agv'].forEach(id => {
+        ['upload','extract','llm','parse','domain'].forEach(id => {
           const el = document.getElementById('step-' + id);
           if (el && el.classList.contains('step-running')) setStep(id, 'done', 'Done');
         });
@@ -443,7 +443,7 @@ async function handleFile(file) {
     }
   }
   // Stream ended without a result or error event — stop all animations
-  ['upload','extract','llm','parse','agv'].forEach(id => {
+  ['upload','extract','llm','parse','domain'].forEach(id => {
     const el = document.getElementById('step-' + id);
     if (el && el.classList.contains('step-running')) setStep(id, 'error', 'Interrupted');
   });
@@ -475,12 +475,12 @@ function showResult(d) {
   document.getElementById('missingList').innerHTML = missing.map(m => `<li>${m}</li>`).join('');
   document.getElementById('missingCard').style.display = missing.length ? '' : 'none';
 
-  if (d.detected_domain && d.agv_criteria) {
-    show('agvSection');
-    renderAgvRequirements(d.agv_criteria);
+  if (d.detected_domain && d.domain_criteria) {
+    show('domainSection');
+    renderDomainRequirements(d.domain_criteria);
     renderSupplierCards(d.matches_all || d.matches || []);
   } else {
-    hide('agvSection');
+    hide('domainSection');
   }
 
   set('metaFilename',  d.filename || '');
@@ -545,8 +545,8 @@ function _totalDeviation(knockouts) {
 }
 
 // Summary panel: read-only chip display of all non-null tender fields.
-function renderAgvRequirements(crit) {
-  const container = document.getElementById('agvRequirements');
+function renderDomainRequirements(crit) {
+  const container = document.getElementById('domainRequirements');
   container.innerHTML = '';
   const shownKeys = new Set();
   const allKeys = [];
@@ -1100,7 +1100,7 @@ function openFieldDialog({ title, subtitle, confirmLabel, dismissLabel, fields, 
 function openClarificationDialog(data) {
   _currentAnalysisId = data.analysis_id;
   const currentVt = data.vehicle_type_canonical || '';
-  const fields = buildClarificationFields(data.agv_criteria || {}, currentVt);
+  const fields = buildClarificationFields(data.domain_criteria || {}, currentVt);
   if (fields.length === 0) { showResult(data); return; }
   openFieldDialog({
     title: 'Missing values',
@@ -1108,7 +1108,7 @@ function openClarificationDialog(data) {
     confirmLabel: 'Continue to results',
     dismissLabel: 'Skip',
     fields,
-    crit: data.agv_criteria || {},
+    crit: data.domain_criteria || {},
     analysisId: data.analysis_id,
     showPicker: false,
   });
@@ -1120,14 +1120,14 @@ function openClarificationDialog(data) {
 function openEditDialog() {
   if (!_lastResult) return;
   const currentVt = _lastResult.vehicle_type_canonical || '';
-  const fields = buildEditFields(_lastResult.agv_criteria || {}, currentVt);
+  const fields = buildEditFields(_lastResult.domain_criteria || {}, currentVt);
   openFieldDialog({
     title: 'Anforderungen bearbeiten',
     subtitle: '',
     confirmLabel: 'Neu berechnen',
     dismissLabel: 'Abbrechen',
     fields,
-    crit: _lastResult.agv_criteria || {},
+    crit: _lastResult.domain_criteria || {},
     analysisId: _currentAnalysisId,
     showPicker: true,
   });
@@ -1185,14 +1185,14 @@ function confirmDialog() {
         if (pendingData) {
           pendingData.matches     = result.top  || [];
           pendingData.matches_all = result.all  || [];
-          pendingData.agv_criteria = result.agv_criteria || pendingData.agv_criteria;
+          pendingData.domain_criteria = result.domain_criteria || pendingData.domain_criteria;
           showResult(pendingData);
         } else {
           _lastResult.matches     = result.top  || [];
           _lastResult.matches_all = result.all  || [];
-          _lastResult.agv_criteria = result.agv_criteria || _lastResult.agv_criteria;
+          _lastResult.domain_criteria = result.domain_criteria || _lastResult.domain_criteria;
           show('resultSection');
-          renderAgvRequirements(_lastResult.agv_criteria);
+          renderDomainRequirements(_lastResult.domain_criteria);
           renderSupplierCards(_lastResult.matches_all || _lastResult.matches || []);
         }
       } catch (renderErr) {
@@ -1252,7 +1252,7 @@ function reset() {
   fileInput.value = ''; _lastResult = null; _debugWindow = null;
   _currentAnalysisId = null; _dialogData = null;
   // Reset all ring progress indicators
-  ['upload','extract','llm','parse','agv'].forEach(id => {
+  ['upload','extract','llm','parse','domain'].forEach(id => {
     const ring = document.getElementById('ring-fill-' + id);
     const cnt  = document.getElementById('progress-count-' + id);
     if (ring) { ring.classList.remove('indeterminate'); ring.style.strokeDashoffset = _RING_CIRC; }

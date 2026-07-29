@@ -20,7 +20,7 @@ from src.prompt_markers import strip_null_rule
 from src.data_loader import load_suppliers
 from src.matching import match_suppliers_new, TenderRequirements, Matcher
 from src.context_builder import product_type_keyword_fallback, build_system_context, PRODUCT_TYPE_KEYWORDS
-from src.tender_store import init_db, build_tender_run, persist_tender_run
+from src.tender_store import init_db, build_tender_run, persist_tender_run, read_run_criteria
 _SUPPLIERS = load_suppliers()
 log_setup = logging.getLogger("haystacked")
 log_setup.info("SQLite DB loaded: %d active supplier records", len(_SUPPLIERS))
@@ -630,10 +630,10 @@ async def analyze(file: UploadFile = File(...)):
                 yield sse("error", {"message": f"Invalid JSON: {e}"}); return
 
             replay_vt       = cached.get("vehicle_type") or ""
-            replay_criteria = cached.get("agv_criteria") or {}
+            replay_criteria = read_run_criteria(cached)
 
             if not replay_vt or not replay_criteria:
-                yield sse("error", {"message": "JSON must contain 'vehicle_type' and 'agv_criteria'."}); return
+                yield sse("error", {"message": "JSON must contain 'vehicle_type' and 'domain_criteria'."}); return
 
             yield sse("step", {"id": "extract", "status": "done",
                                "message": "Replay mode — LLM extraction skipped"})
@@ -841,7 +841,7 @@ async def analyze(file: UploadFile = File(...)):
             matches_all = []
 
         if is_extractable and not is_replay:
-            yield sse("step", {"id": "agv", "status": "running",
+            yield sse("step", {"id": "domain", "status": "running",
                                 "message": "Produktkategorie wird klassifiziert…"})
             await asyncio.sleep(0)
 
@@ -945,7 +945,7 @@ async def analyze(file: UploadFile = File(...)):
             }
             _4a_calls = 0 if _is_single_leaf else 1
             _agv_total = 1 + _4a_calls + len(_4c_fields)   # 4a(0 or 1) + 4b(1) + N×4c
-            yield sse("step", {"id": "agv", "status": "running",
+            yield sse("step", {"id": "domain", "status": "running",
                                 "message": f"Kategorie: {canonical_product_type} — Kriterien werden extrahiert…",
                                 "done": _4a_calls, "total": _agv_total})
             await asyncio.sleep(0)
@@ -1041,7 +1041,7 @@ async def analyze(file: UploadFile = File(...)):
                 if _v is not None and not str(_k).endswith("_source") and not str(_k).startswith("_")
             }
 
-            yield sse("step", {"id": "agv", "status": "running",
+            yield sse("step", {"id": "domain", "status": "running",
                                 "message": "Pass 4b: Batch-Extraktion abgeschlossen",
                                 "done": _4a_calls + 1, "total": _agv_total})
             await asyncio.sleep(0)
@@ -1052,7 +1052,7 @@ async def analyze(file: UploadFile = File(...)):
             # Results override 4b values; source-span enforcement (below) still applies.
             # canonical_product_type == AP0 sheet name ("Forklift AGV", "Tugger AGV", "Mobile AMR")
             if _4c_fields:
-                yield sse("step", {"id": "agv", "status": "running",
+                yield sse("step", {"id": "domain", "status": "running",
                                    "message": f"Pass 4c: {len(_4c_fields)} numerische Felder einzeln…",
                                    "done": _4a_calls + 1, "total": _agv_total})
                 await asyncio.sleep(0)
@@ -1107,7 +1107,7 @@ async def analyze(file: UploadFile = File(...)):
                         _4c_abstained.add(_fk)
                         _4c_state[_fk] = "parse_error"
                         log.warning("4c '%s' fehlgeschlagen (→ abstained): %s", _fk, _pe)
-                    yield sse("step", {"id": "agv", "status": "running",
+                    yield sse("step", {"id": "domain", "status": "running",
                                        "message": f"Pass 4c ({_4c_i}/{len(_4c_fields)})",
                                        "done": _4a_calls + 1 + _4c_i, "total": _agv_total})
                     await asyncio.sleep(0)
@@ -1223,7 +1223,7 @@ async def analyze(file: UploadFile = File(...)):
 
             new_req = dict(domain_criteria)
             new_req["required_product_type"] = canonical_product_type
-            # write canonical value back so result["agv_criteria"] JSON is consistent
+            # write canonical value back so result["domain_criteria"] JSON is consistent
             domain_criteria["required_product_type"] = canonical_product_type
             new_req["required_navigation_type"] = nav_list
 
@@ -1254,7 +1254,7 @@ async def analyze(file: UploadFile = File(...)):
                      matches[0]["score"] if matches else 0)
             persist_tender_run(_tender_run, match_results=matches_all_raw)
 
-            yield sse("step", {"id": "agv", "status": "done",
+            yield sse("step", {"id": "domain", "status": "done",
                                 "message": f"AGV-Analyse fertig · Top-Match: {matches[0]['product'] if matches else '–'}"})
             yield sse("log", {"message": f"AGV-Kriterien extrahiert | Top-Score: {matches[0]['score'] if matches else 0} | {len(matches_all)} Supplier bewertet"})
 
@@ -1264,7 +1264,7 @@ async def analyze(file: UploadFile = File(...)):
         result["text_length"]            = len(text)
         result["duration_s"]             = round(total, 1)
         result["parse_method"]           = parse_method
-        result["agv_criteria"]           = domain_criteria
+        result["domain_criteria"]        = domain_criteria
         result["matches"]                = matches
         result["matches_all"]            = matches_all if matches_all else []
         result["vehicle_type_canonical"] = canonical_product_type
@@ -1307,7 +1307,7 @@ async def rematch_endpoint(request: Request):
     """Re-run matching after user clarification or edit-panel override.
 
     Accepts {"analysis_id": "<uuid>", "overrides": {"lifting_height_mm": 12000, ...}} —
-    db_keys with values in storage units. Uses the server-side cached agv_criteria as
+    db_keys with values in storage units. Uses the server-side cached domain_criteria as
     base so all previously extracted KO fields are preserved.
     Updates _analyses[analysis_id] so /api/last-result stays in sync.
     Returns 400 if analysis_id is not found in _analyses.
@@ -1325,7 +1325,7 @@ async def rematch_endpoint(request: Request):
     else:
         return JSONResponse({"error": "No analysis to rematch."}, status_code=400)
 
-    criteria = dict(cached.get("agv_criteria", {}))
+    criteria = dict(cached.get("domain_criteria", {}))
     for field_name, value in overrides.items():
         _fn_specs = _FIELDS_BY_FIELD_NAME.get(field_name, [])
         tender_key = _fn_specs[0].tender_key if _fn_specs and _fn_specs[0].tender_key else field_name
@@ -1357,13 +1357,13 @@ async def rematch_endpoint(request: Request):
     top = [r.to_dict() for r in top_raw]
     all_results = [r.to_dict() for r in all_raw]
 
-    cached["matches"]      = top
-    cached["matches_all"]  = all_results
-    cached["agv_criteria"] = criteria
+    cached["matches"]         = top
+    cached["matches_all"]     = all_results
+    cached["domain_criteria"] = criteria
 
     return {"top": top, "all": all_results, "total": len(all_results),
             "analysis_id": cached.get("analysis_id"),
-            "agv_criteria": criteria}
+            "domain_criteria": criteria}
 
 
 @app.get("/api/field-meta")

@@ -75,12 +75,12 @@ def test_rematch_happy_path_override_changes_match_count():
     max_payload_kg maps to tender_key required_max_payload_kg (KO_IF_LT).
     Setting it to 45000 kg KOs every supplier with a real payload (all <= 5000 kg).
     Value must stay within plausibility range [100–50000 kg] — values above that
-    are silently dropped by validate_agv_criteria and no KOs fire.
+    are silently dropped by validate_domain_criteria and no KOs fire.
     Suppliers with max_payload_kg = NULL survive (null-rule LL-06) but get -15 pt penalty.
     DB-agnostic: asserts structural behavior (majority KO'd) rather than exact counts.
     """
     test_id = str(uuid.uuid4())
-    _app_module._analyses[test_id] = {"analysis_id": test_id, "agv_criteria": {}}
+    _app_module._analyses[test_id] = {"analysis_id": test_id, "domain_criteria": {}}
     try:
         response = client.post(
             "/rematch",
@@ -111,7 +111,7 @@ def test_rematch_unknown_override_key_does_not_crash():
     ignores it; all suppliers remain qualified regardless of DB count.
     """
     test_id = str(uuid.uuid4())
-    _app_module._analyses[test_id] = {"analysis_id": test_id, "agv_criteria": {}}
+    _app_module._analyses[test_id] = {"analysis_id": test_id, "domain_criteria": {}}
     try:
         response = client.post(
             "/rematch",
@@ -125,7 +125,7 @@ def test_rematch_unknown_override_key_does_not_crash():
         assert qualified == data["total"]   # bogus key has zero effect — all suppliers qualify
 
         # bogus key lands in criteria under its own name — doesn't pollute real AP0 keys
-        updated = _app_module._analyses[test_id].get("agv_criteria", {})
+        updated = _app_module._analyses[test_id].get("domain_criteria", {})
         assert "bogus_field_xyz" in updated
         assert "required_max_payload_kg" not in updated
     finally:
@@ -141,7 +141,7 @@ def test_rematch_lift_height_override_applies_mm_conversion():
     If conversion is correct: 8000 compared → suppliers below threshold correctly KO'd.
     """
     test_id = str(uuid.uuid4())
-    _app_module._analyses[test_id] = {"analysis_id": test_id, "agv_criteria": {}}
+    _app_module._analyses[test_id] = {"analysis_id": test_id, "domain_criteria": {}}
     try:
         response = client.post(
             "/rematch",
@@ -172,7 +172,7 @@ def test_rematch_aisle_width_override_applies_mm_conversion():
     If conversion is correct: 1800 compared → appropriate mix of qualified/disqualified.
     """
     test_id = str(uuid.uuid4())
-    _app_module._analyses[test_id] = {"analysis_id": test_id, "agv_criteria": {}}
+    _app_module._analyses[test_id] = {"analysis_id": test_id, "domain_criteria": {}}
     try:
         response = client.post(
             "/rematch",
@@ -206,7 +206,7 @@ def test_rematch_vt_change_clears_old_vt_fields():
     _app_module._analyses[test_id] = {
         "analysis_id": test_id,
         "vehicle_type_canonical": "Tugger AGV",
-        "agv_criteria": {
+        "domain_criteria": {
             "required_towing_capacity_kg": 1000,
             "required_max_payload_kg": 500,
         },
@@ -221,7 +221,7 @@ def test_rematch_vt_change_clears_old_vt_fields():
             },
         )
         assert response.status_code == 200
-        updated = _app_module._analyses[test_id]["agv_criteria"]
+        updated = _app_module._analyses[test_id]["domain_criteria"]
         assert "required_towing_capacity_kg" not in updated, (
             "Tugger-specific field must be cleared on VT change to Forklift AGV"
         )
@@ -248,7 +248,7 @@ def test_rematch_vt_change_forklift_to_tugger_clears_forklift_fields():
     _app_module._analyses[test_id] = {
         "analysis_id": test_id,
         "vehicle_type_canonical": "Forklift AGV",
-        "agv_criteria": {
+        "domain_criteria": {
             "required_lifting_height_mm": 8.0,
             "required_max_payload_kg": 1000,
         },
@@ -263,7 +263,7 @@ def test_rematch_vt_change_forklift_to_tugger_clears_forklift_fields():
             },
         )
         assert response.status_code == 200
-        updated = _app_module._analyses[test_id]["agv_criteria"]
+        updated = _app_module._analyses[test_id]["domain_criteria"]
         assert "required_lifting_height_mm" not in updated, (
             "Forklift-specific field must be cleared on VT change to Tugger AGV"
         )
@@ -287,7 +287,7 @@ def test_rematch_same_vt_does_not_clear_criteria():
     _app_module._analyses[test_id] = {
         "analysis_id": test_id,
         "vehicle_type_canonical": "Forklift AGV",
-        "agv_criteria": {
+        "domain_criteria": {
             "required_lifting_height_mm": 8.0,
             "required_max_payload_kg": 1000,
         },
@@ -301,7 +301,7 @@ def test_rematch_same_vt_does_not_clear_criteria():
             },
         )
         assert response.status_code == 200
-        updated = _app_module._analyses[test_id]["agv_criteria"]
+        updated = _app_module._analyses[test_id]["domain_criteria"]
         assert "required_lifting_height_mm" in updated, (
             "Forklift-specific field must NOT be cleared when VT is unchanged"
         )

@@ -127,11 +127,11 @@ function renderDebugPage(d) {
      d.parse_method ? 'Parse: ' + d.parse_method : null]
     .filter(Boolean).join(' · ');
 
-  renderExtDetails(d.agv_criteria || {});
+  renderExtDetails(d.domain_criteria || {});
   renderRankTable(d.matches_all || d.matches || []);
   renderKoList(d.matches_all || d.matches || []);
   document.getElementById('dbg-raw-req').textContent =
-    JSON.stringify(d.agv_criteria, null, 2);
+    JSON.stringify(d.domain_criteria, null, 2);
 }
 
 function renderExtDetails(crit) {

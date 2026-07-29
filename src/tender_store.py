@@ -16,7 +16,7 @@ from src.matching import MatchResult
 DB_PATH = Path(__file__).parent.parent / "data" / "haystacked.db"
 
 # Allowlist of keys copied from the pipeline `result` dict into basic_info.
-# Never use dict(result) — internal keys (_parse_method, agv_criteria, etc.) must not leak.
+# Never use dict(result) — internal keys (_parse_method, domain_criteria, etc.) must not leak.
 _nace_cfg = json.loads((Path(__file__).parent.parent / "config" / "nace_codes.json").read_text())
 _SCHEMA_KEYS: frozenset = frozenset(e["key"] for e in _nace_cfg["basic_schema"])
 
@@ -292,3 +292,15 @@ def load_tender_run(run_id: str, db_path: Path = DB_PATH) -> Optional[TenderRun]
         )
     finally:
         con.close()
+
+
+def read_run_criteria(doc: dict) -> dict:
+    """Read extraction criteria from a run/golden JSON doc, old or new key name.
+
+    OI-102 renamed the wire key agv_criteria -> domain_criteria. The 8 committed
+    golden fixtures (tests/tenders/golden_run_tender_*.json) deliberately stay on
+    the old key forever — this keeps the alias path exercised by every test run,
+    rather than becoming untested dead code once "everything" is migrated. Any
+    newly captured run uses the new key.
+    """
+    return doc.get("domain_criteria") or doc.get("agv_criteria") or {}
