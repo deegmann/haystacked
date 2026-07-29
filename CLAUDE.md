@@ -117,7 +117,7 @@ PDF upload
       Layer 2: null value if 4c abstained AND source_confirms_value() fails,
         UNLESS rescued (D0): value+unit found adjacent in the real document
   → validate_tender_values(): AP0 allowed_values filter (rejects LLM hallucinations)
-  → validate_agv_criteria(): plausibility ranges + mm→m auto-conversion
+  → validate_domain_criteria(): plausibility ranges + mm→m auto-conversion
   → field_text_fallbacks: regex-driven overrides (from vehicle_types.json)
   → match_suppliers_new(): rule engine against SQLite supplier records
   → SSE streaming result to frontend

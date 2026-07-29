@@ -19,7 +19,7 @@ from src.prompt_markers import strip_null_rule
 # ── New structured matching engine (AP-I1) ────────────────────────────────────
 from src.data_loader import load_suppliers
 from src.matching import match_suppliers_new, TenderRequirements, Matcher
-from src.context_builder import product_type_keyword_fallback, build_system_context, AGV_KEYWORDS
+from src.context_builder import product_type_keyword_fallback, build_system_context, PRODUCT_TYPE_KEYWORDS
 from src.tender_store import init_db, build_tender_run, persist_tender_run
 _SUPPLIERS = load_suppliers()
 log_setup = logging.getLogger("haystacked")
@@ -371,7 +371,7 @@ _DOMAIN_SYSTEM: dict[str, str] = {
     sid: build_system_context(domain_prefix=sid)
     for sid in _EXTRACTABLE_DOMAINS
 }
-AGV_USER_TEMPLATE       = _load_prompt("extraction_template.txt")          # full fallback template
+EXTRACTION_USER_TEMPLATE = _load_prompt("extraction_template.txt")          # full fallback template
 # Pass 4a: scope_classification_template.txt (Step 7); fall back to vehicle_type_template.txt
 _scope_cls_path = _CONFIG_DIR / "prompts" / "scope_classification_template.txt"
 SCOPE_CLASSIFICATION_TEMPLATE = (
@@ -392,7 +392,7 @@ assert _DOMAIN_CLASSIF_TEMPLATES, (
     "run generate_all.py and check config/prompts/classification_template_*.txt"
 )
 # Pass 4b templates — derived from scope_registry.json scope nodes (Step 7)
-_AGV_TYPE_TEMPLATES = {
+_PRODUCT_TYPE_TEMPLATES = {
     node["canonical_name"]: _load_prompt(f"extraction_template_{node['tab_name'].lower().replace(' ', '_')}.txt")
     for node in _scope_reg["scopes"].values()
     if node.get("canonical_name") and node.get("tab_name")
@@ -400,8 +400,8 @@ _AGV_TYPE_TEMPLATES = {
 }
 # Fields determined in Pass 4a — excluded from 4b AP0 validation (loaded from vehicle_types.json)
 _4A_SKIP = frozenset(_vehicle_cfg.get("4a_fields", []))
-AGV_RETRY_SYSTEM     = _load_prompt("extraction_retry_system.txt")
-AGV_RETRY_TEMPLATE   = _load_prompt("extraction_retry_template.txt")
+EXTRACTION_RETRY_SYSTEM   = _load_prompt("extraction_retry_system.txt")
+EXTRACTION_RETRY_TEMPLATE = _load_prompt("extraction_retry_template.txt")
 
 
 # ── AGV value validation ──────────────────────────────────────────────────────
@@ -418,11 +418,11 @@ for _conv_key in ("required_lifting_height_mm", "required_min_aisle_width_mm"):
 
 
 def _to_match_units(criteria: dict) -> dict:
-    """Convert agv_criteria values from stored units to matching-engine units.
+    """Convert domain_criteria values from stored units to matching-engine units.
 
     Reads conversion factors from _plausibility_cfg (AP0-generated).
     Only fields with a 'conversion' block are affected — all others pass through unchanged.
-    Input values are assumed to be already normalized (post-validate_agv_criteria).
+    Input values are assumed to be already normalized (post-validate_domain_criteria).
     """
     result = dict(criteria)
     for field, cfg in _plausibility_cfg.items():
@@ -438,7 +438,7 @@ def _to_match_units(criteria: dict) -> dict:
     return result
 
 
-def validate_agv_criteria(crit: dict) -> tuple:
+def validate_domain_criteria(crit: dict) -> tuple:
     """Returns (cleaned_dict, warnings_list).
 
     Auto-converts LLM unit errors (e.g. mm→m) using conversion rules from plausibility.json.
@@ -522,7 +522,7 @@ def sse(event: str, data: dict) -> str:
 def _attribute_nulls(before: dict, after: dict, cause: str, sink: dict, rejected: dict = None) -> None:
     """Record `cause` in `sink` for any key that had a non-null value in `before`
     and became None in `after` (dict-diff attribution for validate_tender_values()/
-    validate_agv_criteria(), neither of which is modified by this — see D1 plan).
+    validate_domain_criteria(), neither of which is modified by this — see D1 plan).
     `sink.setdefault` so an earlier attribution for the same key is never overwritten.
     If `rejected` is given, also captures the rejected (value, None) pair — these two
     validators have no source concept, so the source half is always None (F3).
@@ -541,7 +541,7 @@ def _assemble_field_provenance(
 ) -> dict:
     """D1a (F3, test-coverage fix): assemble per-field provenance, keyed by tender_key,
     for build_tender_run(). Pure function of its arguments — does not touch
-    agv_criteria/new_req or any other analyze() scope.
+    domain_criteria/new_req or any other analyze() scope.
 
     `raw_value`/`raw_source` reflect the actually-rejected (value, source) pair
     (from `rejected`) when present — the true point-of-rejection data, which is
@@ -641,12 +641,12 @@ async def analyze(file: UploadFile = File(...)):
                                           f"{len(replay_criteria)} criteria fields"})
 
             canonical_product_type = _VT_MAP_CFG.get(replay_vt.lower().strip()) or replay_vt
-            agv_criteria       = dict(replay_criteria)
+            domain_criteria       = dict(replay_criteria)
             # D1a: every non-null field taken from the replayed source is attributed
             # to "replay" — mutually exclusive with the "4a"/4b/4c branches below
             # (this is the `if is_replay:` branch; those live in the `else:` path).
             _produced_by = {
-                _k: "replay" for _k, _v in agv_criteria.items()
+                _k: "replay" for _k, _v in domain_criteria.items()
                 if _v is not None and not str(_k).endswith("_source") and not str(_k).startswith("_")
             }
             text               = ""
@@ -827,7 +827,7 @@ async def analyze(file: UploadFile = File(...)):
             log.info("Domain erkannt: %s (is_extractable=%s)", result.get("detected_domain"), is_extractable)
 
             # ── LLM: AGV criteria extraction (if applicable) ──────────────────────
-            agv_criteria = None
+            domain_criteria = None
             matches = []
             matches_all = []
             canonical_product_type = None
@@ -873,12 +873,12 @@ async def analyze(file: UploadFile = File(...)):
                             except ValueError:
                                 log.warning("4a-Antwort kein JSON — Retry")
                                 yield sse("log", {"message": "4a: Kein JSON → Retry…"})
-                                raw_vt2 = await call_ollama(AGV_RETRY_SYSTEM,
-                                                            _fill(AGV_RETRY_TEMPLATE, text=text), "agv_4a_retry")
+                                raw_vt2 = await call_ollama(EXTRACTION_RETRY_SYSTEM,
+                                                            _fill(EXTRACTION_RETRY_TEMPLATE, text=text), "agv_4a_retry")
                                 vt_criteria = repair_and_parse(raw_vt2)
                         else:
                             correction_user = _build_correction_prompt(_ap0_violations_4a, text)
-                            raw_vt = await call_ollama(AGV_RETRY_SYSTEM, correction_user,
+                            raw_vt = await call_ollama(EXTRACTION_RETRY_SYSTEM, correction_user,
                                                        f"agv_4a_correction{_attempt}")
                             try:
                                 correction = repair_and_parse(raw_vt)
@@ -965,11 +965,11 @@ async def analyze(file: UploadFile = File(...)):
                     )
                 })
 
-            template_4b = _AGV_TYPE_TEMPLATES.get(canonical_product_type, AGV_USER_TEMPLATE)
+            template_4b = _PRODUCT_TYPE_TEMPLATES.get(canonical_product_type, EXTRACTION_USER_TEMPLATE)
             agv_user_4b = _fill(template_4b, text=text,
                                 vehicle_type=canonical_product_type)
 
-            agv_criteria: dict = {}
+            domain_criteria: dict = {}
             _ap0_warnings: list = []
             _ap0_violations: dict = {}
             try:
@@ -977,15 +977,15 @@ async def analyze(file: UploadFile = File(...)):
                     if _attempt == 0:
                         raw_agv = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], agv_user_4b, "agv_4b")
                         try:
-                            agv_criteria = repair_and_parse(raw_agv)
+                            domain_criteria = repair_and_parse(raw_agv)
                         except ValueError:
                             log.warning("4b-Antwort kein JSON — Retry mit typ-spezifischem Template")
                             yield sse("log", {"message": "4b: Kein JSON → Retry mit typ-spezifischem Template…"})
-                            raw_agv2 = await call_ollama(AGV_RETRY_SYSTEM, agv_user_4b, "agv_4b_retry")
-                            agv_criteria = repair_and_parse(raw_agv2)
+                            raw_agv2 = await call_ollama(EXTRACTION_RETRY_SYSTEM, agv_user_4b, "agv_4b_retry")
+                            domain_criteria = repair_and_parse(raw_agv2)
                     else:
                         correction_user = _build_correction_prompt(_ap0_violations, text)
-                        raw_agv = await call_ollama(AGV_RETRY_SYSTEM, correction_user,
+                        raw_agv = await call_ollama(EXTRACTION_RETRY_SYSTEM, correction_user,
                                                     f"agv_4b_correction{_attempt}")
                         try:
                             correction = repair_and_parse(raw_agv)
@@ -994,15 +994,15 @@ async def analyze(file: UploadFile = File(...)):
                             correction = {}
                         for _tk in _ap0_violations:
                             if _tk in correction:
-                                agv_criteria[_tk] = correction[_tk]
+                                domain_criteria[_tk] = correction[_tk]
 
-                    agv_criteria.pop("_parse_method", None)
-                    for k, v in list(agv_criteria.items()):
+                    domain_criteria.pop("_parse_method", None)
+                    for k, v in list(domain_criteria.items()):
                         if v in ("null", "NULL", "None", "none", "N/A", "n/a", ""):
-                            agv_criteria[k] = None
+                            domain_criteria[k] = None
 
                     # AP0 validation for 4b fields — skip fields already validated in 4a
-                    _ap0_violations = _find_invalid_ap0_fields(agv_criteria, skip=_4A_SKIP)
+                    _ap0_violations = _find_invalid_ap0_fields(domain_criteria, skip=_4A_SKIP)
                     if not _ap0_violations:
                         break
 
@@ -1031,13 +1031,13 @@ async def analyze(file: UploadFile = File(...)):
             # D1: snapshot numeric-KO fields as 4b left them, before Pass 4c / the
             # source-span guard can overwrite or null them — recoverable for forensics.
             _pre_4c_snapshot = {
-                _k: (agv_criteria.get(_k), agv_criteria.get(f"{_k}_source"))
+                _k: (domain_criteria.get(_k), domain_criteria.get(f"{_k}_source"))
                 for _k in _NUMERIC_KO_TENDER_KEYS
             }
             # D1: every non-null field present after 4b is (so far) attributed to 4b;
             # Pass 4c below overrides individual entries when it returns a value.
             _produced_by = {
-                _k: "4b" for _k, _v in agv_criteria.items()
+                _k: "4b" for _k, _v in domain_criteria.items()
                 if _v is not None and not str(_k).endswith("_source") and not str(_k).startswith("_")
             }
 
@@ -1086,8 +1086,8 @@ async def analyze(file: UploadFile = File(...)):
                             _4c_src = _per_parsed.get(f"{_fk}_source")
                             if _4c_val is not None:
                                 # 4c found a value → use it (focused extraction wins)
-                                agv_criteria[_fk]              = _4c_val
-                                agv_criteria[f"{_fk}_source"]  = _4c_src
+                                domain_criteria[_fk]              = _4c_val
+                                domain_criteria[f"{_fk}_source"]  = _4c_src
                                 _4c_count += 1
                                 _4c_state[_fk] = "returned_value"
                                 _produced_by[_fk] = "4c"
@@ -1127,8 +1127,8 @@ async def analyze(file: UploadFile = File(...)):
             #   otherwise genuinely present in the document.
             # See src/json_repair.py::enforce_source_spans for the full logic.
             _4c_abstained_ref = _4c_abstained if _4c_fields else set()
-            agv_criteria, _span_messages, _span_events = enforce_source_spans(
-                agv_criteria, text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained_ref, units=_NUMERIC_KO_FIELD_UNITS
+            domain_criteria, _span_messages, _span_events = enforce_source_spans(
+                domain_criteria, text, _NUMERIC_KO_TENDER_KEYS, _4c_abstained_ref, units=_NUMERIC_KO_FIELD_UNITS
             )
             for _msg in _span_messages:
                 yield sse("log", {"message": _msg})
@@ -1147,37 +1147,37 @@ async def analyze(file: UploadFile = File(...)):
                 _nulled_by[_ev.field] = _ev.layer
                 _rejected[_ev.field] = (_ev.value, _ev.source)
 
-            # Merge 4a results into agv_criteria
+            # Merge 4a results into domain_criteria
             # D1a (F2): "4a" is a pipeline-STAGE tag, not "LLM was called" — it
             # covers both the Pass-4a LLM-classification sub-path and the OI-107
             # single-leaf-domain shortcut sub-path (_is_single_leaf, no LLM call).
             # The finer LLM-vs-shortcut distinction is preserved separately in the
             # debug log ("Pass 4a skipped (single-leaf domain %s)...").
             _merged_product_type = vt_criteria.get("required_product_type")
-            agv_criteria["required_product_type"] = _merged_product_type
+            domain_criteria["required_product_type"] = _merged_product_type
             if _merged_product_type is not None:
                 _produced_by["required_product_type"] = "4a"
 
         if is_extractable:
             # Validate against AP0 allowed_values — reject values not in the allowed list
             from src.matching import validate_tender_values
-            _before_av = dict(agv_criteria)
-            agv_criteria, av_warnings = validate_tender_values(agv_criteria)
-            _attribute_nulls(_before_av, agv_criteria, "allowed_values", _nulled_by, _rejected)
+            _before_av = dict(domain_criteria)
+            domain_criteria, av_warnings = validate_tender_values(domain_criteria)
+            _attribute_nulls(_before_av, domain_criteria, "allowed_values", _nulled_by, _rejected)
             for w in av_warnings:
                 log.info("AP0 allowed_values filter: %s", w)
                 yield sse("log", {"message": f"⚠ AP0-Filter: {w}"})
 
             # Validate plausibility — set implausible values to null
-            _before_pl = dict(agv_criteria)
-            agv_criteria, val_warnings = validate_agv_criteria(agv_criteria)
-            _attribute_nulls(_before_pl, agv_criteria, "plausibility", _nulled_by, _rejected)
+            _before_pl = dict(domain_criteria)
+            domain_criteria, val_warnings = validate_domain_criteria(domain_criteria)
+            _attribute_nulls(_before_pl, domain_criteria, "plausibility", _nulled_by, _rejected)
             if val_warnings:
                 for w in val_warnings:
                     yield sse("log", {"message": f"⚠ Plausibility: {w}"})
-            agv_criteria["_validation_warnings"] = val_warnings
+            domain_criteria["_validation_warnings"] = val_warnings
 
-            log.info("AGV-Kriterien (validiert): %s", json.dumps(agv_criteria, ensure_ascii=False)[:300])
+            log.info("AGV-Kriterien (validiert): %s", json.dumps(domain_criteria, ensure_ascii=False)[:300])
 
             # Field text fallbacks: apply regex-based overrides for fields the LLM missed.
             # Rules loaded from config/vehicle_types.json → field_text_fallbacks (AP0-driven).
@@ -1187,10 +1187,10 @@ async def analyze(file: UploadFile = File(...)):
                 _val  = _fb.get("value")
                 if not _key or not _rgx or not _val:
                     continue
-                if _fb.get("only_if_null") and agv_criteria.get(_key) is not None:
+                if _fb.get("only_if_null") and domain_criteria.get(_key) is not None:
                     continue
                 if re.search(_rgx, text or ""):
-                    agv_criteria[_key] = _val
+                    domain_criteria[_key] = _val
                     # D1: fallback re-produced this field — it's no longer "nulled" by
                     # whatever guard/validation nulled it earlier.
                     _produced_by[_key] = "fallback"
@@ -1200,7 +1200,7 @@ async def analyze(file: UploadFile = File(...)):
             # Run matching against SQLite supplier records
             # canonical_product_type already set in Pass 4a;
             # re-derive here as safety net (idempotent for valid values).
-            raw_vt = agv_criteria.get("required_product_type") or ""
+            raw_vt = domain_criteria.get("required_product_type") or ""
             if isinstance(raw_vt, list):
                 raw_vt = next(
                     (item for item in raw_vt if _VT_MAP_CFG.get(str(item).lower().strip())),
@@ -1218,13 +1218,13 @@ async def analyze(file: UploadFile = File(...)):
                         break
 
             # Split navigation string into list (e.g. "SLAM, QR Code" → ["SLAM", "QR Code"])
-            raw_nav = agv_criteria.get("required_navigation_type") or ""
+            raw_nav = domain_criteria.get("required_navigation_type") or ""
             nav_list = [n.strip() for n in raw_nav.replace(";", ",").split(",") if n.strip()] if raw_nav else []
 
-            new_req = dict(agv_criteria)
+            new_req = dict(domain_criteria)
             new_req["required_product_type"] = canonical_product_type
             # write canonical value back so result["agv_criteria"] JSON is consistent
-            agv_criteria["required_product_type"] = canonical_product_type
+            domain_criteria["required_product_type"] = canonical_product_type
             new_req["required_navigation_type"] = nav_list
 
             new_req = _to_match_units(new_req)
@@ -1239,7 +1239,7 @@ async def analyze(file: UploadFile = File(...)):
                 run_id       = analysis_id,
                 source_file  = filename,
                 new_req      = new_req,
-                agv_criteria = agv_criteria,
+                domain_criteria = domain_criteria,
                 result       = result,
                 vehicle_type = canonical_product_type,
                 in_scope     = bool(result.get("in_scope", False)),
@@ -1264,7 +1264,7 @@ async def analyze(file: UploadFile = File(...)):
         result["text_length"]            = len(text)
         result["duration_s"]             = round(total, 1)
         result["parse_method"]           = parse_method
-        result["agv_criteria"]           = agv_criteria
+        result["agv_criteria"]           = domain_criteria
         result["matches"]                = matches
         result["matches_all"]            = matches_all if matches_all else []
         result["vehicle_type_canonical"] = canonical_product_type
@@ -1348,7 +1348,7 @@ async def rematch_endpoint(request: Request):
                 del criteria[tender_key]
 
     # Apply same unit-conversion + plausibility logic as main flow — handles mm→m input from dialog
-    criteria, _ = validate_agv_criteria(criteria)
+    criteria, _ = validate_domain_criteria(criteria)
 
     top_raw, all_raw = match_suppliers_new(
         TenderRequirements.from_dict(_criteria_to_uuid_keyed(_to_match_units(criteria))),

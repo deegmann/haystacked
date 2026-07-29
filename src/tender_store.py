@@ -109,7 +109,7 @@ def build_tender_run(
     run_id: str,
     source_file: str,
     new_req: dict,         # post-conversion tender criteria (tender_key-keyed + _source keys)
-    agv_criteria: dict,    # pre-conversion dict — used ONLY to extract _source citations
+    domain_criteria: dict,    # pre-conversion dict — used ONLY to extract _source citations
     result: dict,          # full pipeline result dict — allowlisted keys go into basic_info
     vehicle_type: Optional[str],
     in_scope: bool,
@@ -122,7 +122,7 @@ def build_tender_run(
 
     for tender_key, specs in tk_to_specs.items():
         raw_val = new_req.get(tender_key)
-        source  = agv_criteria.get(f"{tender_key}_source")
+        source  = domain_criteria.get(f"{tender_key}_source")
         _prov   = field_provenance.get(tender_key) or {}
         _produced_by_val = _prov.get("produced_by")
         _nulled_by_val   = _prov.get("nulled_by")

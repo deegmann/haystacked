@@ -71,7 +71,7 @@ def build_system_context(domain_prefix: str) -> str:
     return context
 
 
-def _load_agv_keywords() -> dict:
+def _load_product_type_keywords() -> dict:
     """Load keyword map from scope_registry.json (generated from AP0 ③ Scope Registry)."""
     if _SCOPE_REGISTRY.exists():
         reg = json.loads(_SCOPE_REGISTRY.read_text())
@@ -82,7 +82,7 @@ def _load_agv_keywords() -> dict:
         }
     return {}
 
-AGV_KEYWORDS = _load_agv_keywords()
+PRODUCT_TYPE_KEYWORDS = _load_product_type_keywords()
 
 
 def product_type_keyword_fallback(text: str) -> "str | None":
@@ -90,7 +90,7 @@ def product_type_keyword_fallback(text: str) -> "str | None":
     excerpt = text[:5000].lower()
     scores  = {
         t: sum(1 for kw in kws if kw in excerpt)
-        for t, kws in AGV_KEYWORDS.items()
+        for t, kws in PRODUCT_TYPE_KEYWORDS.items()
     }
     best = max(scores, key=scores.get)
     return best if scores[best] > 0 else None

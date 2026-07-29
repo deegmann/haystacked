@@ -3,7 +3,7 @@ U-E-xx — Post-LLM validation unit tests.
 
 No live Ollama required. These tests cover the deterministic code that runs
 AFTER the LLM returns but BEFORE matching:
-  - validate_agv_criteria(): plausibility filter that must not coerce nulls
+  - validate_domain_criteria(): plausibility filter that must not coerce nulls
   - source_confirms_value(): Layer 2 digit-in-source numeric guard
   - _NUMERIC_KO_TENDER_KEYS: module-level constant populated from config
 
@@ -16,17 +16,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
 # ---------------------------------------------------------------------------
-# U-E-05: null values survive validate_agv_criteria unchanged
+# U-E-05: null values survive validate_domain_criteria unchanged
 # ---------------------------------------------------------------------------
 
 def test_U_E_05_null_lift_height_survives_plausibility_filter():
     """
-    A null required_lifting_height_mm must pass through validate_agv_criteria
+    A null required_lifting_height_mm must pass through validate_domain_criteria
     unchanged — the plausibility filter must not coerce null to a default value.
 
     This verifies LL-06 (Blank ≠ Zero) is upheld in the post-LLM validation step.
     """
-    from app import validate_agv_criteria
+    from app import validate_domain_criteria
 
     criteria = {
         "required_product_type": "Forklift AGV",
@@ -34,9 +34,9 @@ def test_U_E_05_null_lift_height_survives_plausibility_filter():
         "required_min_aisle_width_mm": 1.9,
         "required_max_payload_kg": 1000,
     }
-    validated, warnings = validate_agv_criteria(criteria)
+    validated, warnings = validate_domain_criteria(criteria)
     assert validated.get("required_lifting_height_mm") is None, (
-        "validate_agv_criteria must not fill a null required_lifting_height_mm "
+        "validate_domain_criteria must not fill a null required_lifting_height_mm "
         "with a default value (LL-06: Blank ≠ Zero)."
     )
 

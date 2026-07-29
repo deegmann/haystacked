@@ -37,7 +37,7 @@ PDF (or JSON replay)
   validate_tender_values() — AP0 allowed_values filter (src/matching.py)
         |
         v
-  validate_agv_criteria() — plausibility + unit conversion (app.py)
+  validate_domain_criteria() — plausibility + unit conversion (app.py)
         |
         v
   field_text_fallbacks — regex overrides (from vehicle_types.json)
@@ -99,7 +99,7 @@ python3 scripts/generate_all.py
 | `config/scope_registry.json` | `app.py`, `src/matching.py` |
 | `config/nace_codes.json` | `app.py` (NACE prompt) |
 | `config/sqlite_schema.json` | `sync_airtable.py`, `src/data_loader.py` |
-| `config/plausibility.json` | `app.py` (validate_agv_criteria) |
+| `config/plausibility.json` | `app.py` (validate_domain_criteria) |
 | `config/prompts/*.txt` | `app.py` (all LLM calls) |
 | `config/ap0_checksum.txt` | `app.py` (startup auto-regen trigger) |
 
@@ -343,7 +343,7 @@ Implemented in `src/json_repair.py::enforce_source_spans()`. Runs after Pass 4c 
 
 ### 8.2 Plausibility Filter
 
-`validate_agv_criteria()` in `app.py`. Reads ranges from `config/plausibility.json`. For each numeric field:
+`validate_domain_criteria()` in `app.py`. Reads ranges from `config/plausibility.json`. For each numeric field:
 - If value exceeds the unit-conversion threshold, auto-convert (e.g. 12000 mm -> 12 m for lifting_height_mm)
 - If value is outside [min, max] after conversion, set to None
 
@@ -536,5 +536,5 @@ Key open items tracked in project memory:
 - **OI-55**: Unit-suffix drift warning (e.g. lifting_height_mm with AP0 unit=m). Warning only, not a runtime error.
 - **OI-56**: Column-name collision guard in data_loader — startup assertion prevents Base Model fields from shadowing Product/Company columns.
 - **OI-66–73**: UFR Sprint follow-ups including sub-spec OI-73 (multi-domain scoping future work).
-- **M1**: m->mm conversion factor hardcoded inline in validate_agv_criteria — should come from plausibility.json.
+- **M1**: m->mm conversion factor hardcoded inline in validate_domain_criteria — should come from plausibility.json.
 - **H2**: Positional INSERTs in sync_airtable.py — schema-driven column ordering not yet fully complete.

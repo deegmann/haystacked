@@ -255,7 +255,7 @@ def test_U_SS_11_documented_residual_gradient_collision_case():
 # ---------------------------------------------------------------------------
 
 def test_D1_returns_events_alongside_messages():
-    """enforce_source_spans() returns (agv_criteria, messages, events). One
+    """enforce_source_spans() returns (domain_criteria, messages, events). One
     SpanEvent per field actually nulled, carrying field/layer/value/source —
     this is what D1 provenance attribution in app.py consumes.
     """

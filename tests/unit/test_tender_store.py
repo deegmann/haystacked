@@ -170,14 +170,14 @@ def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
         "kilograms, describing the heaviest load the AGV can carry during operation."
     )
 
-    agv_criteria = {
+    domain_criteria = {
         tender_key: fabricated_value,
         f"{tender_key}_source": hint_echo_source,
     }
 
     # D1 step (a): pre-4c snapshot (what 4b produced, before 4c/guard can touch it).
     pre_4c_snapshot = {
-        tender_key: (agv_criteria[tender_key], agv_criteria[f"{tender_key}_source"]),
+        tender_key: (domain_criteria[tender_key], domain_criteria[f"{tender_key}_source"]),
     }
     produced_by = {tender_key: "4b"}
 
@@ -188,10 +188,10 @@ def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
     # Source-span guard: L1 (source present) and L0 (grounded — "payload"/"operation"/
     # "maximum" co-locate with the anchored "4800" in the document) both pass; L2 fires
     # because the fabricated source has no digit confirming 4.8/4800/0.0048.
-    agv_criteria, messages, events = enforce_source_spans(
-        dict(agv_criteria), document_text, {tender_key}, four_c_abstained
+    domain_criteria, messages, events = enforce_source_spans(
+        dict(domain_criteria), document_text, {tender_key}, four_c_abstained
     )
-    assert agv_criteria[tender_key] is None, "L2 must null the fabricated value in this fixture"
+    assert domain_criteria[tender_key] is None, "L2 must null the fabricated value in this fixture"
     assert len(events) == 1 and events[0].field == tender_key and events[0].layer == "L2"
 
     # D1 step (c): attribute the null to its guard layer, and (D1a/F3) capture
@@ -208,12 +208,12 @@ def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
     with tempfile.TemporaryDirectory() as tmpdir:
         db = Path(tmpdir) / "test.db"
         init_db(db)
-        new_req = dict(agv_criteria)
+        new_req = dict(domain_criteria)
         run = build_tender_run(
             run_id="run-d1-acceptance",
             source_file="CompanyX.pdf",
             new_req=new_req,
-            agv_criteria=agv_criteria,
+            domain_criteria=domain_criteria,
             result={"buyer": "CompanyX", "in_scope": True},
             vehicle_type="Forklift AGV",
             in_scope=True,

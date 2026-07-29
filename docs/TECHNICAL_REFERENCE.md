@@ -252,7 +252,7 @@ All constants are loaded from config files at import time. No domain knowledge i
 | `_VALID_VTS` | `set` | `vehicle_types.json["scoring_bucket_map"].keys()` | Valid canonical VT names for /rematch VT change |
 | `CATEGORY_LIST` | `str` | `nace_codes.json["codes"]` | NACE code list for Pass 3 prompt |
 | `AGV_SYSTEM` | `str` | `build_system_context()` | LLM system prompt for all AGV passes (4a/4b/4c) |
-| `_AGV_TYPE_TEMPLATES` | `dict` | `vehicle_types.json["vt_prompt_map"]` + file reads | canonical_vt -> prompt template string |
+| `_PRODUCT_TYPE_TEMPLATES` | `dict` | `vehicle_types.json["vt_prompt_map"]` + file reads | canonical_vt -> prompt template string |
 | `_4A_SKIP` | `frozenset` | `vehicle_types.json["4a_fields"]` | Fields from Pass 4a to skip in 4b AP0 validation |
 
 ### 6.1 Startup Assertions (fail-fast)
@@ -385,7 +385,7 @@ All functions in this module are field-agnostic. Never add field names, AP0 allo
 
 ```python
 def enforce_source_spans(
-    agv_criteria: dict,
+    domain_criteria: dict,
     document_text: str,
     numeric_ko_keys,       # frozenset of tender_keys subject to the guard
     four_c_abstained: set, # tender_keys where Pass 4c returned null
@@ -393,9 +393,9 @@ def enforce_source_spans(
 ) -> tuple[dict, list[str], list[SpanEvent]]:
 ```
 
-For each key in `numeric_ko_keys` with a non-null value in `agv_criteria`, applies three layers in order. Returns `(agv_criteria, messages, events)` — `events` is a `list[SpanEvent(field, layer, value, source)]`, one per field actually nulled OR rescued, consumed by app.py for D1 provenance attribution and (since D0) filtered for `layer == "L2_RESCUED"` before feeding `_nulled_by`.
+For each key in `numeric_ko_keys` with a non-null value in `domain_criteria`, applies three layers in order. Returns `(domain_criteria, messages, events)` — `events` is a `list[SpanEvent(field, layer, value, source)]`, one per field actually nulled OR rescued, consumed by app.py for D1 provenance attribution and (since D0) filtered for `layer == "L2_RESCUED"` before feeding `_nulled_by`.
 
-**Layer 1:** `agv_criteria.get(f"{key}_source")` is falsy -> null value, add message.
+**Layer 1:** `domain_criteria.get(f"{key}_source")` is falsy -> null value, add message.
 
 **Layer 0:** `source_is_grounded(value, source, document_text)` returns False -> null value, add message.
 
@@ -664,7 +664,7 @@ Accepts `{analysis_id, overrides, vehicle_type?}` and re-runs matching against t
 1. Load cached `agv_criteria` from `_analyses[analysis_id]`
 2. Apply `overrides` (by field_name -> tender_key via `_FIELDS_BY_FIELD_NAME`; empty string -> None)
 3. If `vehicle_type` changed: clear all fields scoped to the old VT's leaf scope from criteria; reset `required_vna_capable = None` (cannot determine VNA without re-running Pass 4a)
-4. Apply `validate_agv_criteria()` (same unit conversion and plausibility as main flow)
+4. Apply `validate_domain_criteria()` (same unit conversion and plausibility as main flow)
 5. Apply `_to_match_units()` and `_criteria_to_uuid_keyed()`
 6. Run `match_suppliers_new()` and return results
 7. Update `_analyses[analysis_id]` so `/api/last-result` stays in sync

@@ -392,7 +392,7 @@ def _messages_from_events(events: list) -> list:
 
 
 def enforce_source_spans(
-    agv_criteria: dict,
+    domain_criteria: dict,
     document_text: str,
     numeric_ko_keys,
     four_c_abstained: set,
@@ -427,7 +427,7 @@ def enforce_source_spans(
     Pure function — no async, no I/O — so tests can import and call it directly
     instead of replicating this logic inline.
 
-    Returns (agv_criteria, messages, events):
+    Returns (domain_criteria, messages, events):
       - messages: human-readable log lines for each field nulled or rescued, for
         the caller to surface (e.g. via SSE). Derived generically from `events`.
       - events: list of SpanEvent(field, layer, value, source) — one per field
@@ -437,18 +437,18 @@ def enforce_source_spans(
     units = units or {}
     events: list = []
     for key in numeric_ko_keys:
-        if agv_criteria.get(key) is None:
+        if domain_criteria.get(key) is None:
             continue
-        value = agv_criteria[key]
-        src_val = agv_criteria.get(f"{key}_source")
+        value = domain_criteria[key]
+        src_val = domain_criteria.get(f"{key}_source")
         if not src_val:
             log.warning("Source-span L1: %s=%s -> null (kein Quellenbeleg)", key, value)
             events.append(SpanEvent(field=key, layer="L1", value=value, source=src_val))
-            agv_criteria[key] = None
+            domain_criteria[key] = None
         elif not source_is_grounded(value, str(src_val), document_text):
             log.warning("Source-span L0: %s=%s -> null (Zitat nicht im Dokument verankert)", key, value)
             events.append(SpanEvent(field=key, layer="L0", value=value, source=src_val))
-            agv_criteria[key] = None
+            domain_criteria[key] = None
         elif key in four_c_abstained and not source_confirms_value(value, str(src_val)):
             unit = units.get(key, "")
             if document_supports_value_with_unit(value, unit, document_text):
@@ -457,6 +457,6 @@ def enforce_source_spans(
             else:
                 log.warning("Source-span L2: %s=%s — 4c abstained, Quelle bestätigt Wert nicht -> null", key, value)
                 events.append(SpanEvent(field=key, layer="L2", value=value, source=src_val))
-                agv_criteria[key] = None
+                domain_criteria[key] = None
     messages = _messages_from_events(events)
-    return agv_criteria, messages, events
+    return domain_criteria, messages, events

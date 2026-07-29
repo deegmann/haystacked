@@ -54,7 +54,7 @@ def test_T_UUID_04_tender_requirements_from_run_resolves_via_uuid_primary():
         run_id="test-uuid-04",
         source_file="test.pdf",
         new_req={"required_max_payload_kg": 2000.0, "required_product_type": "Forklift AGV"},
-        agv_criteria={},
+        domain_criteria={},
         result={"buyer": "Test", "in_scope": True},
         vehicle_type="Forklift AGV",
         in_scope=True,

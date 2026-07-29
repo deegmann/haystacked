@@ -158,7 +158,7 @@ def test_U_CL_10_single_leaf_domain_contract():
     from app import (
         _SINGLE_LEAF_DOMAINS,
         _LEGACY_MAP,
-        _AGV_TYPE_TEMPLATES,
+        _PRODUCT_TYPE_TEMPLATES,
         _RESOLUTION_ORDER,
     )
 
@@ -173,8 +173,8 @@ def test_U_CL_10_single_leaf_domain_contract():
             f"_LEGACY_MAP missing entry for {canonical_name!r} (single-leaf domain {domain!r})"
         )
 
-        assert canonical_name in _AGV_TYPE_TEMPLATES, (
-            f"_AGV_TYPE_TEMPLATES missing entry for {canonical_name!r} "
+        assert canonical_name in _PRODUCT_TYPE_TEMPLATES, (
+            f"_PRODUCT_TYPE_TEMPLATES missing entry for {canonical_name!r} "
             f"(single-leaf domain {domain!r}) — Pass 4b template unresolved"
         )
 

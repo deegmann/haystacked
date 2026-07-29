@@ -22,7 +22,7 @@ And writes all of these:
 | `src/field_spec.py` | FieldSpec dataclass + load_fields(), fields_by_tender_key(), fields_by_field_name(), fields_by_scope() | `app.py`, `src/matching.py`, `src/context_builder.py` |
 | `config/vehicle_types.json` | vt_map, VNA subtypes, text_overrides, keyword fallback, scoring_bucket_map | `app.py`, `src/context_builder.py` |
 | `config/nace_codes.json` | NACE Prio-1 list for LLM classification | `app.py` |
-| `config/plausibility.json` | Min/max ranges for LLM value validation | `app.py validate_agv_criteria()` |
+| `config/plausibility.json` | Min/max ranges for LLM value validation | `app.py validate_domain_criteria()` |
 | `config/sqlite_schema.json` | CREATE TABLE SQL for all four tables | `sync_airtable.py` |
 | `config/prompts/extraction_template.txt` | AGV extraction prompt (field hints, vehicle type guide) | `app.py` |
 | `config/prompts/extraction_retry_template.txt` | Retry prompt (shorter, simpler) | `app.py` |
