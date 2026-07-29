@@ -108,7 +108,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "HQ country of the selling company. Used as Cond. K.O. when buyer requires domestic or regional supplier. NULL RULE: output null unless the tender explicitly requires a domestic or specific-country supplier. Do NOT infer from buyer address or document language.",
+    "hint": "HQ country of the selling company. Used as Cond. K.O. when buyer requires domestic or regional supplier. NULL RULE: output null unless the tender explicitly requires a domestic or specific-country supplier. Do NOT infer from buyer address or document language. If a country requirement is stated, output the 2-letter ISO 3166-1 alpha-2 code in uppercase. Never output a country name, a region, or a word meaning \"domestic\".",
     "user_description": "In which country is the operating site located?",
     "display_mode": null,
     "display_label": null,
