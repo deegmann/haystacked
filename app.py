@@ -1155,9 +1155,8 @@ async def analyze(file: UploadFile = File(...)):
             # single-leaf-domain shortcut sub-path (_is_single_leaf, no LLM call).
             # The finer LLM-vs-shortcut distinction is preserved separately in the
             # debug log ("Pass 4a skipped (single-leaf domain %s)...").
-            _merged_product_type = vt_criteria.get("required_product_type")
-            domain_criteria["required_product_type"] = _merged_product_type
-            if _merged_product_type is not None:
+            domain_criteria["required_product_type"] = canonical_product_type
+            if canonical_product_type is not None:
                 _produced_by["required_product_type"] = "4a"
 
         if is_extractable:
