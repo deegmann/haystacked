@@ -661,7 +661,7 @@ new_req["required_vna_capable"] = (
 
 Accepts `{analysis_id, overrides, vehicle_type?}` and re-runs matching against the cached extraction.
 
-1. Load cached `agv_criteria` from `_analyses[analysis_id]`
+1. Load cached `domain_criteria` from `_analyses[analysis_id]`
 2. Apply `overrides` (by field_name -> tender_key via `_FIELDS_BY_FIELD_NAME`; empty string -> None)
 3. If `vehicle_type` changed: clear all fields scoped to the old VT's leaf scope from criteria; reset `required_vna_capable = None` (cannot determine VNA without re-running Pass 4a)
 4. Apply `validate_domain_criteria()` (same unit conversion and plausibility as main flow)

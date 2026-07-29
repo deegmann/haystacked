@@ -3,6 +3,7 @@ Tender analysis persistence layer.
 Builds TenderRun from pipeline output and stores to SQLite.
 """
 import dataclasses
+import functools
 import json
 import sqlite3
 from datetime import datetime, timezone
@@ -17,8 +18,6 @@ DB_PATH = Path(__file__).parent.parent / "data" / "haystacked.db"
 
 # Allowlist of keys copied from the pipeline `result` dict into basic_info.
 # Never use dict(result) — internal keys (_parse_method, domain_criteria, etc.) must not leak.
-_nace_cfg = json.loads((Path(__file__).parent.parent / "config" / "nace_codes.json").read_text())
-_SCHEMA_KEYS: frozenset = frozenset(e["key"] for e in _nace_cfg["basic_schema"])
 
 # Pipeline-STAGE metadata keys — CLOSED and APPEND-ONLY, mirroring the D1
 # provenance vocabularies below. These describe pipeline STAGES (NACE
@@ -27,7 +26,21 @@ _SCHEMA_KEYS: frozenset = frozenset(e["key"] for e in _nace_cfg["basic_schema"])
 # an AP0-boundary violation — do not add one.
 _PIPELINE_META_KEYS = frozenset({"detected_domain", "nace_tender", "in_scope"})
 
-_BASIC_INFO_KEYS = _SCHEMA_KEYS | _PIPELINE_META_KEYS
+
+@functools.lru_cache(maxsize=1)
+def _basic_info_keys() -> frozenset:
+    """Allowlist of keys copied from the pipeline result dict into basic_info.
+
+    Lazily loaded and cached on first call (not at module import time) —
+    config/nace_codes.json is gitignored and only guaranteed to exist after
+    app.py's _check_and_regen() has run, which happens AFTER this module is
+    imported. Reading it at import time crashes a fresh clone before the
+    self-healing regen gets a chance to run. build_tender_run() is only ever
+    called from request-handling code, by which point regen has completed.
+    """
+    cfg = json.loads((Path(__file__).parent.parent / "config" / "nace_codes.json").read_text())
+    schema_keys = frozenset(e["key"] for e in cfg["basic_schema"])
+    return schema_keys | _PIPELINE_META_KEYS
 
 # D1 provenance vocabularies — CLOSED and APPEND-ONLY. Both describe pipeline
 # STAGES, never fields or vehicle types. A new entry must name a new extraction/
@@ -144,7 +157,7 @@ def build_tender_run(
                 provenance  = _prov.get("provenance"),
             )
 
-    basic_info = {k: result.get(k) for k in _BASIC_INFO_KEYS if k in result}
+    basic_info = {k: result.get(k) for k in _basic_info_keys() if k in result}
 
     return TenderRun(
         run_id       = run_id,

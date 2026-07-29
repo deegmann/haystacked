@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import pytest
 from src.tender_store import (
-    init_db, build_tender_run, persist_tender_run, load_tender_run, _BASIC_INFO_KEYS,
+    init_db, build_tender_run, persist_tender_run, load_tender_run, _basic_info_keys,
     read_run_criteria,
 )
 from src.field_spec import load_fields, fields_by_tender_key
@@ -85,7 +85,9 @@ def test_T_TR_03_basic_info_allowlist():
         assert run.basic_info["buyer"] == "Acme"
         # OI-96: basic_info must never contain keys outside the AP0-derived allowlist —
         # a future silent basic_schema addition must surface here, not pass silently.
-        assert set(run.basic_info.keys()) <= _BASIC_INFO_KEYS
+        # NOTE: this check is tautological (basic_info is built BY comprehending over
+        # _basic_info_keys()); the real independent guard is T_TR_03c below.
+        assert set(run.basic_info.keys()) <= _basic_info_keys()
 
 # --- T-TR-03b: OI-96 — project_location and missing_info now persist ---
 def test_T_TR_03b_project_location_and_missing_info_now_persist():
@@ -103,6 +105,18 @@ def test_T_TR_03b_project_location_and_missing_info_now_persist():
         run = build_tender_run("run-002b", "f.pdf", {}, {}, result, None, True)
         assert run.basic_info.get("project_location") == "Munich, Germany"
         assert run.basic_info.get("missing_info") == ["lifting_height_mm"]
+
+# --- T-TR-03c: OI-96 real guard against silent basic_schema drift ---
+def test_T_TR_03c_basic_info_keys_match_ap0_source():
+    """OI-96 real guard: _basic_info_keys() must equal basic_schema keys (read
+    independently, not via the production derivation) unioned with the known
+    pipeline-meta keys — catches silent basic_schema drift that the tautological
+    subset check in T_TR_03 cannot."""
+    cfg_path = Path(__file__).parent.parent.parent / "config" / "nace_codes.json"
+    cfg = json.loads(cfg_path.read_text())
+    expected_schema_keys = frozenset(e["key"] for e in cfg["basic_schema"])
+    expected = expected_schema_keys | frozenset({"detected_domain", "nace_tender", "in_scope"})
+    assert _basic_info_keys() == expected
 
 # --- T-TR-04: vehicle_type not used for config lookup in load ---
 def test_T_TR_04_load_does_not_use_vehicle_type_for_config():

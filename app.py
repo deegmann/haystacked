@@ -52,15 +52,17 @@ _OLLAMA_NUM_CTX = 32_768  # must match num_ctx in call_ollama() options
 _analyses: dict[str, dict] = {}
 # ── Config loading — startup checksum auto-regenerates if AP0 xlsx changed ────
 _CONFIG_DIR = Path(__file__).parent / "config"
-_AP0_PATH   = Path(__file__).parent / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
+_AP0_PATH      = Path(__file__).parent / "Spec" / "haystacked_AP0_field_spec_v0_10.xlsx"
+_PLATFORM_PATH = Path(__file__).parent / "Spec" / "haystacked_platform_config.xlsx"
 
 def _check_and_regen():
-    """Auto-regenerate all config files if AP0 xlsx has changed (checksum mismatch)."""
+    """Auto-regenerate all config files if AP0 xlsx or platform_config xlsx has changed (checksum mismatch)."""
     import hashlib, importlib.util
     checksum_file = _CONFIG_DIR / "ap0_checksum.txt"
     if not _AP0_PATH.exists():
         return
-    current = hashlib.md5(_AP0_PATH.read_bytes()).hexdigest()
+    _platform_bytes = _PLATFORM_PATH.read_bytes() if _PLATFORM_PATH.exists() else b""
+    current = hashlib.md5(_AP0_PATH.read_bytes() + _platform_bytes).hexdigest()
     stored  = checksum_file.read_text().strip() if checksum_file.exists() else ""
     if current == stored:
         return

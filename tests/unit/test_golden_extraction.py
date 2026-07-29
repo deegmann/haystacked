@@ -2,8 +2,11 @@
 
 Reads golden run JSON files from tests/tenders/golden_run_tender_XXX.json
 (produced by scripts/capture_pipeline_run.py) and compares the extracted
-agv_criteria values against the golden_extraction fields in the corresponding
-fixture file tests/tenders/tender_XXX.json.
+criteria values against the golden_extraction fields in the corresponding
+fixture file tests/tenders/tender_XXX.json. Extracted criteria are read via
+read_run_criteria(golden_run), which aliases either the new `domain_criteria`
+key or, for older golden run files (all 8 committed fixtures, as of
+2026-07-29), the legacy `agv_criteria` key.
 
 If no golden run file exists for a tender, the test is skipped — the suite
 never fails just because the LLM has not been run yet.
@@ -12,11 +15,11 @@ To generate a golden run file:
     python3 scripts/capture_pipeline_run.py tenders/Beispielausschreibung_AGV_Nordlicht.pdf
 
 For in-scope AGV tenders the test verifies:
-    golden_run['agv_criteria'][key] == fixture['golden_extraction'][key]
+    read_run_criteria(golden_run)[key] == fixture['golden_extraction'][key]
 for every key in the fixture's golden_extraction dict.
 
 For out-of-scope tenders (fixture has expected_out_of_scope=true) the test
-verifies that the pipeline produced an empty agv_criteria and no matches —
+verifies that the pipeline produced empty criteria and no matches —
 i.e. the document was correctly identified as not an AGV tender.
 """
 import sys
@@ -66,9 +69,13 @@ def _golden_run_path(fixture: dict):
 
 @pytest.mark.parametrize("fixture_path", _fixture_files(), ids=lambda p: p.stem)
 def test_golden_extraction(fixture_path: Path):
-    """Compare agv_criteria in a golden run file against the fixture's golden_extraction.
+    """Compare criteria in a golden run file against the fixture's golden_extraction.
 
-    For out-of-scope tenders, asserts the pipeline produced empty agv_criteria
+    Criteria are read via read_run_criteria(golden_run), which aliases the new
+    `domain_criteria` key or, for older golden run files (all 8 committed
+    fixtures, as of 2026-07-29), the legacy `agv_criteria` key.
+
+    For out-of-scope tenders, asserts the pipeline produced empty criteria
     and no matches. Skipped if no golden run file exists for this tender.
     """
     fixture = _load_json(fixture_path)

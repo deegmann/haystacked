@@ -75,9 +75,13 @@ _SKIP_FILTER: frozenset = frozenset(
 assert _SKIP_FILTER, (
     "no field has post_extraction_derived=True in fields.json — check AP0 xlsx / generate_all.py"
 )
-assert _SKIP_FILTER <= set(_TK_TO_SPECS), (
-    f"_SKIP_FILTER contains tender_keys not present in fields_by_tender_key(): "
-    f"{_SKIP_FILTER - set(_TK_TO_SPECS)}"
+_orphaned_pe_fields = {
+    f.field_name for f in load_fields().values()
+    if f.post_extraction_derived and not f.tender_key
+}
+assert not _orphaned_pe_fields, (
+    f"post_extraction_derived=True but no tender_key: {_orphaned_pe_fields} — "
+    "check AP0 xlsx (Global tab, Post Extraction Derived column)"
 )
 
 

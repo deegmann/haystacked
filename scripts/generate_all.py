@@ -235,7 +235,6 @@ def read_field_levels(wb, data_sheets) -> dict:
         col_allowed     = cols.get("Allowed Values")
         col_unit        = cols.get("Unit")
         col_display_mode = cols.get("Display Mode")
-        col_post_extraction_derived = cols.get("Post Extraction Derived")
         for row in rows[hi+1:]:
             fname = row[0]
             if not fname or str(fname).startswith("──"):
@@ -265,12 +264,6 @@ def read_field_levels(wb, data_sheets) -> dict:
                     entry["allowed_values"] = av_list
             if col_display_mode is not None and col_display_mode < len(row) and row[col_display_mode]:
                 entry["display_mode"] = str(row[col_display_mode]).strip()
-            entry["post_extraction_derived"] = bool(
-                col_post_extraction_derived is not None
-                and col_post_extraction_derived < len(row)
-                and row[col_post_extraction_derived]
-                and str(row[col_post_extraction_derived]).strip().lower() in ("true", "yes")
-            )
             if level in ("KO","COND_KO") and "operator" not in entry:
                 print(f"  [WARN] '{fname}' is {level} but has no operator")
             if fname not in fields:
