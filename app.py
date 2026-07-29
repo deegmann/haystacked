@@ -325,6 +325,22 @@ _nace_cfg     = json.loads((_CONFIG_DIR / "nace_codes.json").read_text())
 CATEGORY_LIST = "\n".join(_nace_cfg.get("codes", []))
 log.info("NACE codes loaded: %d Prio-1 entries", len(_nace_cfg.get("codes", [])))
 
+# ── OI-98: contact-fallback field sets — derived from Basic Extraction Schema's
+# "Contact Fallback" column (platform_config.xlsx → config/nace_codes.json).
+# TRIGGER decides whether the fallback pass runs; TARGET is the full set of
+# fields it may fill in (trigger fields are always also targets).
+_CONTACT_FALLBACK_TRIGGER: frozenset = frozenset(
+    e["key"] for e in _nace_cfg.get("basic_schema", []) if e.get("contact_fallback") == "trigger"
+)
+_CONTACT_FALLBACK_TARGET: frozenset = frozenset(
+    e["key"] for e in _nace_cfg.get("basic_schema", [])
+    if e.get("contact_fallback") in ("trigger", "target")
+)
+assert _CONTACT_FALLBACK_TRIGGER, (
+    "no basic_schema field has contact_fallback='trigger' — check platform_config.xlsx"
+)
+assert _CONTACT_FALLBACK_TRIGGER <= _CONTACT_FALLBACK_TARGET
+
 # ── Prompts ───────────────────────────────────────────────────────────────────
 
 # ── Prompt loading — all industry knowledge lives in config/prompts/, not here ──
@@ -730,7 +746,7 @@ async def analyze(file: UploadFile = File(...)):
             # Contact info is often at the end of a document. If the main extraction
             # missed contact fields and the document has a meaningful tail, run a
             # short focused call on the last 4000 chars.
-            contact_missing = not any(result.get(f) for f in ("contact_name", "contact_email", "contact_phone"))
+            contact_missing = not any(result.get(f) for f in _CONTACT_FALLBACK_TRIGGER)
             full_text_len = result.get("text_length", len(text))  # not set yet, use len(text)
             if contact_missing and len(text) > 6000:
                 tail = text[-4000:]
@@ -738,7 +754,7 @@ async def analyze(file: UploadFile = File(...)):
                     raw_contact = await call_ollama(CONTACT_SYSTEM, _fill(CONTACT_USER_TEMPLATE, text=tail), "contact")
                     contact_data = repair_and_parse(raw_contact)
                     contact_data.pop("_parse_method", None)
-                    for field in ("contact_name", "contact_email", "contact_phone", "deadline", "tender_date"):
+                    for field in _CONTACT_FALLBACK_TARGET:
                         if contact_data.get(field) and not result.get(field):
                             result[field] = contact_data[field]
                             log.info("Kontakt-Fallback: %s = %s", field, contact_data[field])
@@ -1360,7 +1376,10 @@ async def field_meta():
     _ABBR = {"Agv":"AGV","Amr":"AMR","Vda":"VDA","Vda5050":"VDA 5050","Wms":"WMS","Oem":"OEM",
              "Ko":"KO","Ui":"UI","Id":"ID","Ip":"IP","Fps":"FPS","Roi":"ROI",
              "Cop":"COP","Ik":"IK","Ped":"PED","Atex":"ATEX"}
-    def _label(key: str, ap0_unit=None) -> str:
+    def _label(key: str, ap0_unit=None, override=None) -> str:
+        # OI-100: AP0 "Display Label" column overrides the abbreviation heuristic below.
+        if override:
+            return override
         k = key
         # Prefer AP0 unit over suffix heuristic — avoids "_mm" label when storage is actually "m"
         unit = ap0_unit
@@ -1395,7 +1414,7 @@ async def field_meta():
         seen_field_names.add(db_key)
         tender_key = spec.tender_key
         entry = {
-            "label":          _label(db_key, spec.unit),
+            "label":          _label(db_key, spec.unit, spec.display_label),
             "tender_key":     tender_key,
             "entity":         spec.entity,
             "level":          spec.level,
@@ -1410,7 +1429,7 @@ async def field_meta():
         meta[db_key] = entry
         if tender_key and tender_key != db_key:
             # Clone entry keyed by tender_key — used for label lookups by tender_key in the frontend.
-            clones[tender_key] = {**entry, "label": _label(tender_key, spec.unit)}
+            clones[tender_key] = {**entry, "label": _label(tender_key, spec.unit, spec.display_label)}
     meta.update(clones)
 
     # Build per-domain descriptor for the DB browser domain filter

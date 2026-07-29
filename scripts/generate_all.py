@@ -235,6 +235,7 @@ def read_field_levels(wb, data_sheets) -> dict:
         col_allowed     = cols.get("Allowed Values")
         col_unit        = cols.get("Unit")
         col_display_mode = cols.get("Display Mode")
+        col_post_extraction_derived = cols.get("Post Extraction Derived")
         for row in rows[hi+1:]:
             fname = row[0]
             if not fname or str(fname).startswith("──"):
@@ -264,6 +265,12 @@ def read_field_levels(wb, data_sheets) -> dict:
                     entry["allowed_values"] = av_list
             if col_display_mode is not None and col_display_mode < len(row) and row[col_display_mode]:
                 entry["display_mode"] = str(row[col_display_mode]).strip()
+            entry["post_extraction_derived"] = bool(
+                col_post_extraction_derived is not None
+                and col_post_extraction_derived < len(row)
+                and row[col_post_extraction_derived]
+                and str(row[col_post_extraction_derived]).strip().lower() in ("true", "yes")
+            )
             if level in ("KO","COND_KO") and "operator" not in entry:
                 print(f"  [WARN] '{fname}' is {level} but has no operator")
             if fname not in fields:
@@ -894,13 +901,19 @@ def read_platform(wb, platform_path: Path) -> dict:
             c_mand = cols.get("Mandatory?", 2)
             c_hint = cols.get("LLM Extraction Hint", 3)
             c_def  = cols.get("JSON Default", 4)
+            c_cf   = cols.get("Contact Fallback")
             for row in rows[hi+1:]:
                 if not row or not row[c_key]: continue
                 key  = str(row[c_key]).strip()
                 hint = str(row[c_hint]).strip() if c_hint < len(row) and row[c_hint] else ""
                 mand = str(row[c_mand]).strip().lower() == "yes" if c_mand < len(row) and row[c_mand] else False
                 dflt = str(row[c_def]).strip() if c_def < len(row) and row[c_def] else "null"
-                basic_schema.append({"key": key, "mandatory": mand, "hint": hint, "default": dflt})
+                cf_raw = str(row[c_cf]).strip().lower() if c_cf is not None and c_cf < len(row) and row[c_cf] else None
+                contact_fallback = cf_raw if cf_raw in ("trigger", "target") else None
+                basic_schema.append({
+                    "key": key, "mandatory": mand, "hint": hint, "default": dflt,
+                    "contact_fallback": contact_fallback,
+                })
 
     return {"scope_in": scope_in, "scope_out": scope_out, "codes": codes, "basic_schema": basic_schema}
 
@@ -1452,6 +1465,8 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
         col_hint          = cols.get("LLM Hint")
         col_display       = cols.get("Display Mode")
         col_client        = cols.get("UI Hint")
+        col_post_extraction_derived = cols.get("Post Extraction Derived")
+        col_display_label = cols.get("Display Label")
         col_value_if_null = cols_snake.get("value_if_null")
 
         for row in rows[hi + 1:]:
@@ -1490,6 +1505,13 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             _check_null_rule_marker(fname, hint)
             display = str(row[col_display]).strip() if col_display is not None and col_display < len(row) and row[col_display] else None
             client_exp = str(row[col_client]).strip() if col_client is not None and col_client < len(row) and row[col_client] else None
+            post_extraction_derived = bool(
+                col_post_extraction_derived is not None
+                and col_post_extraction_derived < len(row)
+                and row[col_post_extraction_derived]
+                and str(row[col_post_extraction_derived]).strip().lower() in ("true", "yes")
+            )
+            display_label = str(row[col_display_label]).strip() if col_display_label is not None and col_display_label < len(row) and row[col_display_label] else None
 
             # Parse allowed_values only for Dropdown/Multi-Select — numeric fields
             # store unit strings in this column which must not be treated as enums.
@@ -1566,6 +1588,8 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
                 "hint":             hint,
                 "user_description": client_exp,
                 "display_mode":     display,
+                "post_extraction_derived": post_extraction_derived,
+                "display_label":    display_label,
                 "value_if_null":    value_if_null,
             }
 
@@ -1646,6 +1670,8 @@ class FieldSpec:
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
+    post_extraction_derived: bool = False
+    display_label: Optional[str] = None
     value_if_null: object = None
 
 
@@ -1845,6 +1871,23 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     platform          = read_platform(wb_platform, platform_path)
     nace              = platform  # nace data is inside platform dict
 
+    # OI-98: contact-fallback pass field set, derived from the "Contact Fallback"
+    # column of the Basic Extraction Schema tab (platform_config.xlsx). "trigger"
+    # fields decide whether the fallback pass runs; "target" fields (plus all
+    # trigger fields, which are always also targets) are the fields it may fill in.
+    _contact_trigger_keys = [
+        e["key"] for e in platform["basic_schema"] if e.get("contact_fallback") == "trigger"
+    ]
+    _contact_target_keys = _contact_trigger_keys + [
+        e["key"] for e in platform["basic_schema"] if e.get("contact_fallback") == "target"
+    ]
+    if not _contact_trigger_keys:
+        sys.exit(
+            "[FEHLER] Basic Extraction Schema: kein Feld mit Contact Fallback='trigger' — "
+            "der Kontakt-Fallback-Pass würde nie ausgelöst. contact_name/contact_email/"
+            "contact_phone (oder Äquivalent) in platform_config.xlsx markieren."
+        )
+
     # Additional runtime fields derived from AP0.
     # scoring_bucket_map, vna_applicable_types, agv_detection_keywords retired in Step 7:
     # these are now emitted to scope_registry.json via _write_scope_registry().
@@ -1999,8 +2042,11 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
         (PROMPTS_DIR / "basic_template.txt").write_text(basic_template)
         (PROMPTS_DIR / "contact_system.txt").write_text(
             "You are a contact-data extraction assistant. Extract contact details from the document excerpt. Output ONLY valid JSON. No markdown, no explanation.")
+        _contact_skeleton = "{" + ",".join(f'"{k}":null' for k in _contact_target_keys) + "}"
         (PROMPTS_DIR / "contact_template.txt").write_text(
-            'Extract contact details from this document excerpt. Use null if not found.\n\nDOCUMENT EXCERPT (last pages):\n{text}\n\nOutput ONLY this JSON:\n{"contact_name":null,"contact_email":null,"contact_phone":null,"deadline":null,"tender_date":null}')
+            "Extract contact details from this document excerpt. Use null if not found.\n\n"
+            "DOCUMENT EXCERPT (last pages):\n{text}\n\n"
+            f"Output ONLY this JSON:\n{_contact_skeleton}")
         (PROMPTS_DIR / "nace_system.txt").write_text(
             "You are an industrial classification specialist. Pick the single best NACE code from the provided list. Output ONLY valid JSON with exactly the field names shown.")
         (PROMPTS_DIR / "nace_template.txt").write_text(nace_template)

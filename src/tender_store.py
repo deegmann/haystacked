@@ -17,13 +17,17 @@ DB_PATH = Path(__file__).parent.parent / "data" / "haystacked.db"
 
 # Allowlist of keys copied from the pipeline `result` dict into basic_info.
 # Never use dict(result) — internal keys (_parse_method, agv_criteria, etc.) must not leak.
-_BASIC_INFO_KEYS = frozenset({
-    "buyer", "project_name", "buyer_industry", "tender_category",
-    "detected_domain", "summary",
-    "contact_name", "contact_email", "contact_phone",
-    "deadline", "tender_date",
-    "nace_tender", "in_scope",
-})
+_nace_cfg = json.loads((Path(__file__).parent.parent / "config" / "nace_codes.json").read_text())
+_SCHEMA_KEYS: frozenset = frozenset(e["key"] for e in _nace_cfg["basic_schema"])
+
+# Pipeline-STAGE metadata keys — CLOSED and APPEND-ONLY, mirroring the D1
+# provenance vocabularies below. These describe pipeline STAGES (NACE
+# classification, domain detection, scope decision), never fields or vehicle
+# types. A hypothetical entry named after a field or domain concept would be
+# an AP0-boundary violation — do not add one.
+_PIPELINE_META_KEYS = frozenset({"detected_domain", "nace_tender", "in_scope"})
+
+_BASIC_INFO_KEYS = _SCHEMA_KEYS | _PIPELINE_META_KEYS
 
 # D1 provenance vocabularies — CLOSED and APPEND-ONLY. Both describe pipeline
 # STAGES, never fields or vehicle types. A new entry must name a new extraction/

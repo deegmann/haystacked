@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import pytest
-from src.tender_store import init_db, build_tender_run, persist_tender_run, load_tender_run
+from src.tender_store import init_db, build_tender_run, persist_tender_run, load_tender_run, _BASIC_INFO_KEYS
 from src.field_spec import load_fields, fields_by_tender_key
 from src.json_repair import enforce_source_spans
 from app import _assemble_field_provenance, _attribute_nulls
@@ -80,6 +80,26 @@ def test_T_TR_03_basic_info_allowlist():
         assert "agv_criteria" not in run.basic_info
         assert "matches" not in run.basic_info
         assert run.basic_info["buyer"] == "Acme"
+        # OI-96: basic_info must never contain keys outside the AP0-derived allowlist —
+        # a future silent basic_schema addition must surface here, not pass silently.
+        assert set(run.basic_info.keys()) <= _BASIC_INFO_KEYS
+
+# --- T-TR-03b: OI-96 — project_location and missing_info now persist ---
+def test_T_TR_03b_project_location_and_missing_info_now_persist():
+    """OI-96 intentional behavior change: project_location and missing_info are part
+    of the AP0-derived basic_schema and must now appear in basic_info when present
+    in the pipeline result (previously excluded by the old literal allowlist)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db = Path(tmpdir) / "test.db"
+        init_db(db)
+        result = {
+            "buyer": "Acme",
+            "project_location": "Munich, Germany",
+            "missing_info": ["lifting_height_mm"],
+        }
+        run = build_tender_run("run-002b", "f.pdf", {}, {}, result, None, True)
+        assert run.basic_info.get("project_location") == "Munich, Germany"
+        assert run.basic_info.get("missing_info") == ["lifting_height_mm"]
 
 # --- T-TR-04: vehicle_type not used for config lookup in load ---
 def test_T_TR_04_load_does_not_use_vehicle_type_for_config():

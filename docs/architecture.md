@@ -262,10 +262,10 @@ After parsing: if `is_agv_amr` is False/missing but AGV keywords appear in the f
 
 ### Pass 2 — Contact Fallback (conditional)
 
-**Runs only if:** all contact fields (contact_name, contact_email, contact_phone) are missing AND `len(text) > 6000`
-**Prompt:** `contact_system.txt` + `contact_template.txt`
+**Runs only if:** all TRIGGER fields are missing AND `len(text) > 6000`. The TRIGGER and TARGET field sets are not hardcoded — they are derived from the "Contact Fallback" column of the Basic Extraction Schema tab in `platform_config.xlsx` (`trigger` / `target` / blank per row), exposed at runtime as `_CONTACT_FALLBACK_TRIGGER` and `_CONTACT_FALLBACK_TARGET` in `app.py`. Trigger fields are always also targets. Today's flagged fields: TRIGGER = contact_name, contact_email, contact_phone; TARGET = the trigger fields plus deadline, tender_date.
+**Prompt:** `contact_system.txt` + `contact_template.txt` (the JSON skeleton in `contact_template.txt` is generated from the TARGET field set, not hardcoded)
 **Placeholder:** `{text}` — last 4,000 chars of document
-**Extracts:** contact_name, contact_email, contact_phone, deadline, tender_date (only non-null values merged into Pass 1 result)
+**Extracts:** the TARGET field set (only non-null values merged into Pass 1 result)
 
 ### Pass 3 — NACE Classification (always)
 

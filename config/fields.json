@@ -17,6 +17,8 @@
     "hint": "Completed reference installs. Source: 'references / case studies' or ask supplier. Proxy for maturity; blank = unknown (NOT zero).",
     "user_description": "Number of reference projects from the supplier. (filled automatically)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "62344aff-cb9d-40c2-9329-a85b34e1d62a": {
@@ -37,6 +39,8 @@
     "hint": "Typical order-to-commissioning time. Source: sales-provided (rarely on web). Shorter = better; leave blank if unverified.",
     "user_description": "How many weeks lead time until commissioning is acceptable?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "7ca18941-1522-4b3d-a34e-38fb11dad36b": {
@@ -62,6 +66,8 @@
     "hint": "Geographic service & support reach. Source: 'locations / service network'. Cond. K.O.: hard filter when the buyer needs fast on-site SLA in a specific region. 'None' = no own network stated. NULL RULE: output null unless the tender explicitly demands a service/support region. Do NOT infer coverage from the document language or buyer location.",
     "user_description": "In which countries or regions is service and support required?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "e3577e52-3cdf-4975-8754-97352919eb3e": {
@@ -87,6 +93,8 @@
     "hint": "How the product reaches the customer. Source: 'partners / dealers / where to buy'. Tells the buyer WHO they actually contract with. (NB: lives on the Product layer L2, not the base model.)",
     "user_description": "How is the AGV sold or delivered?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "d220b0c4-b012-44d1-8caa-8cce800904de": {
@@ -107,6 +115,8 @@
     "hint": "HQ country of the selling company. Used as Cond. K.O. when buyer requires domestic or regional supplier. NULL RULE: output null unless the tender explicitly requires a domestic or specific-country supplier. Do NOT infer from buyer address or document language.",
     "user_description": "In which country is the operating site located?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "cd5d42f2-9e0c-421a-a683-9ec754e23661": {
@@ -132,6 +142,8 @@
     "hint": "Headcount band of the company. Proxy for project capacity and financial stability.",
     "user_description": "Number of employees at the manufacturer. (filled automatically)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "da18d0c0-fc3b-4400-8a3a-2d3c02467615": {
@@ -157,6 +169,8 @@
     "hint": "Company-level quality and compliance certifications. Supplements product-level safety_standard.",
     "user_description": "Which certifications must the manufacturer hold? (e.g. ISO 9001)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "f4b07ccf-cc19-413c-9cea-2b6c2fc3c7ad": {
@@ -183,6 +197,8 @@
     "hint": "Support languages required. Output 2-letter ISO 639-1 codes only (DE, EN, FR, ES, ZH), comma-separated. null = not stated.",
     "user_description": "Which language(s) must the manufacturer support for service and documentation?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "1b74765a-4dca-4216-905d-469f7f846a5e": {
@@ -203,6 +219,8 @@
     "hint": "City of headquarters. Context only — helps buyer assess geographic proximity.",
     "user_description": "Manufacturer headquarters. (filled automatically)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "05acd6db-ed2e-46e3-a3e6-ebddcaeea044": {
@@ -223,6 +241,8 @@
     "hint": "Year founded. Context only — indicative of market maturity and stability.",
     "user_description": "Manufacturer founding year. (filled automatically)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "325dd61d-f828-4639-a128-fd5e1a1a3728": {
@@ -248,6 +268,8 @@
     "hint": "AGV/AMR category. Output exactly one of the allowed values. Hard K.O.: Forklift AGV never matches Tugger or AMR.",
     "user_description": "What AGV type is required? (automatically detected from the document)",
     "display_mode": "display",
+    "post_extraction_derived": true,
+    "display_label": null,
     "value_if_null": null
   },
   "18b0abbe-33f3-4dbc-b03e-cb9fdb216fb8": {
@@ -276,6 +298,8 @@
     "hint": "Navigation technology used by the AGV. Output from allowed values only, comma-separated. Mapping rules: 'SLAM' / 'natural feature' / 'free navigation' / 'marker-free' / 'environment mapping' / 'contour-based' → 'Natural Feature (SLAM)'; 'laser reflector' / 'reflector marker' / 'laser scanner with reflectors' → 'Laser Reflector'; 'magnetic tape' / 'magnetic stripe' → 'Magnetic Tape'; 'QR code' / 'barcode' / 'data matrix' → 'QR/DM Code'; 'inductive loop' / 'wire guidance' → 'Inductive Loop'; 'vision' / 'camera-based' → 'Vision'. If multiple navigation types are required, list all. null = not stated in the document.",
     "user_description": "What navigation type is intended or allowed? (e.g. Natural Feature/SLAM, magnetic tape, QR code)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "ba4b544a-6e32-4127-8ee8-d68e2ef3c7fc": {
@@ -296,6 +320,8 @@
     "hint": "Whether the AGV operates without any permanent physical infrastructure on the facility floor or walls (no reflectors, no magnetic tape, no inductive loops, no floor markings). TRUE = infrastructure-free (no permanent site modifications required); FALSE = requires permanent infrastructure. Cond. K.O.: relevant when buyer explicitly states they cannot tolerate infrastructure modifications. NULL RULE: null unless the document explicitly addresses whether permanent infrastructure modifications are required or explicitly states the system requires no site preparation.",
     "user_description": "Is installation of infrastructure (guide wires, reflectors, QR codes) acceptable or explicitly not desired?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "f1aafec8-86c0-4d3a-81f7-e07ec2e60a85": {
@@ -316,6 +342,8 @@
     "hint": "Outdoor operation required. Output true or false (boolean) — never 'yes'/'no'. null = not stated.",
     "user_description": "Is outdoor operation required?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "31ee8eb5-cd88-483a-ad11-bd1c8bc27d99": {
@@ -336,6 +364,8 @@
     "hint": "Re-routes AROUND obstacles autonomously vs. only stopping & waiting. Source: 'dynamic obstacle avoidance'. Implies throughput in busy mixed-traffic aisles.",
     "user_description": "Can the AGV autonomously navigate around obstacles?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "152f5c62-ca84-4446-a6df-dccdfaf2da4f": {
@@ -356,6 +386,8 @@
     "hint": "Holonomic drive — sideways + spin on the spot (Mecanum / multi-steer). Source: 'omnidirectional'. Implies maneuverability in tight aisles.",
     "user_description": "Must the AGV be able to move in all directions without turning (omnidirectional)?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "bda1cd9b-cfb6-474e-a858-a3fde419a94d": {
@@ -376,6 +408,8 @@
     "hint": "Maximum payload the AGV must carry per trip, in kg. This value may appear as prose (e.g. 'a maximum of X kg', 'loads up to X kg', 'pallets weigh up to X kg') OR as a table column (labelled 'Max Loaded weight' / 'gross weight'). Read BOTH prose sentences and table cells — do not restrict search to tables only. In tables, use the loaded/gross weight — IGNORE 'tare weight' / 'empty pallet weight'. If a range or several load types are given, report the heaviest stated number. NULL RULE: Output null only if no maximum load weight is stated anywhere in the document text. CONSERVATIVE EXTRACTION: if multiple values are stated, extract the MAXIMUM — the supplier must meet or exceed this threshold.",
     "user_description": "What is the maximum load weight per carrier? The AGV must be able to carry at least this weight.",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "3cf372d4-e297-4827-b38e-8838a1e7f5bd": {
@@ -407,6 +441,8 @@
     "hint": "Load carriers handled. Output ONLY from allowed values — do NOT describe the process (e.g. 'floor delivery'). null = not determinable from document.",
     "user_description": "What type of load carriers will be transported? (e.g. Euro pallet, wire mesh box, container)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "2faf934a-73a1-4cfe-bc56-b494a2a46a28": {
@@ -427,6 +463,8 @@
     "hint": "Handles several carrier types/sizes in ONE workflow without manual reconfiguration. Source: 'auto fork adjust / mixed loads'. Cond. K.O.: hard filter only if the buyer runs mixed loads.",
     "user_description": "Must the AGV be able to transport multiple load carriers simultaneously?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "7b313001-a796-4f57-bbf5-6b3b67367a3b": {
@@ -447,6 +485,8 @@
     "hint": "Top travel speed (capture rated/unloaded if only one given). Source: spec table. Implies cycle time; check safety-derated speed too.",
     "user_description": "What maximum speed should the AGV achieve? (m/s)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6776eb08-6b03-4a3e-a605-0e009854e864": {
@@ -467,6 +507,8 @@
     "hint": "Vehicle length. Source: dimensions (L×W×H). Used with width for footprint & turn calculations.",
     "user_description": "Vehicle length. (mm; for reference only)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "b86e480d-85b0-4da0-a044-f14efe49b28f": {
@@ -487,6 +529,8 @@
     "hint": "Vehicle width. Source: dimensions. Drives min aisle/door clearance.",
     "user_description": "Vehicle width. (mm; for reference only)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6c7b2b2c-4f44-4bba-83c8-d2243cd787eb": {
@@ -507,6 +551,8 @@
     "hint": "Lowest rated operating temperature the vehicle must sustain, in °C. Source: a temperature range or operating condition in the document's environment, site requirements, or technical specification section. For a range (e.g. 'X to Y °C'), this field holds the lower bound (X). NULL RULE — READ FIRST: this field is null by default. Only fill it if the tender document explicitly states a minimum operating or ambient temperature (with a °C or K unit). If not stated, output null. Do NOT supply any default, typical, or example value. Do NOT copy numbers from this description or from rule notes. Do NOT confuse temperatures with dates, year/revision numbers, quantities, or project metadata.",
     "user_description": "What is the minimum temperature at the operating site? (°C; e.g. -20°C for cold storage)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "67c103ef-c16f-4785-bfcf-8e264a462580": {
@@ -527,6 +573,8 @@
     "hint": "Highest rated operating temperature the vehicle must sustain, in °C. Source: a temperature range or operating condition in the document's environment, site requirements, or technical specification section. For a range (e.g. 'X to Y °C'), this field holds the upper bound (Y). NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a maximum operating or ambient temperature (with a °C or K unit). If not stated, output null. Do NOT supply a default, typical, or example value. Do NOT copy numbers from this description or from rule notes. Do NOT confuse temperatures with dates, year numbers, or version codes.",
     "user_description": "What is the maximum temperature at the operating site? (°C; e.g. 30°C for production hall)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9a61e67e-417c-44c6-946e-61ac6a02a17c": {
@@ -547,6 +595,8 @@
     "hint": "Maximum rated relative humidity the vehicle must tolerate, as a percentage. Source: an explicit relative-humidity % figure in the environment specification. NULL RULE — READ FIRST: null by default. Only fill it if the document explicitly states a relative-humidity value as a % figure in an environment or technical-specification section. If no humidity percentage is stated, output null. Do NOT supply a default, typical, or example value, and do NOT copy numbers from this description or from rule/domain notes. Do NOT infer humidity from warehouse type, food/beverage context, washdown wording, or cold-storage environment.",
     "user_description": "What is the maximum relative humidity at the operating site? (%)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "004857ec-af13-4850-a69d-b6ca79a59618": {
@@ -575,6 +625,8 @@
     "hint": "IP code for dust/water resistance. Source: spec 'IP rating' — must be explicitly printed (e.g. 'IP54', 'IP65'). Cond. K.O.: IP52+ binds for dust/moisture/washdown (F&B, beverage); standard AMRs ≈ IP20. 'None' = no rating stated. NULL RULE: null if no IP code is explicitly stated. Warehouse type, AGV type, and storage environment do NOT imply an IP rating — a VNA high-bay warehouse is NOT necessarily IP65.",
     "user_description": "What ingress protection rating (IP class) is required at the operating site? (e.g. IP54 for splash water protection)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "fb32d20a-02cf-4fa3-9355-8674d59f308b": {
@@ -598,6 +650,8 @@
     "hint": "Cleanroom certification, if any. Source: 'cleanroom version'. Cond. K.O.: binds only for pharma/semiconductor/sterile F&B. 'None' = no cleanroom rating. NULL RULE: output 'None' or null unless the document explicitly states a cleanroom ISO class (e.g. 'ISO 7', 'cleanroom version'). Do NOT infer from words like 'clean', 'hygiene', or 'food-grade'.",
     "user_description": "Are there cleanroom requirements at the operating site? (ISO class; only fill in if cleanroom is present)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "3b3c2e34-e8b7-402e-8ffe-f68c493a98f5": {
@@ -618,6 +672,8 @@
     "hint": "Max ramp gradient the loaded unit handles. Source: spec 'gradeability' — must appear as an explicit % value. The value represents the steepest ramp gradient (%) the loaded vehicle must climb. Cond. K.O.: binds only where the site has ramps/dock inclines. NULL RULE: null unless a slope or gradient percentage is explicitly stated in the document. An approximate value (e.g. 'approximately X%') counts as explicit — do not null it solely because the document qualifies the figure. Do NOT infer or apply typical values when the document is silent on gradients.",
     "user_description": "How steep is the steepest driving route in the operating area? (% gradient; e.g. 1.5 for a 1.5% ramp)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "370e78f7-7291-48c3-a90f-6b710d81cd3b": {
@@ -643,6 +699,8 @@
     "hint": "Floor flatness the system requires for safe operation/high-lift. Source: install requirements — must name a standard or value. Cond. K.O.: binds when the site floor is below spec → costly grinding. NULL RULE: null unless a floor quality standard (DIN 15185, FM number, FF number, etc.) or explicit flatness value is named. Do NOT infer from VNA or high-bay context.",
     "user_description": "Are there special requirements for floor quality or flatness?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "7c2bd9ed-70e2-40fb-bb32-1304621fdeb5": {
@@ -663,6 +721,8 @@
     "hint": "General docking/stop positioning accuracy at a target (e.g. ±5–10 mm on premium units). Source: spec 'positioning / stop accuracy'. Tighter = reliable hand-off. (moved here; forklift adds detailed pick/drop accuracy on top)",
     "user_description": "How precisely must the AGV position at transfer or pickup points? (mm deviation)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "60cd7189-d343-42db-aa3d-6788fd73ab34": {
@@ -688,6 +748,8 @@
     "hint": "Energy storage technology. Source: 'battery'. Li-Ion/LiFePO4 = opportunity charging, no battery room; Lead-Acid = swap rooms. (consolidated here for all types)",
     "user_description": "What battery type is preferred or required?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c93c2b2c-350f-4858-b2f8-172ead5b99d3": {
@@ -708,6 +770,8 @@
     "hint": "Operating hours per charge. Source: 'runtime / operating time'. Pair with charge_time & autonomous_charging for true uptime. (consolidated)",
     "user_description": "How many hours of operating time per charge are required as a minimum? (h)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "e2b8a10f-5e90-4de9-93f0-3bba7a52f6fa": {
@@ -728,6 +792,8 @@
     "hint": "Recharge / fast-charge duration. Source: 'charging time' (e.g. Geek+ ~10 min opportunity; Locus Vector ~60 min full). Short charge + auto-charging ≈ continuous run. (consolidated)",
     "user_description": "What is the maximum acceptable duration of a full charging cycle? (min)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6e19998f-2ee7-441f-b8c9-f2c48220c459": {
@@ -748,6 +814,8 @@
     "hint": "Self-charging / auto opportunity-charging or auto battery-swap without operator. Source: 'automatic charging'. Enables 24/7 unattended operation. (consolidated here for all types)",
     "user_description": "Must the AGV autonomously navigate to the charging station and charge itself?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "0512f334-04ce-4a64-84c3-f6e0f2eada9e": {
@@ -768,6 +836,8 @@
     "hint": "Supports quick manual battery hot-swap (e.g. MiR). Source: 'battery swap'. Alternative to charging dwell for very high duty cycles. (consolidated)",
     "user_description": "Is fast manual battery swapping desired instead of charging?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "05e8ead4-bc7f-4209-af5d-d4ac5e9417ee": {
@@ -794,6 +864,8 @@
     "hint": "Declared driverless-truck SAFETY standards only. Source: 'certification / compliance'. ISO 3691-4 is the current EU AGV/AMR safety norm — its presence raises trust. (Removed CE = conformity marking, and IEC 62443 = cybersecurity — neither is a safety standard.)",
     "user_description": "Which safety standards must be met? (e.g. EN ISO 3691-4)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "88596a40-f85b-4361-90aa-ca3e16456a85": {
@@ -820,6 +892,8 @@
     "hint": "Performance Level (ISO 13849) of the safety function. Source: safety datasheet. Higher PL = safer human-robot coexistence in shared aisles.",
     "user_description": "What functional safety level is required? (e.g. PLd, SIL2)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "ba6fa567-5b42-46fb-a2cf-b9d0bc986d1a": {
@@ -844,6 +918,8 @@
     "hint": "What volume the safety sensors monitor: floor-level 2D scan, partial 3D ('waterfall' front field), or full 3D. Source: 'safety scanner / 3D camera'. Full 3D detects overhanging/low obstacles → fewer collisions.",
     "user_description": "Which areas must be covered by safety sensors?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "04fb859e-054a-4360-bf75-af62c03d73c9": {
@@ -869,6 +945,8 @@
     "hint": "Architecture of the fleet controller. Source: 'fleet manager / software'. Implies lock-in vs. interoperability. NULL RULE: output null unless the tender explicitly names a required fleet-controller architecture (one of the allowed values). Do NOT infer from the mere presence of a WMS, fleet software, or VDA 5050 mention — those are separate fields. Canonical form mapping: German 'VDA 5050-kompatibel' or 'VDA-5050-fähig' → 'VDA 5050 compatible'. Always output the English canonical form.",
     "user_description": "Is there an existing fleet management system that must be compatible?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "b8c12d22-1c46-4c2d-96b4-ec2c06d16c99": {
@@ -893,6 +971,8 @@
     "hint": "Central server vs. on-board swarm logic (e.g. AGILOX X-SWARM). Source: 'centralized control / swarm'. Decentralized = no server, simpler scaling & failover.",
     "user_description": "What control architecture is intended for the fleet? (centralised, decentralised)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "1830f69a-d29d-4a51-944f-32b621922117": {
@@ -913,6 +993,8 @@
     "hint": "Supports VDA 5050 (open AGV↔master-control interface standard). Source: 'VDA 5050 ready' or 'VDA-5050'. Cond. K.O.: trending to a hard requirement for large EU multi-vendor tenders. NULL RULE: null unless the document literally contains 'VDA 5050' or 'VDA-5050'. Do NOT infer from fleet management, MES/WMS integration, or system openness requirements.",
     "user_description": "Must the AGV support the VDA 5050 interface standard?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": "VDA 5050 Compatible",
     "value_if_null": null
   },
   "e8e1e6a0-0cd9-4685-a8e7-e59ccc64d635": {
@@ -933,6 +1015,8 @@
     "hint": "Max vehicles in one managed fleet. Source: 'fleet / scalability'. Implies growth headroom for phased/peak rollouts. (consolidated)",
     "user_description": "How many AGVs should be in simultaneous operation?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "3222f9f6-d19a-4a6a-9365-dd55ee59ba85": {
@@ -953,6 +1037,8 @@
     "hint": "Interoperates with other vendors' robots (open / VDA 5050 fleet). Source: 'mixed fleet'. Avoids vendor lock-in. (consolidated)",
     "user_description": "Must AGVs from different manufacturers be able to coexist in the same area?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "96328930-c387-438f-82a1-8fd17fbded91": {
@@ -983,6 +1069,8 @@
     "hint": "System integrations required by the tender. Extract all mentioned: SAP, WMS, ERP, MES, REST API, MQTT, OPC-UA, Modbus. List comma-separated. null if none mentioned. Use canonical forms only: 'OPC-UA' (hyphen — never 'OPC UA' with space), 'WMS' (not 'SAP WM', 'Warehouse Management', or 'WMS system').",
     "user_description": "Which existing systems must the AGV integrate with? (WMS, ERP, MES)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c348cf0d-97ef-4b47-8358-853ea980f00d": {
@@ -1006,6 +1094,8 @@
     "hint": "Who may physically install/commission on site. Source: 'commissioning / deployment'. Client-installable = faster, cheaper rollout & expansion.",
     "user_description": "Are there requirements for the installation process of the AGV system?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9babddb2-3951-4b4b-9c61-c80a0257a2b9": {
@@ -1030,6 +1120,8 @@
     "hint": "Who may change routes/stations/layout AFTER go-live. Source: 'teach-in / map editing'. 'Supplier limited' = supplier does it but with a constrained/quick-change service; 'Client: All' = full operational autonomy. (renamed per request)",
     "user_description": "How easy must later modifications or expansions be?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "f9edb5e9-d78d-4717-83d4-8f050fc181a9": {
@@ -1062,6 +1154,8 @@
     "hint": "Pick/drop station types the AGV must serve. Extract all mentioned: Floor, Conveyor, Machine cell, Gravity rack, Pushback rack, Drive-in rack. If any conveyor station mentioned → include 'Conveyor'. List comma-separated.",
     "user_description": "What special station applications are required? (e.g. charging station, transfer station)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "660e8f14-5ca7-4808-bfea-64c35479acba": {
@@ -1082,6 +1176,8 @@
     "hint": "Smallest sensible deployment. Source: sales/solution pages. High minimums exclude small first-time buyers.",
     "user_description": "How many AGVs are needed as a minimum?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9f4b2836-0d81-4441-8eb0-bf079dd6a4d9": {
@@ -1107,6 +1203,8 @@
     "hint": "Typical total project value band. Source: inferred from references/sales. Budget-fit orientation.",
     "user_description": "What budget is available for the AGV project? (EUR)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "16867284-4633-4de6-a1f3-0d10181630d4": {
@@ -1127,6 +1225,8 @@
     "hint": "Can be driven manually (operator on board / walkie) as fallback. Source: 'manual / semi-automatic mode'. Redundancy reassurance for first-time automation buyers.",
     "user_description": "Should the vehicle also be manually operable?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "64e57189-87ab-4b62-9b62-8b10aecf143c": {
@@ -1156,6 +1256,8 @@
     "hint": "Verticals with live references. Source: 'industries / case studies'. Weigh F&B references for the target market.",
     "user_description": "In which industry will the AGV be used?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "fe2f41c5-b630-4b4f-b6e7-2388eded0882": {
@@ -1176,6 +1278,8 @@
     "hint": "AGV fork lift height in METERS — the height the forks travel, NOT building height, rack height or storage height. Source: 'Hubhöhe / lift height / fork height' in the AGV specification. If only building or rack height is stated → null. NULL RULE: null unless the document explicitly states a required AGV lift height as a technical specification with its own value and unit. Do NOT confuse with transfer station height, conveyor height, rack height, or building height — these are site dimensions, not AGV specifications. Do NOT compute, derive, or estimate the lift height from any other stated quantity — pallet height, stack height, number of storage levels, or rack capacity are design inputs, not AGV lift specifications. A lift height obtained by calculation rather than read directly from an AGV specification has no source sentence and must be output as null.",
     "user_description": "How high must the device lift loads? Enter the maximum pick height in the rack. (mm; e.g. 10,000 mm = 10 m for high-bay storage)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c5ed2418-76d6-4065-84b6-0f6204353a0a": {
@@ -1196,6 +1300,8 @@
     "hint": "Lowest overall vehicle height (mast collapsed). Source: dimensions. Cond. K.O.: binds where doors/sprinklers/mezzanines limit clearance.",
     "user_description": "What is the height of the lowest doorways or passages in the operating area? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "39d6919b-5de1-465e-949e-c63f0adc1ad6": {
@@ -1220,6 +1326,8 @@
     "hint": "Non-standard fork or attachment type required by the tender. Standard forks are the default for all forklifts and must NOT be extracted as a requirement. Rotating forks are the default for VNA/narrow-aisle turret trucks and are resolved from the vehicle classification, not from this field. NULL RULE — READ FIRST: null by default. Only output a value if the tender document EXPLICITLY names a non-standard attachment type — i.e. 'telescopic forks', 'side-shift', or 'clamp'. If the document does not explicitly name Telescopic, Side-Shift, or Clamp — output null. A null value never disqualifies any supplier; a wrong value eliminates qualified suppliers.",
     "user_description": "Is a special fork attachment required? (e.g. side-shift, clamp)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "74521426-7c35-4c9b-8141-48d5ef9d7b1b": {
@@ -1244,6 +1352,8 @@
     "hint": "Can fork width adjust to different pallet widths, and how? Source: 'fork adjustment / auto fork width'. Cond. K.O.: 'Auto' becomes required only when the buyer runs mixed pallet widths.",
     "user_description": "What fork spacing is required for the load carriers? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "4d63ba57-5e22-4517-bbc6-7f28432203be": {
@@ -1269,6 +1379,8 @@
     "hint": "Mast stage count. Source: spec. Per your note: does not gate execution — kept as Context.",
     "user_description": "What mast type is intended? (e.g. duplex, triplex, quad)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "efb0b0c7-e938-4d5a-8c2d-d31282da22a0": {
@@ -1289,6 +1401,8 @@
     "hint": "Minimum working aisle width available in the facility, in METERS. ONLY extract if the document explicitly states an aisle, corridor, or rack-to-rack width. Source terms: 'Gangbreite', 'aisle width', 'working aisle', 'corridor width'. If no explicit width is stated anywhere in the document → output null. Do NOT infer or estimate a width from the warehouse type, the forklift category, or any typical or standard value — absence of a stated width means null, never a guess. If the figure is given in mm, divide by 1000. Do NOT confuse aisle width with lift height, rack height, vehicle height, or transfer-station height.",
     "user_description": "How wide are the narrowest aisles in your facility? The AGV must manoeuvre within this width. (mm; e.g. 1,800 mm for narrow-aisle operation)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "ccf99b97-919c-474f-94c8-6e46eba7360d": {
@@ -1309,6 +1423,8 @@
     "hint": "Set to true ONLY if this tender explicitly mandates VNA (Very Narrow Aisle) capability — aisle widths below 1.8 m requiring turret or side-loader technology. Set to false if VNA is not mentioned or standard aisles are assumed — this is the default for standard Forklift AGV tenders. Do NOT set to true if VNA is mentioned only as existing warehouse context, historical infrastructure, or areas outside this procurement scope. Null only if aisle requirements are genuinely ambiguous.",
     "user_description": "Is VNA (Very Narrow Aisle) capability required — or explicitly not desired?",
     "display_mode": "display",
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": false
   },
   "b74a9cab-fb2e-4a93-ac33-fe6b0bbd1c1a": {
@@ -1335,6 +1451,8 @@
     "hint": "Forklift drive category — describes the physical build of the forklift mechanism. There are five types:\n- Counterbalanced (Gegengewichtsstapler): rear counterweight, no front support legs, forks fully exposed. Can pick pallets directly from the floor and mate with closed conveyors. Wide aisles (≥3 m).\n- Reach Truck (Schubmaststapler): forks extend forward between two front legs. Handles racking in medium aisles (2–3 m), lifts up to ~8 m.\n- Straddle Stacker (Spreizenstapler): load sits between the front legs. Narrower aisles and higher lift than a reach truck.\n- Pallet Mover (Niederhubwagen): low-profile, floor-to-floor transport only, no high-lift to racking.\n- VNA Turret (Schmalgangstapler): only the turret rotates, not the chassis. Ultra-narrow aisles (<2 m), high-bay racking up to 17 m. Always wire- or rail-guided in the aisle.\nEXTRACTION RULE: if required_vna_capable=true → always output 'VNA Turret'. Otherwise: ONLY output if the buyer explicitly names a drive type or forklift category in the document (e.g. 'Gegengewichtsstapler', 'counterbalanced forklift', 'Schubmaststapler', 'reach truck required'). DO NOT infer from the task — floor-level pallet transport does NOT imply Counterbalanced. Output null if the buyer does not specify a drive type.",
     "user_description": "What drive type is intended? (e.g. counterbalanced, reach truck, VNA)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c9dcda6f-50ac-4e87-8d66-bec0cd0f05ce": {
@@ -1355,6 +1473,8 @@
     "hint": "Placement accuracy LATERALLY (sideways) at drop. Source: 'positioning accuracy' or sales. Drives rack-opening tolerance; tighter = denser racking, higher score.",
     "user_description": "How precisely must the AMR deposit loads laterally? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "443cf07f-782f-4c66-bb81-15ba033ffc69": {
@@ -1375,6 +1495,8 @@
     "hint": "Placement accuracy in DEPTH at drop. Source: as above. Tighter = less damage & denser storage. (reordered to lat·dep·angle)",
     "user_description": "How precisely must the AMR deposit loads in depth? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "d7b23f4b-dcfe-4396-bd8e-7954420f0d1b": {
@@ -1395,6 +1517,8 @@
     "hint": "Angular placement accuracy at drop. Source: as above. Skew tolerance for conveyor/rack hand-off.",
     "user_description": "How precisely must the AMR deposit loads angularly? (degrees)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "85b7c020-0cd3-4485-8281-3b8ee605b2e2": {
@@ -1415,6 +1539,8 @@
     "hint": "How precisely a pallet must be PRE-positioned (laterally) for the truck to pick it. Source: integration spec. Loose tolerance = forgiving of sloppy upstream placement, easier deployment.",
     "user_description": "What lateral precision is required when picking up loads? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "43641d9b-0424-4cc8-af67-1daa55954f8a": {
@@ -1435,6 +1561,8 @@
     "hint": "Required pre-position accuracy in DEPTH to pick. Source: as above.",
     "user_description": "What depth precision is required during order picking? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "340057db-8dd0-4cb7-8e01-23ae7a5fe893": {
@@ -1455,6 +1583,8 @@
     "hint": "Required pre-position ANGLE accuracy to pick. Source: as above. Tolerant handling reduces upstream constraints.",
     "user_description": "What angular precision is required during order picking? (degrees)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "f418a304-e6d0-4cbe-9d57-f049bfbd3a17": {
@@ -1475,6 +1605,8 @@
     "hint": "Single forks with NO support legs/structure under the load (true counterbalance free-lift). Source: drive_type=Counterbalanced + 'free lift'. Required to pick closed-bottom pallets on the floor and mate with closed conveyors — straddle/reach trucks fail here. Cond. K.O.: decisive only when the buyer has closed pallets/conveyors.",
     "user_description": "Must the forks be laterally shiftable or free-floating?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "dcf086e5-18d5-4023-a595-a4a9ba61cf8a": {
@@ -1495,6 +1627,8 @@
     "hint": "Can stack & de-stack pallets (vertical), vs. floor-to-floor transport only. Source: 'stacking'. Filter for storage vs. pure transport tenders.",
     "user_description": "Must the device be able to stack loads on top of each other?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "ba89e614-9c33-4ff2-a555-e85945b78ac4": {
@@ -1524,6 +1658,8 @@
     "hint": "How the truck identifies/verifies the pallet & target slot before handling. Source: 'load / pallet detection / vision'. Better detection tolerates imperfect placement & prevents mis-picks.",
     "user_description": "How should load pickup be detected?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "400f837a-ef34-4c65-bb37-acb8b21fafc9": {
@@ -1544,6 +1680,8 @@
     "hint": "Reads barcodes/DataMatrix and acts on the data (confirm SKU/location). Source: 'barcode / scanning'. Cond. K.O.: hard requirement when the buyer explicitly demands barcode verification; otherwise scores as an enhancement. (template case for Cond. K.O.)",
     "user_description": "Are integrated barcode scanners for load identification required?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "d0bda96d-6948-4b20-a16a-3a0e3537fc0a": {
@@ -1564,6 +1702,8 @@
     "hint": "Scans a storage line to auto-find the next free slot or next pallet to pick. Source: 'inventory scanning / slotting'. Enables autonomous put-away/retrieval logic.",
     "user_description": "Must the AGV be able to automatically scan inventory in the racks?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "ca8a2e5f-ebf1-49dd-a41c-3ccf270fbb73": {
@@ -1584,6 +1724,8 @@
     "hint": "Autonomously LOADS trailers/trucks at the dock. Source: 'automatic truck loading'. Cond. K.O.: decisive only for dock-automation tenders.",
     "user_description": "Must the AGV be able to enter and load truck trailers?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "94438838-9fb6-46e2-ba04-1d31b6ac40aa": {
@@ -1604,6 +1746,8 @@
     "hint": "Autonomously UNLOADS trailers/trucks. Source: same. Cond. K.O.: decisive only for dock-automation tenders.",
     "user_description": "Must the AGV be able to unload from truck trailers?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "e2205c93-10d2-45ce-af50-86c300a56b82": {
@@ -1628,6 +1772,8 @@
     "hint": "Physical guidance for rail/wire-guided VNA trucks (distinct from free-nav AGVs). Source: VNA spec. 'None' for free-roaming units.",
     "user_description": "What guidance concept should the racking vehicle use in the VNA aisle?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "efa987be-5f04-47ca-89ab-35776339e013": {
@@ -1648,6 +1794,8 @@
     "hint": "Draws power / charges via in-aisle busbar instead of battery cycling. Source: VNA power spec. Enables continuous high-duty VNA operation.",
     "user_description": "Is a rail-based power supply system (busbar) planned?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "730de80f-ba52-44bf-bfb8-dc72b2b701c3": {
@@ -1668,6 +1816,8 @@
     "hint": "Total towed load in kg. [TUGGER ONLY] — output null unless required_product_type is 'Tugger AGV'. Source: 'Schleppkraft / towing capacity'.",
     "user_description": "What is the maximum total weight of the train? (kg; sum of all trailers including load; e.g. 5,000 kg)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c34f69c9-4cb7-4df1-9fe0-d2afb5dde2ba": {
@@ -1688,6 +1838,8 @@
     "hint": "Number of trailers per train. [TUGGER ONLY] null for other vehicle types.",
     "user_description": "How many trailers must be able to be towed simultaneously?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "2a06e565-eb70-44e8-b362-bd057cfd9a7a": {
@@ -1713,6 +1865,8 @@
     "hint": "Trailer attachment method. Output from allowed values only, comma-separated if multiple. null = not stated. NULL RULE: output null unless the tender explicitly names a coupling method. Do NOT default to 'Automatic' or infer from 'auto_hitch'.",
     "user_description": "What coupling type do the existing or planned trailers use?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "745ac03b-c39f-4ce3-af99-d7e3e19343ae": {
@@ -1733,6 +1887,8 @@
     "hint": "Automatic trailer coupling without manual intervention. true/false. [TUGGER ONLY] null for other vehicle types.",
     "user_description": "Must the tugger be able to automatically couple trailers?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "77406f3e-7a53-48f6-80c1-3384598edc35": {
@@ -1753,6 +1909,8 @@
     "hint": "How far a cart may be mis-parked and still be auto-hitched. Source: rarely published — ask supplier (mechanism: the tugger approaches the cart and the hitch self-engages within a capture window; wider window = more forgiving of human cart placement). Larger tolerance = easier real-world operation.",
     "user_description": "What positioning tolerance is acceptable for automatic coupling? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "ec8bb86e-40a5-4d69-8c57-7c6dd38b43af": {
@@ -1778,6 +1936,8 @@
     "hint": "Mechanical train concept. Source: product family (e.g. STILL LiftRunner B-/C-frame). Implies load/unload ergonomics & which trolleys fit.",
     "user_description": "What train configuration is intended? (e.g. trailers in line, carousel)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9d0f802b-7041-4343-858e-e0ac14b0fac6": {
@@ -1803,6 +1963,8 @@
     "hint": "How load moves on/off trailers at stations. Source: 'automatic load transfer'. Automatic transfer removes the last manual touch.",
     "user_description": "How should the load handover at the trailer be performed?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "8609905f-24b8-4eea-8005-e7b4893ef261": {
@@ -1823,6 +1985,8 @@
     "hint": "Which trailer/cart makes & models the tugger is qualified to pull (e.g. K.Hartwall, STILL LiftRunner, LKE, FlexQube, in-house carts). Source: 'compatible carts / partners' or reference photos. Tells the buyer whether existing carts can be reused.",
     "user_description": "Which trailer types will be used?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c6bfa5fc-0307-4230-b575-78291116d28a": {
@@ -1851,6 +2015,8 @@
     "hint": "How the pulled trailers steer/track. Source: cart datasheet. Self-steering tiers (quad-steer, tracking drawbar/virtual coupling, forced axle steer) follow the tugger's exact path with little 'snaking' → tighter aisles & safer; passive caster carts off-track more and may need wider aisles; 'Manual only' = no tracking aid. Better tracking = higher score and narrower aisle need.",
     "user_description": "What steering technology do the trailers use? (e.g. passive steering, active steering)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9ff0e3bc-521b-4dc9-b7e8-9350ced25969": {
@@ -1875,6 +2041,8 @@
     "hint": "Routing mode. Output exactly one allowed value. Fixed Route = predefined milk-run loop; Flexible Route = semi-dynamic; Fully Dynamic = on-demand point-to-point.",
     "user_description": "What type of route is planned? (fixed route, flexible route)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "f636b9aa-947c-4df0-b406-03a34a5eac71": {
@@ -1899,6 +2067,8 @@
     "hint": "How routes are created/edited. Source: 'teach-in / mapping'. Map-based + client-editable = cheap to change (ties to modification_process).",
     "user_description": "How should routes be programmed or adjusted?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9fb72751-a4de-4468-b406-372f7a5bb2e8": {
@@ -1919,6 +2089,8 @@
     "hint": "Autonomous negotiation of crossings/merges with other traffic. Source: 'traffic management'. Implies throughput & safety in shared corridors.",
     "user_description": "How should intersection situations between multiple AGVs be handled?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "1fbf91de-a1fc-4512-bc80-92c44c11c9b4": {
@@ -1939,6 +2111,8 @@
     "hint": "Min working aisle in METERS (not mm). Source: 'Gangbreite / aisle width'. If doc states mm (e.g. 2700 mm) → divide by 1000 → 2.7. Hard filter; decisive for VNA. WARNING: Do NOT confuse aisle width with other dimensions. Source terms: 'Gangbreite', 'aisle width', 'working aisle'. If no explicit aisle width is stated → output null.",
     "user_description": "How wide are the narrowest aisles in your facility? The AGV must manoeuvre within this width. (mm; e.g. 1,800 mm for narrow-aisle operation)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "7664d132-1de2-4f01-8a99-013968f58919": {
@@ -1959,6 +2133,8 @@
     "hint": "Tugger turning radius (tractor alone). Source: spec 'turning radius' (e.g. Vecna ATG ≈ 2,900 mm / 9'6\"). Hard filter for tight bends & dock turns.",
     "user_description": "How much space is available for cornering? (mm; vehicle turning radius must be smaller)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "715d8879-3cb5-4523-af97-1b924e440a21": {
@@ -1979,6 +2155,8 @@
     "hint": "Min working aisle in METERS (not mm). Source: 'Gangbreite / aisle width'. If doc states mm (e.g. 2700 mm) → divide by 1000 → 2.7. Hard filter; decisive for VNA.",
     "user_description": "How wide are the narrowest passages in the entire travel area including trailers? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "8da77114-fbe9-4e21-a0d3-e03edfce5588": {
@@ -2003,6 +2181,8 @@
     "hint": "AMR workflow function. [AMR ONLY] null for other types. Output from allowed values, comma-separated. NULL RULE: output null unless the tender explicitly specifies the AMR workflow (Transport, Goods-to-Person, Picking support). Do NOT infer from general automation context.",
     "user_description": "What workflows should the AMR support?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "a7753133-3bc8-4ec7-b14a-7b328556ca8c": {
@@ -2023,6 +2203,8 @@
     "hint": "Requires fixed storage grid. [AMR ONLY] true/false. null for other types. NULL RULE: output null unless the tender explicitly requires a fixed storage grid (e.g. AutoStore-style). Do NOT infer from 'racking' or 'shelving'.",
     "user_description": "Is a physical grid system (e.g. storage robot grid) part of the solution?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "9a1ce2ba-f680-4a5a-b6c3-494952729061": {
@@ -2043,6 +2225,8 @@
     "hint": "Can rotate the carried rack/pod in place to present a chosen face (hallmark of G2P). Source: 'shelf rotation / spin'. rotation_capable + grid_required ≈ goods-to-person; both false ≈ pure transport.",
     "user_description": "Must the AMR be able to rotate loads during travel?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6d332b7e-0da6-4638-bf67-37bf54424603": {
@@ -2069,6 +2253,8 @@
     "hint": "Picking method. [AMR ONLY] null for other types. Output from allowed values. NULL RULE: output null unless the tender explicitly names a picking method. Do NOT infer from generic 'picking' mentions.",
     "user_description": "What mechanism should the AMR use for picking or gripping?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "1df6b905-0a76-4103-bb48-62cecd0e7e51": {
@@ -2089,6 +2275,8 @@
     "hint": "Lift stroke to raise the cart/rack/pod off the floor. Source: spec 'lifting height/stroke'. Implies whether it clears the carrier underside; filter vs. carrier leg height. (0 for non-lifting transport tops.)",
     "user_description": "How high must the AMR lift loads or shelving units? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6a6f5ac8-5147-4664-a0d8-fea186f667d0": {
@@ -2109,6 +2297,8 @@
     "hint": "Robot height / clearance needed to drive UNDER the carrier (undercarriage workflows). Source: vehicle height spec. Must be less than the carrier's underside gap — classic undercarriage K.O.",
     "user_description": "What minimum ground clearance is required? (mm; e.g. for floor unevenness)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "74c64993-f70f-4b5b-bf7e-68fe325d6577": {
@@ -2129,6 +2319,8 @@
     "hint": "Engages standard rack/shelf pin systems (Geek+/Quicktron style). Source: 'shelf/rack compatibility'. Cond. K.O.: binds when the buyer reuses existing movable shelving.",
     "user_description": "Must the AMR work with pin-compatible storage racks?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "4c8451ee-6cac-4d5e-a72e-19fc89bcb813": {
@@ -2149,6 +2341,8 @@
     "hint": "Handles BOTH open and closed-bottom pallets (e.g. AGILOX OCF free-lift). Source: 'open/closed pallet'. Cond. K.O.: mirrors the forklift closed-pallet case; binds only when the buyer has closed pallets.",
     "user_description": "Must the AMR be able to pick up pallets without fork openings?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6f771137-7364-4d36-abbb-f4a9ac4abe41": {
@@ -2178,6 +2372,8 @@
     "hint": "Interchangeable top modules the platform accepts (e.g. MiR Hook/Shelf-Lift/Pallet-Lift; UR cobot). Source: 'top modules / accessories'. More modules = one platform covers more workflows.",
     "user_description": "What top module is required? (e.g. conveyor belt, lifting table, robotic arms)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "30487671-8cec-427a-8026-4b7d6e0a82a4": {
@@ -2198,6 +2394,8 @@
     "hint": "Range of cart/carrier heights the hook/lift can collect without modifying existing carts. Source: 'hook / cart' spec. Wider range = reuse of existing fleet.",
     "user_description": "At what height range must the AMR pick up carts or carriers? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "384a66e5-19c1-48df-bcc0-509d676dbaf8": {
@@ -2218,6 +2416,8 @@
     "hint": "Min turning radius (0 if omnidirectional). Source: spec. Filter vs. aisle/turn geometry; combine with footprint.",
     "user_description": "How much space is available for turning movements? (mm; turning radius must be smaller)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "281c147d-8631-4e35-92a8-037bebca89d7": {
@@ -2238,6 +2438,8 @@
     "hint": "Required pre-park accuracy in DEPTH to engage the carrier. Source: as above.",
     "user_description": "What depth precision is required during order picking? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "646f14fe-cda9-47db-b8b8-d548a793a938": {
@@ -2258,6 +2460,8 @@
     "hint": "Required pre-park ANGLE accuracy to engage. Source: as above. Tighter angle need = stricter parking discipline upstream.",
     "user_description": "What angular precision is required during order picking? (degrees)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "73ee007a-8afa-4a1f-a59c-38a03582a1e3": {
@@ -2278,6 +2482,8 @@
     "hint": "Placement accuracy LATERALLY when the robot sets a carrier down at a defined position/marker. Source: spec 'positioning accuracy'. Matters when the dropped carrier must be re-acquired later. (added — was missing for AMR)",
     "user_description": "How precisely must the AMR deposit loads laterally? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "401ff126-934a-4b8d-a57e-a4dcc481fb23": {
@@ -2298,6 +2504,8 @@
     "hint": "Placement accuracy in DEPTH at drop. Source: as above.",
     "user_description": "How precisely must the AMR deposit loads in depth? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "b7f20be0-e007-4d72-a0e1-0e19675fbc98": {
@@ -2318,6 +2526,8 @@
     "hint": "Angular placement accuracy at drop. Source: as above.",
     "user_description": "How precisely must the AMR deposit loads angularly? (degrees)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "16c5389a-65d5-44b1-a07d-597bbaa12851": {
@@ -2343,6 +2553,8 @@
     "hint": "Goods-to-Person storage paradigm the AMR is designed to operate within. Source: system overview, 'goods-to-person', 'G2P', storage compatibility section. Output ONLY from allowed values (Bin-to-Person, Tote-to-Person, Shelf-to-Person, Pallet-to-Person). Cond. K.O.: binds when tender specifies an existing or planned storage infrastructure the AMR must integrate with.",
     "user_description": "What storage system should the AMR serve?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "40b295f1-a133-4d9a-8e1d-91833c7da653": {
@@ -2363,6 +2575,8 @@
     "hint": "Max shelf/rack/pod height handled (Geek+ ~2.8 m; RoboShuttle ~11 m). Source: spec. Cond. K.O.: binds for G2P vs. building height; density driver.",
     "user_description": "How high are the storage racks the AMR should serve? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "63afacee-60c5-4129-b852-628263f39066": {
@@ -2383,6 +2597,8 @@
     "hint": "Pod/shelf footprint the robot drives under (e.g. 880×880, 1020×1020). Source: spec 'shelf size'. Cond. K.O.: binds when matching existing shelving dimensions.",
     "user_description": "What is the footprint of the storage units? (mm)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "5f36df82-a7a1-46ea-a0e5-0671f3923d06": {
@@ -2403,6 +2619,8 @@
     "hint": "Smallest sensible storage field for a G2P deployment. Source: solution/sales. Entry-footprint orientation.",
     "user_description": "What is the minimum storage area for the AMR system? (m²)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "31d98668-22b6-46f9-9b8d-894d9293e2c7": {
@@ -2423,6 +2641,8 @@
     "hint": "Maximum throughput in picks per hour as a single integer — the rated capacity of the system. Source: datasheet throughput / performance section.",
     "user_description": "How many picks per hour are required as a minimum?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "e66dbd99-39c8-4935-aa5f-0a6d49e41197": {
@@ -2447,6 +2667,8 @@
     "hint": "What throughput_picks_per_hour refers to. Source: read the fine print of the vendor KPI. Essential to disambiguate G2P (per-station) vs picking (per-robot) numbers. (new — fixes the per-station/per-robot confusion)",
     "user_description": "On what basis is throughput measured?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "e1b69ffc-31e1-40fb-8a5e-bd5d7f00e2c8": {
@@ -2467,6 +2689,8 @@
     "hint": "How many robots queue/serve one G2P station at once. Source: solution spec. Implies station utilization & peak throughput.",
     "user_description": "How many AMRs must be able to work at one station simultaneously?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "6f0b43c1-d999-4bfa-a17c-ea4540e149bb": {
@@ -2487,6 +2711,8 @@
     "hint": "Order lines per robot run before returning to a station (picking workflows). Source: solution spec. Travel efficiency / batch depth.",
     "user_description": "How many order lines should be processed per trip?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "71cb3acf-5a23-4f7f-8abc-9488803a5584": {
@@ -2507,6 +2733,8 @@
     "hint": "Mixes pick + put-away + replenishment + returns in one run (Locus Origin). Source: 'task interleaving'. Higher asset utilization.",
     "user_description": "Should AMRs be able to alternate between different task types?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "002a11fb-19eb-42a2-810f-6848f7d86a06": {
@@ -2527,6 +2755,8 @@
     "hint": "Storage density vs. conventional shelving (Geek+ claims ~2.5×). Source: solution marketing — treat as a vendor claim.",
     "user_description": "How important is high storage density for your system?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "e5eb0e99-54a4-4c8b-82ae-f0a4e4c8f2c1": {
@@ -2547,6 +2777,8 @@
     "hint": "Pick/put height adjusts to operator ergonomics (picking workflows). Source: 'ergonomic / adjustable'. Sustains pick rate.",
     "user_description": "Must the working height be ergonomically adjustable for operators?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "09ca5135-a860-4236-844e-d2b47e8db98d": {
@@ -2567,6 +2799,8 @@
     "hint": "Onboard screen guiding the worker (Locus Origin). Source: 'onboard display / UI'. Speeds training & cuts errors.",
     "user_description": "Is a display or control panel on the vehicle required?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": "Onboard UI",
     "value_if_null": null
   },
   "27965aae-7b51-4704-b14a-3e19ae1a1b7c": {
@@ -2587,6 +2821,8 @@
     "hint": "Onboard UI supports multiple languages. Source: 'multi-language'. Relevant for diverse workforces.",
     "user_description": "Must the display support multiple languages?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c2e9dbf0-0ec5-4434-82bf-6bb5879ef70e": {
@@ -2607,6 +2843,8 @@
     "hint": "Optional worker gamification/incentive features (Locus). Source: 'gamification'. Soft productivity lever.",
     "user_description": "Are gamification elements for operator motivation desired?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "4a9b0aa5-8303-49e5-96dc-87ae6d179f1b": {
@@ -2633,6 +2871,8 @@
     "hint": "Physical carrier type the AMR transports on its deck or platform. Source: spec 'payload type', 'transports', 'carries', solution overview. Output ONLY from allowed values (Tote, Bin, Pallet, Shelf, None — use None for robots that tow or interact with fixed shelving without carrying). Cond. K.O.: binds when tender specifies which container types must be handled.",
     "user_description": "What container type should be transported on the AMR?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "51472385-d742-4e72-a91f-b480738c48ed": {
@@ -2653,6 +2893,8 @@
     "hint": "Simultaneous containers carried (multi-order/batch picking). Source: spec/config. More = batch efficiency.",
     "user_description": "How many containers should the AMR transport simultaneously?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "23d088ad-1bd2-4bf7-83af-f4a170364e43": {
@@ -2679,6 +2921,8 @@
     "hint": null,
     "user_description": "Is a direct native integration with the Warehouse Management System required?",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": "WMS Integration Native",
     "value_if_null": null
   },
   "23992ff7-c679-4328-971a-e0ad5700af80": {
@@ -2703,6 +2947,8 @@
     "hint": "Which refrigeration application categor(ies) does this tender require? Output only values from the classification guide above, comma-separated if the tender requires more than one. Match on meaning in any document language, not on the English wording. NULL RULE: if the document gives no indication of the application category, return null.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "b8e6446a-07dd-4414-91c5-55d2646651b8": {
@@ -2723,6 +2969,8 @@
     "hint": "Extract the MAXIMUM total cooling capacity in kW. Use the highest stated value. Do NOT convert from tons of refrigeration unless the document provides an explicit conversion. NULL RULE: return null if no explicit kW or TR figure is found.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "833fb224-f218-4b28-8719-591a0ba86483": {
@@ -2743,6 +2991,8 @@
     "hint": "Extract the MINIMUM evaporation or supply temperature the system can achieve in °C. Use the lowest (most negative) stated temperature target. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "59b9c33b-833a-4026-8061-2fab3a68de0c": {
@@ -2771,6 +3021,8 @@
     "hint": "Extract ALL refrigerant types supported by this system. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "c7989fc1-f256-4159-9c4c-ae3f481836ff": {
@@ -2796,6 +3048,8 @@
     "hint": "Extract ALL relevant certifications held by this system. NULL RULE: return null if not stated.",
     "user_description": "Required safety certifications for the refrigeration system (e.g. EN 378, PED, ATEX for explosive atmospheres, F-Gas regulation)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": "Certifications IK",
     "value_if_null": null
   },
   "b5204d0e-9069-4f9b-844a-b464bf2c2ef7": {
@@ -2816,6 +3070,8 @@
     "hint": "Extract the COP (Coefficient of Performance) at rated conditions. Use the highest stated COP. NULL RULE: return null if not stated.",
     "user_description": "Minimum Coefficient of Performance required — ratio of refrigeration output to electrical power input (e.g. COP 3.5 means 3.5 kW cooling per 1 kW electricity)",
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": "COP Efficiency (COP)",
     "value_if_null": null
   },
   "80fb3a63-341f-47b0-85ec-b41c8169f7af": {
@@ -2840,6 +3096,8 @@
     "hint": "Extract the cooling medium used: glycol circuit, water, or direct expansion. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "d4acded7-017e-4328-a2f4-115095a717b1": {
@@ -2860,6 +3118,8 @@
     "hint": "Extract the maximum temperature fluctuation tolerance in Kelvin. Lower is better. NULL RULE: return null if no explicit tolerance value is stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "fde5ac60-1669-4543-89ec-03e02a2930b4": {
@@ -2880,6 +3140,8 @@
     "hint": "Extract the MAXIMUM room volume in m³ this system can handle. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "b6921aa9-6d37-4432-9e26-b0b321052a07": {
@@ -2900,6 +3162,8 @@
     "hint": "Does this system provide active humidity control? Only mark true if explicitly confirmed. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "fb9c7834-e48d-40d0-a0ef-4d5e8d1d75d2": {
@@ -2920,6 +3184,8 @@
     "hint": "Extract the blast freezing throughput capacity in kg/h. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   },
   "265424b5-ee01-4bc4-9c3f-072d53ff64dd": {
@@ -2940,6 +3206,8 @@
     "hint": "Extract the required pulldown time in hours (time to reach target temperature). Lower is better for supplier. NULL RULE: return null if not stated.",
     "user_description": null,
     "display_mode": null,
+    "post_extraction_derived": false,
+    "display_label": null,
     "value_if_null": null
   }
 }

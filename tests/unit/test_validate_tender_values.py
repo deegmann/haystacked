@@ -186,3 +186,36 @@ def test_U_V_09_slash_compound_split_into_valid_parts():
     )
     assert "rest" in parts[0].lower(), f"'REST' part missing from {parts}"
     assert warnings, "Expected a warning for rejected 'OPC UA' part"
+
+
+# ---------------------------------------------------------------------------
+# U-V-10: OI-95 — required_product_type is exempted from AP0 allowed-values
+# filtering via the AP0-derived post_extraction_derived flag (_SKIP_FILTER).
+# ---------------------------------------------------------------------------
+
+def test_U_V_10_required_product_type_exempted_from_filter():
+    """required_product_type is normalized by app.py (vehicle-type classification
+    pipeline) after extraction — it must pass through validate_tender_values()
+    unfiltered even when the raw LLM output is not a literal AP0 allowed value.
+    """
+    result, warnings = validate_tender_values(
+        {"required_product_type": "vna forklift (not a canonical AP0 value)"}
+    )
+    assert result.get("required_product_type") == "vna forklift (not a canonical AP0 value)", (
+        "required_product_type must be exempted from AP0 allowed-values filtering "
+        "(post_extraction_derived=True in AP0 xlsx)"
+    )
+    assert not warnings, f"Unexpected warnings for exempted field: {warnings}"
+
+
+def test_U_V_11_negative_control_other_dropdown_still_filtered():
+    """Negative control: a field NOT flagged post_extraction_derived is still
+    subject to normal AP0 allowed-values filtering (i.e. the skip is scoped
+    to the flagged field only, not a blanket bypass)."""
+    result, warnings = validate_tender_values(
+        {"required_load_type": "Floor delivery & picking"}
+    )
+    assert result.get("required_load_type") is None, (
+        "Fields without post_extraction_derived=True must still be filtered normally"
+    )
+    assert warnings, "Expected a warning for the disallowed value on a non-exempted field"

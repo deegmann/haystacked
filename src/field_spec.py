@@ -28,6 +28,8 @@ class FieldSpec:
     hint: Optional[str]
     user_description: Optional[str]
     display_mode: Optional[str]
+    post_extraction_derived: bool = False
+    display_label: Optional[str] = None
     value_if_null: object = None
 
 
