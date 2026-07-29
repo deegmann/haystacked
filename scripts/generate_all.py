@@ -1941,7 +1941,10 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     domain_detection_template = build_domain_detection_template(scope_nodes, scopes_raw)
 
     # Checksums & validation
-    xlsx_md5 = hashlib.md5(xlsx_path.read_bytes()).hexdigest()
+    # Must combine AP0 + platform_config bytes exactly like app.py's _check_and_regen()
+    # does, or the two can never agree and every startup spuriously re-regenerates.
+    _platform_bytes_for_checksum = platform_path.read_bytes() if platform_path.exists() else b""
+    xlsx_md5 = hashlib.md5(xlsx_path.read_bytes() + _platform_bytes_for_checksum).hexdigest()
     warnings = validate_vs_sqlite(field_levels, db_path)
     drift_warnings = validate_unit_suffix_drift(
         json.loads((CONFIG_DIR / "fields.json").read_text()) if (CONFIG_DIR / "fields.json").exists() else {}
