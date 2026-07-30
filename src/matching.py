@@ -194,8 +194,8 @@ def _op_subset(tender, supplier) -> tuple[bool, str]:
     """
     if not tender or not supplier:
         return False, ""  # empty = no constraint
-    t_list = [str(x).strip().lower() for x in (tender if isinstance(tender, list) else [tender]) if x]
-    s_list = [str(x).strip().lower() for x in (supplier if isinstance(supplier, list) else [supplier]) if x]
+    t_list = [x.lower() for x in _ms(tender)]
+    s_list = [x.lower() for x in _ms(supplier)]
     if not t_list or not s_list:
         return False, ""
     unmatched = [t for t in t_list if not any(t in s or s in t for s in s_list)]

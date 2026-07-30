@@ -155,14 +155,20 @@ def test_U_M_13_empty_tender_returns_all_active():
     assert all(not r.disqualified for r in all_r)
 
 
-def test_U_M_14_service_coverage_dach_required_eu_only_excluded():
+def test_U_M_14_service_coverage_is_context_not_ko():
+    """service_coverage demoted Cond.K.O.->Context (OI-97 Blocker A, 2026-07-30):
+    the AP0 allowed_values bucket set (None/DACH/EU/Global) had zero DACH-tagged
+    suppliers in the live DB while 199 carried EU/EU|Global, so a real DACH-required
+    tender would have disqualified every active supplier once KO_SUBSET's substring
+    false-pass bug (OI-97) is fixed. Field is informational until the Airtable
+    per-country re-tagging research item is done. A mismatch must NOT disqualify."""
     prod = _make_prod(service_coverage=["EU"])
     rec = SupplierRecord(
         product=prod,
         values=_make_values(prod=prod),
     )
-    top, _ = matcher.match([rec], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"required_service_coverage": ["DACH"]})))
-    assert top[0].disqualified, "EU-only supplier must be disqualified for DACH-required tender"
+    top, _ = matcher.match([rec], TenderRequirements.from_dict(_criteria_to_uuid_keyed({"required_service_coverage": ["DE"]})))
+    assert not top[0].disqualified, "service_coverage is CONTEXT-level and must never disqualify"
 
 
 def test_U_M_15_ranking_3_suppliers():
@@ -646,3 +652,97 @@ def test_temperature_ko_direction():
         "Supplier with temperature_min_celsius=-25.0 must NOT be disqualified for a "
         "-2 °C cold store tender (-25.0 <= -2, KO_IF_GT does not fire)"
     )
+
+
+# ---------------------------------------------------------------------------
+# OI-97: KO_SUBSET must split a raw comma/pipe string, not treat it as one blob
+# ---------------------------------------------------------------------------
+
+def test_U_M_54_op_subset_raw_string_splits_correctly():
+    """OI-97 direct pin: _op_subset must split a raw (unsplit) tender string on
+    comma/pipe before comparing — not treat it as one substring-matchable blob.
+    Before the fix: "wms, erp" contains "wms" as a substring, so the whole
+    requirement silently passed even though "erp" was never covered.
+    """
+    from src.matching import _op_subset
+    failed, msg = _op_subset("WMS, ERP", ["SAP", "WMS"])
+    assert failed, "supplier lacking ERP must be disqualified, not pass via substring blob match"
+    assert "erp" in msg.lower()
+
+
+def test_U_M_55_ko_subset_raw_string_disqualifies_via_real_pipeline_path():
+    """OI-97 real-path pin: the production pipeline stores tender values UUID-keyed
+    (TenderRequirements(run), not from_dict()) and never pre-splits Multi-Select
+    strings. Feed a raw comma string through build_tender_run() -> TenderRequirements
+    exactly as app.py does, and confirm the KO fires for real via that path."""
+    from src.tender_store import build_tender_run
+
+    prod = _make_prod()
+    rec = SupplierRecord(
+        product=prod,
+        values=_make_values(prod=prod, integration_capability=["SAP", "WMS"]),
+    )
+    run = build_tender_run(
+        run_id="test-oi97-01",
+        source_file="test.pdf",
+        new_req={"required_integration_capability": "WMS, ERP"},
+        domain_criteria={},
+        result={"buyer": "Test", "in_scope": True},
+        vehicle_type="Forklift AGV",
+        in_scope=True,
+    )
+    top, _ = matcher.match([rec], TenderRequirements(run), top_n=1)
+    assert top[0].disqualified, "raw comma-string tender requirement must disqualify a supplier missing ERP"
+    assert any("erp" in m.lower() for m in top[0].disqualified_by)
+
+
+def test_U_M_56_ko_subset_raw_string_no_false_ko_when_covered():
+    """OI-97 no-false-KO pin: same real pipeline path, but supplier actually has
+    ERP too -> must NOT be disqualified. Without this, a fix that just KO's
+    everything would also satisfy test_U_M_55."""
+    from src.tender_store import build_tender_run
+
+    prod = _make_prod()
+    rec = SupplierRecord(
+        product=prod,
+        values=_make_values(prod=prod, integration_capability=["SAP", "WMS", "ERP"]),
+    )
+    run = build_tender_run(
+        run_id="test-oi97-02",
+        source_file="test.pdf",
+        new_req={"required_integration_capability": "WMS, ERP"},
+        domain_criteria={},
+        result={"buyer": "Test", "in_scope": True},
+        vehicle_type="Forklift AGV",
+        in_scope=True,
+    )
+    top, _ = matcher.match([rec], TenderRequirements(run), top_n=1)
+    assert not top[0].disqualified, "supplier covering both WMS and ERP must not be disqualified"
+
+
+def test_U_M_57_ko_subset_raw_string_non_multiselect_country_field():
+    """OI-97 blind-spot pin: `country`'s AP0 data_type is 'ISO 3166 (2-letter)', not
+    'Multi-Select' — a fix keyed off data_type (e.g. a _COERCE dict lookup) would
+    silently skip it. The correct fix lives inside _op_subset itself, so it must
+    also split/compare correctly for this field regardless of its data_type label."""
+    from src.tender_store import build_tender_run
+
+    prod_de = _make_prod()
+    rec_de = SupplierRecord(product=prod_de, values=_make_values(prod=prod_de, country="DE"))
+
+    run = build_tender_run(
+        run_id="test-oi97-03",
+        source_file="test.pdf",
+        new_req={"required_country": "DE"},
+        domain_criteria={},
+        result={"buyer": "Test", "in_scope": True},
+        vehicle_type="Forklift AGV",
+        in_scope=True,
+    )
+    top, _ = matcher.match([rec_de], TenderRequirements(run), top_n=1)
+    assert not top[0].disqualified, "DE supplier must satisfy a DE-required tender"
+
+    prod_fr = _make_prod()
+    rec_fr = SupplierRecord(product=prod_fr, values=_make_values(prod=prod_fr, country="FR"))
+    top_fr, _ = matcher.match([rec_fr], TenderRequirements(run), top_n=1)
+    assert top_fr[0].disqualified, "FR supplier must be disqualified for a DE-required tender"
