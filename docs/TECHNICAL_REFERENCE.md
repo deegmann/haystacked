@@ -577,7 +577,7 @@ This is what feeds the source-span guard. Fields without a `hint` in AP0 do not 
 
 1. Loads `config/industry_readme_{slug}.md` for the given domain slug (domain knowledge); raises FileNotFoundError if slug file is absent — run generate_all.py
 2. Iterates all FieldSpec entries; deduplicates by field_name; separates KO and COND_KO fields
-3. Builds `## Field-level descriptions` section from `spec.user_description`
+3. Builds `## Field-level descriptions` section listing each KO/COND_KO field name + level only (`spec.user_description` deliberately excluded since 2026-07-30 — it's UI-only text for the Clarification Dialog, not LLM instruction text; leaking it into this prompt caused a confirmed hallucination)
 4. Appends 9 critical matching rules (conservative extraction, anti-hallucination, etc.)
 
 `agv_type_keyword_fallback(text)` — independent of LLM — scores the first 5,000 chars against keyword lists from `vehicle_types.json["keyword_map"]` and returns the highest-scoring canonical VT name, or None if no keywords match. Used as fallback when Pass 4a fails.
