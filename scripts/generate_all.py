@@ -1399,6 +1399,21 @@ def _check_null_rule_marker(fname, hint) -> None:
         )
 
 
+def _check_operator_direction_duplication(fname, hint, op, dtype) -> None:
+    """Fail loud if the raw AP0 hint already contains, verbatim, the sentence that
+    build_extraction_template() auto-appends for this operator/data_type combination.
+    Prevents the sentence from appearing twice in the generated prompt templates —
+    see D6 hygiene fix."""
+    if op in _OPERATOR_DIRECTION and dtype in _NUMERIC_DTYPES:
+        if hint and _OPERATOR_DIRECTION[op] in hint:
+            sys.exit(
+                f"[FEHLER] emit_fields_json: Feld '{fname}' enthält im rohen AP0-Hint "
+                "bereits den Satz, den build_extraction_template() automatisch anhängt "
+                f"('{_OPERATOR_DIRECTION[op]}'). Bitte den manuell getippten Satz aus der "
+                "AP0-Hint-Zelle entfernen."
+            )
+
+
 def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict = None, scope_nodes: dict = None) -> None:
     """Read all sheets from data_sheets and write config/fields.json + src/field_spec.py.
 
@@ -1495,6 +1510,7 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             weight = _nullable_int(row[col_weight] if col_weight is not None and col_weight < len(row) else None)
             hint = str(row[col_hint]).strip() if col_hint is not None and col_hint < len(row) and row[col_hint] else None
             _check_null_rule_marker(fname, hint)
+            _check_operator_direction_duplication(fname, hint, op, dtype)
             display = str(row[col_display]).strip() if col_display is not None and col_display < len(row) and row[col_display] else None
             client_exp = str(row[col_client]).strip() if col_client is not None and col_client < len(row) and row[col_client] else None
             display_label = str(row[col_display_label]).strip() if col_display_label is not None and col_display_label < len(row) and row[col_display_label] else None

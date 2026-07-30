@@ -432,7 +432,7 @@
     "threshold_a": null,
     "threshold_b": null,
     "scoring_weight": null,
-    "hint": "Maximum payload the AGV must carry per trip, in kg. This value may appear as prose (e.g. 'a maximum of X kg', 'loads up to X kg', 'pallets weigh up to X kg') OR as a table column (labelled 'Max Loaded weight' / 'gross weight'). Read BOTH prose sentences and table cells — do not restrict search to tables only. In tables, use the loaded/gross weight — IGNORE 'tare weight' / 'empty pallet weight'. If a range or several load types are given, report the heaviest stated number. NULL RULE: Output null only if no maximum load weight is stated anywhere in the document text. CONSERVATIVE EXTRACTION: if multiple values are stated, extract the MAXIMUM — the supplier must meet or exceed this threshold.",
+    "hint": "Maximum payload the AGV must carry per trip, in kg. This value may appear as prose (e.g. 'a maximum of X kg', 'loads up to X kg', 'pallets weigh up to X kg') OR as a table column (labelled 'Max Loaded weight' / 'gross weight'). Read BOTH prose sentences and table cells — do not restrict search to tables only. In tables, use the loaded/gross weight — IGNORE 'tare weight' / 'empty pallet weight'. If a range or several load types are given, report the heaviest stated number. NULL RULE: Output null only if no maximum load weight is stated anywhere in the document text.",
     "user_description": "What is the maximum load weight per carrier? The AGV must be able to carry at least this weight.",
     "display_mode": null,
     "display_label": null,

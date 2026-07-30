@@ -4,6 +4,7 @@ import uuid
 import httpx
 import pdfplumber
 import logging
+import logging.handlers
 import asyncio
 from datetime import datetime
 from pathlib import Path
@@ -31,7 +32,7 @@ logging.basicConfig(
     format="%(asctime)s  %(levelname)-8s  %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler("haystacked.log", encoding="utf-8"),
+        logging.handlers.RotatingFileHandler("haystacked.log", maxBytes=20_000_000, backupCount=5, encoding="utf-8"),
     ],
 )
 logging.getLogger("multipart").setLevel(logging.WARNING)
@@ -953,8 +954,10 @@ async def analyze(file: UploadFile = File(...)):
             await asyncio.sleep(0)
 
             # ── Pass 4b: extract type-specific fields ─────────────────────────
+            template_4b = _PRODUCT_TYPE_TEMPLATES.get(canonical_product_type, EXTRACTION_USER_TEMPLATE)
+
             _TEXT_TOKEN_ESTIMATE = len(text) // 4
-            _FIXED_OVERHEAD_TOKENS = 10_100  # domain system prompt (~5500) + 4b template (~4600)
+            _FIXED_OVERHEAD_TOKENS = (len(_DOMAIN_SYSTEM[result.get("detected_domain")]) + len(template_4b)) // 4
             _TOTAL_ESTIMATE = _TEXT_TOKEN_ESTIMATE + _FIXED_OVERHEAD_TOKENS
             if _TOTAL_ESTIMATE > _OLLAMA_NUM_CTX:
                 yield sse("log", {
@@ -967,7 +970,6 @@ async def analyze(file: UploadFile = File(...)):
                     )
                 })
 
-            template_4b = _PRODUCT_TYPE_TEMPLATES.get(canonical_product_type, EXTRACTION_USER_TEMPLATE)
             agv_user_4b = _fill(template_4b, text=text,
                                 vehicle_type=canonical_product_type)
 
