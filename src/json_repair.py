@@ -283,6 +283,10 @@ _METRIC_UNIT_AFTER_RE = re.compile(r"^[^\w]{0,3}(" + _METRIC_UNIT_ALTERNATION + 
 _METRIC_UNIT_BEFORE_RE = re.compile(r"\b(" + _METRIC_UNIT_ALTERNATION + r")[^\w]{0,3}$")
 _METRIC_UNIT_MAX_LEN = max(len(u) for u in _METRIC_PREFIX_SCALE)
 
+# Distinct scale factors only — the value side gets exactly ONE free metric-prefix
+# choice. Derived from the table, never a literal, so it stays correct if the table grows.
+_METRIC_PREFIX_SCALE_FACTORS = frozenset(_METRIC_PREFIX_SCALE.values())
+
 
 def _adjacent_metric_prefix_unit(document: str, start: int, end: int, max_gap: int = 3) -> str:
     """Return a `_METRIC_PREFIX_SCALE` unit token found within `max_gap` characters
@@ -305,21 +309,25 @@ def _converted_anchor_dimensionally_valid(
     matched_values: set, av: float, unit: str, document: str, start: int, end: int
 ) -> bool:
     """Gate for a converted-scale (x1000/x0.001) anchor candidate: only counts if a
-    metric-prefix unit token sits adjacent to the matched number AND that unit,
-    applied to the document's number, resolves to the same real-world quantity as
-    `value` under `unit` (the field's actual AP0 unit) — comparing both sides in a
-    common base-SI space (`_METRIC_PREFIX_SCALE` values are already scale factors
-    relative to the base unit) rather than hand-rolled float equality.
+    metric-prefix unit token sits adjacent to the matched number AND the document's
+    number, read under that real adjacent token, resolves to the same real-world
+    quantity as `value` read under SOME metric-prefix scale (comparing both sides in
+    a common base-SI space — `_METRIC_PREFIX_SCALE` values are already scale factors
+    relative to the base unit — rather than hand-rolled float equality).
+
+    The value side gets exactly ONE free metric-prefix choice (any single entry from
+    `_METRIC_PREFIX_SCALE`, not `unit` specifically) since `value`'s own declared
+    unit is not itself trusted here; the document side is never free — its scale is
+    always the real adjacent token found by `_adjacent_metric_prefix_unit()`, never
+    assumed equal to `unit`. `unit` itself is unused in this comparison (the caller's
+    `gate_active` check still uses it to decide whether this gate applies at all).
 
     Pure function — no field names, no AP0 value lists, no domain knowledge.
     """
     doc_unit = _adjacent_metric_prefix_unit(document, start, end)
     if not doc_unit:
         return False
-    av_family_in_base = {
-        round(c * _METRIC_PREFIX_SCALE[unit], 6)
-        for c in (av, av * 1000, round(av / 1000, 6))
-    }
+    av_family_in_base = {round(av * s, 6) for s in _METRIC_PREFIX_SCALE_FACTORS}
     for dv in matched_values:
         if round(dv * _METRIC_PREFIX_SCALE[doc_unit], 6) in av_family_in_base:
             return True
@@ -339,10 +347,12 @@ def source_is_grounded(
          The exact-scale target (`value` itself) anchors unconditionally, as always.
          A x1000/x0.001 unit-scale-converted target (e.g. value=10 matching a document's
          "10000") only anchors if `unit` is a known `_METRIC_PREFIX_SCALE` unit AND a
-         metric-prefix unit token sits adjacent to that document number AND it
-         dimensionally resolves to the same real-world quantity as `value` under `unit`
-         (see `_converted_anchor_dimensionally_valid()`). If `unit` is empty or not a
-         `_METRIC_PREFIX_SCALE` key, converted-scale targets anchor unconditionally,
+         metric-prefix unit token sits adjacent to that document number AND the
+         document's number, read under that real adjacent token, dimensionally
+         resolves to the same real-world quantity as `value` read under SOME
+         metric-prefix scale (see `_converted_anchor_dimensionally_valid()`). If
+         `unit` is empty or not a `_METRIC_PREFIX_SCALE` key, converted-scale
+         targets anchor unconditionally,
          same as before this gate existed — this is a deliberate carve-out, not a bug,
          for non-metric units (%, °C, h, kW, ...) this table has no opinion about.
       2. Co-location: at least one distinctive word from the ±25-char phrase around

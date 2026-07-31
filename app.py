@@ -413,33 +413,6 @@ EXTRACTION_RETRY_TEMPLATE = _load_prompt("extraction_retry_template.txt")
 _plausibility_cfg = json.loads((_CONFIG_DIR / "plausibility.json").read_text()) \
     if (_CONFIG_DIR / "plausibility.json").exists() else {}
 
-# Conversion keys used in the tender→supplier unit conversion (m→mm matching path).
-# If plausibility.json loses these, app.py would KeyError at request time — catch it at startup.
-for _conv_key in ("required_lifting_height_mm", "required_min_aisle_width_mm"):
-    assert (_plausibility_cfg.get(_conv_key) or {}).get("conversion", {}).get("factor"), \
-        f"plausibility.json missing {_conv_key}.conversion.factor — run generate_all.py"
-
-
-def _to_match_units(criteria: dict) -> dict:
-    """Convert domain_criteria values from stored units to matching-engine units.
-
-    Reads conversion factors from _plausibility_cfg (AP0-generated).
-    Only fields with a 'conversion' block are affected — all others pass through unchanged.
-    Input values are assumed to be already normalized (post-validate_domain_criteria).
-    """
-    result = dict(criteria)
-    for field, cfg in _plausibility_cfg.items():
-        conv = cfg.get("conversion")
-        if not conv:
-            continue
-        val = result.get(field)
-        if val is None:
-            continue
-        factor = conv.get("factor")
-        if factor and factor != 0:
-            result[field] = int(float(val) / factor)
-    return result
-
 
 def validate_domain_criteria(crit: dict) -> tuple:
     """Returns (cleaned_dict, warnings_list).
@@ -461,8 +434,16 @@ def validate_domain_criteria(crit: dict) -> tuple:
         lo, hi, unit, label = cfg["min"], cfg["max"], cfg["unit"], cfg["label"]
         conv = cfg.get("conversion")
 
-        # Auto-convert using unit conversion rules from AP0 Unit Conversions sheet
-        if conv and v > conv["threshold"]:
+        # Auto-convert using unit conversion rules from AP0 Unit Conversions sheet.
+        # Gate direction depends on which way the factor scales: a shrinking
+        # factor (<1) fires when v is too LARGE (above threshold); a growing
+        # factor (>1) fires when v is too SMALL (below threshold). Generic math,
+        # no field names involved.
+        conv_gate = conv and (
+            (conv["factor"] < 1 and v > conv["threshold"])
+            or (conv["factor"] > 1 and v < conv["threshold"])
+        )
+        if conv_gate:
             v_converted = v * conv["factor"]
             if lo <= v_converted <= hi:
                 warnings.append(
@@ -1230,8 +1211,6 @@ async def analyze(file: UploadFile = File(...)):
             domain_criteria["required_product_type"] = canonical_product_type
             new_req["required_navigation_type"] = nav_list
 
-            new_req = _to_match_units(new_req)
-
             # D1: assemble per-field provenance, keyed by tender_key, for build_tender_run().
             _field_provenance = _assemble_field_provenance(
                 _produced_by, _nulled_by, _rejected, _pre_4c_snapshot, _4c_state, _l2_rescued_fields
@@ -1354,7 +1333,7 @@ async def rematch_endpoint(request: Request):
     criteria, _ = validate_domain_criteria(criteria)
 
     top_raw, all_raw = match_suppliers_new(
-        TenderRequirements.from_dict(_criteria_to_uuid_keyed(_to_match_units(criteria))),
+        TenderRequirements.from_dict(_criteria_to_uuid_keyed(criteria)),
         _SUPPLIERS, top_n=10
     )
     top = [r.to_dict() for r in top_raw]

@@ -380,49 +380,56 @@ def test_U_M_34_is_active_requirement_numeric_nonzero():
     assert not _is_active_requirement(None, "KO_IF_LT")
 
 
-# ── OI-20: mm→m auto-conversion in validate_domain_criteria ─────────────────────
+# ── OI-115b: reversed (m→mm) auto-heal conversion in validate_domain_criteria ────
+# lifting_height_mm/min_aisle_width_mm's AP0 Unit is now 'mm' (was 'm'). The AP0
+# Unit Conversions sheet now defines the REVERSE direction: threshold=30, factor=1000
+# (m→mm) — historical replay files that stored these fields' values in meters
+# self-heal on replay instead of needing a forward mm→m conversion.
 
-def test_U_M_35_lifting_height_mm_auto_converted_to_m():
-    """validate_domain_criteria converts lifting height from mm to m when LLM returns mm.
+def test_U_M_35_lifting_height_m_auto_healed_to_mm():
+    """validate_domain_criteria converts a lifting height mistakenly stated in
+    meters (small raw value, below threshold=30) up to mm.
 
-    The AP0 Unit Conversions sheet defines: threshold=10, factor=0.001 (mm→m).
-    A value of 8000 (clearly in mm, > threshold of 10) must be converted to 8.0 m.
-    A value of 8.0 (already in m, <= threshold) must pass through unchanged.
+    A value of 8 (clearly meters, < threshold of 30) must be healed to 8000 mm.
+    A value of 8000 (already in mm, >= threshold) must pass through unchanged.
     """
     from app import validate_domain_criteria
+    result_m, warnings_m = validate_domain_criteria(
+        {"required_lifting_height_mm": 8}
+    )
+    assert result_m["required_lifting_height_mm"] == pytest.approx(8000.0), (
+        "8 m must be auto-healed to 8000 mm (factor=1000 from plausibility.json)"
+    )
+    assert any("konvertiert" in w or "converted" in w.lower() for w in warnings_m), (
+        "A conversion warning must be emitted when m→mm auto-heal fires"
+    )
+
     result_mm, warnings_mm = validate_domain_criteria(
         {"required_lifting_height_mm": 8000}
     )
-    assert result_mm["required_lifting_height_mm"] == pytest.approx(8.0), (
-        "8000 mm must be auto-converted to 8.0 m (factor=0.001 from plausibility.json)"
-    )
-    assert any("konvertiert" in w or "converted" in w.lower() for w in warnings_mm), (
-        "A conversion warning must be emitted when mm→m auto-conversion fires"
-    )
-
-    result_m, warnings_m = validate_domain_criteria(
-        {"required_lifting_height_mm": 8.0}
-    )
-    assert result_m["required_lifting_height_mm"] == pytest.approx(8.0), (
-        "8.0 m (already in m, <= threshold of 10) must pass through unchanged"
+    assert result_mm["required_lifting_height_mm"] == pytest.approx(8000.0), (
+        "8000 mm (already in mm, >= threshold of 30) must pass through unchanged"
     )
 
 
-def test_U_M_36_aisle_width_mm_auto_converted_to_m():
-    """validate_domain_criteria converts aisle width from mm to m when LLM returns mm.
+def test_U_M_36_aisle_width_m_auto_healed_to_mm():
+    """validate_domain_criteria converts an aisle width mistakenly stated in
+    meters up to mm.
 
-    Same conversion rule as lifting height: threshold=10, factor=0.001.
-    1800 mm → 1.8 m; 1.8 stays as 1.8.
+    Same conversion rule as lifting height: threshold=30, factor=1000.
+    1.8 m → 1800 mm; 1800 stays as 1800.
     """
     from app import validate_domain_criteria
-    result, warnings = validate_domain_criteria({"required_min_aisle_width_mm": 1800})
-    assert result["required_min_aisle_width_mm"] == pytest.approx(1.8), (
-        "1800 mm must be auto-converted to 1.8 m"
+    result, warnings = validate_domain_criteria({"required_min_aisle_width_mm": 1.8})
+    assert result["required_min_aisle_width_mm"] == pytest.approx(1800.0), (
+        "1.8 m must be auto-healed to 1800 mm"
     )
     assert any("konvertiert" in w or "converted" in w.lower() for w in warnings)
 
-    result2, _ = validate_domain_criteria({"required_min_aisle_width_mm": 1.8})
-    assert result2["required_min_aisle_width_mm"] == pytest.approx(1.8)
+    result2, _ = validate_domain_criteria({"required_min_aisle_width_mm": 1800})
+    assert result2["required_min_aisle_width_mm"] == pytest.approx(1800.0), (
+        "1800 mm (already in mm, >= threshold of 30) must pass through unchanged"
+    )
 
 
 def test_U_M_37_integration_capability_ko_subset_mismatch_disqualifies():

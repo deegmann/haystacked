@@ -285,18 +285,19 @@ def test_U_SG_17_nordlicht_genuine_lifting_height_survives_metric_gate():
 
 
 def test_U_SG_18_aisle_width_unit_scale_mismatch_survives_metric_gate_explicit_unit():
-    """Re-run of test_U_SG_04 (genuine unit-scale mismatch: value in meters,
-    document in mm) but now exercised THROUGH the new metric-prefix gate by
-    passing unit="m" explicitly (required_min_aisle_width_mm's real AP0 unit,
-    per _NUMERIC_KO_FIELD_UNITS) instead of relying on the unit="" carve-out
-    default. Proves the fix does not regress this exact case: document's
-    "2000 mm" dimensionally resolves (2000 * 0.001 == 2.0) to the tender
-    value 2.0 under unit="m".
+    """Re-run of test_U_SG_04 (genuine unit-scale mismatch) but now exercised
+    THROUGH the new metric-prefix gate by passing unit="mm" explicitly
+    (required_min_aisle_width_mm's real AP0 unit post-OI-115b, per
+    _NUMERIC_KO_FIELD_UNITS) instead of relying on the unit="" carve-out
+    default. Proves the corrected fix (single free metric-prefix choice on the
+    value side) still grounds this genuine cross-unit case: document's "2 m"
+    dimensionally resolves (2 * scale(m)=2.0 == 2000 * scale(mm)=2.0) to the
+    tender value 2000 under unit="mm".
     """
-    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "m"
-    document = "Aisle width is 2000 mm rack-to-rack, with a minimum of 1900 mm pallet-to-pallet."
+    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "mm"
+    document = "Aisle width is 2 m rack-to-rack, with a minimum of 1.9 m pallet-to-pallet."
     quote = document
-    assert source_is_grounded(2.0, quote, document, unit="m") is True
+    assert source_is_grounded(2000, quote, document, unit="mm") is True
 
 
 def test_U_SG_19_nonmetric_unit_carveout_converted_scale_still_anchors_unconditionally():
@@ -365,3 +366,26 @@ def test_U_SG_21_numeric_ko_field_units_coverage_survives_dash_o():
             f"numeric KO field {tk!r} has no truthy unit in _NUMERIC_KO_FIELD_UNITS — "
             "the metric-prefix gate can never activate for it"
         )
+
+
+# ---------------------------------------------------------------------------
+# OI-115b Phase 0: the value side of the metric-prefix gate must get exactly
+# ONE free scale choice (any single _METRIC_PREFIX_SCALE factor), not two
+# independent free choices ({x1000/x0.001} on top of scale(unit)) that cancel
+# out whenever doc_unit == unit. See .claude/agent-memory (senior-architect)
+# for the 84-triple corpus validation behind this fix.
+# ---------------------------------------------------------------------------
+
+def test_U_SG_22_dragonfly_fabrication_rejected_under_mm_declaration():
+    """OI-115b blocker pin: the Dragonfly fabrication must stay rejected after the
+    AP0 Unit relabel m->mm. Fails on the pre-fix implementation (True)."""
+    document = _pdf_text("Dragonfly.pdf")
+    assert source_is_grounded(10000, "Lift height: 10,000 mm", document, unit="mm") is False
+
+
+def test_U_SG_23_nordlicht_genuine_grounds_under_both_unit_declarations():
+    """The genuine counterpart must ground regardless of which unit the field is
+    declared in — L0 must not depend on the AP0 Unit declaration."""
+    document = _pdf_text("Beispielausschreibung_AGV_Nordlicht.pdf")
+    for u in ("m", "mm"):
+        assert source_is_grounded(10000, "Höhe 10 m", document, unit=u) is True

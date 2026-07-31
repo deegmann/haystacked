@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
-from app import _criteria_to_uuid_keyed, _to_match_units
+from app import _criteria_to_uuid_keyed
 from src.matching import match_suppliers_new, TenderRequirements, validate_tender_values
 from src.data_loader import load_suppliers
 from src.tender_store import read_run_criteria
@@ -52,9 +52,7 @@ def refresh_golden(path: Path, suppliers) -> dict:
     # values stored in pre-OI-61 golden files, and removes 'OPC UA' post-Step-6)
     criteria_validated, _ = validate_tender_values(criteria_with_vt)
 
-    # Convert stored units (m) back to match-engine units (mm) — mirrors app.py pipeline
-    criteria_match_units = _to_match_units(criteria_validated)
-    uuid_criteria = _criteria_to_uuid_keyed(criteria_match_units)
+    uuid_criteria = _criteria_to_uuid_keyed(criteria_validated)
     req = TenderRequirements.from_dict(uuid_criteria)
 
     top_raw, all_raw = match_suppliers_new(req, suppliers)

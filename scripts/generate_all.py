@@ -1383,13 +1383,13 @@ def _text_contains_unit_token(text: str, unit: str) -> bool:
     return re.search(pattern, text, re.IGNORECASE) is not None
 
 
-# OI-115a Phase 2: fields whose DB/supplier storage unit (mm) genuinely differs
-# from their AP0 tender/extraction unit (m) — their LLM Hint keeps a manual
-# disambiguation clause until OI-115b renames the field_name. max_gradient_pct's
-# hint mentions '%' only as an extraction-FORMAT instruction, not a redundant
-# self-label. All four are exempt from the Phase 3 hint-duplication lint.
+# OI-115b: lifting_height_mm/min_aisle_width_mm/tugger_min_aisle_width_mm's AP0
+# Unit was realigned from 'm' to 'mm' (matching the real DB/supplier storage unit),
+# closing the split that used to require this exemption. max_gradient_pct's hint
+# mentions '%' only as an extraction-FORMAT instruction, not a redundant
+# self-label — its exemption is unrelated and still valid.
 _UNIT_DUPLICATION_HINT_EXEMPT = {
-    "lifting_height_mm", "min_aisle_width_mm", "tugger_min_aisle_width_mm", "max_gradient_pct",
+    "max_gradient_pct",
 }
 
 

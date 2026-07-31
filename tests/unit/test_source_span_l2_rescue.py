@@ -183,22 +183,19 @@ def test_D0_negative_coincidental_anchor_collision_still_nulled_no_rescue():
 # ---------------------------------------------------------------------------
 
 def test_D0_single_char_unit_m_never_rescues_despite_adjacency():
-    """required_lifting_height_mm / required_min_aisle_width_mm /
-    required_tugger_min_aisle_width_mm all carry unit 'm' in fields.json
-    (post mm->m conversion) despite the _mm name suffix. A single-letter unit
-    is excluded unconditionally — even when it sits immediately adjacent to a
-    matching digit-string in the real document, as it genuinely does here:
-    real CompanyX.pdf text '...(yellow), which is 4m wide...'.
+    """Before OI-115b, required_lifting_height_mm / required_min_aisle_width_mm /
+    required_tugger_min_aisle_width_mm carried unit 'm' in fields.json despite
+    the _mm name suffix; OI-115b realigned their AP0 Unit to 'mm', so no numeric
+    KO field carries the single-character unit 'm' any more. The exclusion rule
+    itself is generic (field-agnostic, keyed on the unit string's length, not on
+    a field list) so it still needs pinning against a real single-char-unit
+    adjacency collision: real CompanyX.pdf text '...(yellow), which is 4m
+    wide...'.
     """
     document = _companyx_text()
-    for field in (
-        "required_lifting_height_mm",
-        "required_min_aisle_width_mm",
-        "required_tugger_min_aisle_width_mm",
-    ):
-        assert _NUMERIC_KO_FIELD_UNITS[field] == "m", (
-            f"expected {field!r} to carry unit 'm' in fields.json — plan assumption violated"
-        )
+    assert not any(u == "m" for u in _NUMERIC_KO_FIELD_UNITS.values()), (
+        "no numeric KO field should carry the bare unit 'm' post-OI-115b"
+    )
     # The real 0-char-distance adjacency case: "4m wide" in the document.
     assert document_supports_value_with_unit(4, "m", document) is False
 
@@ -306,10 +303,10 @@ def test_D0_scale_tolerance_not_applied_matches_T_TR_06_fixture():
 def test_D0_units_dict_real_shared_scope_key_populated():
     """required_min_aisle_width_mm is the one tender_key in the current AP0
     that is genuinely shared across two scopes (Forklift AGV, Tugger AGV).
-    Both scopes carry the same truthy unit ('m') today, so this pins that the
-    real construction picks a non-empty unit for it (the degenerate case where
-    both entries agree)."""
-    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "m"
+    Both scopes carry the same truthy unit ('mm' post-OI-115b) today, so this
+    pins that the real construction picks a non-empty unit for it (the
+    degenerate case where both entries agree)."""
+    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "mm"
 
 
 def test_D0_units_dict_selection_algorithm_skips_empty_unit_shadowing_entry():

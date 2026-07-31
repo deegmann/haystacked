@@ -6,16 +6,16 @@
   "requirements": {
     "product_type": "Forklift AGV",
     "required_max_payload_kg": 1200,
-    "required_lifting_height_mm": 10,
-    "required_min_aisle_width_mm": 3.4,
+    "required_lifting_height_mm": 10000,
+    "required_min_aisle_width_mm": 3400,
     "required_operating_temp_min_c": 10,
     "required_operating_temp_max_c": 30,
     "required_vna_capable": "not_required"
   },
   "golden_extraction": {
     "required_max_payload_kg": 1200,
-    "required_lifting_height_mm": 10,
-    "required_min_aisle_width_mm": 3.4,
+    "required_lifting_height_mm": 10000,
+    "required_min_aisle_width_mm": 3400,
     "required_operating_temp_min_c": 10,
     "required_operating_temp_max_c": 30,
     "required_operating_humidity_max_pct": null,
