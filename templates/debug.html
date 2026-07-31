@@ -57,16 +57,14 @@
       <div class="table-wrap" style="margin-top:12px">
         <table id="dbg-rank-table">
           <thead>
-            <tr>
+            <tr id="dbg-rank-head-row">
               <th>#</th>
               <th>Produkt</th>
               <th>Unternehmen</th>
               <th>AGV-Typ</th>
               <th>Score</th>
-              <th>Payload</th>
-              <th>Hub</th>
-              <th>Gang</th>
-              <th>Status / K.O.</th>
+              <!-- KO numeric field columns injected dynamically by renderRankTable() -->
+              <th id="dbg-rank-status-th">Status / K.O.</th>
             </tr>
           </thead>
           <tbody id="dbg-rank-body"></tbody>
@@ -103,6 +101,30 @@ function _fieldLabel(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
+
+// Unit comes from AP0 via _fieldMeta[key].unit — no key-suffix heuristic, no conversion.
+function _fmtValue(key, val) {
+  const unit = _fieldMeta[key]?.unit;
+  return unit ? `${val} ${unit}` : `${val}`;
+}
+
+// Selects up to `maxCols` numeric KO fields that actually have a value somewhere in
+// the current result set — domain-agnostic (AGV, IK, ...), same KO/Float/Integer
+// selection criteria as the shortlist's _koChips().
+function _koNumericFields(all, maxCols = 3) {
+  const fields = [];
+  const seen = new Set();
+  for (const [key, info] of Object.entries(_fieldMeta)) {
+    if (seen.has(key)) continue;
+    if (info.level !== 'KO') continue;
+    if (!['Float', 'Integer'].includes(info.data_type)) continue;
+    if (!all.some(r => r[key] != null)) continue;
+    seen.add(key);
+    fields.push(key);
+    if (fields.length >= maxCols) break;
+  }
+  return fields;
+}
 
 fetch('/api/last-result')
   .then(r => {
@@ -181,12 +203,26 @@ function renderRankTable(all) {
   document.getElementById('dbg-rank-meta').textContent =
     `${all.length} Produkte · ${nQ} qualifiziert · ${nD} ausgeschlossen`;
 
+  // Domain-agnostic KO numeric columns (field-meta-driven, see _koNumericFields()).
+  const koFields = _koNumericFields(all);
+  const headRow = document.getElementById('dbg-rank-head-row');
+  const statusTh = document.getElementById('dbg-rank-status-th');
+  headRow.querySelectorAll('.dbg-rank-ko-th').forEach(th => th.remove());
+  koFields.forEach(key => {
+    const th = document.createElement('th');
+    th.className = 'dbg-rank-ko-th';
+    th.textContent = (_fieldMeta[key]?.label || key);
+    headRow.insertBefore(th, statusTh);
+  });
+  const totalCols = 5 + koFields.length + 1;
+
   all.forEach(r => {
     const pct = maxScore > 0 ? Math.round(r.score / maxScore * 100) : 0;
     const cls = r.disqualified ? 'dq' : pct >= 60 ? 'green' : pct >= 30 ? 'yellow' : 'red';
-    const lift    = r.lifting_height_mm  != null ? (r.lifting_height_mm/1000).toFixed(1)+'m' : '–';
-    const aisle   = r.min_aisle_width_mm != null ? (r.min_aisle_width_mm/1000).toFixed(2)+'m' : '–';
-    const payload = r.max_payload_kg     != null ? r.max_payload_kg+'kg' : '–';
+    const koCells = koFields.map(key => {
+      const val = r[key];
+      return `<td>${val != null ? _fmtValue(key, val) : '–'}</td>`;
+    }).join('');
     const ko = (r.disqualified_by || r.knockouts || []).map(x => `<span class="ko-tag sm">✗ ${x}</span>`).join(' ');
     const tr = document.createElement('tr');
     if (r.disqualified) tr.classList.add('row-disqualified');
@@ -196,7 +232,7 @@ function renderRankTable(all) {
       <td>${r.company}</td>
       <td><span class="type-pill type-pill-sm">${r.product_type||'–'}</span></td>
       <td><span class="score-pill score-${cls}">${pct}%<span class="score-max"> ${r.score}/${maxScore}</span></span></td>
-      <td>${payload}</td><td>${lift}</td><td>${aisle}</td>
+      ${koCells}
       <td class="debug-reasons">${ko || (r.disqualified ? '' : '<span class="no-match">scored</span>')}</td>`;
     tbody.appendChild(tr);
 
@@ -205,7 +241,7 @@ function renderRankTable(all) {
     if (details.length) {
       const det = document.createElement('tr');
       det.className = 'detail-row';
-      det.innerHTML = `<td colspan="9"><div class="detail-inner">
+      det.innerHTML = `<td colspan="${totalCols}"><div class="detail-inner">
         <div class="detail-label">Score Breakdown</div>
         <div class="sb-table">
           ${details.map(d => `<div class="sb-row"><span class="sb-field">${d.field}</span><span class="sb-val">${d.value??'–'}</span><span class="sb-pts">+${d.points} pts</span></div>`).join('')}

@@ -303,18 +303,16 @@ function renderCell(key, val) {
   if (Array.isArray(val)) return val.length ? val.join(', ') : '<span class="cell-na">–</span>';
   if (key==='country')      return `<span class="country-badge">${val}</span>`;
   if (key==='product_type') return `<span class="type-pill type-pill-sm">${val}</span>`;
-  if (key.endsWith('_eur') && typeof val==='number') return '€'+val.toLocaleString();
+  if (_fieldMeta[key]?.unit === 'EUR' && typeof val==='number') return '€'+val.toLocaleString();
   return val;
 }
 
-const _UNIT_SUFF = {_kg:'kg',_mm:'mm',_pct:'%',_h:'h',_ms:'m/s',_c:'°C',_eur:'EUR',_min:'min',_m:'m'};
+// Label + unit come from AP0 via /api/field-meta (see _fieldMeta) — no key-suffix heuristic.
 function autoLabel(key) {
-  let k=key, unit=null;
-  for (const [s,u] of Object.entries(_UNIT_SUFF)) {
-    if (k.endsWith(s)) { k=k.slice(0,-s.length); unit=u; break; }
-  }
-  const label = k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  return unit ? `${label} (${unit})` : label;
+  const meta = _fieldMeta[key];
+  if (meta?.label) return meta.label;
+  const label = key.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  return meta?.unit ? `${label} (${meta.unit})` : label;
 }
 
 // ── Sort ──────────────────────────────────────────────────────────────────────

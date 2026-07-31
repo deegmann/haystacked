@@ -503,15 +503,12 @@ function _fieldLabel(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Human-readable label for raw gap field names (suffix-stripping, no AP0 dependency)
+// Human-readable label for raw gap field names — AP0-driven via _fieldMeta (label, unit).
 function _gapFieldLabel(fn) {
-  const units = [['_mm','mm'],['_kg','kg'],['_pct','%'],['_ms','m/s'],['_c','°C'],['_h','h'],['_m','m']];
-  let name = fn, unit = '';
-  for (const [sfx, u] of units) {
-    if (name.endsWith(sfx)) { name = name.slice(0, -sfx.length); unit = u; break; }
-  }
-  const label = name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  return unit ? `${label} (${unit})` : label;
+  const meta = _fieldMeta[fn];
+  if (meta?.label) return meta.label;
+  const label = fn.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return meta?.unit ? `${label} (${meta.unit})` : label;
 }
 function _fieldLevel(key) { return _fieldMeta[key]?.level || null; }
 
@@ -746,15 +743,11 @@ function openDebug() {
 
 // ── KO chip renderer — driven by AP0 field metadata ──────────────────────────
 // Reads KO numeric fields from _fieldMeta (loaded from /api/field-meta at startup).
-// Unit display derived from key naming convention (_mm, _kg, etc.) — no domain knowledge.
-const _MM_KEYS = new Set(); // populated once _fieldMeta loads
+// Unit display comes from AP0's Unit column (_fieldMeta[key].unit) — no key-suffix
+// heuristic, no unit conversion. The value is rendered as stored.
 function _fmtValue(key, val) {
-  if (key.endsWith('_mm'))  return `${(val / 1000).toFixed(2).replace(/\.?0+$/, '')} m`;
-  if (key.endsWith('_kg'))  return `${val} kg`;
-  if (key.endsWith('_pct')) return `${val}%`;
-  if (key.endsWith('_h'))   return `${val} h`;
-  if (key.endsWith('_ms'))  return `${val} m/s`;
-  return `${val}`;
+  const unit = _fieldMeta[key]?.unit;
+  return unit ? `${val} ${unit}` : `${val}`;
 }
 function _koChips(matchResult, maxChips = 3) {
   const chips = [];

@@ -1353,8 +1353,6 @@ async def field_meta():
     """Return AP0 field metadata for the frontend — labels, levels, data types, and sheet (vehicle-type group).
     Built from config/fields.json (generated from AP0 xlsx by generate_all.py)."""
     fields = load_fields()
-    _UNITS = {"_kg":"kg","_mm":"mm","_pct":"%","_h":"h","_ms":"m/s",
-              "_c":"°C","_eur":"EUR","_min":"min","_m":"m","_deg":"°"}
     _ABBR = {"Agv":"AGV","Amr":"AMR","Vda":"VDA","Vda5050":"VDA 5050","Wms":"WMS","Oem":"OEM",
              "Ko":"KO","Ui":"UI","Id":"ID","Ip":"IP","Fps":"FPS","Roi":"ROI",
              "Cop":"COP","Ik":"IK","Ped":"PED","Atex":"ATEX"}
@@ -1362,18 +1360,13 @@ async def field_meta():
         # OI-100: AP0 "Display Label" column overrides the abbreviation heuristic below.
         if override:
             return override
-        k = key
-        # Prefer AP0 unit over suffix heuristic — avoids "_mm" label when storage is actually "m"
-        unit = ap0_unit
-        for suf, u in _UNITS.items():
-            if k.endswith(suf):
-                k = k[:-len(suf)]
-                if unit is None:
-                    unit = u
-                break
-        words = [_ABBR.get(w.capitalize(), w.capitalize()) for w in k.replace("_", " ").split()]
+        # OI-115c: unit always comes from AP0's Unit column (ap0_unit) — no suffix
+        # heuristic. A key suffix like "_mm" or "_min" is never used to guess the
+        # unit or to strip words from the label (that previously mis-stripped
+        # "Min" from names like "temperature_min" whenever ap0_unit was already set).
+        words = [_ABBR.get(w.capitalize(), w.capitalize()) for w in key.replace("_", " ").split()]
         label = " ".join(words)
-        return f"{label} ({unit})" if unit else label
+        return f"{label} ({ap0_unit})" if ap0_unit else label
     # scope → sheet: canonical_name for leaf nodes, tab_name for domain-shared nodes, None for Global ("*")
     scope_to_sheet: dict[str, str | None] = {
         sid: None if sid == "*" else (node.get("canonical_name") or node.get("tab_name"))
@@ -1407,6 +1400,7 @@ async def field_meta():
             "sheet":          scope_to_sheet.get(spec.scope),
             "display_mode":      spec.display_mode or "editable",
             "user_description":  spec.user_description,
+            "unit":           spec.unit,
         }
         meta[db_key] = entry
         if tender_key and tender_key != db_key:
