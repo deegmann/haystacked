@@ -7,10 +7,10 @@
     "min_project_value_eur"
   ],
   "base_model_extensions": [
-    "auto_hitch_position_tolerance_mm",
-    "cart_pickup_height_range_mm",
+    "auto_hitch_position_tolerance",
+    "cart_pickup_height_range",
     "concurrent_robots_per_station",
-    "drop_accuracy_angle_deg",
+    "drop_accuracy_angle",
     "ergonomic_height_adjustable",
     "extra_fields",
     "floor_flatness_req",
@@ -18,18 +18,18 @@
     "installation_process",
     "load_transfer",
     "min_fleet_size",
-    "min_grid_area_m2",
+    "min_grid_area",
     "modification_process",
     "multi_language_display",
     "onboard_container_count",
     "onboard_container_type",
     "order_lines_per_run",
-    "pick_req_accuracy_angle_deg",
-    "pick_req_accuracy_dep_mm",
+    "pick_req_accuracy_angle",
+    "pick_req_accuracy_dep",
     "stock_line_scanning",
     "storage_density_factor",
     "task_interleaving",
-    "tugger_min_aisle_width_mm",
-    "typical_project_value_eur"
+    "tugger_min_aisle_width",
+    "typical_project_value"
   ]
 }

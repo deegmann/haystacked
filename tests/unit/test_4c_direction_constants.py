@@ -37,54 +37,54 @@ def test_U_C_01_4c_direction_non_empty():
 
 
 # ---------------------------------------------------------------------------
-# U-C-02: required_max_payload_kg maps to MAXIMUM direction
+# U-C-02: required_max_payload maps to MAXIMUM direction
 # ---------------------------------------------------------------------------
 
 def test_U_C_02_weight_capacity_direction_maximum():
-    """required_max_payload_kg (KO_IF_LT) must map to MAXIMUM direction.
+    """required_max_payload (KO_IF_LT) must map to MAXIMUM direction.
 
     KO_IF_LT: supplier must meet or exceed the tender threshold. To find the
     correct threshold in documents with multiple weight values, 4c must extract
     the MAXIMUM (the heaviest weight the AGV must carry).
     """
-    direction = _4C_EXTRACTION_DIRECTION.get("required_max_payload_kg", "")
+    direction = _4C_EXTRACTION_DIRECTION.get("required_max_payload", "")
     assert "MAXIMUM" in direction, (
-        f"required_max_payload_kg direction must contain 'MAXIMUM' (KO_IF_LT). "
+        f"required_max_payload direction must contain 'MAXIMUM' (KO_IF_LT). "
         f"Got: {direction!r}"
     )
 
 
 # ---------------------------------------------------------------------------
-# U-C-03: required_min_aisle_width_mm maps to MINIMUM direction
+# U-C-03: required_min_aisle_width maps to MINIMUM direction
 # ---------------------------------------------------------------------------
 
 def test_U_C_03_aisle_width_direction_minimum():
-    """required_min_aisle_width_mm (KO_IF_GT) must map to MINIMUM direction.
+    """required_min_aisle_width (KO_IF_GT) must map to MINIMUM direction.
 
     KO_IF_GT: supplier must not exceed the available aisle width. When a document
     states both rack-to-rack and pallet-to-pallet widths, 4c must extract the
     MINIMUM (the tightest constraint the AGV must fit through).
     """
-    direction = _4C_EXTRACTION_DIRECTION.get("required_min_aisle_width_mm", "")
+    direction = _4C_EXTRACTION_DIRECTION.get("required_min_aisle_width", "")
     assert "MINIMUM" in direction, (
-        f"required_min_aisle_width_mm direction must contain 'MINIMUM' (KO_IF_GT). "
+        f"required_min_aisle_width direction must contain 'MINIMUM' (KO_IF_GT). "
         f"Got: {direction!r}"
     )
 
 
 # ---------------------------------------------------------------------------
-# U-C-04: required_lifting_height_mm maps to MAXIMUM direction
+# U-C-04: required_lifting_height maps to MAXIMUM direction
 # ---------------------------------------------------------------------------
 
 def test_U_C_04_lift_height_direction_maximum():
-    """required_lifting_height_mm (KO_IF_LT) must map to MAXIMUM direction.
+    """required_lifting_height (KO_IF_LT) must map to MAXIMUM direction.
 
     KO_IF_LT: supplier's lift height must meet or exceed the maximum racking height
     required. 4c must extract the MAXIMUM (highest storage level the AGV must reach).
     """
-    direction = _4C_EXTRACTION_DIRECTION.get("required_lifting_height_mm", "")
+    direction = _4C_EXTRACTION_DIRECTION.get("required_lifting_height", "")
     assert "MAXIMUM" in direction, (
-        f"required_lifting_height_mm direction must contain 'MAXIMUM' (KO_IF_LT). "
+        f"required_lifting_height direction must contain 'MAXIMUM' (KO_IF_LT). "
         f"Got: {direction!r}"
     )
 

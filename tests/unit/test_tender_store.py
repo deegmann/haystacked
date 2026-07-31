@@ -100,11 +100,11 @@ def test_T_TR_03b_project_location_and_missing_info_now_persist():
         result = {
             "buyer": "Acme",
             "project_location": "Munich, Germany",
-            "missing_info": ["lifting_height_mm"],
+            "missing_info": ["lifting_height"],
         }
         run = build_tender_run("run-002b", "f.pdf", {}, {}, result, None, True)
         assert run.basic_info.get("project_location") == "Munich, Germany"
-        assert run.basic_info.get("missing_info") == ["lifting_height_mm"]
+        assert run.basic_info.get("missing_info") == ["lifting_height"]
 
 # --- T-TR-03c: OI-96 real guard against silent basic_schema drift ---
 def test_T_TR_03c_basic_info_keys_match_ap0_source():
@@ -174,7 +174,7 @@ def test_T_TR_06_d1_l2_hint_echo_provenance_persists():
     load_tender_run) the live pipeline uses — only the Ollama calls are
     replaced by fixture data, per the D1 acceptance-test allowance.
     """
-    tender_key = "required_max_payload_kg"
+    tender_key = "required_max_payload"
 
     # Real document text: the actual number appears, unrelated to the fabricated quote.
     document_text = "Maximum payload 4800 kg specified for heavy duty operation onsite."
@@ -391,32 +391,32 @@ def test_T_TR_11_attribute_nulls_populates_sink_and_rejected():
 def test_T_TR_12_attribute_nulls_excludes_source_and_underscore_prefixed_keys():
     """Keys ending in _source or starting with _ must never be attributed (F5)."""
     before = {
-        "required_max_payload_kg_source": "some quote",
+        "required_max_payload_source": "some quote",
         "_internal_flag": "x",
-        "required_max_payload_kg": 1000,
+        "required_max_payload": 1000,
     }
     after = {
-        "required_max_payload_kg_source": None,
+        "required_max_payload_source": None,
         "_internal_flag": None,
-        "required_max_payload_kg": None,
+        "required_max_payload": None,
     }
     sink: dict = {}
     rejected: dict = {}
     _attribute_nulls(before, after, "plausibility", sink, rejected)
-    assert sink == {"required_max_payload_kg": "plausibility"}
-    assert rejected == {"required_max_payload_kg": (1000, None)}
+    assert sink == {"required_max_payload": "plausibility"}
+    assert rejected == {"required_max_payload": (1000, None)}
 
 
 def test_T_TR_13_attribute_nulls_setdefault_does_not_overwrite():
     """An earlier attribution for the same key must never be overwritten (both
     sink and rejected use setdefault semantics)."""
-    before = {"required_max_payload_kg": 1000}
-    after = {"required_max_payload_kg": None}
-    sink = {"required_max_payload_kg": "L2"}
-    rejected = {"required_max_payload_kg": (999, "earlier source")}
+    before = {"required_max_payload": 1000}
+    after = {"required_max_payload": None}
+    sink = {"required_max_payload": "L2"}
+    rejected = {"required_max_payload": (999, "earlier source")}
     _attribute_nulls(before, after, "plausibility", sink, rejected)
-    assert sink == {"required_max_payload_kg": "L2"}
-    assert rejected == {"required_max_payload_kg": (999, "earlier source")}
+    assert sink == {"required_max_payload": "L2"}
+    assert rejected == {"required_max_payload": (999, "earlier source")}
 
 
 # ── D1a: _assemble_field_provenance() direct unit tests (test-coverage fix) ──
@@ -424,7 +424,7 @@ def test_T_TR_14_assemble_provenance_4c_override_then_rejected():
     """(a) 4c overrode 4b, then the guard rejected the 4c-produced value:
     raw_value/raw_source must reflect the 4c-rejected pair while
     pre_4c_value/pre_4c_source still show the original 4b data."""
-    tk = "required_max_payload_kg"
+    tk = "required_max_payload"
     produced_by = {tk: "4c"}
     nulled_by = {tk: "L0"}
     rejected = {tk: (950, "4c fabricated quote")}
@@ -465,7 +465,7 @@ def test_T_TR_15_assemble_provenance_allowed_values_rejection_populates_raw_valu
 
 def test_T_TR_16_assemble_provenance_replay_produced_by():
     """(c) A replay-sourced field must show produced_by == 'replay'."""
-    tk = "required_max_payload_kg"
+    tk = "required_max_payload"
     produced_by = {tk: "replay"}
 
     result = _assemble_field_provenance(produced_by, nulled_by={}, rejected={},
@@ -478,7 +478,7 @@ def test_T_TR_16_assemble_provenance_replay_produced_by():
 def test_T_TR_17_read_run_criteria_old_and_new_key_alias():
     """Old-format doc (agv_criteria) and new-format doc (domain_criteria) must
     replay to identical criteria via read_run_criteria()."""
-    criteria = {"required_max_payload_kg": 500.0, "required_product_type": "Forklift AGV"}
+    criteria = {"required_max_payload": 500.0, "required_product_type": "Forklift AGV"}
     old_doc = {"agv_criteria": criteria}
     new_doc = {"domain_criteria": criteria}
 

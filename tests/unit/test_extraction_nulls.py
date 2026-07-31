@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 def test_U_E_05_null_lift_height_survives_plausibility_filter():
     """
-    A null required_lifting_height_mm must pass through validate_domain_criteria
+    A null required_lifting_height must pass through validate_domain_criteria
     unchanged — the plausibility filter must not coerce null to a default value.
 
     This verifies LL-06 (Blank ≠ Zero) is upheld in the post-LLM validation step.
@@ -30,13 +30,13 @@ def test_U_E_05_null_lift_height_survives_plausibility_filter():
 
     criteria = {
         "required_product_type": "Forklift AGV",
-        "required_lifting_height_mm": None,
-        "required_min_aisle_width_mm": 1900,
-        "required_max_payload_kg": 1000,
+        "required_lifting_height": None,
+        "required_min_aisle_width": 1900,
+        "required_max_payload": 1000,
     }
     validated, warnings = validate_domain_criteria(criteria)
-    assert validated.get("required_lifting_height_mm") is None, (
-        "validate_domain_criteria must not fill a null required_lifting_height_mm "
+    assert validated.get("required_lifting_height") is None, (
+        "validate_domain_criteria must not fill a null required_lifting_height "
         "with a default value (LL-06: Blank ≠ Zero)."
     )
 
@@ -90,10 +90,10 @@ def test_U_E_07_numeric_ko_tender_keys_non_empty():
         "_NUMERIC_KO_TENDER_KEYS is empty — fields.json may be missing or "
         "has no KO_IF_LT/KO_IF_GT Float/Integer fields. Run generate_all.py."
     )
-    assert "required_max_payload_kg" in _NUMERIC_KO_TENDER_KEYS, (
-        "required_max_payload_kg missing from _NUMERIC_KO_TENDER_KEYS — "
-        "check fields.json tender_key mapping for max_payload_kg."
+    assert "required_max_payload" in _NUMERIC_KO_TENDER_KEYS, (
+        "required_max_payload missing from _NUMERIC_KO_TENDER_KEYS — "
+        "check fields.json tender_key mapping for max_payload."
     )
-    assert "required_lifting_height_mm" in _NUMERIC_KO_TENDER_KEYS, (
-        "required_lifting_height_mm missing from _NUMERIC_KO_TENDER_KEYS."
+    assert "required_lifting_height" in _NUMERIC_KO_TENDER_KEYS, (
+        "required_lifting_height missing from _NUMERIC_KO_TENDER_KEYS."
     )

@@ -5,22 +5,22 @@
   "in_scope": true,
   "requirements": {
     "product_type": "Forklift AGV",
-    "required_max_payload_kg": 1200,
-    "required_lifting_height_mm": 10000,
-    "required_min_aisle_width_mm": 3400,
-    "required_operating_temp_min_c": 10,
-    "required_operating_temp_max_c": 30,
+    "required_max_payload": 1200,
+    "required_lifting_height": 10000,
+    "required_min_aisle_width": 3400,
+    "required_operating_temp_min": 10,
+    "required_operating_temp_max": 30,
     "required_vna_capable": "not_required"
   },
   "golden_extraction": {
-    "required_max_payload_kg": 1200,
-    "required_lifting_height_mm": 10000,
-    "required_min_aisle_width_mm": 3400,
-    "required_operating_temp_min_c": 10,
-    "required_operating_temp_max_c": 30,
-    "required_operating_humidity_max_pct": null,
-    "required_max_gradient_pct": 1.5,
-    "required_min_total_height_mm": null
+    "required_max_payload": 1200,
+    "required_lifting_height": 10000,
+    "required_min_aisle_width": 3400,
+    "required_operating_temp_min": 10,
+    "required_operating_temp_max": 30,
+    "required_operating_humidity_max": null,
+    "required_max_gradient": 1.5,
+    "required_min_total_height": null
   },
   "golden_run_file": "golden_run_tender_nordlicht.json",
   "known_issues": [

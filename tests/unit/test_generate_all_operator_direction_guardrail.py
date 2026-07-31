@@ -71,14 +71,14 @@ def test_check_operator_direction_duplication_silent_on_non_directional_op():
 
 
 def test_check_operator_direction_duplication_silent_on_real_ap0_content():
-    """Regression guard for the actual D6 fix: max_payload_kg's real hint,
+    """Regression guard for the actual D6 fix: max_payload's real hint,
     post-fix, must not trip the assertion."""
     generate_all = _load_generate_all()
     from src.field_spec import load_fields
 
     fields = load_fields()
     max_payload = next(
-        f for f in fields.values() if f.field_name == "max_payload_kg"
+        f for f in fields.values() if f.field_name == "max_payload"
     )
     generate_all._check_operator_direction_duplication(
         max_payload.field_name,

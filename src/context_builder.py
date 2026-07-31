@@ -47,7 +47,7 @@ def build_system_context(domain_prefix: str) -> str:
         # Dialog frontend), not LLM instruction text. Do not re-add for "readability" without
         # first re-auditing ALL KO/COND_KO user_description values for numeric literals (see
         # CLAUDE.md "No numeric literals in AP0 Description cells" — this caused a confirmed
-        # hallucination on required_lifting_height_mm, 2026-07-30).
+        # hallucination on required_lifting_height, 2026-07-30).
         lines = [f"  {field} [{spec.level}]" for field, spec in list(ko_fields.items()) + list(cond_fields.items())]
         field_section = "## Field-level descriptions (K.O. and Cond. K.O.)\n" + "\n".join(lines)
 

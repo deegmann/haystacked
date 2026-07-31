@@ -42,7 +42,7 @@ def test_rematch_allowed_values_in_field_meta():
     """GET /api/field-meta must include non-empty allowed_values for Multi-Select/Dropdown
     fields and null (or absent) allowed_values for Float fields.
 
-    Uses navigation_type (Multi-Select, KO_SUBSET) and max_payload_kg (Float, KO_IF_LT)
+    Uses navigation_type (Multi-Select, KO_SUBSET) and max_payload (Float, KO_IF_LT)
     as concrete examples — both are stable AP0 fields that will not disappear.
     """
     response = client.get("/api/field-meta")
@@ -60,23 +60,23 @@ def test_rematch_allowed_values_in_field_meta():
     )
 
     # Float KO field must have allowed_values absent or null (not a list)
-    payload_entry = meta.get("max_payload_kg")
-    assert payload_entry is not None, "max_payload_kg must be present in /api/field-meta"
+    payload_entry = meta.get("max_payload")
+    assert payload_entry is not None, "max_payload must be present in /api/field-meta"
     float_av = payload_entry.get("allowed_values")
     assert float_av is None, (
-        f"max_payload_kg.allowed_values should be null for a Float field, got: {float_av!r}"
+        f"max_payload.allowed_values should be null for a Float field, got: {float_av!r}"
     )
 
 
 def test_rematch_happy_path_override_changes_match_count():
-    """POST /rematch with an extreme max_payload_kg override must KO all suppliers
+    """POST /rematch with an extreme max_payload override must KO all suppliers
     with a real payload value, leaving only null-payload suppliers qualified.
 
-    max_payload_kg maps to tender_key required_max_payload_kg (KO_IF_LT).
+    max_payload maps to tender_key required_max_payload (KO_IF_LT).
     Setting it to 45000 kg KOs every supplier with a real payload (all <= 5000 kg).
     Value must stay within plausibility range [100–50000 kg] — values above that
     are silently dropped by validate_domain_criteria and no KOs fire.
-    Suppliers with max_payload_kg = NULL survive (null-rule LL-06) but get -15 pt penalty.
+    Suppliers with max_payload = NULL survive (null-rule LL-06) but get -15 pt penalty.
     DB-agnostic: asserts structural behavior (majority KO'd) rather than exact counts.
     """
     test_id = str(uuid.uuid4())
@@ -84,7 +84,7 @@ def test_rematch_happy_path_override_changes_match_count():
     try:
         response = client.post(
             "/rematch",
-            json={"analysis_id": test_id, "overrides": {"max_payload_kg": 45000}},
+            json={"analysis_id": test_id, "overrides": {"max_payload": 45000}},
         )
         assert response.status_code == 200
         data = response.json()
@@ -127,7 +127,7 @@ def test_rematch_unknown_override_key_does_not_crash():
         # bogus key lands in criteria under its own name — doesn't pollute real AP0 keys
         updated = _app_module._analyses[test_id].get("domain_criteria", {})
         assert "bogus_field_xyz" in updated
-        assert "required_max_payload_kg" not in updated
+        assert "required_max_payload" not in updated
     finally:
         _app_module._analyses.pop(test_id, None)
 
@@ -135,8 +135,8 @@ def test_rematch_unknown_override_key_does_not_crash():
 def test_rematch_lift_height_override_applies_mm_conversion():
     """POST /rematch with lift-height override in meters must apply m→mm conversion before matching.
 
-    required_lifting_height_mm is KO_IF_LT — supplier lift height must be >= tender requirement.
-    Override: 8 m = 8000 mm. Suppliers with lift_height_mm < 8000 must be disqualified.
+    required_lifting_height is KO_IF_LT — supplier lift height must be >= tender requirement.
+    Override: 8 m = 8000 mm. Suppliers with lift_height < 8000 must be disqualified.
     If conversion is missing: 8 is compared against mm values (~12000) → nobody KO'd.
     If conversion is correct: 8000 compared → suppliers below threshold correctly KO'd.
     """
@@ -145,7 +145,7 @@ def test_rematch_lift_height_override_applies_mm_conversion():
     try:
         response = client.post(
             "/rematch",
-            json={"analysis_id": test_id, "overrides": {"required_lifting_height_mm": 8}},
+            json={"analysis_id": test_id, "overrides": {"required_lifting_height": 8}},
         )
         assert response.status_code == 200
         data = response.json()
@@ -166,8 +166,8 @@ def test_rematch_lift_height_override_applies_mm_conversion():
 def test_rematch_aisle_width_override_applies_mm_conversion():
     """POST /rematch with aisle-width override in meters must apply m→mm conversion before matching.
 
-    required_min_aisle_width_mm is KO_IF_GT — supplier aisle width must be <= tender requirement.
-    Override: 1.8 m = 1800 mm. Suppliers with min_aisle_width_mm > 1800 must be disqualified.
+    required_min_aisle_width is KO_IF_GT — supplier aisle width must be <= tender requirement.
+    Override: 1.8 m = 1800 mm. Suppliers with min_aisle_width > 1800 must be disqualified.
     If conversion is missing: 1.8 is compared against mm values (~2700) → everyone KO'd (wrong).
     If conversion is correct: 1800 compared → appropriate mix of qualified/disqualified.
     """
@@ -176,7 +176,7 @@ def test_rematch_aisle_width_override_applies_mm_conversion():
     try:
         response = client.post(
             "/rematch",
-            json={"analysis_id": test_id, "overrides": {"required_min_aisle_width_mm": 1.8}},
+            json={"analysis_id": test_id, "overrides": {"required_min_aisle_width": 1.8}},
         )
         assert response.status_code == 200
         data = response.json()
@@ -197,8 +197,8 @@ def test_rematch_aisle_width_override_applies_mm_conversion():
 def test_rematch_vt_change_clears_old_vt_fields():
     """POST /rematch with a VT change clears Tugger-specific fields but preserves shared fields.
 
-    required_towing_capacity_kg is Tugger AGV-specific (sheet='Tugger AGV').
-    required_max_payload_kg is shared (sheet='SHARED – All AGV Types').
+    required_towing_capacity is Tugger AGV-specific (sheet='Tugger AGV').
+    required_max_payload is shared (sheet='SHARED – All AGV Types').
     Changing from Tugger AGV to Forklift AGV must delete the Tugger-specific field
     and preserve the shared field. required_vna_capable must be set to None.
     """
@@ -207,8 +207,8 @@ def test_rematch_vt_change_clears_old_vt_fields():
         "analysis_id": test_id,
         "vehicle_type_canonical": "Tugger AGV",
         "domain_criteria": {
-            "required_towing_capacity_kg": 1000,
-            "required_max_payload_kg": 500,
+            "required_towing_capacity": 1000,
+            "required_max_payload": 500,
         },
     }
     try:
@@ -222,10 +222,10 @@ def test_rematch_vt_change_clears_old_vt_fields():
         )
         assert response.status_code == 200
         updated = _app_module._analyses[test_id]["domain_criteria"]
-        assert "required_towing_capacity_kg" not in updated, (
+        assert "required_towing_capacity" not in updated, (
             "Tugger-specific field must be cleared on VT change to Forklift AGV"
         )
-        assert "required_max_payload_kg" in updated, (
+        assert "required_max_payload" in updated, (
             "Shared field must be preserved on VT change"
         )
         assert _app_module._analyses[test_id]["vehicle_type_canonical"] == "Forklift AGV"
@@ -239,8 +239,8 @@ def test_rematch_vt_change_clears_old_vt_fields():
 def test_rematch_vt_change_forklift_to_tugger_clears_forklift_fields():
     """POST /rematch with a VT change from Forklift AGV to Tugger AGV clears Forklift-specific fields.
 
-    required_lifting_height_mm is Forklift-specific (sheet='Forklift AGV').
-    required_max_payload_kg is shared (sheet='SHARED – All AGV Types').
+    required_lifting_height is Forklift-specific (sheet='Forklift AGV').
+    required_max_payload is shared (sheet='SHARED – All AGV Types').
     Changing to Tugger AGV must delete the Forklift-specific field and preserve the shared one.
     required_vna_capable must be set to None.
     """
@@ -249,8 +249,8 @@ def test_rematch_vt_change_forklift_to_tugger_clears_forklift_fields():
         "analysis_id": test_id,
         "vehicle_type_canonical": "Forklift AGV",
         "domain_criteria": {
-            "required_lifting_height_mm": 8.0,
-            "required_max_payload_kg": 1000,
+            "required_lifting_height": 8.0,
+            "required_max_payload": 1000,
         },
     }
     try:
@@ -264,10 +264,10 @@ def test_rematch_vt_change_forklift_to_tugger_clears_forklift_fields():
         )
         assert response.status_code == 200
         updated = _app_module._analyses[test_id]["domain_criteria"]
-        assert "required_lifting_height_mm" not in updated, (
+        assert "required_lifting_height" not in updated, (
             "Forklift-specific field must be cleared on VT change to Tugger AGV"
         )
-        assert "required_max_payload_kg" in updated, (
+        assert "required_max_payload" in updated, (
             "Shared field must be preserved on VT change"
         )
         assert updated.get("required_vna_capable") is None, (
@@ -288,8 +288,8 @@ def test_rematch_same_vt_does_not_clear_criteria():
         "analysis_id": test_id,
         "vehicle_type_canonical": "Forklift AGV",
         "domain_criteria": {
-            "required_lifting_height_mm": 8.0,
-            "required_max_payload_kg": 1000,
+            "required_lifting_height": 8.0,
+            "required_max_payload": 1000,
         },
     }
     try:
@@ -302,10 +302,10 @@ def test_rematch_same_vt_does_not_clear_criteria():
         )
         assert response.status_code == 200
         updated = _app_module._analyses[test_id]["domain_criteria"]
-        assert "required_lifting_height_mm" in updated, (
+        assert "required_lifting_height" in updated, (
             "Forklift-specific field must NOT be cleared when VT is unchanged"
         )
-        assert "required_max_payload_kg" in updated, (
+        assert "required_max_payload" in updated, (
             "Shared field must NOT be cleared when VT is unchanged"
         )
     finally:
@@ -316,9 +316,9 @@ def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
     """GET /api/field-meta must assign each KO field to the correct VT scope.
 
     Verified fields:
-    - towing_capacity_kg   → scope NOT in extractable_domains (tugger-only leaf scope)
-    - lifting_height_mm    → scope NOT in extractable_domains (forklift-only leaf scope)
-    - max_payload_kg       → scope IN extractable_domains     (shared across all VTs)
+    - towing_capacity   → scope NOT in extractable_domains (tugger-only leaf scope)
+    - lifting_height    → scope NOT in extractable_domains (forklift-only leaf scope)
+    - max_payload       → scope IN extractable_domains     (shared across all VTs)
     """
     response = client.get("/api/field-meta")
     assert response.status_code == 200
@@ -332,20 +332,20 @@ def test_field_meta_vt_sheet_assignment_separates_vehicle_types():
     legacy_map = vt_config.get("legacy_map", {})
 
     # Tugger-only KO field
-    tugger = meta.get("towing_capacity_kg")
-    assert tugger is not None, "towing_capacity_kg missing from /api/field-meta"
+    tugger = meta.get("towing_capacity")
+    assert tugger is not None, "towing_capacity missing from /api/field-meta"
     assert tugger["scope"] not in extractable_domains
     assert tugger["scope"] != legacy_map.get("Forklift AGV", "")
 
     # Forklift-only KO field
-    forklift = meta.get("lifting_height_mm")
-    assert forklift is not None, "lifting_height_mm missing from /api/field-meta"
+    forklift = meta.get("lifting_height")
+    assert forklift is not None, "lifting_height missing from /api/field-meta"
     assert forklift["scope"] not in extractable_domains
     assert forklift["scope"] != legacy_map.get("Tugger AGV", "")
 
     # Shared KO field
-    shared = meta.get("max_payload_kg")
-    assert shared is not None, "max_payload_kg missing from /api/field-meta"
+    shared = meta.get("max_payload")
+    assert shared is not None, "max_payload missing from /api/field-meta"
     assert shared["scope"] in extractable_domains
 
 
@@ -361,27 +361,27 @@ def test_field_meta_sheet_and_shared_sheet_name():
     assert shared, "__vt_config__.shared_sheet_name must be a non-empty string"
 
     # Shared KO field → sheet == shared_sheet_name
-    payload = meta.get("max_payload_kg")
+    payload = meta.get("max_payload")
     assert payload is not None
     assert payload.get("sheet") == shared, (
-        f"max_payload_kg should have sheet='{shared}', got {payload.get('sheet')!r}"
+        f"max_payload should have sheet='{shared}', got {payload.get('sheet')!r}"
     )
 
     # Forklift-only field → sheet == canonical VT name, not shared
-    lift = meta.get("lifting_height_mm")
+    lift = meta.get("lifting_height")
     assert lift is not None
     assert lift.get("sheet") not in (None, shared), (
-        f"lifting_height_mm should have a VT-specific sheet, got {lift.get('sheet')!r}"
+        f"lifting_height should have a VT-specific sheet, got {lift.get('sheet')!r}"
     )
 
     # Tugger-only field → sheet == canonical VT name, not shared
-    tow = meta.get("towing_capacity_kg")
+    tow = meta.get("towing_capacity")
     assert tow is not None
     assert tow.get("sheet") not in (None, shared), (
-        f"towing_capacity_kg should have a VT-specific sheet, got {tow.get('sheet')!r}"
+        f"towing_capacity should have a VT-specific sheet, got {tow.get('sheet')!r}"
     )
     assert tow.get("sheet") != lift.get("sheet"), (
-        "towing_capacity_kg and lifting_height_mm must belong to different sheets"
+        "towing_capacity and lifting_height must belong to different sheets"
     )
 
     # Global field → sheet == None

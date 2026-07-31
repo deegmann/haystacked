@@ -173,7 +173,7 @@ def test_U_SG_12_non_numeric_value_passes_through():
 
 
 def test_U_SG_13_single_digit_anchor_substring_colocation_rejected():
-    """OI-83 regression: LLM hallucinated lifting_height_mm=3.0 with source
+    """OI-83 regression: LLM hallucinated lifting_height=3.0 with source
     'The AGVs must be able to lift pallets up to a height of 3 meters.'
     The digit '3' appears in 'Hall 3' in the document; 'lift' in the source
     matched as substring inside 'forklift' in the window around 'Hall 3'.
@@ -189,7 +189,7 @@ def test_U_SG_13_single_digit_anchor_substring_colocation_rejected():
 
 
 def test_U_SG_14_single_digit_anchor_aisle_width_rejected():
-    """OI-83 regression: LLM hallucinated min_aisle_width_mm=2.0 with source
+    """OI-83 regression: LLM hallucinated min_aisle_width=2.0 with source
     'The minimum working aisle width available in the facility is 2 meters.'
     The digit '2' appears many times in the document (data tables).
     After the word-boundary co-location fix, co-location must not produce
@@ -214,7 +214,7 @@ def test_U_SG_14_single_digit_anchor_aisle_width_rejected():
 # ago as an accepted, monitored residual risk in test_U_SS_11 (see
 # tests/unit/test_source_span_enforcement.py:227), whose docstring says
 # "if this starts failing... needs a real fix, not a threshold nudge" — that
-# risk materialized on the real Dragonfly tender's required_lifting_height_mm
+# risk materialized on the real Dragonfly tender's required_lifting_height
 # field (captured tests/tenders/run_20260730_dragonfly.json, before the
 # separately-shipped user_description prompt fix in commit 685b492 already
 # resolved the acute symptom for that specific tender run). This section is
@@ -225,7 +225,7 @@ def test_U_SG_14_single_digit_anchor_aisle_width_rejected():
 # ---------------------------------------------------------------------------
 
 def test_U_SG_15_dragonfly_fabricated_lifting_height_rejected_after_fix():
-    """The actual historical regression: required_lifting_height_mm=10000
+    """The actual historical regression: required_lifting_height=10000
     (Pass 4c/4b's raw pre-mm-to-m-conversion value; enforce_source_spans() runs
     before validate_domain_criteria()'s mm->m auto-conversion, so this is the
     value source_is_grounded() actually saw — the final persisted value in
@@ -287,14 +287,14 @@ def test_U_SG_17_nordlicht_genuine_lifting_height_survives_metric_gate():
 def test_U_SG_18_aisle_width_unit_scale_mismatch_survives_metric_gate_explicit_unit():
     """Re-run of test_U_SG_04 (genuine unit-scale mismatch) but now exercised
     THROUGH the new metric-prefix gate by passing unit="mm" explicitly
-    (required_min_aisle_width_mm's real AP0 unit post-OI-115b, per
+    (required_min_aisle_width's real AP0 unit post-OI-115b, per
     _NUMERIC_KO_FIELD_UNITS) instead of relying on the unit="" carve-out
     default. Proves the corrected fix (single free metric-prefix choice on the
     value side) still grounds this genuine cross-unit case: document's "2 m"
     dimensionally resolves (2 * scale(m)=2.0 == 2000 * scale(mm)=2.0) to the
     tender value 2000 under unit="mm".
     """
-    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "mm"
+    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width"] == "mm"
     document = "Aisle width is 2 m rack-to-rack, with a minimum of 1.9 m pallet-to-pallet."
     quote = document
     assert source_is_grounded(2000, quote, document, unit="mm") is True
@@ -302,7 +302,7 @@ def test_U_SG_18_aisle_width_unit_scale_mismatch_survives_metric_gate_explicit_u
 
 def test_U_SG_19_nonmetric_unit_carveout_converted_scale_still_anchors_unconditionally():
     """Structural pin for the carve-out: for a unit outside
-    _METRIC_PREFIX_SCALE (here '%' — required_max_gradient_pct's real AP0
+    _METRIC_PREFIX_SCALE (here '%' — required_max_gradient's real AP0
     unit), a x1000/x0.001 converted-scale anchor must keep matching
     unconditionally, exactly as before this fix — the new gate only applies
     to metric-prefix units (mm/cm/m/km/g/kg/t). Synthetic document (not from
@@ -331,7 +331,7 @@ def test_U_SG_20_wiring_enforce_source_spans_passes_unit_through_end_to_end():
     coincidental change.
     """
     document = _pdf_text("Dragonfly.pdf")
-    key = "required_lifting_height_mm"
+    key = "required_lifting_height"
     criteria = {key: 10000, f"{key}_source": "Lift height: 10,000 mm"}
 
     result_wired, _messages, events_wired = enforce_source_spans(

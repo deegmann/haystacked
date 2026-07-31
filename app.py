@@ -99,7 +99,7 @@ _FIELDS_BY_TENDER_KEY = fields_by_tender_key()  # tender_key → list[FieldSpec]
 _FIELDS_BY_FIELD_NAME = fields_by_field_name()  # field_name → list[FieldSpec]
 
 # ── tender_key → uuid translation map — built once at startup ────────────────
-# Broadcast to all UUIDs that share a tender_key (multi-sheet fields like min_aisle_width_mm).
+# Broadcast to all UUIDs that share a tender_key (multi-sheet fields like min_aisle_width).
 from collections import defaultdict as _defaultdict
 _TK_TO_UUIDS: dict = _defaultdict(list)
 for _spec in load_fields().values():
@@ -109,7 +109,7 @@ for _spec in load_fields().values():
 def _criteria_to_uuid_keyed(criteria: dict) -> dict:
     """Translate tender_key → uuid at the AP0 boundary.
     Non-AP0 keys (detected_domain, summary, etc.) pass through unchanged.
-    Multi-sheet fields (e.g. min_aisle_width_mm) are broadcast to all matching UUIDs."""
+    Multi-sheet fields (e.g. min_aisle_width) are broadcast to all matching UUIDs."""
     result = {}
     for k, v in criteria.items():
         uuids = _TK_TO_UUIDS.get(k)
@@ -161,7 +161,7 @@ _NUMERIC_KO_TENDER_KEYS: frozenset = frozenset(
 # ── Pass 4c: per-field extraction hints — built from fields.json ──────────────
 # Maps tender_key → {hint, sheet} for numeric KO fields — used in Pass 4c to
 # build one focused LLM prompt per field instead of a single 40-field batch.
-# First-spec-wins for multi-VT fields (e.g. required_min_aisle_width_mm picks Forklift AGV
+# First-spec-wins for multi-VT fields (e.g. required_min_aisle_width picks Forklift AGV
 # sheet); Pass 4c runtime filter then suppresses it for non-Forklift tenders.
 _NUMERIC_KO_FIELD_HINTS: dict = {}
 for _tk in _NUMERIC_KO_TENDER_KEYS:
@@ -176,7 +176,7 @@ assert _NUMERIC_KO_FIELD_HINTS, (
 # ── Layer-2 rescue: per-field unit strings — built from fields.json ──────────
 # Maps tender_key → unit string — used only by enforce_source_spans()'s Layer 2
 # rescue check (D0 fix). Requires _spec.unit truthy (not just hint/scope) — a
-# tender_key shared across scopes (e.g. required_min_aisle_width_mm under both
+# tender_key shared across scopes (e.g. required_min_aisle_width under both
 # Forklift and Tugger) must not let an empty-unit scope entry shadow a real unit
 # populated under a different scope for the same key.
 _NUMERIC_KO_FIELD_UNITS: dict = {}
@@ -1288,7 +1288,7 @@ async def match_endpoint(request: Request):
 async def rematch_endpoint(request: Request):
     """Re-run matching after user clarification or edit-panel override.
 
-    Accepts {"analysis_id": "<uuid>", "overrides": {"lifting_height_mm": 12000, ...}} —
+    Accepts {"analysis_id": "<uuid>", "overrides": {"lifting_height": 12000, ...}} —
     db_keys with values in storage units. Uses the server-side cached domain_criteria as
     base so all previously extracted KO fields are preserved.
     Updates _analyses[analysis_id] so /api/last-result stays in sync.

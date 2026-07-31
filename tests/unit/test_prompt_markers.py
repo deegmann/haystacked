@@ -42,7 +42,7 @@ def _hint_for(tender_key: str) -> str:
 
 
 def test_strip_null_rule_preserves_source_and_bound_temp_min():
-    stripped = strip_null_rule(_hint_for("required_operating_temp_min_c"))
+    stripped = strip_null_rule(_hint_for("required_operating_temp_min"))
     assert "Source: a temperature range or operating condition" in stripped
     assert "this field holds the lower bound (X)" in stripped
     for phrase in _NULL_BIAS_PHRASES:
@@ -50,7 +50,7 @@ def test_strip_null_rule_preserves_source_and_bound_temp_min():
 
 
 def test_strip_null_rule_preserves_source_and_bound_temp_max():
-    stripped = strip_null_rule(_hint_for("required_operating_temp_max_c"))
+    stripped = strip_null_rule(_hint_for("required_operating_temp_max"))
     assert "Source: a temperature range or operating condition" in stripped
     assert "this field holds the upper bound (Y)" in stripped
     for phrase in _NULL_BIAS_PHRASES:
@@ -58,7 +58,7 @@ def test_strip_null_rule_preserves_source_and_bound_temp_max():
 
 
 def test_strip_null_rule_preserves_source_humidity():
-    stripped = strip_null_rule(_hint_for("required_operating_humidity_max_pct"))
+    stripped = strip_null_rule(_hint_for("required_operating_humidity_max"))
     assert "Source: an explicit relative-humidity % figure in the environment specification" in stripped
     for phrase in _NULL_BIAS_PHRASES:
         assert phrase not in stripped

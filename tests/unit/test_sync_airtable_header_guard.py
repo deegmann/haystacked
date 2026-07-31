@@ -51,12 +51,12 @@ def test_missing_business_column_triggers_system_exit():
     an Airtable field rename/drift that is NOT in the known baseline gap list)
     must abort the import via SystemExit."""
     real_headers = _real_csv_headers("base_model_extensions")
-    assert "max_payload_kg" in real_headers
-    assert "max_payload_kg" not in sync_airtable._KNOWN_GAPS.get(
+    assert "max_payload" in real_headers
+    assert "max_payload" not in sync_airtable._KNOWN_GAPS.get(
         "base_model_extensions", []
     )
 
-    synthetic_headers = [h for h in real_headers if h != "max_payload_kg"]
+    synthetic_headers = [h for h in real_headers if h != "max_payload"]
 
     with pytest.raises(SystemExit):
         sync_airtable.check_header_guard(
@@ -67,12 +67,17 @@ def test_missing_business_column_triggers_system_exit():
 
 
 def test_renamed_business_column_triggers_system_exit():
-    """A schema column renamed in the source CSV (e.g. 'max_payload_kg' ->
-    'max_payload') is functionally identical to a missing column from the
-    guard's perspective — the old name disappears from the header set."""
+    """A schema column renamed in the source CSV (e.g. 'max_payload' ->
+    'max_payload_renamed') is functionally identical to a missing column from
+    the guard's perspective — the old name disappears from the header set.
+    Uses a synthetic, non-real post-OI-115c-rename name ('max_payload_renamed')
+    rather than a real field_name — after OI-115c stripped unit suffixes from
+    field_names, substituting one real field_name for another real field_name
+    here would be a no-op identity transform (both sides already read
+    'max_payload') and the guard would never fire."""
     real_headers = _real_csv_headers("base_model_extensions")
     synthetic_headers = [
-        "max_payload" if h == "max_payload_kg" else h for h in real_headers
+        "max_payload_renamed" if h == "max_payload" else h for h in real_headers
     ]
 
     with pytest.raises(SystemExit):

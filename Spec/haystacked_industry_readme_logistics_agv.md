@@ -57,7 +57,7 @@ VNA trucks operate in aisles roughly 1.5–1.8 m wide (vs. ~2.5–3.5 m for stan
 - High lift heights (often >8–10 m) combined with tight aisles.
 - "Man-up" picking references (operator cab rises with the forks).
 
-If none of these is present, VNA is usually *not* required and demanding it would over-spec the tender. Conversely, a wide-aisle site never needs VNA. (`vna_capable`, `min_aisle_width_mm`, `guidance`.)
+If none of these is present, VNA is usually *not* required and demanding it would over-spec the tender. Conversely, a wide-aisle site never needs VNA. (`vna_capable`, `min_aisle_width`, `guidance`.)
 
 **Important implication for extraction:** VNA always implies rack operations. If `required_vna_capable = true`, the facility has racking — `required_station_types` must include at least one rack type (e.g. "Standard rack") even if the tender does not explicitly name the rack model. Note: a VNA drive type does not exclude floor or conveyor stations — a VNA truck can also serve floor-level or conveyor pick/drop points in narrow aisles alongside rack operations.
 
@@ -79,14 +79,14 @@ So the knockout for closed-bottom pallets / closed floor conveyors applies to st
 
 ## 6a. `stacking_capability` — pallets on top of each other, not rack placement
 
-**Definition:** `stacking_capability = true` means the vehicle can place one pallet **directly on top of another pallet** (block stacking / floor-level stack). It does **not** mean "can place pallets into racking" — that is a separate concept covered by `lifting_height_mm` and `station_applications`.
+**Definition:** `stacking_capability = true` means the vehicle can place one pallet **directly on top of another pallet** (block stacking / floor-level stack). It does **not** mean "can place pallets into racking" — that is a separate concept covered by `lifting_height` and `station_applications`.
 
 Almost all reach trucks and counterbalanced forklifts serve racks, but only a subset support true block stacking. The distinction matters because some load types, floor loadings, or yard operations specifically require stacking pallets floor-to-floor rather than putting them into racking.
 
 **Setting the value:**
 
 - **True only if explicitly confirmed:** the manufacturer's datasheet or product page explicitly states "block stacking", "floor stacking", "pallets-on-pallets", or shows the vehicle lifting a pallet that sits on top of another pallet. Do not infer from rack capability alone.
-- **False if lift height makes it physically impossible:** a standard EUR pallet (including load) is typically 1,440 mm tall. To place a second pallet on top, the vehicle must lift to at least ~1,500 mm free-lift height. Any product with `lifting_height_mm` well below that cannot stack pallets regardless of stated capability.
+- **False if lift height makes it physically impossible:** a standard EUR pallet (including load) is typically 1,440 mm tall. To place a second pallet on top, the vehicle must lift to at least ~1,500 mm free-lift height. Any product with `lifting_height` well below that cannot stack pallets regardless of stated capability.
   - Mobile AMRs and Tugger AGVs → always **False** (structurally impossible — no mast/fork mechanism for stacking).
   - Low-lift Forklift AGVs (pallet jacks, floor transporters with lift < ~500 mm) → always **False**.
 - **Null if uncertain:** a Forklift AGV with sufficient lift height but no explicit stacking reference should be left **null**, not forced to False. Rack capability alone does not imply block stacking. Blank ≠ False — an unknown value is always better than a wrong False that would cause incorrect K.O. filtering.
@@ -115,8 +115,8 @@ Implications for the database:
 
 F&B and beverage tenders frequently imply hard environmental requirements that are **not stated as explicit specs** but follow from the environment:
 
-- **Washdown / wet areas:** require high ingress protection (IP54–IP65+). Standard warehouse AMRs are ~IP20 and will not survive. (`ingress_protection_rating`, `operating_humidity_max_pct`.)
-- **Cold store / freezer:** standard units are rated only to ~0–5 °C; freezer operation (down to −25 °C) needs a special cold-store variant. (`operating_temp_min_c`.)
+- **Washdown / wet areas:** require high ingress protection (IP54–IP65+). Standard warehouse AMRs are ~IP20 and will not survive. (`ingress_protection_rating`, `operating_humidity_max`.)
+- **Cold store / freezer:** standard units are rated only to ~0–5 °C; freezer operation (down to −25 °C) needs a special cold-store variant. (`operating_temp_min`.)
 - **Hygiene / cleanroom (dairy, pharma-adjacent food):** may need a cleanroom class. (`cleanroom_class`.)
 
 When a tender names an F&B sub-sector, infer the likely environmental gate even if the buyer did not spell it out, and flag it. These are typically Conditional K.O. fields that become hard filters precisely in this market.
@@ -130,7 +130,7 @@ For tugger / tractor trains, the **trailer** technology, not just the tractor, d
 - **Passive caster carts** "off-track" (the trailers cut corners / snake), so the train sweeps a wider path and needs wider aisles.
 - **Self-steering / tracking carts** (quad-steer, tracking drawbar / virtual coupling, forced axle steer) follow the tractor's exact path with little deviation, allowing tighter aisles and safer operation.
 
-So a tugger's own `min_aisle_width_mm` can be optimistic if paired with passive carts. Read `trailer_steering_technology` and `trailer_compatibility` together with the aisle figure. (Also: `auto_hitch` lets a train drop and collect carts without an operator — a throughput multiplier, not just a convenience.)
+So a tugger's own `min_aisle_width` can be optimistic if paired with passive carts. Read `trailer_steering_technology` and `trailer_compatibility` together with the aisle figure. (Also: `auto_hitch` lets a train drop and collect carts without an operator — a throughput multiplier, not just a convenience.)
 
 **Conveyor incompatibility:** Tugger AGVs tow trailer trains and cannot interface with conveyor belts without manual reloading. If a tender requires direct conveyor integration (goods transferred automatically from/to a belt conveyor), a Tugger AGV is not appropriate — a Forklift AGV or AMR with a conveyor interface is needed instead.
 
@@ -149,7 +149,7 @@ VDA 5050 is an open interface standard between AGVs/AMRs and a master control / 
 - **Lithium (Li-Ion / LiFePO4):** supports opportunity charging (top-ups during natural idle), no dedicated battery-swap room, enables 24/7 operation with less floor space.
 - **Lead-Acid:** longer charge cycles, often needs a ventilated battery-change room and spare batteries — consumes floor space and labour.
 
-So a Li-Ion + autonomous-charging combination implies near-continuous uptime; lead-acid implies shift planning and infrastructure. Read `battery_type`, `autonomous_charging`, `charge_time_min`, and `battery_swap_capable` together when judging true availability.
+So a Li-Ion + autonomous-charging combination implies near-continuous uptime; lead-acid implies shift planning and infrastructure. Read `battery_type`, `autonomous_charging`, `charge_time`, and `battery_swap_capable` together when judging true availability.
 
 ---
 
@@ -288,7 +288,7 @@ products — each installation is engineered to the buyer's specific requirement
 ### Matching Rules
 - Blank ≠ Zero: A supplier not listing a refrigerant type does NOT mean they cannot use it.
   Null = unknown, never absent capability.
-- temperature_min_celsius uses KO_IF_GT: tender requires at least as cold as X °C.
+- temperature_min uses KO_IF_GT: tender requires at least as cold as X °C.
   A supplier achieving -25°C satisfies a tender requiring -18°C (supplier value < tender value).
 - Negative °C values are valid and must not be treated as errors.
 - certifications_ik uses KO_SUBSET: tender may require a subset of certifications.

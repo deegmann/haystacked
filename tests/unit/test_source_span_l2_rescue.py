@@ -6,7 +6,7 @@ Background: Pass 4b's `_source` fields sometimes echo the AP0 extraction hint
 abstains on the same field, Layer 2 previously nulled the value unconditionally —
 correctly for real hallucinations, but ALSO for genuinely correct extractions
 whose citation channel happened to be broken the same way (the CompanyX
-`required_max_payload_kg=1000` / `required_max_gradient_pct=1.5` regression).
+`required_max_payload=1000` / `required_max_gradient=1.5` regression).
 
 The rescue: before nulling, check whether the value's digit-string occurs in the
 REAL document adjacent to its unit token. If so, keep the value instead of
@@ -51,9 +51,9 @@ def _companyx_text() -> str:
 # CompanyX runs per the D0 baseline capture in docs/d0_baseline_20260728/)
 # shows exactly 3 UNIQUE (field, value) pairs ever reaching Layer 2 for the
 # current CompanyX.pdf + current field-naming generation of the pipeline:
-#   required_max_gradient_pct=1.5   (known-correct  -> must rescue)
-#   required_max_payload_kg=1000    (known-correct  -> must rescue)
-#   required_min_aisle_width_mm=3000 (known-fabricated -> must NOT rescue;
+#   required_max_gradient=1.5   (known-correct  -> must rescue)
+#   required_max_payload=1000    (known-correct  -> must rescue)
+#   required_min_aisle_width=3000 (known-fabricated -> must NOT rescue;
 #       the document contains no "3000"/"3,000" anchor at all, and the field's
 #       unit is the single-char 'm' which is excluded unconditionally anyway —
 #       double-covered by both guard conditions)
@@ -65,9 +65,9 @@ def _companyx_text() -> str:
 # code).
 # ---------------------------------------------------------------------------
 _BASELINE_L2_FIRINGS = [
-    ("required_max_gradient_pct", 1.5, True),
-    ("required_max_payload_kg", 1000, True),
-    ("required_min_aisle_width_mm", 3000, False),
+    ("required_max_gradient", 1.5, True),
+    ("required_max_payload", 1000, True),
+    ("required_min_aisle_width", 3000, False),
 ]
 
 
@@ -88,7 +88,7 @@ def test_D0_full_corpus_false_rescue_sweep_current_baseline():
 
 def test_D0_known_fabricated_values_from_prior_investigation_not_rescued():
     """Additional known-fabricated values named by the senior-architect's 2026-06
-    investigation (required_max_gradient_pct=10, required_operating_temp_min_c=-25)
+    investigation (required_max_gradient=10, required_operating_temp_min=-25)
     do not occur as digit-anchors anywhere in the real CompanyX.pdf text at all —
     confirmed not rescued regardless of unit.
     """
@@ -117,7 +117,7 @@ def test_D0_positive_payload_rescued_end_to_end_via_enforce_source_spans():
     abstained): the field must be kept, not nulled, and a SpanEvent(layer=
     "L2_RESCUED", ...) must be present.
     """
-    key = "required_max_payload_kg"
+    key = "required_max_payload"
     hint_echo_source = (
         "The maximum permissible payload capacity of the vehicle, expressed in "
         "kilograms, describing the heaviest load the AGV can carry during operation."
@@ -136,7 +136,7 @@ def test_D0_positive_payload_rescued_end_to_end_via_enforce_source_spans():
 
 
 def test_D0_positive_gradient_rescued_end_to_end_via_enforce_source_spans():
-    key = "required_max_gradient_pct"
+    key = "required_max_gradient"
     hint_echo_source = (
         "The maximum gradient value the AGV must handle, described as a "
         "percentage figure for the loading area."
@@ -156,13 +156,13 @@ def test_D0_positive_gradient_rescued_end_to_end_via_enforce_source_spans():
 # ---------------------------------------------------------------------------
 
 def test_D0_negative_coincidental_anchor_collision_still_nulled_no_rescue():
-    """A fabricated required_max_gradient_pct=10 whose hint-echoed source
+    """A fabricated required_max_gradient=10 whose hint-echoed source
     happens to be grounded (L0 passes) because the real document independently
     contains an unrelated '10' (spare-parts-availability '10 years' clause,
     not a gradient figure) must still be nulled at Layer 2 — the rescue must
     not fire because '%' does not co-locate with that unrelated '10'.
     """
-    key = "required_max_gradient_pct"
+    key = "required_max_gradient"
     document = _companyx_text()
     hint_echo_source = (
         "Spare parts availability is guaranteed for an extended number of "
@@ -183,8 +183,8 @@ def test_D0_negative_coincidental_anchor_collision_still_nulled_no_rescue():
 # ---------------------------------------------------------------------------
 
 def test_D0_single_char_unit_m_never_rescues_despite_adjacency():
-    """Before OI-115b, required_lifting_height_mm / required_min_aisle_width_mm /
-    required_tugger_min_aisle_width_mm carried unit 'm' in fields.json despite
+    """Before OI-115b, required_lifting_height / required_min_aisle_width /
+    required_tugger_min_aisle_width carried unit 'm' in fields.json despite
     the _mm name suffix; OI-115b realigned their AP0 Unit to 'mm', so no numeric
     KO field carries the single-character unit 'm' any more. The exclusion rule
     itself is generic (field-agnostic, keyed on the unit string's length, not on
@@ -213,8 +213,8 @@ def test_D0_single_char_unit_m_squared_collision_never_rescues():
 
 def test_D0_single_char_unit_K_and_h_also_excluded():
     """Generic rule, not a per-field list: ANY single-character alphabetic
-    unit is excluded, including 'K' (required_temperature_stability_k) and
-    'h' (required_pulldown_time_h).
+    unit is excluded, including 'K' (required_temperature_stability) and
+    'h' (required_pulldown_time).
     """
     document = "The system runs at a stable 5 K variance for 3 h during the test cycle."
     assert document_supports_value_with_unit(5, "K", document) is False
@@ -247,7 +247,7 @@ def test_D0_regex_safety_percent_and_degree_and_cubic_units_real_text():
     assert document_supports_value_with_unit(2, "°C", document) is True
     assert document_supports_value_with_unit(80, "%", document) is True
     # kg/h contains a regex-metacharacter-free but slash-bearing unit that the
-    # AP0 field list carries (required_blast_freeze_capacity_kg_h) — the real
+    # AP0 field list carries (required_blast_freeze_capacity) — the real
     # deep-freeze doc expresses the same physical quantity as "0,65 t/h", not
     # literally "kg/h", so this must not crash and must correctly return False
     # (no literal "kg/h" match) rather than silently no-op-matching everything.
@@ -270,7 +270,7 @@ def test_D0_regex_safety_cop_unit_no_metacharacters_still_safe():
 def test_D0_scale_tolerance_not_applied_matches_T_TR_06_fixture():
     """Pin the exact fixture values from
     test_T_TR_06_d1_l2_hint_echo_provenance_persists (tests/unit/test_tender_store.py):
-    fabricated required_max_payload_kg=4.8, unit 'kg', document text containing
+    fabricated required_max_payload=4.8, unit 'kg', document text containing
     the genuine but numerically-scaled '4800 kg'. document_supports_value_with_unit()
     must NOT rescue this — it must require an EXACT digit-string match, not the
     x1000/x0.001 scale tolerance used elsewhere in this module. If this ever
@@ -301,12 +301,12 @@ def test_D0_scale_tolerance_not_applied_matches_T_TR_06_fixture():
 # ---------------------------------------------------------------------------
 
 def test_D0_units_dict_real_shared_scope_key_populated():
-    """required_min_aisle_width_mm is the one tender_key in the current AP0
+    """required_min_aisle_width is the one tender_key in the current AP0
     that is genuinely shared across two scopes (Forklift AGV, Tugger AGV).
     Both scopes carry the same truthy unit ('mm' post-OI-115b) today, so this
     pins that the real construction picks a non-empty unit for it (the
     degenerate case where both entries agree)."""
-    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "mm"
+    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width"] == "mm"
 
 
 def test_D0_units_dict_selection_algorithm_skips_empty_unit_shadowing_entry():

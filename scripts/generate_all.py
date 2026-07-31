@@ -30,14 +30,14 @@ tender_key is derived as "required_" + field_name (no separate "Tender JSON Key"
     All extraction fields are anchored in AP0 via field_name:
       required_product_type          ← product_type (SHARED, K.O.)
       required_navigation_type   ← navigation_type (SHARED, Cond. K.O.)
-      required_max_payload_kg    ← max_payload_kg (SHARED, K.O.)
-      required_lifting_height_mm ← lifting_height_mm (Forklift, K.O.)
-      required_min_aisle_width_mm ← min_aisle_width_mm (Forklift, K.O.)
+      required_max_payload    ← max_payload (SHARED, K.O.)
+      required_lifting_height ← lifting_height (Forklift, K.O.)
+      required_min_aisle_width ← min_aisle_width (Forklift, K.O.)
       required_outdoor_capable   ← outdoor_capable (SHARED, Cond. K.O.)
-      required_operating_temp_min_c ← operating_temp_min_c (SHARED, Cond. K.O.)
+      required_operating_temp_min ← operating_temp_min (SHARED, Cond. K.O.)
       required_cleanroom_class   ← cleanroom_class (SHARED, Cond. K.O.)
       required_load_type         ← load_type (SHARED, K.O.)
-      required_towing_capacity_kg ← towing_capacity_kg (Tugger, K.O.)
+      required_towing_capacity ← towing_capacity (Tugger, K.O.)
       required_integration_capability ← integration_capability (SHARED, Scoring)
       required_station_applications ← station_applications (SHARED, Cond. K.O.)
 """
@@ -1383,13 +1383,14 @@ def _text_contains_unit_token(text: str, unit: str) -> bool:
     return re.search(pattern, text, re.IGNORECASE) is not None
 
 
-# OI-115b: lifting_height_mm/min_aisle_width_mm/tugger_min_aisle_width_mm's AP0
+# OI-115b: lifting_height/min_aisle_width/tugger_min_aisle_width's AP0
 # Unit was realigned from 'm' to 'mm' (matching the real DB/supplier storage unit),
-# closing the split that used to require this exemption. max_gradient_pct's hint
+# closing the split that used to require this exemption. max_gradient's hint
 # mentions '%' only as an extraction-FORMAT instruction, not a redundant
-# self-label — its exemption is unrelated and still valid.
+# self-label — its exemption is unrelated and still valid. Renamed field_name
+# per OI-115c Phase 3C (unit suffixes stripped from field_names).
 _UNIT_DUPLICATION_HINT_EXEMPT = {
-    "max_gradient_pct",
+    "max_gradient",
 }
 
 

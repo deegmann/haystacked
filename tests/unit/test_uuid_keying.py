@@ -14,10 +14,10 @@ from src.matching import TenderRequirements
 
 def test_T_UUID_01_translates_known_tender_key():
     """_criteria_to_uuid_keyed must translate a known tender_key to at least one UUID key."""
-    result = _criteria_to_uuid_keyed({"required_max_payload_kg": 5000})
-    assert "required_max_payload_kg" not in result, "tender_key must not survive translation"
-    uuids = _TK_TO_UUIDS.get("required_max_payload_kg", [])
-    assert uuids, "required_max_payload_kg must have at least one UUID in _TK_TO_UUIDS"
+    result = _criteria_to_uuid_keyed({"required_max_payload": 5000})
+    assert "required_max_payload" not in result, "tender_key must not survive translation"
+    uuids = _TK_TO_UUIDS.get("required_max_payload", [])
+    assert uuids, "required_max_payload must have at least one UUID in _TK_TO_UUIDS"
     assert result.get(uuids[0]) == 5000, "UUID-keyed value must equal the original"
 
 
@@ -33,9 +33,9 @@ def test_T_UUID_02_passthrough_non_ap0_keys():
 
 def test_T_UUID_03_tender_requirements_reads_uuid_keyed_dict():
     """TenderRequirements.get() must resolve a UUID-keyed dict via spec.uuid primary path."""
-    translated = _criteria_to_uuid_keyed({"required_max_payload_kg": 5000})
+    translated = _criteria_to_uuid_keyed({"required_max_payload": 5000})
     req = TenderRequirements.from_dict(translated)
-    assert req.get("max_payload_kg") == 5000.0, (
+    assert req.get("max_payload") == 5000.0, (
         "TenderRequirements must resolve UUID-keyed value via spec.uuid"
     )
 
@@ -53,7 +53,7 @@ def test_T_UUID_04_tender_requirements_from_run_resolves_via_uuid_primary():
     run = build_tender_run(
         run_id="test-uuid-04",
         source_file="test.pdf",
-        new_req={"required_max_payload_kg": 2000.0, "required_product_type": "Forklift AGV"},
+        new_req={"required_max_payload": 2000.0, "required_product_type": "Forklift AGV"},
         domain_criteria={},
         result={"buyer": "Test", "in_scope": True},
         vehicle_type="Forklift AGV",
@@ -61,8 +61,8 @@ def test_T_UUID_04_tender_requirements_from_run_resolves_via_uuid_primary():
     )
     req = TenderRequirements(run)
 
-    assert req.get("max_payload_kg") == 2000.0, (
-        "TenderRequirements(TenderRun) must resolve max_payload_kg via UUID primary path"
+    assert req.get("max_payload") == 2000.0, (
+        "TenderRequirements(TenderRun) must resolve max_payload via UUID primary path"
     )
     assert req.get("product_type") == "Forklift AGV", (
         "TenderRequirements(TenderRun) must resolve product_type via UUID primary path"

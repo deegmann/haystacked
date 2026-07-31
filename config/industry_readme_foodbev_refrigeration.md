@@ -42,7 +42,7 @@ Industrial refrigeration systems for food & beverage applications. Three sub-typ
 
 ## Blank ≠ Zero
 
-A null value means the specification is unknown — never that the capability is absent. A supplier with null cooling_capacity_kw may still qualify; do not assume limitation.
+A null value means the specification is unknown — never that the capability is absent. A supplier with null cooling_capacity may still qualify; do not assume limitation.
 
 ## Common Terminology (DE/EN)
 

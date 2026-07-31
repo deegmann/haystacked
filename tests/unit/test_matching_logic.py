@@ -14,18 +14,18 @@ def _make_values(prod: "Product | None" = None, **kwargs) -> dict:
     specs = load_fields()
     defaults = dict(
         product_type="Forklift AGV",
-        max_payload_kg=2000.0,
-        lifting_height_mm=12000,
-        min_aisle_width_mm=1600,
+        max_payload=2000.0,
+        lifting_height=12000,
+        min_aisle_width=1600,
         navigation_type=["Natural Feature"],
         stacking_capability=True,
         forks_free_floating=True,
         outdoor_capable=False,
         vda5050_compatible=True,
-        battery_runtime_h=10.0,
+        battery_runtime=10.0,
         autonomous_charging=True,
         safety_standard=["ISO 3691-4"],
-        stop_accuracy_mm=8,
+        stop_accuracy=8,
     )
     defaults.update(kwargs)
     values = {}
@@ -72,12 +72,12 @@ def _match_one(req_dict: dict, **ext_kwargs) -> object:
 
 
 def test_U_M_01_ko_payload_too_low():
-    r = _match_one({"max_payload_kg": 3000}, max_payload_kg=1000.0)
+    r = _match_one({"max_payload": 3000}, max_payload=1000.0)
     assert r.disqualified
 
 
 def test_U_M_02_ko_payload_null_not_excluded():
-    r = _match_one({"max_payload_kg": 3000}, max_payload_kg=None)
+    r = _match_one({"max_payload": 3000}, max_payload=None)
     assert not r.disqualified
 
 
@@ -186,7 +186,7 @@ def test_U_M_16_score_details_present():
 
 
 def test_U_M_17_deterministic_same_input_same_order():
-    recs = [_make_record(max_payload_kg=float(i * 500 + 1000)) for i in range(5)]
+    recs = [_make_record(max_payload=float(i * 500 + 1000)) for i in range(5)]
     req  = TenderRequirements.from_dict(_criteria_to_uuid_keyed({"product_type": "Forklift AGV"}))
     _, r1 = matcher.match(recs, req)
     _, r2 = matcher.match(recs, req)
@@ -243,14 +243,14 @@ def test_U_M_24_special_fork_telescopic_supplier_has_it_passes():
 
 def test_U_M_25_null_ko_penalty_fires_for_null_supplier_numeric_field():
     # Tender requires lift height 8000mm; supplier has no data → not disqualified but -15pt
-    r = _match_one({"required_lifting_height_mm": 8000}, lifting_height_mm=None)
+    r = _match_one({"required_lifting_height": 8000}, lifting_height=None)
     assert not r.disqualified
     penalty = sum(d["points"] for d in r.score_details if "null_penalty" in d["field"])
     assert penalty == -15
 
 def test_U_M_26_null_ko_penalty_absent_when_tender_null():
     # No tender requirement → no null penalty even if supplier field is null
-    r = _match_one({}, lifting_height_mm=None)
+    r = _match_one({}, lifting_height=None)
     assert not any("null_penalty" in d["field"] for d in r.score_details)
 
 
@@ -283,26 +283,26 @@ def test_U_M_28_no_hardcoded_preferred_bonus_labels():
 def test_OI47_tugger_supplier_not_penalised_for_forklift_field():
     """Tugger-Supplier must not receive a null-KO-penalty for Forklift-specific fields.
 
-    lifting_height_mm belongs to the 'Forklift AGV' sheet only.
-    A Tugger supplier with lifting_height_mm=None and a tender that requires
+    lifting_height belongs to the 'Forklift AGV' sheet only.
+    A Tugger supplier with lifting_height=None and a tender that requires
     a lift height must NOT accumulate a null_penalty for that field, because
-    lifting_height_mm is not in the relevant field set for Tugger AGV suppliers.
+    lifting_height is not in the relevant field set for Tugger AGV suppliers.
     """
     prod = _make_prod(product_type="Tugger AGV")
     rec = SupplierRecord(
         product=prod,
-        values=_make_values(prod=prod, product_type="Tugger AGV", lifting_height_mm=None),
+        values=_make_values(prod=prod, product_type="Tugger AGV", lifting_height=None),
     )
     top, _ = matcher.match(
         [rec],
-        TenderRequirements.from_dict(_criteria_to_uuid_keyed({"required_lifting_height_mm": 5.0})),
+        TenderRequirements.from_dict(_criteria_to_uuid_keyed({"required_lifting_height": 5.0})),
         top_n=1,
     )
     r = top[0]
     assert not r.disqualified, "Tugger supplier must not be disqualified for lift height"
     penalty_labels = [d["field"] for d in r.score_details if "null_penalty" in d["field"]]
-    assert "lifting_height_mm_null_penalty" not in penalty_labels, (
-        "Tugger supplier must not receive null-penalty for Forklift-specific lifting_height_mm"
+    assert "lifting_height_null_penalty" not in penalty_labels, (
+        "Tugger supplier must not receive null-penalty for Forklift-specific lifting_height"
     )
 
 
@@ -381,7 +381,7 @@ def test_U_M_34_is_active_requirement_numeric_nonzero():
 
 
 # ── OI-115b: reversed (m→mm) auto-heal conversion in validate_domain_criteria ────
-# lifting_height_mm/min_aisle_width_mm's AP0 Unit is now 'mm' (was 'm'). The AP0
+# lifting_height/min_aisle_width's AP0 Unit is now 'mm' (was 'm'). The AP0
 # Unit Conversions sheet now defines the REVERSE direction: threshold=30, factor=1000
 # (m→mm) — historical replay files that stored these fields' values in meters
 # self-heal on replay instead of needing a forward mm→m conversion.
@@ -395,9 +395,9 @@ def test_U_M_35_lifting_height_m_auto_healed_to_mm():
     """
     from app import validate_domain_criteria
     result_m, warnings_m = validate_domain_criteria(
-        {"required_lifting_height_mm": 8}
+        {"required_lifting_height": 8}
     )
-    assert result_m["required_lifting_height_mm"] == pytest.approx(8000.0), (
+    assert result_m["required_lifting_height"] == pytest.approx(8000.0), (
         "8 m must be auto-healed to 8000 mm (factor=1000 from plausibility.json)"
     )
     assert any("konvertiert" in w or "converted" in w.lower() for w in warnings_m), (
@@ -405,9 +405,9 @@ def test_U_M_35_lifting_height_m_auto_healed_to_mm():
     )
 
     result_mm, warnings_mm = validate_domain_criteria(
-        {"required_lifting_height_mm": 8000}
+        {"required_lifting_height": 8000}
     )
-    assert result_mm["required_lifting_height_mm"] == pytest.approx(8000.0), (
+    assert result_mm["required_lifting_height"] == pytest.approx(8000.0), (
         "8000 mm (already in mm, >= threshold of 30) must pass through unchanged"
     )
 
@@ -420,14 +420,14 @@ def test_U_M_36_aisle_width_m_auto_healed_to_mm():
     1.8 m → 1800 mm; 1800 stays as 1800.
     """
     from app import validate_domain_criteria
-    result, warnings = validate_domain_criteria({"required_min_aisle_width_mm": 1.8})
-    assert result["required_min_aisle_width_mm"] == pytest.approx(1800.0), (
+    result, warnings = validate_domain_criteria({"required_min_aisle_width": 1.8})
+    assert result["required_min_aisle_width"] == pytest.approx(1800.0), (
         "1.8 m must be auto-healed to 1800 mm"
     )
     assert any("konvertiert" in w or "converted" in w.lower() for w in warnings)
 
-    result2, _ = validate_domain_criteria({"required_min_aisle_width_mm": 1800})
-    assert result2["required_min_aisle_width_mm"] == pytest.approx(1800.0), (
+    result2, _ = validate_domain_criteria({"required_min_aisle_width": 1800})
+    assert result2["required_min_aisle_width"] == pytest.approx(1800.0), (
         "1800 mm (already in mm, >= threshold of 30) must pass through unchanged"
     )
 
@@ -624,7 +624,7 @@ def test_U_M_53_context_info_in_to_dict():
 # ---------------------------------------------------------------------------
 
 def test_temperature_ko_direction():
-    """KO_IF_GT: supplier temperature_min_celsius must be <= tender requirement.
+    """KO_IF_GT: supplier temperature_min must be <= tender requirement.
 
     Cold store tender requires -2 °C minimum temperature.
     Supplier that can only go to 0.0 °C is warmer than required → disqualified.
@@ -634,29 +634,29 @@ def test_temperature_ko_direction():
     rec_warm = SupplierRecord(
         product=prod_warm,
         values=_make_values(prod=prod_warm, product_type="Industrial Refrigeration",
-                            temperature_min_celsius=0.0),
+                            temperature_min=0.0),
     )
 
     prod_cold = _make_prod(product_type="Industrial Refrigeration")
     rec_cold = SupplierRecord(
         product=prod_cold,
         values=_make_values(prod=prod_cold, product_type="Industrial Refrigeration",
-                            temperature_min_celsius=-25.0),
+                            temperature_min=-25.0),
     )
 
     req = TenderRequirements.from_dict(
-        _criteria_to_uuid_keyed({"temperature_min_celsius": -2})
+        _criteria_to_uuid_keyed({"temperature_min": -2})
     )
 
     top_warm, _ = matcher.match([rec_warm], req, top_n=1)
     assert top_warm[0].disqualified, (
-        "Supplier with temperature_min_celsius=0.0 must be disqualified for a "
+        "Supplier with temperature_min=0.0 must be disqualified for a "
         "-2 °C cold store tender (0.0 > -2 triggers KO_IF_GT)"
     )
 
     top_cold, _ = matcher.match([rec_cold], req, top_n=1)
     assert not top_cold[0].disqualified, (
-        "Supplier with temperature_min_celsius=-25.0 must NOT be disqualified for a "
+        "Supplier with temperature_min=-25.0 must NOT be disqualified for a "
         "-2 °C cold store tender (-25.0 <= -2, KO_IF_GT does not fire)"
     )
 

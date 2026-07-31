@@ -558,21 +558,21 @@ def test_T_DM_03_field_meta_editable_default_for_ko_numeric_fields():
     assert response.status_code == 200
     meta = response.json()
 
-    assert meta.get("max_payload_kg", {}).get("display_mode") == "editable", \
-        "max_payload_kg must have display_mode='editable' (AP0 default)"
-    assert meta.get("lifting_height_mm", {}).get("display_mode") == "editable", \
-        "lifting_height_mm must have display_mode='editable' (AP0 default)"
+    assert meta.get("max_payload", {}).get("display_mode") == "editable", \
+        "max_payload must have display_mode='editable' (AP0 default)"
+    assert meta.get("lifting_height", {}).get("display_mode") == "editable", \
+        "lifting_height must have display_mode='editable' (AP0 default)"
 
 
 def test_T_CON_08_fields_json_correctness():
     """fields.json: spot-check that a known field has correct values from AP0."""
     fields = _load("fields.json")
-    # Find lifting_height_mm (Forklift AGV) by field_name
-    match = [f for f in fields.values() if f.get("field_name") == "lifting_height_mm"]
-    assert match, "lifting_height_mm not found in fields.json"
+    # Find lifting_height (Forklift AGV) by field_name
+    match = [f for f in fields.values() if f.get("field_name") == "lifting_height"]
+    assert match, "lifting_height not found in fields.json"
     f = match[0]
-    assert f["tender_key"] == "required_lifting_height_mm", (
-        f"Expected required_lifting_height_mm, got {f['tender_key']!r}"
+    assert f["tender_key"] == "required_lifting_height", (
+        f"Expected required_lifting_height, got {f['tender_key']!r}"
     )
     assert f["operator"] == "KO_IF_LT", f"Expected KO_IF_LT, got {f['operator']!r}"
     assert f["data_type"] == "Integer", f"Expected Integer, got {f['data_type']!r}"
@@ -616,9 +616,9 @@ def test_T_DM_05_to_dict_contains_debug_table_fields():
     record = SupplierRecord(product=product, values=values)
     mr = MatchResult(record=record)
     result = mr.to_dict()
-    assert "lifting_height_mm" in result
-    assert "min_aisle_width_mm" in result
-    assert "max_payload_kg" in result
+    assert "lifting_height" in result
+    assert "min_aisle_width" in result
+    assert "max_payload" in result
 
 
 # ─────────────────────────────────────────────────────────────────────────────
