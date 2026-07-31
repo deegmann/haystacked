@@ -17,7 +17,8 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.json_repair import source_is_grounded
+from app import _NUMERIC_KO_TENDER_KEYS, _NUMERIC_KO_FIELD_UNITS
+from src.json_repair import source_is_grounded, enforce_source_spans, _METRIC_PREFIX_SCALE
 
 _TENDERS = Path(__file__).parent.parent.parent / "tenders"
 
@@ -200,3 +201,167 @@ def test_U_SG_14_single_digit_anchor_aisle_width_rejected():
     assert source_is_grounded(2.0, quote, document) is False, (
         "min_aisle_width=2.0 must be rejected: fabricated source not grounded"
     )
+
+
+# ---------------------------------------------------------------------------
+# Metric-prefix unit-gated anchor (D2 residual-risk fix, 2026-07-31).
+#
+# Background: the converted-scale target family ({value*1000, value/1000}) used
+# to anchor unconditionally, with no check on WHAT the matched document number
+# actually meant. For a round value like 10000, the target set includes a bare
+# 10 — which anchors against almost any document (e.g. an unrelated "10 years"
+# clause, or an unrelated "mm 10" table cell). This was predicted over a month
+# ago as an accepted, monitored residual risk in test_U_SS_11 (see
+# tests/unit/test_source_span_enforcement.py:227), whose docstring says
+# "if this starts failing... needs a real fix, not a threshold nudge" — that
+# risk materialized on the real Dragonfly tender's required_lifting_height_mm
+# field (captured tests/tenders/run_20260730_dragonfly.json, before the
+# separately-shipped user_description prompt fix in commit 685b492 already
+# resolved the acute symptom for that specific tender run). This section is
+# the real fix test_U_SS_11 anticipated: the converted-scale anchor now only
+# counts if a metric-prefix unit token sits adjacent to the matched document
+# number AND that unit dimensionally resolves to the same real-world quantity
+# as `value` under the field's actual AP0 unit.
+# ---------------------------------------------------------------------------
+
+def test_U_SG_15_dragonfly_fabricated_lifting_height_rejected_after_fix():
+    """The actual historical regression: required_lifting_height_mm=10000
+    (Pass 4c/4b's raw pre-mm-to-m-conversion value; enforce_source_spans() runs
+    before validate_domain_criteria()'s mm->m auto-conversion, so this is the
+    value source_is_grounded() actually saw — the final persisted value in
+    run_20260730_dragonfly.json is 10.0, i.e. 10000 * 0.001) with fabricated
+    source "Lift height: 10,000 mm" — captured verbatim from
+    tests/tenders/run_20260730_dragonfly.json. The real Dragonfly.pdf contains
+    no "lift"/"Lift" text at all and no genuine lift-height figure; the only
+    reason this fabrication passed grounding before this fix is a coincidental
+    "10" collision (pallet-deflection table cells "width mm 10" / "length mm
+    10", and an unrelated "10 years" clause) plus the word "height" from an
+    unrelated "pallet height" line sitting nearby. Before this fix this
+    asserted True (confirmed empirically during implementation); after this
+    fix it must be False.
+    """
+    document = _pdf_text("Dragonfly.pdf")
+    assert "Lift" not in document and "lift" not in document, (
+        "test assumption: the real Dragonfly document contains no lift-height text at all"
+    )
+    assert source_is_grounded(
+        10000, "Lift height: 10,000 mm", document, unit="m"
+    ) is False
+
+
+def test_U_SG_16_dragonfly_second_fabricated_lifting_height_variant_rejected():
+    """A second real Dragonfly fabrication for the same field, captured from
+    tests/tenders/run_20260729_dragonfly.json ("Lift height: 12 m", value
+    12000 mm-scale pre-conversion). This one was already correctly rejected
+    before this fix (no "12"/"12,000"/"12000" anchor at all in the real
+    document) — included alongside U_SG_15 for corpus completeness, not
+    because it demonstrates new gating behavior.
+    """
+    document = _pdf_text("Dragonfly.pdf")
+    assert source_is_grounded(
+        12000, "Lift height: 12 m", document, unit="m"
+    ) is False
+
+
+def test_U_SG_17_nordlicht_genuine_lifting_height_survives_metric_gate():
+    """The genuine counterpart the fix must preserve: a real height figure
+    "Höhe 10 m" appears in the real Nordlicht PDF text (warehouse height,
+    m·high-bay context: "20.000 m² · Höhe 10 m · Gasse 3,4 m"). A tender
+    value of 10000 (pre-conversion mm-scale, same convention as the Dragonfly
+    triples above) with a source quoting this real "10 m" text must ground:
+    the adjacent unit "m" dimensionally resolves 10 m back to the same
+    real-world quantity as value=10000 under unit="m" (10000/1000 == 10).
+
+    Note: the real Nordlicht PDF does not literally contain the word
+    "Hubhöhe" (lift height) anywhere — the closest genuine real occurrence of
+    a "<number> m" height figure is this warehouse-height line. Used here
+    (per this file's real-corpus-only convention) instead of a synthetic
+    "Hubhöhe >= 10 m" string.
+    """
+    document = _pdf_text("Beispielausschreibung_AGV_Nordlicht.pdf")
+    assert "Höhe 10 m" in document, "test assumption: real Nordlicht text must contain this figure"
+    quote = "Höhe 10 m"
+    assert source_is_grounded(10000, quote, document, unit="m") is True
+
+
+def test_U_SG_18_aisle_width_unit_scale_mismatch_survives_metric_gate_explicit_unit():
+    """Re-run of test_U_SG_04 (genuine unit-scale mismatch: value in meters,
+    document in mm) but now exercised THROUGH the new metric-prefix gate by
+    passing unit="m" explicitly (required_min_aisle_width_mm's real AP0 unit,
+    per _NUMERIC_KO_FIELD_UNITS) instead of relying on the unit="" carve-out
+    default. Proves the fix does not regress this exact case: document's
+    "2000 mm" dimensionally resolves (2000 * 0.001 == 2.0) to the tender
+    value 2.0 under unit="m".
+    """
+    assert _NUMERIC_KO_FIELD_UNITS["required_min_aisle_width_mm"] == "m"
+    document = "Aisle width is 2000 mm rack-to-rack, with a minimum of 1900 mm pallet-to-pallet."
+    quote = document
+    assert source_is_grounded(2.0, quote, document, unit="m") is True
+
+
+def test_U_SG_19_nonmetric_unit_carveout_converted_scale_still_anchors_unconditionally():
+    """Structural pin for the carve-out: for a unit outside
+    _METRIC_PREFIX_SCALE (here '%' — required_max_gradient_pct's real AP0
+    unit), a x1000/x0.001 converted-scale anchor must keep matching
+    unconditionally, exactly as before this fix — the new gate only applies
+    to metric-prefix units (mm/cm/m/km/g/kg/t). Synthetic document (not from
+    the tender corpus) because this pins the ABSENCE of new gating behavior
+    for a non-metric field, not a real hallucination case.
+    """
+    assert "%" not in _METRIC_PREFIX_SCALE
+    document = "The maximum incline the AGV must climb is rated at 10 percent under load."
+    quote = document
+    # value=0.01 -> converted target av*1000 == 10, matching the document's
+    # literal "10". The exact-scale target (0.01 itself) does not occur.
+    assert "0.01" not in document and "0,01" not in document
+    assert source_is_grounded(0.01, quote, document, unit="%") is True
+
+
+def test_U_SG_20_wiring_enforce_source_spans_passes_unit_through_end_to_end():
+    """Guards against the wiring silently regressing to unit="" (old
+    behavior) if a future refactor drops the `unit=units.get(key, "")`
+    argument at the enforce_source_spans() call site. Exercises the full
+    production function (not source_is_grounded() directly) with the real
+    `units` dict (_NUMERIC_KO_FIELD_UNITS, as passed in production by
+    app.py:1135) against the real Dragonfly fabrication: with real units,
+    Layer 0 must null the value; with an empty units dict (simulating the
+    pre-fix/unwired state), the same fabrication must survive Layer 0 —
+    proving the unit parameter is what makes the difference, not some other
+    coincidental change.
+    """
+    document = _pdf_text("Dragonfly.pdf")
+    key = "required_lifting_height_mm"
+    criteria = {key: 10000, f"{key}_source": "Lift height: 10,000 mm"}
+
+    result_wired, _messages, events_wired = enforce_source_spans(
+        dict(criteria), document, _NUMERIC_KO_TENDER_KEYS, set(),
+        units=_NUMERIC_KO_FIELD_UNITS,
+    )
+    assert result_wired[key] is None, "with real units wired through, L0 must null the fabrication"
+    assert any(ev.layer == "L0" and ev.field == key for ev in events_wired)
+
+    result_unwired, _messages2, _events_unwired = enforce_source_spans(
+        dict(criteria), document, _NUMERIC_KO_TENDER_KEYS, set(),
+        units={},
+    )
+    assert result_unwired[key] == 10000, (
+        "sanity check: without units, the metric-prefix gate is inactive (carve-out) "
+        "and this same fabrication survives L0 — confirms the wired test above is "
+        "actually exercising the new gate, not some unrelated change"
+    )
+
+
+def test_U_SG_21_numeric_ko_field_units_coverage_survives_dash_o():
+    """app.py has a hard `assert` (lines ~188-195) that _NUMERIC_KO_FIELD_UNITS
+    is non-empty and covers every _NUMERIC_KO_TENDER_KEYS entry with a truthy
+    unit — but `assert` is stripped under Python's -O flag. This pytest-based
+    test independently re-verifies the same invariant so a -O deployment
+    cannot silently lose unit coverage (and therefore silently lose this
+    fix's gating for every numeric KO field).
+    """
+    assert _NUMERIC_KO_FIELD_UNITS, "_NUMERIC_KO_FIELD_UNITS must not be empty"
+    for tk in _NUMERIC_KO_TENDER_KEYS:
+        assert tk in _NUMERIC_KO_FIELD_UNITS and _NUMERIC_KO_FIELD_UNITS[tk], (
+            f"numeric KO field {tk!r} has no truthy unit in _NUMERIC_KO_FIELD_UNITS — "
+            "the metric-prefix gate can never activate for it"
+        )

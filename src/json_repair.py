@@ -170,6 +170,16 @@ def _interpret_number_token(raw: str) -> set:
     return results
 
 
+# Generic SI metric-prefix scale table (relative to the base SI unit: m, kg).
+# Pure math — no field names, no AP0 vocabulary. Used only by source_is_grounded()'s
+# converted-scale anchor gate (see _adjacent_metric_prefix_unit() /
+# _converted_anchor_dimensionally_valid() below).
+_METRIC_PREFIX_SCALE = {
+    "mm": 0.001, "cm": 0.01, "m": 1.0, "km": 1000.0,
+    "g": 0.001, "kg": 1.0, "t": 1000.0,
+}
+
+
 def source_confirms_value(value, source_text: str) -> bool:
     """Return True if source_text contains a number matching value within unit-scale tolerance.
 
@@ -260,15 +270,81 @@ def _phrase_words_around_value(source: str, targets: set, word_radius: int = 3) 
     return set()
 
 
-def source_is_grounded(value, source: str, document: str, window: int = _GROUNDING_WINDOW_CHARS) -> bool:
+# Adjacency scan for a metric-prefix unit token next to a matched number, used only
+# by the converted-scale anchor gate in source_is_grounded(). Gap <= 3 chars, checked
+# both before and after the number — same bidirectional-adjacency style already used
+# by document_supports_value_with_unit() elsewhere in this module, just tightened from
+# a window search to a strict gap since this check needs to bind a unit to one specific
+# number, not just confirm co-occurrence somewhere nearby.
+_METRIC_UNIT_ALTERNATION = "|".join(
+    re.escape(u) for u in sorted(_METRIC_PREFIX_SCALE, key=len, reverse=True)
+)
+_METRIC_UNIT_AFTER_RE = re.compile(r"^[^\w]{0,3}(" + _METRIC_UNIT_ALTERNATION + r")\b")
+_METRIC_UNIT_BEFORE_RE = re.compile(r"\b(" + _METRIC_UNIT_ALTERNATION + r")[^\w]{0,3}$")
+_METRIC_UNIT_MAX_LEN = max(len(u) for u in _METRIC_PREFIX_SCALE)
+
+
+def _adjacent_metric_prefix_unit(document: str, start: int, end: int, max_gap: int = 3) -> str:
+    """Return a `_METRIC_PREFIX_SCALE` unit token found within `max_gap` characters
+    immediately before or after `document[start:end]`, or "" if none found.
+
+    Pure string/regex adjacency check — no field names, no domain knowledge.
+    """
+    after = document[end:end + max_gap + _METRIC_UNIT_MAX_LEN]
+    m = _METRIC_UNIT_AFTER_RE.match(after)
+    if m:
+        return m.group(1)
+    before = document[max(0, start - max_gap - _METRIC_UNIT_MAX_LEN):start]
+    m = _METRIC_UNIT_BEFORE_RE.search(before)
+    if m:
+        return m.group(1)
+    return ""
+
+
+def _converted_anchor_dimensionally_valid(
+    matched_values: set, av: float, unit: str, document: str, start: int, end: int
+) -> bool:
+    """Gate for a converted-scale (x1000/x0.001) anchor candidate: only counts if a
+    metric-prefix unit token sits adjacent to the matched number AND that unit,
+    applied to the document's number, resolves to the same real-world quantity as
+    `value` under `unit` (the field's actual AP0 unit) — comparing both sides in a
+    common base-SI space (`_METRIC_PREFIX_SCALE` values are already scale factors
+    relative to the base unit) rather than hand-rolled float equality.
+
+    Pure function — no field names, no AP0 value lists, no domain knowledge.
+    """
+    doc_unit = _adjacent_metric_prefix_unit(document, start, end)
+    if not doc_unit:
+        return False
+    av_family_in_base = {
+        round(c * _METRIC_PREFIX_SCALE[unit], 6)
+        for c in (av, av * 1000, round(av / 1000, 6))
+    }
+    for dv in matched_values:
+        if round(dv * _METRIC_PREFIX_SCALE[doc_unit], 6) in av_family_in_base:
+            return True
+    return False
+
+
+def source_is_grounded(
+    value, source: str, document: str, window: int = _GROUNDING_WINDOW_CHARS, unit: str = ""
+) -> bool:
     """Return True if `source` (the LLM's self-reported quote) is actually grounded in
     `document` (the real extracted PDF text) — not just numerically self-consistent
     with `value`, which is all `source_confirms_value()` checks.
 
     Two necessary, binary conditions (no fraction, no calibrated cutoff):
-      1. Anchor: value's digit-string (locale + x1000/x0.001 unit-scale tolerance,
-         via the same `_interpret_number_token` used elsewhere in this module) must
-         occur somewhere in the real document — not just in the LLM's own quote.
+      1. Anchor: value's digit-string must occur somewhere in the real document — not
+         just in the LLM's own quote. Locale interpretation via `_interpret_number_token`.
+         The exact-scale target (`value` itself) anchors unconditionally, as always.
+         A x1000/x0.001 unit-scale-converted target (e.g. value=10 matching a document's
+         "10000") only anchors if `unit` is a known `_METRIC_PREFIX_SCALE` unit AND a
+         metric-prefix unit token sits adjacent to that document number AND it
+         dimensionally resolves to the same real-world quantity as `value` under `unit`
+         (see `_converted_anchor_dimensionally_valid()`). If `unit` is empty or not a
+         `_METRIC_PREFIX_SCALE` key, converted-scale targets anchor unconditionally,
+         same as before this gate existed — this is a deliberate carve-out, not a bug,
+         for non-metric units (%, °C, h, kW, ...) this table has no opinion about.
       2. Co-location: at least one distinctive word from the ±25-char phrase around
          the value's number in `source` must appear (word-boundary match) within
          `window` chars of at least one anchor occurrence in the document.
@@ -276,6 +352,11 @@ def source_is_grounded(value, source: str, document: str, window: int = _GROUNDI
          (e.g. value surrounded only by units and prepositions in the quote).
 
     Zero values always pass (LL-06: a deliberate zero is not an inference hallucination).
+
+    Pure function — no field names, no AP0 value lists, no domain knowledge. `unit` is
+    an opaque unit string (the field's AP0 Unit column value) used only to look up
+    scale factors in the field-agnostic `_METRIC_PREFIX_SCALE` table above; never add
+    field-specific logic here.
     """
     try:
         v = float(value)
@@ -287,11 +368,26 @@ def source_is_grounded(value, source: str, document: str, window: int = _GROUNDI
         return False
 
     av = abs(v)
-    targets = {av, av * 1000, round(av / 1000, 6)}
+    exact_target = {av}
+    converted_targets = {av * 1000, round(av / 1000, 6)}
+    targets = exact_target | converted_targets
+    gate_active = bool(unit) and unit in _METRIC_PREFIX_SCALE
 
     positions = []
     for m in re.finditer(r"\d[\d,\.]*", document):
-        if _interpret_number_token(m.group()) & targets:
+        doc_nums = _interpret_number_token(m.group())
+        if doc_nums & exact_target:
+            positions.append(m.start())
+            continue
+        matched_converted = doc_nums & converted_targets
+        if not matched_converted:
+            continue
+        if not gate_active:
+            positions.append(m.start())
+            continue
+        if _converted_anchor_dimensionally_valid(
+            matched_converted, av, unit, document, m.start(), m.end()
+        ):
             positions.append(m.start())
     if not positions:
         return False
@@ -445,7 +541,7 @@ def enforce_source_spans(
             log.warning("Source-span L1: %s=%s -> null (kein Quellenbeleg)", key, value)
             events.append(SpanEvent(field=key, layer="L1", value=value, source=src_val))
             domain_criteria[key] = None
-        elif not source_is_grounded(value, str(src_val), document_text):
+        elif not source_is_grounded(value, str(src_val), document_text, unit=units.get(key, "")):
             log.warning("Source-span L0: %s=%s -> null (Zitat nicht im Dokument verankert)", key, value)
             events.append(SpanEvent(field=key, layer="L0", value=value, source=src_val))
             domain_criteria[key] = None

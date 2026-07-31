@@ -233,6 +233,17 @@ def test_U_SS_11_documented_residual_gradient_collision_case():
     correctly nulls this fabrication. This test pins that result so a future
     change to the window/stopword constants can't silently reopen the leak
     without a visible test failure.
+
+    This exact vulnerability class (a bare converted-scale number, e.g. 10,
+    anchoring against unrelated document boilerplate) DID materialize over a
+    month later on a different field/tender: Dragonfly's required_lifting_height_mm
+    fabrication ("Lift height: 10,000 mm" against an unrelated "mm 10" table
+    cell + "10 years" clause). '%' is not a metric-prefix unit so this specific
+    gradient case is unaffected by that fix (still relies on co-location only,
+    same as before) — but see tests/unit/test_source_is_grounded.py
+    test_U_SG_15..21 for the real fix and the materialized-incident regression
+    tests, and the metric-prefix unit-gated anchor added to source_is_grounded()
+    in src/json_repair.py.
     """
     import pdfplumber
 
