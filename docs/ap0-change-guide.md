@@ -140,7 +140,7 @@ The **Description** column in the Global, AGV_Shared, AGV_Forklift, AGV_Tugger, 
 **Steps:**
 
 1. Open the AP0 xlsx, go to the relevant sheet
-2. Find the field (e.g. `max_payload_kg`)
+2. Find the field (e.g. `max_payload`)
 3. Edit the **LLM Hint** column
 4. Save the xlsx
 5. Run `python3 scripts/generate_all.py`
@@ -150,12 +150,12 @@ The **Description** column in the Global, AGV_Shared, AGV_Forklift, AGV_Tugger, 
 **What makes a good extraction hint:**
 
 - Tell the LLM exactly where to look: `"check ALL of the following: (1) explicit 'payload' fields, (2) pallet weight tables, (3) product weight sections"`
-- Do NOT restate the unit in the hint text (e.g. do NOT write `"Output in kg"`). Since OI-115a, `generate_all.py` auto-renders `(unit: X)` into the prompt line from the AP0 **Unit** column for every field — restating it in the hint is redundant and risks drift between the two if either is edited later without the other (this is what caused the OI-114 Dragonfly hallucination incident). Just set the **Unit** column correctly and let it render automatically. As of OI-115b, this applies without exception — `lifting_height_mm`, `min_aisle_width_mm` (Forklift + Tugger), and `tugger_min_aisle_width_mm` now have AP0 Unit `mm`, matching their DB storage unit, so their hints no longer need (and must not carry) a manual `"in METERS"`-style disambiguation clause.
+- Do NOT restate the unit in the hint text (e.g. do NOT write `"Output in kg"`). Since OI-115a, `generate_all.py` auto-renders `(unit: X)` into the prompt line from the AP0 **Unit** column for every field — restating it in the hint is redundant and risks drift between the two if either is edited later without the other (this is what caused the OI-114 Dragonfly hallucination incident). Just set the **Unit** column correctly and let it render automatically. As of OI-115b, this applies without exception — `lifting_height`, `min_aisle_width` (Forklift + Tugger), and `tugger_min_aisle_width` now have AP0 Unit `mm`, matching their DB storage unit, so their hints no longer need (and must not carry) a manual `"in METERS"`-style disambiguation clause.
 - Warn about common confusions: `"Do NOT confuse aisle width with rack height or lift height"`
 - Specify the null condition: `"Output null if not explicitly stated — do NOT default to example values"`
 - For Cond. K.O. fields, explain when the hard filter activates: `"Cond. K.O.: hard filter only when buyer cannot accept infrastructure modifications"`
 
-**Example of a hint that was improved on 2026-06-01 (max_payload_kg):**
+**Example of a hint that was improved on 2026-06-01 (max_payload):**
 
 Before: "Maximum payload the AGV must carry per trip. Output in kg."
 

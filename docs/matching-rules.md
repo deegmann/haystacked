@@ -18,13 +18,13 @@ A supplier failing a K.O. criterion is **completely excluded** from the results.
 K.O. criteria represent requirements that are physically non-negotiable: if the tender requires a 2,000 kg payload capacity and the supplier's machine handles 1,500 kg, the machine simply cannot do the job.
 
 Current K.O. fields (as of AP0 v0.10):
-- `max_payload_kg` — maximum load per trip
+- `max_payload` — maximum load per trip
 - `load_type` — pallet type supported (EUR, ISO, Tote, etc.)
 - `agv_type` — Forklift AGV vs. Tugger AGV vs. Mobile AMR
 - `fleet_management_system` — fleet controller architecture
-- `lifting_height_mm` — maximum fork lift height (Forklift AGV only)
-- `min_aisle_width_mm` — minimum working aisle width (Forklift AGV only)
-- `towing_capacity_kg` — total towed load (Tugger AGV only)
+- `lifting_height` — maximum fork lift height (Forklift AGV only)
+- `min_aisle_width` — minimum working aisle width (Forklift AGV only)
+- `towing_capacity` — total towed load (Tugger AGV only)
 - `vna_capable` — VNA capable (via KO_BOOL_EXCLUSIVE, see below)
 
 ### Cond. K.O. — Conditional knockout
@@ -62,9 +62,9 @@ Used for capabilities where higher is better and there is a minimum threshold.
 **Does not fire when:** either value is `None` (see null rule below)
 
 **Examples:**
-- `max_payload_kg`: supplier offers 1,500 kg, tender requires 2,000 kg → K.O.
-- `lifting_height_mm`: supplier lifts to 8,000 mm, tender requires 12,000 mm → K.O.
-- `towing_capacity_kg`: supplier tows 3,000 kg, tender requires 5,000 kg → K.O.
+- `max_payload`: supplier offers 1,500 kg, tender requires 2,000 kg → K.O.
+- `lifting_height`: supplier lifts to 8,000 mm, tender requires 12,000 mm → K.O.
+- `towing_capacity`: supplier tows 3,000 kg, tender requires 5,000 kg → K.O.
 
 ### KO_IF_GT — Knock out if supplier value is too high (machine is too large)
 
@@ -74,8 +74,8 @@ Used for physical constraints where the machine must fit within a limit.
 **Does not fire when:** either value is `None`
 
 **Examples:**
-- `min_aisle_width_mm`: the supplier's machine needs 2,200 mm aisle width, but the warehouse only has 1,800 mm available → K.O.
-- `operating_temp_min_c`: the supplier's machine requires minimum ambient temperature of 5 °C, but the cold store runs at -20 °C → K.O.
+- `min_aisle_width`: the supplier's machine needs 2,200 mm aisle width, but the warehouse only has 1,800 mm available → K.O.
+- `operating_temp_min`: the supplier's machine requires minimum ambient temperature of 5 °C, but the cold store runs at -20 °C → K.O.
 
 ### KO_IF_NEQ — Knock out if values do not match exactly
 
@@ -132,8 +132,8 @@ Note: `navigation_type` and `fleet_management_system` were demoted from KO_SUBSE
 
 This is the single most important rule for understanding matching results. It exists because the supplier database is not complete — many fields have not been filled in yet. The system must not exclude a supplier just because a field has not been entered.
 
-- Tender requires 2,000 kg payload, supplier has `max_payload_kg=None` → **no K.O.**
-- Tender requires 12,000 mm lift height, supplier has `lifting_height_mm=None` → **no K.O.**
+- Tender requires 2,000 kg payload, supplier has `max_payload=None` → **no K.O.**
+- Tender requires 12,000 mm lift height, supplier has `lifting_height=None` → **no K.O.**
 - Tender requires outdoor capability, supplier has `outdoor_capable=None` → **no K.O.** (KO_BOOL_REQUIRED does not fire on `None`)
 
 The only exception: `KO_BOOL_EXCLUSIVE` (`vna_capable`) treats `None` the same as `False` when the tender requires VNA. If the tender explicitly needs VNA and the supplier's VNA capability is unknown, the supplier is excluded. This is an intentional asymmetry — VNA is too specialised to allow unknowns into the qualified pool.
@@ -177,7 +177,7 @@ VNA (Very Narrow Aisle) uses `KO_BOOL_EXCLUSIVE`, which is bidirectional — it 
 
 When the system detects VNA, the LLM is instructed (via the industry README injected into the system prompt) that the facility must have racking. `required_station_types` will include at least one rack type as a result. This is enforced at the extraction stage, not in the matching engine.
 
-**VNA does not exclude floor or conveyor stations.** A VNA facility commonly has floor or conveyor pick/drop points alongside its narrow-aisle racking. The presence of floor or conveyor station types alongside a VNA classification is correct and expected. Only the rack station drives the `min_aisle_width_mm` K.O.; floor and conveyor stations do not require an aisle width check.
+**VNA does not exclude floor or conveyor stations.** A VNA facility commonly has floor or conveyor pick/drop points alongside its narrow-aisle racking. The presence of floor or conveyor station types alongside a VNA classification is correct and expected. Only the rack station drives the `min_aisle_width` K.O.; floor and conveyor stations do not require an aisle width check.
 
 ### How VNA is detected
 
@@ -220,9 +220,9 @@ Scoring is separated into buckets by AGV type: `default` (applies to all), `fork
 | reference_count | 15 | proportional (ceiling: 20 references) |
 | lead_time_weeks | 10 | tiered_lower (full ≤ 26 weeks, half ≤ 52 weeks) |
 | vda5050_compatible | 8 | bool_cond |
-| battery_runtime_h | 7 | threshold_upper (≥ 8h = full) |
+| battery_runtime | 7 | threshold_upper (≥ 8h = full) |
 | autonomous_charging | 6 | bool |
-| stop_accuracy_mm | 5 | tiered_lower |
+| stop_accuracy | 5 | tiered_lower |
 | safety_standard | 5 | nonempty |
 
 ---
@@ -236,7 +236,7 @@ Each result entry contains:
 - `max_score` — maximum possible points
 - `rank` — position (qualified suppliers ranked 1, 2, 3... then disqualified follow)
 - `disqualified` — true/false
-- `disqualified_by` — list of K.O. reasons (e.g. `["max_payload_kg: 1500.0 < required 2000.0"]`)
+- `disqualified_by` — list of K.O. reasons (e.g. `["max_payload: 1500.0 < required 2000.0"]`)
 - `score_details` — per-field breakdown of points awarded
 
 The top 5 qualified results are returned as `matches`. The full scored list (all active suppliers) is in `matches_all`, which the frontend uses to show how many suppliers were evaluated and how many qualified.

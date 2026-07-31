@@ -1347,30 +1347,57 @@ def _scope_resolution_chain(scope_id: str, parent_of: dict) -> list:
     return chain
 
 
-def validate_unit_suffix_drift(fields: dict) -> list:
-    """OI-55: warn when a field_name unit suffix disagrees with the AP0 unit column.
+_NO_UNIT_SUFFIX_ALLOWLIST = {
+    "lead_time_weeks",              # commercial lead time; "weeks" defines the metric, not a redundant label
+    "reference_count",              # a count, not a measurement
+    "min_fleet_size",                # Unit is "# units"; "min" here = minimum, not minutes
+    "throughput_picks_per_hour",    # "picks per hour" IS the metric name
+    "min_project_value_eur",        # from the ② Structure Registry tab, not the field spec
+    "max_project_value_eur",        # from the ② Structure Registry tab, not the field spec
+    # OI-115c Phase 3F: "min" is heavily overloaded in this field spec as a
+    # PREFIX/INFIX meaning "minimum" (never "minutes" — every historical
+    # "_min" == minutes suffix was already stripped in Phase 3C, e.g.
+    # charge_time_min -> charge_time). A closed unit-token vocabulary cannot
+    # distinguish "minimum" from "minutes" by token alone, so every genuine
+    # "min = minimum" field_name is allowlisted here, following the same
+    # reasoning already established for min_fleet_size above.
+    "min_aisle_width", "min_grid_area", "min_ground_clearance",
+    "min_total_height", "min_turning_radius", "operating_temp_min",
+    "temperature_min", "tugger_min_aisle_width",
+}
 
-    Example: lifting_height_mm has suffix '_mm' but AP0 unit='m' after the
-    unit-conversion refactor. This is a documentation smell, not a runtime error.
-    The check is deliberately a warning (not an assert) so generation is never blocked.
-    Suffix aliases (e.g. 'h' == 'hours') are normalised before comparison.
+# Closed vocabulary of unit tokens a field_name segment must never equal
+# (case-insensitive). Whole underscore-separated segments only — checked at
+# any position (prefix/infix/suffix), not just trailing suffixes, per OI-115c.
+_UNIT_TOKEN_VOCAB = {
+    "mm", "cm", "m", "km", "kg", "g", "t", "pct", "eur", "usd", "kw", "kwh",
+    "h", "min", "sec", "ms", "deg", "c", "f", "celsius", "k", "m2", "m3",
+}
+
+
+def validate_no_unit_in_field_name(fields: dict) -> None:
+    """OI-115c invariant: a field_name must never encode its own unit — the AP0
+    Unit column is the single source of unit truth. Hard assert, not warn: a
+    silent regression here re-opens the storage-vs-tender-unit split OI-115b
+    closed. Checks whole underscore-separated segments (including infix
+    position, e.g. the historical 'room_volume_m3_max'), not just trailing
+    suffixes.
     """
-    _SUFFIX_UNIT = {"_mm": "mm", "_kg": "kg", "_h": "h", "_min": "min", "_pct": "%", "_kg_h": "kg/h"}
-    _ALIASES = {"hours": "h", "meter": "m", "metres": "m", "meters": "m"}
-    warnings = []
     for uuid, f in fields.items():
         fn = f.get("field_name", "")
-        raw_unit = (f.get("unit") or "").strip()
-        unit = _ALIASES.get(raw_unit.lower(), raw_unit)
-        for suffix, expected in sorted(_SUFFIX_UNIT.items(), key=lambda kv: -len(kv[0])):
-            if fn.endswith(suffix):
-                if unit and unit != expected:
-                    warnings.append(
-                        f"Unit-suffix drift: '{fn}' ends in '{suffix}' "
-                        f"but AP0 unit='{raw_unit}' — rename field_name or update AP0 unit column"
-                    )
-                break
-    return warnings
+        if fn in _NO_UNIT_SUFFIX_ALLOWLIST:
+            continue
+        segments = fn.split("_")
+        for seg in segments:
+            if seg.lower() in _UNIT_TOKEN_VOCAB:
+                sys.exit(
+                    f"[OI-115c FATAL] field_name '{fn}' encodes its own unit "
+                    f"via segment '{seg}' — the AP0 Unit column is the sole "
+                    f"source of unit truth. Rename the field_name (strip the "
+                    f"unit) or, if this is a genuine non-unit word (e.g. "
+                    f"'minimum'), add it to _NO_UNIT_SUFFIX_ALLOWLIST with a "
+                    f"comment explaining why."
+                )
 
 
 def _text_contains_unit_token(text: str, unit: str) -> bool:
@@ -2035,9 +2062,7 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     xlsx_md5 = hashlib.md5(xlsx_path.read_bytes() + _platform_bytes_for_checksum).hexdigest()
     warnings = validate_vs_sqlite(field_levels, db_path)
     _fields_for_lint = json.loads((CONFIG_DIR / "fields.json").read_text()) if (CONFIG_DIR / "fields.json").exists() else {}
-    drift_warnings = validate_unit_suffix_drift(_fields_for_lint)
-    for w in drift_warnings:
-        print(f"[OI-55 WARN] {w}")
+    validate_no_unit_in_field_name(_fields_for_lint)
     hint_unit_dup_warnings = validate_hint_unit_duplication(_fields_for_lint)
     for w in hint_unit_dup_warnings:
         print(f"[OI-115a WARN] {w}")
