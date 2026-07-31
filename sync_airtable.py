@@ -231,6 +231,55 @@ CREATE_PRODUCTS   = _SQLITE_SCHEMA["products"]
 CREATE_BASE_MODELS = _SQLITE_SCHEMA["base_models"]
 CREATE_EXTENSIONS = _SQLITE_SCHEMA["base_model_extensions"]
 
+# ── Header guard (OI-115c Phase 3B) ─────────────────────────────────────────
+# Prevents a silent, zero-exit-code data wipe: if config/sqlite_schema.json's
+# declared columns (generated from AP0 field_name) ever diverge from the live
+# CSV headers (which mirror Airtable field names verbatim), the dynamic
+# INSERT OR REPLACE below would write NULL for every existing row in that
+# column, and the schema-migration ALTER TABLE ADD COLUMN would silently
+# create it. This guard fails loud instead, BEFORE any CREATE/ALTER/INSERT
+# runs. See data/raw/known_header_gaps.json for the committed baseline of
+# expected (non-destructive) gaps — columns that have simply never been
+# populated in Airtable yet.
+_KNOWN_GAPS_FILE = BASE_DIR / "data" / "raw" / "known_header_gaps.json"
+_KNOWN_GAPS: dict = json.loads(_KNOWN_GAPS_FILE.read_text()) if _KNOWN_GAPS_FILE.exists() else {}
+
+_NON_FIELD_CSV_COLUMNS = {"airtable_id", "model_name", "source_notes"}
+
+
+def _csv_headers(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+    with open(path, encoding="utf-8", newline="") as f:
+        return next(csv.reader(f), [])
+
+
+def check_header_guard(table: str, schema_columns: list[str], csv_headers: list[str]) -> None:
+    """Compare DB schema columns (from sqlite_schema.json) against live CSV headers
+    for `table`. Aborts via sys.exit() if a schema column has disappeared from the
+    CSV and isn't in the committed known_header_gaps.json baseline — the signature
+    of an Airtable/AP0 field_name mismatch that would otherwise silently wipe data.
+    """
+    schema_set = set(schema_columns)
+    csv_set = set(csv_headers)
+    known = set(_KNOWN_GAPS.get(table, []))
+
+    missing = schema_set - csv_set - known
+    if missing:
+        sys.exit(
+            f"ERROR: {table}: {len(missing)} schema column(s) declared in "
+            f"config/sqlite_schema.json are missing from the CSV headers and are not "
+            f"in the known baseline gap list (data/raw/known_header_gaps.json): "
+            f"{sorted(missing)}\n"
+            "  Airtable field names no longer match AP0 field_name — rename in "
+            "Airtable or fix the mismatch. Aborting before data loss."
+        )
+
+    extra = csv_set - schema_set - _NON_FIELD_CSV_COLUMNS
+    if extra:
+        print(f"  [WARN] {table}: CSV has {len(extra)} header(s) not declared in "
+              f"sqlite_schema.json: {sorted(extra)}")
+
 # Type coercion sets — loaded from generated schema, not hardcoded.
 # Extra fields that are structural/non-extension but need coercion are added explicitly.
 BOOL_FIELDS  = set(_SQLITE_SCHEMA.get("bool_fields",  [])) | {"is_oem_product", "active"}
@@ -268,6 +317,11 @@ def import_to_sqlite(
     products_csv: Path,
     extensions_csv: Path,
 ):
+    # Header guard runs first — before any CREATE/ALTER/INSERT touches the DB.
+    check_header_guard("companies", _CO_COLUMNS, _csv_headers(companies_csv))
+    check_header_guard("products", _PROD_COLUMNS, _csv_headers(products_csv))
+    check_header_guard("base_model_extensions", _EXT_COLUMNS, _csv_headers(extensions_csv))
+
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.executescript(

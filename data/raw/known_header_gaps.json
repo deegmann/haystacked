@@ -1,0 +1,35 @@
+{
+  "_comment": "Baseline allowlist for sync_airtable.py's header guard (see check_header_guard()). Lists sqlite_schema.json columns that are declared in the schema but have never had a populated value in any Airtable record, so write_csv()'s record-data-union approach never emits a CSV header for them. This is expected/non-destructive and NOT a rename-mismatch bug. Verified live against data/raw/*.csv on 2026-07-31 (OI-115c Phase 3B). If a future Airtable field rename removes a column that WAS populated, that will surface as a new, un-allowlisted gap and the guard will abort — do not add such a column here to silence it; investigate the rename instead. To refresh after a genuine new always-empty AP0 field: re-run the diff (schema_columns - csv_headers) per table and update the corresponding list below.",
+  "companies": [],
+  "products": [
+    "lead_time_weeks",
+    "max_project_value_eur",
+    "min_project_value_eur"
+  ],
+  "base_model_extensions": [
+    "auto_hitch_position_tolerance_mm",
+    "cart_pickup_height_range_mm",
+    "concurrent_robots_per_station",
+    "drop_accuracy_angle_deg",
+    "ergonomic_height_adjustable",
+    "extra_fields",
+    "floor_flatness_req",
+    "gamification",
+    "installation_process",
+    "load_transfer",
+    "min_fleet_size",
+    "min_grid_area_m2",
+    "modification_process",
+    "multi_language_display",
+    "onboard_container_count",
+    "onboard_container_type",
+    "order_lines_per_run",
+    "pick_req_accuracy_angle_deg",
+    "pick_req_accuracy_dep_mm",
+    "stock_line_scanning",
+    "storage_density_factor",
+    "task_interleaving",
+    "tugger_min_aisle_width_mm",
+    "typical_project_value_eur"
+  ]
+}
