@@ -3,6 +3,11 @@
 AP2 Airtable Data Import — haystacked-AGV-PoC
 Imports Companies → Base Models → Products → Extensions from the seed xlsx.
 
+STALE — DO NOT RUN (flagged 2026-07-31, OI-120): depends on airtable_schema_ids.json
+produced by ap2_schema.py, which is itself stale (see that file's header — missing
+the whole FoodBev:Refrigeration domain + 14 current AP0 fields). Fix ap2_schema.py
+first (derive from config/fields.json rather than hand-maintain), then revisit this.
+
 Linking strategy (IDs in xlsx are all placeholders):
   - Products  → Companies:    via company_id shortcode ([Balyo], [JH], …) mapped to L1 full names
   - Products  → Base Models:  by row index (L2[i] corresponds to L3[i])

@@ -3,6 +3,19 @@
 AP2 Airtable Schema Setup — haystacked-AGV-PoC
 Creates all 4 tables with correct field types and views.
 
+STALE — DO NOT RUN (flagged 2026-07-31, OI-120): this script's hand-maintained
+field list predates the multi-domain rollout and is missing the entire
+FoodBev:Refrigeration domain (no table, no fields — zero references to
+"foodbev"/"refrigeration"/"cooling" anywhere below) plus 14 current AP0 fields
+(e.g. typical_project_value_eur, tugger_min_aisle_width_mm, served_categories).
+Running this today would silently bootstrap an incomplete Airtable base. It
+also independently duplicates field name/type/allowed-value information that
+config/fields.json already generates from AP0 — the real fix is a generator
+that derives the Airtable field-creation payload from config/fields.json
+instead of hand-typing it here, not a manual re-sync. See OI-120. Do not
+rename field-name string literals in this file for OI-115c either — there is
+no point patching a script that is already unfit for its stated purpose.
+
 Prerequisites:
   export AIRTABLE_BASE_ID=appXXXXXXXXXXXXXX
   export AIRTABLE_TOKEN=patXXXXXXXXXXXXXX
