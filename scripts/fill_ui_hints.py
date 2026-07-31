@@ -5,6 +5,15 @@ then apply format cleanup.
 
 IMPORTANT: Opens with openpyxl (no read_only, no data_only) to preserve formulas.
 Only modifies column Q (UI Hint) and formatting — no other content changes.
+
+STALE — SUPERSEDED as of OI-115a (2026-07-31): the UI_HINTS literals below are the
+OLD, pre-OI-115a UI Hint text for ~20 fields — they still contain unit annotations
+(e.g. "(mm)", "(m/s)") that OI-115a deliberately stripped from AP0, because the
+buyer-facing label now renders "Label (unit)" automatically (see app.py _label()).
+Re-running this script unmodified would silently regress that fix by overwriting
+the current AP0 UI Hint cells with this stale text. Do NOT re-run without first
+updating these literals to match the current AP0 xlsx content. One-time seeder,
+kept for historical/reference value only — nothing in the codebase calls it.
 """
 
 import openpyxl

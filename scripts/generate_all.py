@@ -45,6 +45,7 @@ tender_key is derived as "required_" + field_name (no separate "Tender JSON Key"
 import argparse
 import hashlib
 import json
+import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -247,6 +248,9 @@ def read_field_levels(wb, data_sheets) -> dict:
             raw_dtype = str(row[col_dtype]).strip() if col_dtype is not None and col_dtype < len(row) and row[col_dtype] else ""
             if raw_dtype:
                 entry["data_type"] = raw_dtype
+            unit = str(row[col_unit]).strip() if col_unit is not None and col_unit < len(row) and row[col_unit] else None
+            if unit:
+                entry["unit"] = unit
             if col_op is not None and col_op < len(row) and row[col_op]:
                 op = str(row[col_op]).strip()
                 if op in VALID_OPS:
@@ -1163,9 +1167,12 @@ def build_extraction_template(vehicle_types: dict, extraction_schema: list,
         hint = field["hint"]
         needs_source = False
         if field_levels:
-            fl  = field_levels.get(field["db_field"], {})
-            op  = fl.get("operator", "")
-            dt  = fl.get("data_type", "")
+            fl   = field_levels.get(field["db_field"], {})
+            op   = fl.get("operator", "")
+            dt   = fl.get("data_type", "")
+            unit = fl.get("unit", "")
+            if unit:
+                hint = hint + f" (unit: {unit})"
             if op in _OPERATOR_DIRECTION and dt in _NUMERIC_DTYPES:
                 hint = hint + " " + _OPERATOR_DIRECTION[op]
                 needs_source = True
@@ -1348,20 +1355,61 @@ def validate_unit_suffix_drift(fields: dict) -> list:
     The check is deliberately a warning (not an assert) so generation is never blocked.
     Suffix aliases (e.g. 'h' == 'hours') are normalised before comparison.
     """
-    _SUFFIX_UNIT = {"_mm": "mm", "_kg": "kg", "_h": "h", "_min": "min", "_pct": "%"}
+    _SUFFIX_UNIT = {"_mm": "mm", "_kg": "kg", "_h": "h", "_min": "min", "_pct": "%", "_kg_h": "kg/h"}
     _ALIASES = {"hours": "h", "meter": "m", "metres": "m", "meters": "m"}
     warnings = []
     for uuid, f in fields.items():
         fn = f.get("field_name", "")
         raw_unit = (f.get("unit") or "").strip()
         unit = _ALIASES.get(raw_unit.lower(), raw_unit)
-        for suffix, expected in _SUFFIX_UNIT.items():
-            if fn.endswith(suffix) and unit and unit != expected:
-                warnings.append(
-                    f"Unit-suffix drift: '{fn}' ends in '{suffix}' "
-                    f"but AP0 unit='{raw_unit}' — rename field_name or update AP0 unit column"
-                )
+        for suffix, expected in sorted(_SUFFIX_UNIT.items(), key=lambda kv: -len(kv[0])):
+            if fn.endswith(suffix):
+                if unit and unit != expected:
+                    warnings.append(
+                        f"Unit-suffix drift: '{fn}' ends in '{suffix}' "
+                        f"but AP0 unit='{raw_unit}' — rename field_name or update AP0 unit column"
+                    )
                 break
+    return warnings
+
+
+def _text_contains_unit_token(text: str, unit: str) -> bool:
+    """Word-boundary-aware, case-insensitive check whether `text` contains `unit`
+    as a standalone token — not as a substring of a longer word (e.g. 'm' must not
+    match inside 'meters' or 'mm')."""
+    if not text or not unit:
+        return False
+    pattern = r"(?<![A-Za-z0-9])" + re.escape(unit) + r"(?![A-Za-z0-9])"
+    return re.search(pattern, text, re.IGNORECASE) is not None
+
+
+# OI-115a Phase 2: fields whose DB/supplier storage unit (mm) genuinely differs
+# from their AP0 tender/extraction unit (m) — their LLM Hint keeps a manual
+# disambiguation clause until OI-115b renames the field_name. max_gradient_pct's
+# hint mentions '%' only as an extraction-FORMAT instruction, not a redundant
+# self-label. All four are exempt from the Phase 3 hint-duplication lint.
+_UNIT_DUPLICATION_HINT_EXEMPT = {
+    "lifting_height_mm", "min_aisle_width_mm", "tugger_min_aisle_width_mm", "max_gradient_pct",
+}
+
+
+def validate_hint_unit_duplication(fields: dict) -> list:
+    """OI-115a Phase 3: warn when a field's LLM Hint still spells out its own AP0
+    unit as a standalone token, now that build_extraction_template() auto-renders
+    '(unit: X)' for every field. Advisory only (warn, not assert) — false positives
+    are acceptable, e.g. legitimate explanatory text that must name the unit."""
+    warnings = []
+    for uuid, f in fields.items():
+        fn = f.get("field_name", "")
+        if fn in _UNIT_DUPLICATION_HINT_EXEMPT:
+            continue
+        unit = (f.get("unit") or "").strip()
+        hint = f.get("hint") or ""
+        if unit and _text_contains_unit_token(hint, unit):
+            warnings.append(
+                f"Hint unit duplication: '{fn}' LLM Hint still contains its own unit "
+                f"'{unit}' as a token — now redundant, auto-rendered by build_extraction_template()."
+            )
     return warnings
 
 
@@ -1412,6 +1460,28 @@ def _check_operator_direction_duplication(fname, hint, op, dtype) -> None:
                 f"('{_OPERATOR_DIRECTION[op]}'). Bitte den manuell getippten Satz aus der "
                 "AP0-Hint-Zelle entfernen."
             )
+
+
+# OI-115a Phase 4: cop_efficiency's UI Hint reads "...ratio of refrigeration output
+# to electrical power input (e.g. COP 3.5 means...)" — "COP" here is genuinely
+# explanatory (defining the ratio for a buyer who may not know the term), not a
+# redundant "(unit)" tag. The only permitted exemption from the hard assertion.
+_UNIT_DUPLICATION_USER_DESC_EXEMPT = {"cop_efficiency"}
+
+
+def _check_user_description_unit_duplication(fname, user_description, unit) -> None:
+    """OI-115a Phase 4: fail the build if user_description (the buyer-facing 'UI
+    Hint') still spells out the field's own AP0 unit as a standalone token. The
+    buyer-facing label already renders 'Label (unit)' independently via app.py's
+    _label() — the unit must not also be duplicated inside the free-text question."""
+    if fname in _UNIT_DUPLICATION_USER_DESC_EXEMPT:
+        return
+    if unit and _text_contains_unit_token(user_description or "", unit):
+        sys.exit(
+            f"[FEHLER] emit_fields_json: Feld '{fname}' UI Hint (user_description) enthält "
+            f"das eigene Unit '{unit}' als Token — redundant, da app.py._label() die Einheit "
+            "bereits automatisch anhängt. Bitte aus der UI-Hint-Zelle entfernen."
+        )
 
 
 def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict = None, scope_nodes: dict = None) -> None:
@@ -1513,6 +1583,7 @@ def emit_fields_json(wb, data_sheets, plausibility_raw=None, tab_scope_map: dict
             _check_operator_direction_duplication(fname, hint, op, dtype)
             display = str(row[col_display]).strip() if col_display is not None and col_display < len(row) and row[col_display] else None
             client_exp = str(row[col_client]).strip() if col_client is not None and col_client < len(row) and row[col_client] else None
+            _check_user_description_unit_duplication(fname, client_exp, unit)
             display_label = str(row[col_display_label]).strip() if col_display_label is not None and col_display_label < len(row) and row[col_display_label] else None
 
             # Parse allowed_values only for Dropdown/Multi-Select — numeric fields
@@ -1962,11 +2033,13 @@ def generate(xlsx_path: Path, db_path: Path, dry_run: bool = False,
     _platform_bytes_for_checksum = platform_path.read_bytes() if platform_path.exists() else b""
     xlsx_md5 = hashlib.md5(xlsx_path.read_bytes() + _platform_bytes_for_checksum).hexdigest()
     warnings = validate_vs_sqlite(field_levels, db_path)
-    drift_warnings = validate_unit_suffix_drift(
-        json.loads((CONFIG_DIR / "fields.json").read_text()) if (CONFIG_DIR / "fields.json").exists() else {}
-    )
+    _fields_for_lint = json.loads((CONFIG_DIR / "fields.json").read_text()) if (CONFIG_DIR / "fields.json").exists() else {}
+    drift_warnings = validate_unit_suffix_drift(_fields_for_lint)
     for w in drift_warnings:
         print(f"[OI-55 WARN] {w}")
+    hint_unit_dup_warnings = validate_hint_unit_duplication(_fields_for_lint)
+    for w in hint_unit_dup_warnings:
+        print(f"[OI-115a WARN] {w}")
 
     if dry_run:
         print("\n[DRY RUN] Would write:")
