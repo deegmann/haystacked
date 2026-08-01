@@ -1,0 +1,4584 @@
+{
+  "tables": [
+    {
+      "fields": [
+        {
+          "id": "fldbHzdSHL9DaSqKf",
+          "name": "Name",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fld0VykhnIjvlPkQx",
+          "name": "Notes",
+          "type": "multilineText"
+        },
+        {
+          "id": "fldgie60vaswb3RdZ",
+          "name": "Assignee",
+          "type": "singleCollaborator"
+        },
+        {
+          "id": "flddLjB8rNBK1n6dZ",
+          "name": "Status",
+          "options": {
+            "choices": [
+              {
+                "color": "redLight2",
+                "id": "selnBvGqFKqXn19MM",
+                "name": "Todo"
+              },
+              {
+                "color": "yellowLight2",
+                "id": "selG92ujPTT8C0txy",
+                "name": "In progress"
+              },
+              {
+                "color": "greenLight2",
+                "id": "selNJ0Mk8teb3fJhO",
+                "name": "Done"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldWICCJuf6oX7HGu",
+          "name": "Attachments",
+          "options": {
+            "isReversed": false
+          },
+          "type": "multipleAttachments"
+        },
+        {
+          "description": "An AI generated summary of the Attachments field. Upload files to Attachments to generate a summary.",
+          "id": "fldH91y6sOXfiy7ZC",
+          "name": "Attachment Summary",
+          "options": {
+            "prompt": [
+              "You are a professional document analyst specializing in summarizing content from various file types. Your task is to extract key points and provide a concise summary of the content found in the attached files. Ensure that the summary captures the main ideas and any important details without including unnecessary information.\n\nAnalyze the content of the attached files to identify the main themes and significant details. Summarize these points clearly and concisely, ensuring that the summary is informative and relevant to the document's purpose.\n\nFormat your response as plain text, keeping it concise and to the point. If you cannot summarize the content, output \"Unable to summarize the content.\" Example: \"The document discusses the impact of climate change on polar bears, highlighting the loss of habitat and food sources.\" (Real examples should be longer and more detailed.)\n\nFiles:\n",
+              {
+                "field": {
+                  "fieldId": "fldWICCJuf6oX7HGu"
+                }
+              }
+            ],
+            "referencedFieldIds": [
+              "fldWICCJuf6oX7HGu"
+            ]
+          },
+          "type": "aiText"
+        }
+      ],
+      "id": "tblpSkY1mnFUvlnoL",
+      "name": "Table 1",
+      "primaryFieldId": "fldbHzdSHL9DaSqKf",
+      "views": [
+        {
+          "id": "viwIarXkdSGLQIWgK",
+          "name": "Grid view",
+          "type": "grid"
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "id": "fld4gdH5jgbuW3H87",
+          "name": "company_name",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldERNA7Ay4E1Zl84",
+          "name": "company_id",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldb7uKChE5AMDelt",
+          "name": "country",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selLBD9fUzO2IoHzj",
+                "name": "AD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selScWGAQchIauyyI",
+                "name": "AE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYzdPmxgs2frQeS",
+                "name": "AF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selALNPVYBQbKGCOb",
+                "name": "AG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRLz8S8MkDSLMaG",
+                "name": "AI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selB20QIjL6AY7ICD",
+                "name": "AL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel07Uo9bxzd7omLo",
+                "name": "AM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRh5yUe4yknZmRc",
+                "name": "AO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selPNEuEjPiEFn502",
+                "name": "AQ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selIq86TxYEkxZSEf",
+                "name": "AR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbE4tZg2xhhO9R7",
+                "name": "AS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzuuh3S5X3PMTrn",
+                "name": "AT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel8eNwj4gXrl7hAI",
+                "name": "AU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selPCk2Dpw0JV3Ulh",
+                "name": "AW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selTXzUc7yk2IXFkW",
+                "name": "AX"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selsipDin3dES0Dd4",
+                "name": "AZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selW9maCPTlCJDysw",
+                "name": "BA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnzr5dapzuVVo1E",
+                "name": "BB"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel2M1SlwAAtyfi6M",
+                "name": "BD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selx1AkcKqUOWhxcl",
+                "name": "BE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selBuoT9qXQTXGiQ4",
+                "name": "BF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selz4DULbQPR6nObD",
+                "name": "BG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwXAFYmtIbUIfzo",
+                "name": "BH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selDjs65M4hB0PxUH",
+                "name": "BI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel49qnRi8vcbGDd8",
+                "name": "BJ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selpL4PBJyLFKHvww",
+                "name": "BL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selli5kPnC4X0VNLW",
+                "name": "BM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selkKnbzb6GKZ8FLD",
+                "name": "BN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwTn610q0d8lX7J",
+                "name": "BO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selec0RMDHkXt3rwU",
+                "name": "BQ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selreI2iuXOBcirBo",
+                "name": "BR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcjwFbSs5Rzx97U",
+                "name": "BS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHkLQaSjBZUlp3q",
+                "name": "BT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOCcJX9GWTqYdev",
+                "name": "BV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5cssUWA89nxNbM",
+                "name": "BW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selqlmOYRtyEt64N7",
+                "name": "BY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sela5oz1geuOkzyH3",
+                "name": "BZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel9AzLdBaiCkYkfw",
+                "name": "CA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selP3hy1R7qBvXuc4",
+                "name": "CC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selH2LfSGZJnKHg2l",
+                "name": "CD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel23N4RXvzNSFbUX",
+                "name": "CF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selfBIBO4ntALLi6S",
+                "name": "CG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selhhtyw1qrPmnEBP",
+                "name": "CH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selAXnWKPtr0cegCM",
+                "name": "CI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJMX38L7bRSzK2X",
+                "name": "CK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOmmic9u8uGGYbG",
+                "name": "CL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selniKZGWSK28MVIl",
+                "name": "CM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFZkuC11owmyuiB",
+                "name": "CN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selMiGsgJMguLODW1",
+                "name": "CO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selCxazCVght7pqyH",
+                "name": "CR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selIQJY32oAu2L5vc",
+                "name": "CU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwCcyQoFLhgsb17",
+                "name": "CV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selAxIe2sM0fjNGQH",
+                "name": "CW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selvhq3UtIvuZbZ32",
+                "name": "CX"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selsPheuzO8fz8Pdx",
+                "name": "CY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seloQ07yERAalzufY",
+                "name": "CZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzS1sb83M58CTEL",
+                "name": "DE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel8bKbBCHbp7Dowl",
+                "name": "DJ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selS8fpLOSIA2fJw2",
+                "name": "DK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel1CQOvkpcJ5rTSu",
+                "name": "DM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sellc3wWF3ImYdEAw",
+                "name": "DO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selewEeamOc5X18DU",
+                "name": "DZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcQV1yMwMKrrhx3",
+                "name": "EC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3BL9gYY4X0AxPn",
+                "name": "EE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seliPjSfG4DFnLW0Z",
+                "name": "EG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFRNivOANSvAK1t",
+                "name": "EH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrgfxb13rc67Dwo",
+                "name": "ER"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selB5qUDbGFcPyYTw",
+                "name": "ES"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selA8JAgYlbTBEgN8",
+                "name": "ET"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selkL6Sp9Cw3bnAzS",
+                "name": "FI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selh7NX8VSSjWNRQc",
+                "name": "FJ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHqWogAThq86uPd",
+                "name": "FK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selksSr6QU5ziX1PZ",
+                "name": "FM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selpU1ycUFiA8S4Jp",
+                "name": "FO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5FsqKYM14N99Fo",
+                "name": "FR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwWOiA39lgwHYrr",
+                "name": "GA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYNe1tn0XkwlSMd",
+                "name": "GB"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selsC7AN5aQ4NLaeB",
+                "name": "GD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOmtEYgVFJOIzf3",
+                "name": "GE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selyhHsD6YD6AJV58",
+                "name": "GF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcFwhN4GzD9Ghev",
+                "name": "GG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel7tM2cheWCVsvr8",
+                "name": "GH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selGcAbf6n6RXtr2Y",
+                "name": "GI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwA4Dvx8d5XUkIz",
+                "name": "GL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seluHBboYORGqhGFG",
+                "name": "GM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selunlgFioTPN2ZMA",
+                "name": "GN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHq0kQZ0ZOb1EWv",
+                "name": "GP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel721qMogBZh5eny",
+                "name": "GQ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selVppdw8u7EGFDxT",
+                "name": "GR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUI0oU37nX6Bf51",
+                "name": "GS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel6X23wDYoGhq8R6",
+                "name": "GT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selhbBtRhWpAC1rLZ",
+                "name": "GU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selZ0YuvP6yoN0EoC",
+                "name": "GW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOrn9uJbvDEOHQy",
+                "name": "GY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selvyGo6kSaj0d6wB",
+                "name": "HK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selhthQv3wyBJXzLA",
+                "name": "HM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel6JAZxS6zubBYh3",
+                "name": "HN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldn99Go8G7xwDZN",
+                "name": "HR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seln8rg0Pc9usrS2W",
+                "name": "HT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel8TYuHKA66H2GLu",
+                "name": "HU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selmrKaUWOMyfSwnN",
+                "name": "ID"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcNkSDYiR6QwYlO",
+                "name": "IE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selAy8XOp0wbqqfv1",
+                "name": "IL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selD3w8dD1wfgUDas",
+                "name": "IM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRpDuyA311a5Aba",
+                "name": "IN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selZsfP7WJelz2l4V",
+                "name": "IO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnYs41ghWdslxg9",
+                "name": "IQ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4T7EoHqJX9nbBR",
+                "name": "IR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selsYoQafyQ0K9kWn",
+                "name": "IS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHwaoLqvV7w69ra",
+                "name": "IT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFXL7pCz4sUOpAH",
+                "name": "JE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljXhXHTsHy2y6zr",
+                "name": "JM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selpjJfF0l2c7Rxfh",
+                "name": "JO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selg2tooeKgRt3j08",
+                "name": "JP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldvjLlq9EvqE1e8",
+                "name": "KE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selEhlYmHYCAEELgI",
+                "name": "KG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selNICK11fUyScYQ0",
+                "name": "KH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selZx6K4QHij5aAJP",
+                "name": "KI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel2NVGNs9wLi0iFh",
+                "name": "KM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOjfVefl3lqrfWl",
+                "name": "KN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnPMKQbiPOxTMcY",
+                "name": "KP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seln60k1nVQKsjoWU",
+                "name": "KR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel2kU7njlOzhOr5L",
+                "name": "KW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbiXL2jdcf6iGCW",
+                "name": "KY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selKUVvmq3buWMDqZ",
+                "name": "KZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selInEul7tJo3PF2X",
+                "name": "LA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selU6jukQbJGemMBB",
+                "name": "LB"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel1PPAWHWtVcmqMb",
+                "name": "LC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcMsympZHXErXBy",
+                "name": "LI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUXeZf5KBo8lLhE",
+                "name": "LK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selfkb7Mp55mQ6V0t",
+                "name": "LR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUEwMqIM4MrgHjZ",
+                "name": "LS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selF8hkj1yYSCCtrt",
+                "name": "LT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltYxpiSG2ZXoQBR",
+                "name": "LU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel9iVJpH2JO94cQP",
+                "name": "LV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel1vSpR0N1G7dzbO",
+                "name": "LY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selMDjActKFC2kmJh",
+                "name": "MA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrVWelp0ilddG8K",
+                "name": "MC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selvvVxayvYumfJQR",
+                "name": "MD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selq6W9o2dTajVaAa",
+                "name": "ME"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4dUi17dKTrR9FF",
+                "name": "MF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selr1RfdXypbsagh2",
+                "name": "MG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selMTWUBe1CKIqZVR",
+                "name": "MH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFQxQ4qWUroCdfh",
+                "name": "MK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selklFA8om9GJBmr9",
+                "name": "ML"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selInLmHXUZUVCpFH",
+                "name": "MM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selodFBFgF8KaJ5jc",
+                "name": "MN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selDVXGJGRq9KKkJ2",
+                "name": "MO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selxL6bgJf3eLHfKT",
+                "name": "MP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selodBi0afVyIe5km",
+                "name": "MQ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selAKYsHQJkwU1uuf",
+                "name": "MR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selduRF3JabwEOBXA",
+                "name": "MS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbdN0Nu9J8wuJvA",
+                "name": "MT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selgTbRP3DJPEh4d9",
+                "name": "MU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selqvk3YzSzCBIaWT",
+                "name": "MV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnzdmNBs5pm1lEN",
+                "name": "MW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel0DgmYQPFOcQ8IL",
+                "name": "MX"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selr9JJ4SbrbIzjsi",
+                "name": "MY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel0ehsE7nzRHBQUJ",
+                "name": "MZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selDhJcsRO0G0RiGr",
+                "name": "NA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selBJbsYAQVKkbas9",
+                "name": "NC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4kXUo2lC7J7rpq",
+                "name": "NE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJ6Hg0cCrJ9iZxD",
+                "name": "NF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel9bWqLEkwNfpXqL",
+                "name": "NG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljAqrNlpI6xP3E0",
+                "name": "NI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sellFIrWYviaXTMCl",
+                "name": "NL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5QTL76lQxdBbdD",
+                "name": "NO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selKtYXHpoLXZPM6F",
+                "name": "NP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel9yFKiHbCy0uNzr",
+                "name": "NR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selEtSYJRbgY4Bxie",
+                "name": "NU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5ZjfP7fToepN3v",
+                "name": "NZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljzYE64STxX1ZvA",
+                "name": "OM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel7dviohoX64mLF8",
+                "name": "PA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seluC5h0lZkC050jh",
+                "name": "PE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljXNd4kyUIgtGjR",
+                "name": "PF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selNB0VzIM69nnKse",
+                "name": "PG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selom0J9UTSTQleZO",
+                "name": "PH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel78P99Pb58TUOGa",
+                "name": "PK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcYN1tP9T95UFvd",
+                "name": "PL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5VgLqzKXbtDsf8",
+                "name": "PM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel37ht1pqW3TdyUz",
+                "name": "PN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldSf4BAX1PcEzo9",
+                "name": "PR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcMufsyQHsFSgjG",
+                "name": "PS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selW6spq62iBewwet",
+                "name": "PT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selyIh9Ly8pfvjrzd",
+                "name": "PW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selR3r4osgJOIrGta",
+                "name": "PY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selyTXKmiyrQs8Z7e",
+                "name": "QA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbyuO7up8kXVDfG",
+                "name": "RE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selGFWfxR6wyCU6qv",
+                "name": "RO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selXJfvyn6UhILdaw",
+                "name": "RS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sels3ievOz31pcwjL",
+                "name": "RU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbvn4lAoEbq5nnw",
+                "name": "RW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selZM1Hvb1bVv2dzA",
+                "name": "SA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selU7GmYehOjGhJ60",
+                "name": "SB"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3jpVJdyd0Qlt6Z",
+                "name": "SC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljMfwwyWIdW04Jr",
+                "name": "SD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrO4eCGCvPbtNt3",
+                "name": "SE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5YnU4OkXg1JJyn",
+                "name": "SG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selN0v8yk2SrsQF7b",
+                "name": "SH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selTUiQ6teFrsz2VP",
+                "name": "SI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selerw75y8xgohS5T",
+                "name": "SJ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selC3Oo5aBUAPaiIf",
+                "name": "SK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selyNzB7Lx1Se3TMO",
+                "name": "SL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSNQdvSFeEssG3c",
+                "name": "SM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwggKgThLGxOyYl",
+                "name": "SN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selF6DZ83f8fUxw5T",
+                "name": "SO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4YEKWNtxHP3hd8",
+                "name": "SR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selLCEq6lBTFDz7Hh",
+                "name": "SS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selVqpL7o02MUtgSk",
+                "name": "ST"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJFcgQUSuVuMO3p",
+                "name": "SV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel8rOpZXqQwa1fK4",
+                "name": "SX"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selxDMHTcG1UwKOLI",
+                "name": "SY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFYeKVI26BAQB95",
+                "name": "SZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selu7fy6VAqaSo3mn",
+                "name": "TC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel6zgVhHyKQKjB0J",
+                "name": "TD"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel6FqRVdHYYHKb2K",
+                "name": "TF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3akTb54Ruv8DQW",
+                "name": "TG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sele1z3SHzAgjYg79",
+                "name": "TH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel0976b9XEzTqXWH",
+                "name": "TJ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrT6c2F55m9yizL",
+                "name": "TK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selEshCJnQlVF94Ec",
+                "name": "TL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldK1Z91SpQZW3eM",
+                "name": "TM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzCOwsv1kVFh5Bg",
+                "name": "TN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selAnQYwt0HS020r0",
+                "name": "TO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selXtJB83jHJ5VjBu",
+                "name": "TR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selxtkRJpeIfEKyFG",
+                "name": "TT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzdPyPvgXp1v0XG",
+                "name": "TV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSfmrn9ULTekNKY",
+                "name": "TW"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selQHbRQCEzaZu3vn",
+                "name": "TZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selNZp0lLBMsCkQhg",
+                "name": "UA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selXx8kxVHhsDHtVT",
+                "name": "UG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFYfqmt6usWiQAW",
+                "name": "UM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljZ7DhuFSJTlJnO",
+                "name": "US"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selyF7CS9IAR6h4Dq",
+                "name": "UY"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sele2FM6NABbymJOv",
+                "name": "UZ"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seliTJOZJcIL8qESa",
+                "name": "VA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selhCdFtNgqKMbKZi",
+                "name": "VC"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selfQp3nrLjV8czeS",
+                "name": "VE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4oSroQYNQwcoZq",
+                "name": "VG"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selEJ9saA6XestG39",
+                "name": "VI"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selsFZ9UOqXga6Qdg",
+                "name": "VN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selgUfE3EiIq2KwHs",
+                "name": "VU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYs8rSleXBkXa3T",
+                "name": "WF"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selepdj2KGcl12w9B",
+                "name": "WS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYPeBnlmhzvEnNt",
+                "name": "XK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selsOGvPmyEOlKPwn",
+                "name": "YE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seliAOkMFn7Ek0fDP",
+                "name": "YT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selU8SuGaaEDqqJl7",
+                "name": "ZA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwNbWwV4Fd1mxHV",
+                "name": "ZM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltHdvdWZh0XRXfe",
+                "name": "ZW"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "flduj4EZzuUmiGl1P",
+          "name": "hq_city",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldkr2VLERH2tW8G8",
+          "name": "hq_address",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldptHGZWikAf8raL",
+          "name": "hq_maps_link",
+          "type": "url"
+        },
+        {
+          "id": "fldIOKRVuzzy3r0Et",
+          "name": "all_sites",
+          "type": "multilineText"
+        },
+        {
+          "id": "fldFXmgJQNLOo3Aia",
+          "name": "employee_count_range",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selzqYC56EsHpXOFc",
+                "name": "<50"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltewYNXcn6LcopH",
+                "name": "50\u2013250"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrVr3cEo8rDDcl1",
+                "name": "250\u20131000"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selVXiRfnh8SIGf9e",
+                "name": ">1000"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selnIBQnodnEFBuLK",
+                "name": "10000+"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selPqaGMBPAeb8ZOk",
+                "name": "1000\u201310000"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fld7dwoFrJrpeGr4j",
+          "name": "fleet_size_vehicles",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldjNJ8YUJvEmDavL",
+          "name": "founding_year",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld0AhRvBc1iKOadg",
+          "name": "website",
+          "type": "url"
+        },
+        {
+          "id": "fldM4wfx0l3KpWjPD",
+          "name": "email",
+          "type": "email"
+        },
+        {
+          "id": "fldu3iqh5FgGraltl",
+          "name": "phone",
+          "type": "phoneNumber"
+        },
+        {
+          "id": "fldthUl0pWTxIbcAQ",
+          "name": "contact_person",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldoCmLgTLNc8BMZe",
+          "name": "certifications_generic",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel5PQwYP3AeB2eJ9",
+                "name": "ISO 9001"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selaQdDyqqDcHFCMa",
+                "name": "ISO 14001"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel9j1UUIqNemeF8O",
+                "name": "CE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seleLQmRKQvO6ShKU",
+                "name": "T\u00dcV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selVIQU8qwGqE6TR5",
+                "name": "VDA5050 ready"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selGN2cyolOAYBqEu",
+                "name": "CE (all devices)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selW7nlhNmIdbvK5G",
+                "name": "ISO 9001 (verify)"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selHiPPqt0ugBiSoS",
+                "name": "VDA 5050 ready"
+              },
+              {
+                "color": "greenLight2",
+                "id": "selJOZjPiPgYK35Bs",
+                "name": "EU Machinery Directive 2006/42/EC"
+              },
+              {
+                "color": "yellowLight2",
+                "id": "selfjeGb2PROP5PiG",
+                "name": "ISO 3691-4"
+              },
+              {
+                "color": "orangeLight2",
+                "id": "selVz6c4fencxChps",
+                "name": "ISO 13849-1"
+              },
+              {
+                "color": "redLight2",
+                "id": "sel4EiH9RByWIxIf7",
+                "name": "UL 3100"
+              },
+              {
+                "color": "pinkLight2",
+                "id": "selbl4sGEkIrKfnqi",
+                "name": "ISO 13849"
+              },
+              {
+                "color": "purpleLight2",
+                "id": "selharZugCN4Il5vn",
+                "name": "ISO 3691-4 (verify)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrqGiMZdObswSeG",
+                "name": "CE (EU models)"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fld15ceX8hihH9Zmh",
+          "name": "languages_spoken",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selOeDJfhWsX0hPSv",
+                "name": "DE"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltkaNUFaA5bF6OD",
+                "name": "EN"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJlINrALQWfqT65",
+                "name": "FR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJ2qWPqwWIOmVlJ",
+                "name": "ES"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selw0UAWFhbDsvJK9",
+                "name": "IT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel7C8KCKHAGFngwK",
+                "name": "ZH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnu4t1sZCcgAvxy",
+                "name": "DK"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzRpgoT5jLN83q6",
+                "name": "+local"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel7LzsRkamXJBkrM",
+                "name": "EN (+local subsidiaries)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selauq2KYDncEMwHB",
+                "name": "EN (+local)"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selxOao0HHt8kvv6b",
+                "name": "DK (+local)"
+              },
+              {
+                "color": "greenLight2",
+                "id": "selwlGC4oPuZ7GUoj",
+                "name": "FR (+local)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selQF1dgxLVwcbmPX",
+                "name": "NL"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fld1XWHC2fOdytQvE",
+          "name": "export_capable",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldd6EYkMlYioBitJ",
+          "name": "service_coverage",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selXkYDvd8XP73uS1",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel0g2i8Kjwl5VxN9",
+                "name": "DACH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel00egJ7b2x2EkR2",
+                "name": "EU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbUl4Qa7BqCcTn6",
+                "name": "Global"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldqCPBEJvz6AB0of",
+          "name": "last_updated",
+          "options": {
+            "dateFormat": {
+              "format": "YYYY-MM-DD",
+              "name": "iso"
+            }
+          },
+          "type": "date"
+        },
+        {
+          "id": "fldnWTyPLBu9ObuVS",
+          "name": "Base Models",
+          "options": {
+            "inverseLinkFieldId": "fldBMXavoZ8AJjvxR",
+            "isReversed": false,
+            "linkedTableId": "tblsaCzUQUrC4m7lj",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        },
+        {
+          "id": "fldxNdydzIWLJaRML",
+          "name": "Products",
+          "options": {
+            "inverseLinkFieldId": "fldRWM1AeLmUn7Oyr",
+            "isReversed": false,
+            "linkedTableId": "tblgizCLjKYcCAbwp",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        }
+      ],
+      "id": "tblxZNhyTlfd1c5Po",
+      "name": "Companies",
+      "primaryFieldId": "fld4gdH5jgbuW3H87",
+      "views": [
+        {
+          "id": "viwxCohIbjG75qtCR",
+          "name": "Grid view",
+          "type": "grid"
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "id": "fldmpVwW8EiJ8uREH",
+          "name": "base_model_name",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldPJAD6L3Xhvsi9d",
+          "name": "base_model_id",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldgs0S0PncjgnS1m",
+          "name": "product_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selgk756eX1gfP3Iw",
+                "name": "Forklift AGV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRHFyH1eNztrskt",
+                "name": "Tugger AGV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selmReLiS6YG7Mb2D",
+                "name": "Mobile AMR"
+              },
+              {
+                "color": "blueLight2",
+                "id": "seluWGzOSpBs6Puih",
+                "name": "Process Cooling"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selQ2NCBVHYJRwzRY",
+                "name": "Cold Store"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selobl0X4iTiEBGz1",
+                "name": "Deep Freeze"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selT8dUkVNcPOarcf",
+                "name": "Industrial Refrigeration"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldhWNHkt9q4pujfB",
+          "name": "oem_link_public",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldOwA8C7lgoU1XrJ",
+          "name": "last_updated",
+          "options": {
+            "dateFormat": {
+              "format": "YYYY-MM-DD",
+              "name": "iso"
+            }
+          },
+          "type": "date"
+        },
+        {
+          "id": "fldBMXavoZ8AJjvxR",
+          "name": "oem_company_id",
+          "options": {
+            "inverseLinkFieldId": "fldnWTyPLBu9ObuVS",
+            "isReversed": false,
+            "linkedTableId": "tblxZNhyTlfd1c5Po",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        },
+        {
+          "id": "fldPBCTKbSr69QkZ7",
+          "name": "Products",
+          "options": {
+            "inverseLinkFieldId": "fldr1rtjzv2DBs5in",
+            "isReversed": false,
+            "linkedTableId": "tblgizCLjKYcCAbwp",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        },
+        {
+          "id": "fld2q8NIRbxsrtQza",
+          "name": "Base Model Extensions",
+          "options": {
+            "inverseLinkFieldId": "fldb87qOyq1YOy3nj",
+            "isReversed": false,
+            "linkedTableId": "tblinb1Zn0Ihc977M",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        }
+      ],
+      "id": "tblsaCzUQUrC4m7lj",
+      "name": "Base Models",
+      "primaryFieldId": "fldmpVwW8EiJ8uREH",
+      "views": [
+        {
+          "id": "viw2Otip5HwshB9QE",
+          "name": "Grid view",
+          "type": "grid"
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "id": "fld71WONgixkS53Qn",
+          "name": "product_name",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldWvCLh0oeKDF6d0",
+          "name": "product_id",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fld5Y4TbwqL2HSyMh",
+          "name": "product_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selNA51Sg6W8KLQfI",
+                "name": "Forklift AGV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUqpKLKvqLcGuO5",
+                "name": "Tugger AGV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3tCl2O1nLv0T9q",
+                "name": "Mobile AMR"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selFFUTymoIoovnoB",
+                "name": "Process Cooling"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selv27ObpSGNCJfX3",
+                "name": "Cold Store"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel5QyB4AaCfOhHyc",
+                "name": "Deep Freeze"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selTVzFHPxBJMMRgl",
+                "name": "Industrial Refrigeration"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fld5ciAGBr1fCjs7X",
+          "name": "product_description",
+          "type": "multilineText"
+        },
+        {
+          "id": "fldHlgJqupkyVyypA",
+          "name": "reference_count",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldsHTUm2oRuVTbzf",
+          "name": "min_project_value_eur",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldsXarYZbCefTWZ1",
+          "name": "max_project_value_eur",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldi38mVYBnuSSOT6",
+          "name": "lead_time_weeks",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldAmCqUTwm5P7kwz",
+          "name": "distribution_model",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel3huRafsuNTVt0A",
+                "name": "Direct"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selKUy4Bm4YsyoASd",
+                "name": "Dealer Network"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYymMy1USiLGGTi",
+                "name": "Integrator only"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel2zy0OeIo9cd2Ng",
+                "name": "License Platform"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selhQoL4DXhPN7mUm",
+                "name": "Direct|Dealer Network"
+              },
+              {
+                "color": "blueLight2",
+                "id": "seltk7z38mVpyvlkY",
+                "name": "Integrator only (project)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldp2RsVMukhZiKJi",
+          "name": "is_oem_product",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldD0bbzrmjHxV04S",
+          "name": "service_coverage",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selcQ9PLhLPRXlfmQ",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selip6XblzLc6FC95",
+                "name": "DACH"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selGreguSnUJm2Pfl",
+                "name": "EU"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel0QPGnkiQHYFprQ",
+                "name": "Global"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldMiHiAh6gfxNWIO",
+          "name": "active",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldFtVgQBPCJ4LXU4",
+          "name": "source_notes",
+          "type": "multilineText"
+        },
+        {
+          "id": "fldRWM1AeLmUn7Oyr",
+          "name": "company_id",
+          "options": {
+            "inverseLinkFieldId": "fldxNdydzIWLJaRML",
+            "isReversed": false,
+            "linkedTableId": "tblxZNhyTlfd1c5Po",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        },
+        {
+          "id": "fldr1rtjzv2DBs5in",
+          "name": "base_model_id",
+          "options": {
+            "inverseLinkFieldId": "fldPBCTKbSr69QkZ7",
+            "isReversed": false,
+            "linkedTableId": "tblsaCzUQUrC4m7lj",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        }
+      ],
+      "id": "tblgizCLjKYcCAbwp",
+      "name": "Products",
+      "primaryFieldId": "fld71WONgixkS53Qn",
+      "views": [
+        {
+          "id": "viwP1kMCqOY3fEuUo",
+          "name": "Grid view",
+          "type": "grid"
+        },
+        {
+          "id": "viwl3BWI3d0AX3okZ",
+          "name": "Forklift AGV",
+          "type": "grid"
+        },
+        {
+          "id": "viwd7STwzpx2C8G8F",
+          "name": "Tugger AGV",
+          "type": "grid"
+        },
+        {
+          "id": "viwa855t301lf051D",
+          "name": "Mobile AMR",
+          "type": "grid"
+        },
+        {
+          "id": "viwE1jRjIqT11XO5z",
+          "name": "Active only",
+          "type": "grid"
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "id": "fldgubDxWTvpV5XGr",
+          "name": "model_name",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldwRPzveGpT70mxm",
+          "name": "extension_id",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldlvptubzjDF2bDo",
+          "name": "product_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selciNkmGFCigXVQf",
+                "name": "Forklift AGV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selMnDd2vgBBEwE5T",
+                "name": "Tugger AGV"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selvFhn1f1ZCsjM8P",
+                "name": "Mobile AMR"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel1pACxut66Ba5qT",
+                "name": "Process Cooling"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selroZWOgVlXqLpPh",
+                "name": "Cold Store"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selpRQDktQ05XufqY",
+                "name": "Deep Freeze"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selJuV7MHlZd7XGgK",
+                "name": "Industrial Refrigeration"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldSuHaYym1JcwtA3",
+          "name": "navigation_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selZoMRtZmkFaiy0q",
+                "name": "Laser Reflector"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrX5NdTXLS2JJW5",
+                "name": "Natural Feature (SLAM)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selpBXRFeyCi8TIB6",
+                "name": "Magnetic Tape"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel2DuwpvJBXsSGCM",
+                "name": "QR/DM Code"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSLtr3ZOsdUN9qs",
+                "name": "Contour"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seloT57yFreAnyDkP",
+                "name": "Inductive Loop"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selydlrWJTd3ERYka",
+                "name": "Vision"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selTCKGEZwg0swrWQ",
+                "name": "Wire"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fld8Lc0oH3aFD3GjJ",
+          "name": "autonomous_obstacle_bypass",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldG2jG84Fby4A4r2",
+          "name": "omnidirectional_movement",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "flduFGvuH1Uy4LZfT",
+          "name": "max_payload_kg",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldk9Yp7E4ja6W3vY",
+          "name": "load_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selPHvlU0mBToU3MP",
+                "name": "Pallet EUR"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selo0UKsZ3QlvB5hh",
+                "name": "Pallet ISO"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selxWlC6bjezxNJ07",
+                "name": "Half-Euro"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selrNo9QjH5ZiBSO7",
+                "name": "UK Pallet"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzLX1sZLaligpSE",
+                "name": "Plastic (closed)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel5I6ZIbucAfC7sU",
+                "name": "Tote"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSkJVztM8FGx7Ki",
+                "name": "Roll Container"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selvsfBSZe0Tn0zvD",
+                "name": "Custom Carrier"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selPpKvAz1ICGnHXb",
+                "name": "None"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selxMked53R1729CG",
+                "name": "Custom Carrier (paper reels)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "seleCvqVu8woAWL1n",
+                "name": "Plastic"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selJrKygSFlS7N4wY",
+                "name": "Custom Carrier (dolly)"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selKLSDQk15KHYxjT",
+                "name": "Medium Euro"
+              },
+              {
+                "color": "greenLight2",
+                "id": "selQ0sGfBSHtlGQyC",
+                "name": "Custom Carrier (shelf/rack)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selEhygt9JTcT3CFS",
+                "name": "Bulk bin"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selL8ooTkBrCsyKYW",
+                "name": "Plastic (open-bottom)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel6e5A9K1WvTaEhb",
+                "name": "Plastic Bin"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "sel2wqY8ikIsWtV6U",
+                "name": "Bulk Bin"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldgupNZm2sX8es4k",
+          "name": "max_speed_ms",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "flddirvWYgs2rjXQe",
+          "name": "length_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldKcCalJsKVUZqTg",
+          "name": "width_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld3Gz4GQNG8UqG6b",
+          "name": "operating_temp_min_c",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldm0gsHbZSrKUCwm",
+          "name": "operating_temp_max_c",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldmH8iouVvoUmWe2",
+          "name": "operating_humidity_max_pct",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldEGOD42bNwoP57Y",
+          "name": "ingress_protection_rating",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selmIyrG2nc3HjVEQ",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwtnGbHJjG4VPSj",
+                "name": "IP20"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJ6CF5NkveItvL6",
+                "name": "IP21"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selxEifreI1W9pr5x",
+                "name": "IP44"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldq2rWMEO5AA8gL",
+                "name": "IP52"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel1QugGG7SzUvwRa",
+                "name": "IP54"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selTSaXKavdW7jcvB",
+                "name": "IP65"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selczlAhE0WkHyPra",
+                "name": "IP67"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selTTmxlOCtsNwCBq",
+                "name": "IP32"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldApAH8Puqwsqu6x",
+          "name": "cleanroom_class",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "seld63xyGyisVgJyE",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel2EwR8VF5gpY6Zc",
+                "name": "ISO 1"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHxzpSXlo8PIxNq",
+                "name": "ISO 2"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFOeaBT7nogqWud",
+                "name": "ISO 3"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sela50k97WyxbnfIj",
+                "name": "ISO 4"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selu7fyDRYNLRVSNu",
+                "name": "ISO 5"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnDrHR6puf1lRpV",
+                "name": "ISO 6"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRLqwY0qC4iBPNE",
+                "name": "ISO 7"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selL2kWgWferBtZUV",
+                "name": "ISO 8"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selY0I9WOUpvKkD9B",
+                "name": "ISO 9"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selUvjOwk1zOnFs6T",
+                "name": "ISO 4 (optional)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldtsHFZWroBi5Yr9",
+          "name": "max_gradient_pct",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldjC4578L4KzvDq8",
+          "name": "floor_flatness_req",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selPE8O0uznLYJU4A",
+                "name": "None stated"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFoGKPz3oqx0T9a",
+                "name": "Standard (FM2)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selqwBhxBeSFg1VfY",
+                "name": "High (FM1)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selpcgD5zi4N58xHy",
+                "name": "Very High (F-number)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldwST3bNFudyB0tV",
+          "name": "stop_accuracy_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldmkYu3tYPbs4Q9a",
+          "name": "battery_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sellVpUqJL00PnlHB",
+                "name": "Li-Ion"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljuZ0kuDTReMW1I",
+                "name": "LiFePO4"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldWBIcBc6689izQ",
+                "name": "Lead-Acid"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltTaTOZJ7pIHPme",
+                "name": "Hydrogen FC"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel4jKhufqh4C1Zte",
+                "name": "Li-Ion (Flash Battery)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selmLrDBBLO8WQGKm",
+                "name": "Li-Ion (Flash Battery induction)"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldOjJp8uqGvrsyz9",
+          "name": "battery_runtime_h",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldvlpGz2dSkcIZ3X",
+          "name": "charge_time_min",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldu1ylhCbrDlddts",
+          "name": "autonomous_charging",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldpejvv5Qvn2rAlM",
+          "name": "battery_swap_capable",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldlVDvgDZ904Ia0Z",
+          "name": "safety_standard",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selZRNyNheUjqkhuS",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selMFA7z9ZccNtXfn",
+                "name": "ISO 3691-4"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selVL9TzJQkiKQXye",
+                "name": "EN 1525 (legacy)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUsAUnJxSitke0P",
+                "name": "ANSI/ITSDF B56.5"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel71m7PHIE2eNCY5",
+                "name": "UL 3100"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selScFoXe2iAiYlJF",
+                "name": "ISO 3691-4 (verify)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel1ezBewwxWmbqts",
+                "name": "None (CE/T\u00dcV marks only)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selmkJuBKLUg35Gqt",
+                "name": "ISO 3691-4 (CE certified)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selDg4uvDtxs0GlDO",
+                "name": "None (CE EU models, verify)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selgXSaGyROTLdWYZ",
+                "name": "ISO 13849-1"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selQXgjbj8YyumZtb",
+                "name": "CE (EU models, verify)"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldgqdJHfJQv3CSrI",
+          "name": "functional_safety_level",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selB50qAgKs99BQYK",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHqTKvtnqfWvTBv",
+                "name": "PLd"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selGtN2dNXeejNji1",
+                "name": "PLe"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4Qx8S8DCwZOs5u",
+                "name": "SIL 2"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOKHFkyIPWdPZiV",
+                "name": "SIL 3"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selFZJ0EHxpjFm6uS",
+                "name": "PLd (verify)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "flddiR7gWz4vBne8j",
+          "name": "safety_coverage",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selYPitqsb5z3L51I",
+                "name": "Single plane (2D)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel9fm19BRzmxfTnr",
+                "name": "Limited 3D (e.g. waterfall)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3rLemhHEbKt6L9",
+                "name": "Full 3D"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selXEvmWnw9qxausa",
+                "name": "Full 3D (2D/3D cameras + 360\u00b0 buffers)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selbFdR2r043Wt5wh",
+                "name": "Full 3D (360\u00b0 + 3D sensors)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selqXZ8ZdcGcH63rs",
+                "name": "Full 3D (360\u00b0 safety scanner)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldlkSXIn5FVxRuVe",
+          "name": "fleet_management_system",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selfVjSApmjx2uOZi",
+                "name": "Proprietary"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selLlzrZ2c9Sm2MQ8",
+                "name": "Open API"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldorgvOD3r067mr",
+                "name": "VDA 5050 compatible"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltaq8xRTyBGh3mJ",
+                "name": "Third-party WMS native"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selflHSz9mtEdMoAs",
+                "name": "VDA 5050 compatible|Open API"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selOGYptiL8HJz04a",
+                "name": "Proprietary (iGo TCS)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selVPoBKFilOiBz85",
+                "name": "Proprietary (X-SWARM)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selXHdDVu7zydn55w",
+                "name": "Open API|VDA 5050 compatible"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selitCL6CXubZNDbQ",
+                "name": "Proprietary (T-ONE)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selRy2dnY8YbSFipB",
+                "name": "Proprietary (FLOW Core)"
+              },
+              {
+                "color": "tealLight2",
+                "id": "sel22ZmCKyPFMm8uh",
+                "name": "Proprietary (Transport Manager)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selSfSG80POLWDyKU",
+                "name": "Proprietary (Fleet Manager)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "sel3PodqFzRNnzv9R",
+                "name": "Proprietary (RCS 2000)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selCRMZO0qM0SMtCt",
+                "name": "Proprietary (MATIC:move)"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selaaWDrQ87STuISC",
+                "name": "Proprietary (AnyFleet)"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selACBpepvouLUcog",
+                "name": "Proprietary (Movu WES)"
+              },
+              {
+                "color": "greenLight2",
+                "id": "seluUis6NZ9UoT01M",
+                "name": "Proprietary (OPAL)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldhSiyyEhoOwvGB5",
+          "name": "fleet_control_architecture",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selNeATJ5tQoTVV9G",
+                "name": "Centralized"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selIqczGd883kks8j",
+                "name": "Decentralized/Swarm"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selINxfUwP0Obemz1",
+                "name": "Hybrid"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldMEAy94zRAOFWVb",
+          "name": "max_fleet_size",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldvol4VxB2UXIRzc",
+          "name": "multi_fleet_capable",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldoliWRBZ7BEhhOu",
+          "name": "integration_capability",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel8yTOTKp2GAmIjz",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHFulWGbF8T2PWo",
+                "name": "SAP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selWvAai1jb7FCBCR",
+                "name": "WMS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel0qALaeFvacuG0j",
+                "name": "ERP"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHJ1UAXH1X0ClQc",
+                "name": "REST API"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljgvNRRiflSZeQk",
+                "name": "MQTT"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOHGku4e49zTE0I",
+                "name": "OPC-UA"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFHRTOIKFECZ5JZ",
+                "name": "Modbus"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selgf8ebcpEVfQR7w",
+                "name": "MES"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fld78atERiQ9Y9aSE",
+          "name": "station_applications",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selAM2uOuLx2nikci",
+                "name": "Floor"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selKDxke0BT9QIktQ",
+                "name": "Conveyor"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFcqqniMd0eHNw1",
+                "name": "Machine cell"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selptFMdmZAeJxYg4",
+                "name": "Gravity rack"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selt0J2l97mBdAlJP",
+                "name": "Standard rack"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel27Cg258MPEZOXI",
+                "name": "Shuttle rack"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selkkQJ0vI2DZlzn6",
+                "name": "Mobile rack"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYAJkJZJZWRgUd0",
+                "name": "Workstation"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selK71i3l9qP9pXqS",
+                "name": "Dock"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selHh9FXtx1EpFJi8",
+                "name": "Pallet Dock transfer station"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldwUXUyGbNSaEv5o",
+          "name": "manual_usage",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldow9VIakqgDVLWL",
+          "name": "industries_served",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selH8MhAUxTnSBZwJ",
+                "name": "Automotive"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selnZSopT9cnnRQif",
+                "name": "F&B"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selapZYkT7Ob7PU3o",
+                "name": "Pharma"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selVNNQujrCXKfqo7",
+                "name": "E-Commerce"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selgHR7DaHWqyrx9P",
+                "name": "General Manufacturing"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selznOq4gNjdv1YVv",
+                "name": "3PL"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selqs2x39aRHig5bt",
+                "name": "Retail"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4dRa4o1anTvn8x",
+                "name": "Tissue/Paper"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selkmYelEPbWF3rKv",
+                "name": "None (tissue/paper)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selOhPEKX2gXVXTJS",
+                "name": "Food & Beverage"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selKhuqVWHxSLycPM",
+                "name": "Brewing"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selcrxiNuasQkpAFg",
+                "name": "Dairy"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel9eUc1ZXS0dRsA2",
+                "name": "Food Logistics"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "sellpuK6uAgVGIYBb",
+                "name": "Fresh Produce"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selLP0C4k77Jsh5XS",
+                "name": "Retail Cold Store"
+              },
+              {
+                "color": "blueLight2",
+                "id": "seltMYLx9T1vPksmP",
+                "name": "Frozen Food"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "seljxXt9QonmY2UKO",
+                "name": "Ice Cream"
+              },
+              {
+                "color": "tealLight2",
+                "id": "selj94FkpreHUCYpX",
+                "name": "Blast Freezing"
+              },
+              {
+                "color": "greenLight2",
+                "id": "selyICJVViWBnEtOx",
+                "name": "Food Production"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldw4dCN24y4RAA9R",
+          "name": "lifting_height_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld5ryewc6Z52ulDQ",
+          "name": "min_total_height_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldzaZ28T8rOtI2lx",
+          "name": "special_fork_option",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selp6LDPJRpNNZVgw",
+                "name": "Standard Fork"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel84KX1FKM1tlRUV",
+                "name": "Telescopic"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selIfrV5ofm3JYok4",
+                "name": "Side-Shift"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRwJxrNrk0H9Cw6",
+                "name": "Rotating"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwfUCcWFfzVwPrM",
+                "name": "Clamp"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fld8jgSJQ1yhsVABG",
+          "name": "fork_spread",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selExet15x0R0sfN5",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel01DvwA9HSauQj7",
+                "name": "Manual"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sele5KlDQMj7t3Zce",
+                "name": "Auto"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel9sY3YXUqkiQOVK",
+                "name": "Auto (optional)"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fld0oaVoBksZ2dlSl",
+          "name": "mast_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selRPLC6bZV11p4yn",
+                "name": "Simplex"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel76PaBkKevZWwoH",
+                "name": "Duplex"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3oQAVv1gi6RMQN",
+                "name": "Triplex"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSFa3rouJgcwCHR",
+                "name": "Quadruplex"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selT9B3wyEEd6AzMo",
+                "name": "Triplex (verify)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selbf1yyOY3RaRnqr",
+                "name": "Duplex|Triplex"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fld7Erw7vZKJtmkHD",
+          "name": "min_aisle_width_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldzofMADA1S86V3c",
+          "name": "drive_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selwcdefe9H4qAZa9",
+                "name": "Counterbalanced"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selNDmuaIl248YEIy",
+                "name": "Reach Truck"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selN035MWpBwH0QRh",
+                "name": "Straddle Stacker"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selpyeAb50hh6Za0s",
+                "name": "Pallet Mover"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selA2ToeDMAVDP5ag",
+                "name": "VNA Turret"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldoLyP7kvVVpRFFr",
+          "name": "drop_accuracy_lat_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldDtXUzReBe1kLyn",
+          "name": "drop_accuracy_dep_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldjUnjDKRg4M97rW",
+          "name": "drop_accuracy_angle_deg",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldeV9tYjFr1hasmd",
+          "name": "pick_req_accuracy_lat_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "flddwaAq0d4OPem5d",
+          "name": "pick_req_accuracy_dep_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldWnbUqD8aEgrpaY",
+          "name": "pick_req_accuracy_angle_deg",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld2bRjtqJmhxHI3E",
+          "name": "load_detection",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selzuQs8dL3xsdTJQ",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selePD6IFuxQdoY40",
+                "name": "Camera/Vision"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seleSpmPSqW6LMi8O",
+                "name": "Laser/LiDAR profiling"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selADGq0y6pV5n2ul",
+                "name": "RFID"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selekJrbyXV1g2BNe",
+                "name": "Barcode/DataMatrix"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seluHZ1ImrqlSt1DH",
+                "name": "Mechanical/Tactile"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selhl7apxKDiGkvEV",
+                "name": "Predefined coordinates"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sele6iuPa5LhONOqI",
+                "name": "Camera/Vision (3D pallet detection)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selHAR4rwndp2IQfX",
+                "name": "Camera/Vision (AI pallet detection)"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selK1uj9b9M4mEZs1",
+                "name": "Camera/Vision (verify)"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldkmtKsdXZYVyxjv",
+          "name": "stock_line_scanning",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldcKnl4fTF1yOsmC",
+          "name": "guidance",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selIQgvdUUxlHaHau",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4c7z4yOhZBB7gP",
+                "name": "Rail"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selQoS9rjzctxWA1H",
+                "name": "Wire"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldmlxDjCN0GrQI56",
+          "name": "busbar_compatible",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldhxg1pTWgYMzas1",
+          "name": "towing_capacity_kg",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld83YPEo4nfbNNia",
+          "name": "max_trailers",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldya0UTQ5iNlh5ne",
+          "name": "coupling_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "seltvc5yfXi0d6qMH",
+                "name": "Automatic"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcl3fHPfTecDHqY",
+                "name": "Manual"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selgk4pvEvhSNFUSU",
+                "name": "Pintle Hook"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel3nXjv7xPx9LDdl",
+                "name": "Towbar"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltwCQHwAeiaKK9z",
+                "name": "Retractable Pin"
+              },
+              {
+                "color": "blueLight2",
+                "id": "sel1vrUFgM2MIpIjs",
+                "name": "Automatic (verify)"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldvbsgTBCglVOX3M",
+          "name": "auto_hitch_position_tolerance_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldsLv6VdPXdBsgdV",
+          "name": "train_configuration",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel2c8ABDjbRYt7Gi",
+                "name": "B-frame"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOrx9drPkoRKd0U",
+                "name": "C-frame"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selfyl714yonG9HxZ",
+                "name": "Underride/Mouse"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUkQ3mM07lm0yyB",
+                "name": "Tugger + trailers"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selAOKA594qh0ZYCR",
+                "name": "B-frame|C-frame"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldeO8CZKQxt6JboH",
+          "name": "load_transfer",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selXwKDvxnmMhef58",
+                "name": "Manual"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selvIcyob8SSEPBo1",
+                "name": "Automatic roller"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSfpt8bAWQn8xaW",
+                "name": "Lift"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selteXcnE0DU2OTDq",
+                "name": "Pull-out frame"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldmO8LroCLocI2yB",
+          "name": "trailer_compatibility",
+          "type": "multilineText"
+        },
+        {
+          "id": "fldzccwhJD1gsJTZp",
+          "name": "trailer_steering_technology",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sellKHjZJ0AeA0Psh",
+                "name": "Passive caster"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selum9tfmFtRfsobP",
+                "name": "Dual-steer"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel93WNUOfeubi6Gj",
+                "name": "Center-steer"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selv3VQxJnpivM4m4",
+                "name": "Quad-steer"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selmWtrLTkIp5dWed",
+                "name": "Tracking drawbar / virtual coupling"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHWF82ly1HKHKyy",
+                "name": "Forced/positive axle steer"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwVgEuwxh94851V",
+                "name": "Manual only"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldVj4IpuQGURh6M4",
+          "name": "route_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sely4J9Ojl6apFRON",
+                "name": "Fixed Route"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selSrpadCRMIW2mkP",
+                "name": "Flexible Route"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selXOm1tNFyBbA2mY",
+                "name": "Fully Dynamic"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selKO5Lzm91tYESec",
+                "name": "Fixed Route|Flexible Route"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldT7SH8zU7C5PgOD",
+          "name": "route_programming",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selvFTlijaPoeZTav",
+                "name": "Teach-in"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seliKcKyu1yxZQdtr",
+                "name": "Map-based"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selzvEEQSKIHCxh9x",
+                "name": "Mixed"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldG7sjlF816McQ1R",
+          "name": "intersection_management",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldvCVPQfLYbyimcZ",
+          "name": "turning_radius_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "flda1pbsUrMTYHFhW",
+          "name": "workflow_capability",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selPMl1ztv9ncfnoF",
+                "name": "Transport"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldJUMeKM9iA3r7s",
+                "name": "Goods-to-Person"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selp3TjCkiGO6JVj9",
+                "name": "Picking support"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selgJFp5uU0X5snsq",
+                "name": "Storage"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldXgjw8x8D9IvOB3",
+          "name": "rotation_capable",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldK3xEvcvBCFhIzg",
+          "name": "picking_mechanism",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selX3AfRTtwQAXIf9",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selCfZYgYc0tYocVJ",
+                "name": "Human-assisted (cart follower)"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selcNzgkr4s9qet3n",
+                "name": "Autonomous arm"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel8vFIAFmvITba19",
+                "name": "Conveyor-integrated"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selAPeNJ5rAYuxGG0",
+                "name": "Bin-transfer"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selv9bCFQSj1Qn1CO",
+                "name": "Bin-transfer|Conveyor-integrated"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldjtnzGdecvnHBla",
+          "name": "lift_height_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldf7GCdVEIGVBvac",
+          "name": "min_ground_clearance_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldM0noftfmRUEKVw",
+          "name": "top_module_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selR2kqkPXbcwRzAn",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selI2VkltLxW6uU5A",
+                "name": "Lift"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selKLjCl7bW15qvIU",
+                "name": "Hook"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljMF32hf0aOHfhX",
+                "name": "Shelf Carrier"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selF6ohT2qKJw15pb",
+                "name": "Conveyor"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selOL2NZWRPBmZC8o",
+                "name": "Roller"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selYJgxxUwsSZoMMb",
+                "name": "Cobot arm"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selDMatp624hnrRTx",
+                "name": "Custom"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selo2uxR75my8YGOH",
+                "name": "Pallet Lift"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldkz62Y1CmsILrG0",
+          "name": "min_turning_radius_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldrZm9s4S9vClXFW",
+          "name": "storage_system_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selvESPVrlETsbT5I",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selDlnrkP4OW4qD9x",
+                "name": "Shelf-to-Person"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seloKwxCiFcItZmCg",
+                "name": "Bin-to-Person"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seli2H111p4aT5RT2",
+                "name": "Tote-to-Person"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel4toroJQOimufVs",
+                "name": "Pallet-to-Person"
+              },
+              {
+                "color": "blueLight2",
+                "id": "selgv2BsyTd0RRYua",
+                "name": "Bin-to-Person|Tote-to-Person"
+              },
+              {
+                "color": "cyanLight2",
+                "id": "selrwGj2g4LeqW3aO",
+                "name": "Pallet-to-Person|Tote-to-Person"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldBxQzXoPLHStQbe",
+          "name": "shelf_height_mm",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldhS3RPuGplOkFiG",
+          "name": "shelf_footprint_mm",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fld6EWWNdPsjBOJ9p",
+          "name": "throughput_picks_per_hour",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldnrOBrqywB7Piij",
+          "name": "throughput_basis",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selo57VPCgl9UXaQf",
+                "name": "Per station"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seleldYQOXAvJLn3C",
+                "name": "Per robot"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selDGMALmA2hNfeYx",
+                "name": "Per system"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldfXLIFS8WmS7mno",
+          "name": "task_interleaving",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldT4o5Kprl7eKSwb",
+          "name": "onboard_ui",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldpF8OHuX28bLe4Z",
+          "name": "onboard_container_type",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel9XbiSrYLIhqNky",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selJ6h5WIa8LrffqA",
+                "name": "Tote"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selFkDKPdkP9hm352",
+                "name": "Bag"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selToL7PSCkvCu00a",
+                "name": "Open shelf"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seltDyf0ByQ5kPeA8",
+                "name": "Bulk bin"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selZU3cUC3kQxDHNe",
+                "name": "Shipping box"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldzYBkcsBOUcdssn",
+          "name": "wms_integration_native",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel1psrn1fDNUAeQc",
+                "name": "None"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selQ6p95CmIoKs33q",
+                "name": "SAP EWM"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel78c4dLSxZZEfb6",
+                "name": "Oracle WMS"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selfUTWxWV3SeCRLh",
+                "name": "Manhattan"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selUQcDlEMrfHR2hQ",
+                "name": "Blue Yonder"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selhcENt81WKYOwxB",
+                "name": "Custom API"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fld1HsSPk7IhakLTo",
+          "name": "source_notes",
+          "type": "multilineText"
+        },
+        {
+          "id": "fldb87qOyq1YOy3nj",
+          "name": "base_model_id",
+          "options": {
+            "inverseLinkFieldId": "fld2q8NIRbxsrtQza",
+            "isReversed": false,
+            "linkedTableId": "tblsaCzUQUrC4m7lj",
+            "prefersSingleRecordLink": false
+          },
+          "type": "multipleRecordLinks"
+        },
+        {
+          "id": "fldM2HTsaG7ZFdJFF",
+          "name": "installation_process",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selUqtigklZwtOeYl",
+                "name": "Supplier only"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljEk0G6hD4fJNWX",
+                "name": "Client"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "flddHp58dDnYvCU9V",
+          "name": "modification_process",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selwNvoGSSo5UJgTb",
+                "name": "Supplier only"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selHbLbW3tvDaXAuH",
+                "name": "Supplier limited"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selewi4MiCZG0Ozpm",
+                "name": "Client: All"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldBcwxYzWPnttR5K",
+          "name": "min_fleet_size",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldsGmOt4wxG61U56",
+          "name": "cart_pickup_height_range_mm",
+          "type": "singleLineText"
+        },
+        {
+          "id": "fldH1yFxvZ7kiEgjm",
+          "name": "min_grid_area_m2",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld11GDqNOQvdEpvl",
+          "name": "concurrent_robots_per_station",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldcWcvw61TShnEEu",
+          "name": "order_lines_per_run",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "flde8r3JoFlsNENUx",
+          "name": "storage_density_factor",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldr7tMoeIXjSsxqP",
+          "name": "ergonomic_height_adjustable",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldZL1FIx7HGbk16R",
+          "name": "multi_language_display",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fldciR6twYhfBWGTb",
+          "name": "gamification",
+          "options": {
+            "color": "greenBright",
+            "icon": "check"
+          },
+          "type": "checkbox"
+        },
+        {
+          "id": "fld40xRyy12kz6QQk",
+          "name": "onboard_container_count",
+          "options": {
+            "precision": 0
+          },
+          "type": "number"
+        },
+        {
+          "id": "fld0nAczZ7IQiX9oP",
+          "name": "_test_field_delete_me",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldwVNCutj71p2PTI",
+          "name": "cooling_capacity_kw",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldlZruIldjd1lNLm",
+          "name": "temperature_min_celsius",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldLyC0zjvl5kNLUU",
+          "name": "refrigerant_types",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selKCFZeOwnJQKaLi",
+                "name": "R744"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selbYnV8DcfoXKHKx",
+                "name": "R290"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selApPBHrbF4WFUJG",
+                "name": "R717"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selPmPOzUUbmTJICb",
+                "name": "R134a"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selChwal61KwFi8PU",
+                "name": "R32"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldW5mZiU4qBIHVow",
+          "name": "certifications_ik",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selLik6OaubwoVFU6",
+                "name": "PED"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel7UJQlbLf51fEid",
+                "name": "ATEX"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selesQJ79c6NgNR2O",
+                "name": "EN 378"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seloaSrQVpSkj6s5C",
+                "name": "F-Gas"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldstlI5zKYYhaAAt",
+          "name": "cop_efficiency",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldfROp8TZnm4aAhX",
+          "name": "cooling_medium",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sellW8ACppuP4BWg6",
+                "name": "glycol"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selY6XjhNBkhETPSl",
+                "name": "water"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selwNTvha4gwikHl8",
+                "name": "direct"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldUzBTq1NGvK4KN8",
+          "name": "temperature_stability_k",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldJp5e6dpsuriGGq",
+          "name": "room_volume_m3_max",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldNmxQ4mTkkmdp56",
+          "name": "blast_freeze_capacity_kg_h",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldCGeN8livRaIK4x",
+          "name": "pulldown_time_h",
+          "options": {
+            "precision": 8
+          },
+          "type": "number"
+        },
+        {
+          "id": "fldrnxQAAA0ZoKzvy",
+          "name": "served_categories",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "seluwkbLWLXeKFT24",
+                "name": "Process Cooling"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selkDXYAyo6uR88yl",
+                "name": "Cold Store"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selPeKRtKI4WtM8x2",
+                "name": "Deep Freeze"
+              }
+            ]
+          },
+          "type": "multipleSelects"
+        },
+        {
+          "id": "fldAHSoaWAyGKsKHD",
+          "name": "vna_capable",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selkc6cUwmxyZi1Fe",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selLY6q01echdW0Zc",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldXziey56BlUHXoa",
+          "name": "stacking_capability",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selJaNF9d6e93iq5j",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel7zTBW1Xyfppqs5",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldjw9XVxfXOXSTbT",
+          "name": "vda5050_compatible",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel4Hht78FObBLom7",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selB9LGmwOmNxFsea",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldqu7t4tg3D34sc9",
+          "name": "infrastructure_free",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selyvVGDzXrS0tpJN",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seldNDeTX0MbyoaAy",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldtTt0dSXrzmr5x6",
+          "name": "forks_free_floating",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selpQrjmDIAJQO6BV",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selqJ7w6UgSAlR4Ff",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldSu98W3Bv4MpnN9",
+          "name": "multi_load_compatibility",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selIIJmLExQYD2rJ3",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seleRK5NqR8czVxKf",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "flduzN2DPFdGn5ypk",
+          "name": "auto_hitch",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selSyaZ3fi8tKKy9w",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selBqNRkI3NiMsmOT",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "flds3cV6NauEyNjjg",
+          "name": "free_lift_open_closed_pallet",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selwdho6GXH9JovAE",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selfCwmKcYvbH1WXT",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldMMbugTcCo42O71",
+          "name": "grid_required",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selTy09XvilMyzmvK",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "sel1Jz3XxObBDNZfN",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldakW0D7StpgLfbm",
+          "name": "outdoor_capable",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selW8m2F3EfBLRVEl",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selmPHUkvLNhtMDL0",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldwogCTGh7Dg4SVU",
+          "name": "trailer_loading",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selAWObg8q4bo3rXK",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selNyV4uXAF95Dozn",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldlXMW2Ok28ivc7F",
+          "name": "trailer_unloading",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel9F8XggHNamhOKH",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selA9b9x8HLThpwjg",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fldaoyqSKAhk49xh0",
+          "name": "barcode_readers",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "sel3QXD76cgIgZowT",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selRRqBXeJS099EEB",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fld4NdRqdzADkG8fD",
+          "name": "humidity_control_capable",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selphEMk2XTzG45YH",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "seljb4sJRBH0o307q",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        },
+        {
+          "id": "fld77bNCZSNGAWzj6",
+          "name": "rack_pin_compatible",
+          "options": {
+            "choices": [
+              {
+                "color": "grayLight2",
+                "id": "selpXcD5NTh1mkouQ",
+                "name": "True"
+              },
+              {
+                "color": "grayLight2",
+                "id": "selZ4vahDImPio0l9",
+                "name": "False"
+              }
+            ]
+          },
+          "type": "singleSelect"
+        }
+      ],
+      "id": "tblinb1Zn0Ihc977M",
+      "name": "Base Model Extensions",
+      "primaryFieldId": "fldgubDxWTvpV5XGr",
+      "views": [
+        {
+          "id": "viw6cJ25F3G9I65Vl",
+          "name": "\ud83d\udccb All \u2014 Unsorted",
+          "type": "grid"
+        },
+        {
+          "id": "viw0BRkIj3gszoSe3",
+          "name": "\ud83d\udd27 Forklift AGV",
+          "type": "grid"
+        },
+        {
+          "id": "viw4o2RJj83yImgKf",
+          "name": "\ud83d\ude9b Tugger AGV",
+          "type": "grid"
+        },
+        {
+          "id": "viwLJHPAPbASaJOmc",
+          "name": "\ud83e\udd16 Mobile AMR",
+          "type": "grid"
+        }
+      ]
+    }
+  ]
+}
