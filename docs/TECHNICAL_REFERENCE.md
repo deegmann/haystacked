@@ -714,7 +714,7 @@ This is what feeds the source-span guard. Fields without a `hint` in AP0 do not 
 12. Add runtime-derived fields to vehicle_types (scoring_bucket_map, vna_applicable_types, agv_detection_keywords, vt_prompt_map, 4a_fields, vna_context_hint)
 13. Write all config files and prompt files
 14. Prune stale `extraction_template_*.txt` files
-15. Run `validate_vs_sqlite()` and `validate_unit_suffix_drift()` -> print warnings
+15. Run `validate_vs_sqlite()` and `validate_no_unit_in_field_name()` -> print warnings / hard-assert
 
 **`_scope_resolution_chain(scope_id, parent_of)`** — single implementation used by both `_write_scope_registry` (to store resolution_order in JSON) and `generate()` (to select fields per VT for prompt templates). Walks the scope tree from leaf to root and returns the chain root-first.
 
@@ -799,7 +799,7 @@ The field replaces `infrastructure_required` with inverted boolean: if a tender 
 
 | ID | Area | Description | Severity |
 |----|------|-------------|----------|
-| OI-55 | Unit naming | **Resolved (OI-115b, commit `26d4195`).** The 3 fields where field_name suffix (_mm) disagreed with the AP0 unit column (m) now have AP0 Unit realigned to `mm`, matching storage — `_to_match_units()` deleted entirely rather than left compensating. `validate_unit_suffix_drift()` now emits zero warnings for the AGV domain; the lint remains as a structural guard against future drift. | Resolved |
+| OI-55 | Unit naming | **Fully resolved (OI-115b commit `26d4195`, then OI-115c commits `3b9f65d`/`e3ce309`).** The 3 fields where field_name suffix (_mm) disagreed with AP0 Unit (m) were realigned to `mm` (OI-115b); all 38 fields with a redundant unit suffix then had it stripped from field_name entirely (OI-115c). `validate_unit_suffix_drift()` was repurposed into `validate_no_unit_in_field_name()` — a hard assert (not a warning) enforcing no field_name may encode its own unit, going forward. | Resolved |
 | OI-56 | Data loader | Startup assertion detects column-name collisions between Base Model and Product/Company. | Mitigation active |
 | M1 | Hardcoding | **Resolved (OI-115b).** The old m->mm conversion factor (0.001) + `_to_match_units()` + its startup assertion are all deleted. A reversed mm->m auto-heal conversion (factor 1000) now lives in `validate_domain_criteria()`'s plausibility gate, with the gate direction derived generically from whether `factor < 1` or `> 1` — no field-name strings involved. | Resolved |
 | H2 | Sync | sync_airtable.py positional INSERTs not yet fully schema-driven from column lists. | Medium |
@@ -890,8 +890,9 @@ split for `lifting_height`/`min_aisle_width`/`tugger_min_aisle_width` specifical
 realigned `Unit` to `mm` (matching storage) and deleted `_to_match_units()` entirely rather
 than leave it compensating for a mismatch that no longer exists. `Unit` is now the single
 source of truth for both the LLM prompt and buyer-facing labels for these fields; no residual
-prompt-side inconsistency. Remaining cosmetic-only work (field_name still carries the `_mm`
-suffix) is tracked as OI-115c.
+prompt-side inconsistency. The formerly-tracked field_name suffix cleanup (OI-115c Phases 3C/3D/3F, commits `3b9f65d`/`e3ce309`)
+has shipped — field_name no longer carries a unit suffix for any of the 38 affected fields.
+Live Airtable rename (Phase 3E) remains a separate, deferred step.
 
 ### 22.9 Resolved, for reference
 
