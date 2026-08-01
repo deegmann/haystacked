@@ -892,7 +892,12 @@ than leave it compensating for a mismatch that no longer exists. `Unit` is now t
 source of truth for both the LLM prompt and buyer-facing labels for these fields; no residual
 prompt-side inconsistency. The formerly-tracked field_name suffix cleanup (OI-115c Phases 3C/3D/3F, commits `3b9f65d`/`e3ce309`)
 has shipped — field_name no longer carries a unit suffix for any of the 38 affected fields.
-Live Airtable rename (Phase 3E) remains a separate, deferred step.
+The live Airtable field rename (Phase 3E, commits `28c03f7`/`bf1468f`, 2026-08-01) has also shipped —
+all 36 renameable Base Model Extensions fields renamed via the Metadata API, all generated config
+deleted and regenerated from a fresh (non-`--local`) Airtable fetch. The OI-115 unit-rework arc
+(Phases a through e) is complete: AP0, generated config, the live DB, and Airtable all agree on
+field names, with `validate_no_unit_in_field_name()` (`scripts/generate_all.py`) now enforcing the
+invariant at generation time.
 
 ### 22.9 Resolved, for reference
 
