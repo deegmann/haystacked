@@ -1,0 +1,193 @@
+{
+  "company": "HAI Robotics",
+  "date": "2026-08-01",
+  "status": "COMPLETE",
+  "company_profile": {
+    "legal_name": "Hai Robotics (Shenzhen Hairou Innovation Technology Co., Ltd.)",
+    "hq_city": "Shenzhen (Bao'an District), Guangdong",
+    "country": "China",
+    "founding_year": 2016,
+    "founding_detail": "Founded 21 December 2016. First HAIPICK ACR deployment marketed as 2015 (pre-incorporation R&D), so marketing copy citing '2015' refers to the technology, not the company.",
+    "employee_count_note": "~1,600 staff globally (2023 InvestHK profile); an older source says >1,000, >50% engineers. Maps to a 1000-5000 band — verify against the AP0 employee_count_range vocabulary before entering.",
+    "subsidiaries": "Hong Kong SAR, Japan, Singapore, USA, Netherlands. Serves 30+ countries.",
+    "website": "https://www.hairobotics.com",
+    "source_urls": [
+      "https://www.hairobotics.com/solutions/robots",
+      "https://www.investhk.gov.hk/media/vxulnq3b/202307-hai_robotics-en.pdf"
+    ]
+  },
+  "researcher_notes": "COMPANY CONFIRMED REAL. Major, well-funded warehouse-robotics vendor (USD 200M Series D, 2021), HQ Shenzhen, China.\n\n=== FIT ASSESSMENT — THE PRIOR 'ACR-ONLY / MARGINAL FIT' FLAG IS WRONG, BUT ONLY PARTLY ===\nThe prior pass concluded HAI Robotics is essentially an ACR/goods-to-person shelf-retrieval vendor. That conclusion came from the public /products page, which lists ONLY the HaiPick ACR family. That page is incomplete. The authoritative catalog is https://www.hairobotics.com/solutions/robots, which lists EIGHT robots, including a dedicated line of conventional floor-transport AMRs (K50, K600, K1000) that never appear on /products. Those three are unambiguous Mobile AMRs by any definition and are NOT rack-climbing, NOT tote-retrieval, NOT goods-to-person mast robots. So 'entirely rack-climbing ACR' is factually false.\n\n=== PER-PRODUCT FIT CLASSIFICATION (8 robots) ===\n1. HaiClimber — EXCLUDED. This is the one genuine rack-climbing machine: it climbs the racking structure vertically (climb speed up to 1 m/s) as the core unit of the 'HaiPick Climb' system. Exactly the Exotec-Skypod-style form factor the brief says to exclude. Not entered.\n2-6. HaiPick A42 / A42T / A42-E6S / A42T-E2 / A3 — INCLUDED as Mobile AMR, with caveats. IMPORTANT: these do NOT climb racking. They are floor-roaming mobile robots with a telescopic/fixed mast that extracts totes and cartons from static racking, carries up to 8-9 of them onboard, and drives them across the warehouse floor to a workstation. HAI's own term is 'Automated Case-handling Mobile Robot'. PRECEDENT: the haystacked DB already contains the exact competitive equivalent — Geek+ RoboShuttle RS8-DA / RS11-DA / P40 — classified as 'Mobile AMR' (max_payload=40 = per-tote, grid_required=1, infrastructure_free=0, stacking_capability=0), plus Geek+ SkyCube and KNAPP Open Shuttle Boxgrip. Entering the HaiPick ACRs as Mobile AMR is therefore CONSISTENT with existing DB practice, not a force-fit. I flag nonetheless that they are goods-to-person case handlers tightly coupled to HAI racking and totes, and are a poor match for a tender asking for generic pallet transport across a floor.\n7-8. K50 / K600 / K1000 — INCLUDED as Mobile AMR, cleanest fit of the whole portfolio. Conventional under-ride/jacking transport AMRs carrying totes, roll containers, carts and racks across the floor.\n\n=== SINGLE BIGGEST COMMERCIAL CAVEAT — READ BEFORE ENABLING THIS SUPPLIER ===\nThe K-series AMRs are explicitly NOT sold standalone. K50 page, verbatim: 'It is available only as a supplementary unit for our HaiPick ACR within our comprehensive systems.' K600/K1000 page, verbatim: 'available as supplementary units for our HaiPick ACR'. Consequence for the matching engine: HAI Robotics cannot bid a standalone AMR transport fleet. A tender for pure floor transport with no ACR/goods-to-person scope would be a commercial mismatch even where the K-series specs pass every K.O. rule. This is a business-rule concern, not a spec concern — there is no AP0 field that expresses it. RECOMMEND the PM decide explicitly whether to enter the K-series at all, or enter them with a product_description that states the bundling constraint.\n\n=== DATA AVAILABILITY ===\nHAI publishes marketing-grade bullet specs only. There is NO public VDI-2198-style datasheet and no downloadable spec PDF that is not gated behind a lead-capture form. Consequently vehicle_length, most vehicle_width values, max_gradient, IP rating, operating temperature/humidity, stop_accuracy, floor_flatness_req, max_fleet_size, functional_safety_level, safety_coverage, VDA 5050 support and integration protocol lists are ALL unpublished and are left NULL throughout. Do not backfill these from aggregator sites — qviro's HaiPick A3 entry, for example, lists 'Payload: 0 kg', which is junk.\n\n=== FIELDS DELIBERATELY LEFT NULL ACROSS ALL PRODUCTS (with reason) ===\n- safety_standard: every product is stated only as 'CE certified' or 'CE+NRTL certified'. CE is a conformity marking and NRTL is a class of certification body — neither is a member of the AP0 vocabulary (ISO 3691-4 / EN 1525 / ANSI-ITSDF B56.5 / UL 3100). NRTL listing for an AMR in North America is *usually* against UL 3100, but HAI never names the standard, so asserting UL 3100 would be an inference. Left NULL.\n- vda5050_compatible: never mentioned anywhere. NULL (not false — blank is not zero).\n- max_speed for the HaiPick ACR family: a search snippet quotes 1.8 m/s, but I could not confirm this on any official HAI page I retrieved. Left NULL rather than assert a KO-adjacent number from a snippet.\n- industries_served: HAI lists Apparel, E-commerce, 3PL, Retail, Grocery, Healthcare, Electronics, Automotive on every product page as generic boilerplate. Mapped where the AP0 vocabulary allows; Apparel and Grocery have no AP0 equivalent and are dropped.\n\n=== CONFLICTS / PLAUSIBILITY FLAGS ===\n- A42T lift height: the product page says 12 m (39 ft); the robots overview page says 10 m for the same model. Recorded 12000 mm (the model-specific page wins) and flagged.\n- Payload semantics are inconsistent across the ACR range: A42T and A42T-E2 state 30 kg (clearly PER TOTE), while A42-E6S states 'maximum payload can reach up to 300 kg' (clearly TOTAL onboard). The HaiPick System 3 page adds a third figure, 'HaiPick Robots handle loads up to 50 kg'. I recorded each product's own page figure and flagged the semantic mismatch per product. Do NOT compare these values against each other.\n- K50 max_speed 4.0 m/s is far above the ~1.5 m/s norm for human-shared areas and above the 2.5 m/s norm for segregated zones. It is nonetheless confirmed twice ('A max speed of 4m/s'). Kept, but flagged: this figure is a peak in segregated/aisle running, not a speed HAI would run in a mixed-traffic area.\n- K50 battery is lithium-titanate (LTO). LTO has no AP0 vocabulary entry. LTO is genuinely a lithium-ion chemistry, so I mapped it to 'Li-Ion', which is defensible but lossy — note the vocabulary already distinguishes LiFePO4 as its own value, implying chemistry-level granularity, so an 'LTO' option may be worth adding.\n- 630 mm chassis width is stated in a feature block shared by BOTH K600 and K1000. It is not clear whether it applies to both models or only the smaller one. I did NOT assign vehicle_width to either product; the figure is recorded here in notes only.",
+  "excluded_products": [
+    {
+      "product_name": "HaiClimber",
+      "source_url": "https://www.hairobotics.com/robots/haiclimber",
+      "reason": "Rack-climbing robot — climbs the racking structure vertically (climb speed up to 1 m/s, ground speed up to 4 m/s) as the core unit of the HaiPick Climb system. This is the fixed/rack-climbing ASRS form factor explicitly out of scope for the AGV/AMR floor-transport category. Not a floor-transport vehicle."
+    }
+  ],
+  "products": [
+    {
+      "product_name": "HAI Robotics K50",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/robots/fast-transit-amr-k50",
+      "fields": {
+        "max_speed": 4.0,
+        "lift_height": 750,
+        "battery_type": ["Li-Ion"],
+        "autonomous_charging": true,
+        "autonomous_obstacle_bypass": true,
+        "workflow_capability": ["Transport", "Goods-to-Person"],
+        "load_type": ["Tote"],
+        "onboard_container_type": ["Tote"],
+        "top_module_type": ["Lift"],
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "high",
+      "notes": "'Fast-Transit Companion' AMR. Cleanest AGV/AMR fit in the portfolio: a compact under-ride/jacking transport AMR that moves totes from the bottom of racks to workstations via a 'backpack method'. max_speed 4.0 verbatim ('A max speed of 4m/s') — see plausibility flag in researcher_notes. lift_height 750 from 'Maximum jacking height of 0.75m suitable for on-robot picking'; note this is the jacking height of the load platform, and it is ambiguous whether it denotes stroke or absolute height — recorded as stated. battery_type: source says 'lithium-titanate battery, 10,000+ lifecycles, 10-year lifespan'; LTO mapped to 'Li-Ion' (see researcher_notes). DELIBERATELY OMITTED: charge_time and battery_runtime — the page says '10 minutes of charging powers the AMR for 2 hours', which is an opportunity-charge relationship, NOT a full charge_time nor a full-charge battery_runtime; entering 10 and 2.0 would misrepresent both fields. DELIBERATELY OMITTED: throughput_picks_per_hour — '18-25 totes per hour' is a range, and totes-handled is not the same basis as picks. DELIBERATELY OMITTED: navigation_type — the page says only 'LiDAR remote scanning' under 'Precise autonomous movement', which does not distinguish a SLAM navigation stack from a safety/obstacle scanner; the sibling K600/K1000 use 2D-code navigation, so inferring SLAM here would be a guess. COMMERCIAL CAVEAT: sold only as a supplementary unit to a HaiPick ACR system."
+    },
+    {
+      "product_name": "HAI Robotics K600",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/products/heavy-duty-amr-k600-k1000",
+      "fields": {
+        "max_payload": 600.0,
+        "navigation_type": ["QR/DM Code", "Natural Feature (SLAM)"],
+        "infrastructure_free": false,
+        "grid_required": true,
+        "autonomous_obstacle_bypass": true,
+        "autonomous_charging": true,
+        "multi_load_compatibility": true,
+        "load_type": ["Roll Container", "Custom Carrier"],
+        "top_module_type": ["Lift"],
+        "workflow_capability": ["Transport"],
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "high",
+      "notes": "'Heavy Duty Companion'. Conventional under-ride/jacking transport AMR — an unambiguous Mobile AMR. max_payload 600 verbatim ('Max. load capacity: 600 kg, and 1000 kg respectively'). navigation_type from '2D code + inertial navigation' (= QR/DM Code) plus 'SLAM navigation (optional)' — NOTE SLAM is an OPTION, not standard; if the matching engine treats navigation_type as an unconditional capability, consider whether an optional feature should be listed. Inertial navigation has no AP0 vocabulary entry and is dropped. infrastructure_free=false and grid_required=true derive from the base configuration being 2D-code-grid navigation, consistent with how Geek+ RoboShuttle RS8-DA is already recorded in the DB. load_type: source says 'pallets, racks, roll containers, and put carts' — 'Roll Container' is explicit and 'Custom Carrier' covers racks/put carts, but I did NOT assert 'Pallet EUR' or 'Pallet ISO' because the source says only 'pallets' without naming a standard, and a Chinese vendor's default may be an Asian 1100x1100 pallet. vehicle_width: a shared feature bullet says '630mm wide chassis adapts to narrow aisles' but it is unclear whether that covers K600 only or both models — left NULL, see researcher_notes. max_speed, vehicle_length and lift_height are not published. COMMERCIAL CAVEAT: sold only as a supplementary unit to a HaiPick ACR system."
+    },
+    {
+      "product_name": "HAI Robotics K1000",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/products/heavy-duty-amr-k600-k1000",
+      "fields": {
+        "max_payload": 1000.0,
+        "navigation_type": ["QR/DM Code", "Natural Feature (SLAM)"],
+        "infrastructure_free": false,
+        "grid_required": true,
+        "autonomous_obstacle_bypass": true,
+        "autonomous_charging": true,
+        "multi_load_compatibility": true,
+        "load_type": ["Roll Container", "Custom Carrier"],
+        "top_module_type": ["Lift"],
+        "workflow_capability": ["Transport"],
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "high",
+      "notes": "Larger sibling of the K600, sharing one product page and one feature list. max_payload 1000 verbatim ('Max. load capacity: 600 kg, and 1000 kg respectively'). All other fields are taken from the shared K600/K1000 feature block and therefore carry the same evidence as the K600 entry. vehicle_width deliberately NULL — the 630 mm chassis figure is more plausibly the smaller model's and is not attributable to the K1000 with confidence. COMMERCIAL CAVEAT: sold only as a supplementary unit to a HaiPick ACR system."
+    },
+    {
+      "product_name": "HaiPick A42",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/robots/haipick-a42",
+      "fields": {
+        "lift_height": 6000,
+        "battery_type": ["LiFePO4"],
+        "autonomous_charging": true,
+        "autonomous_obstacle_bypass": true,
+        "onboard_container_count": 9,
+        "onboard_container_type": ["Tote"],
+        "load_type": ["Tote"],
+        "workflow_capability": ["Goods-to-Person"],
+        "storage_system_type": ["Tote-to-Person"],
+        "picking_mechanism": "Bin-transfer",
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "medium",
+      "notes": "Multi-Layer ACR — base model of the A42 series ('four models'). FIT: floor-roaming mast robot, NOT rack-climbing; entered as Mobile AMR per the Geek+ RoboShuttle precedent (see researcher_notes). lift_height 6000 from 'picking and storage of cases up to a height of 6m (19.7 feet)'. onboard_container_count 9 from 'can handle up to 9 cases simultaneously'. battery_type from HAI's own FAQ on this page: 'The HaiPick system uses lithium-iron phosphate batteries in all its models' — this is an explicit range-wide statement, so LiFePO4 is confirmed rather than inferred. autonomous_charging from the FAQ: 'the HaiPick robot ... automatically moves to a charging station'. autonomous_obstacle_bypass from 'obstacle detection, active obstacle avoidance'. max_payload DELIBERATELY OMITTED — this page states no kg figure, and the range-level figures conflict (30 kg per tote on sibling pages vs '50 kg' on the HaiPick System 3 page). picking_mechanism 'Bin-transfer' is the closest AP0 vocabulary match to a fork-based tote extractor — a mapping judgement, not a published spec. Confidence medium overall because most values are marketing bullets and no dimensional data is published."
+    },
+    {
+      "product_name": "HaiPick A42T",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/robots/haipick-a42t",
+      "fields": {
+        "max_payload": 30.0,
+        "lift_height": 12000,
+        "battery_type": ["LiFePO4"],
+        "autonomous_charging": true,
+        "autonomous_obstacle_bypass": true,
+        "onboard_container_count": 9,
+        "onboard_container_type": ["Tote"],
+        "load_type": ["Tote"],
+        "workflow_capability": ["Goods-to-Person"],
+        "storage_system_type": ["Tote-to-Person"],
+        "picking_mechanism": "Bin-transfer",
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "medium",
+      "notes": "Telescopic Lift ACR. CONFLICT FLAGGED: this product page says 'picking and storing 30kg (66.1 lbs) payloads up to 12m (39feet) high', while the robots overview page says 'up to 10m' for the same model. Recorded 12000 mm on the basis that the model-specific page is more authoritative, but this needs a vendor confirmation before it is trusted in a tender. max_payload 30 is PER TOTE, not total onboard — the robot carries up to nine such totes, so total onboard load is materially higher. Recorded per-tote to stay consistent with the existing Geek+ RoboShuttle RS8-DA record (max_payload=40, also per-tote). onboard_container_count 9 from 'multiple storage trays to carry up to nine payloads simultaneously'."
+    },
+    {
+      "product_name": "HaiPick A42T-E2",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/robots/haipick-a42t-e2",
+      "fields": {
+        "max_payload": 30.0,
+        "lift_height": 12000,
+        "battery_type": ["LiFePO4"],
+        "battery_runtime": 6.6,
+        "charge_time": 39,
+        "autonomous_charging": true,
+        "autonomous_obstacle_bypass": true,
+        "onboard_container_count": 8,
+        "onboard_container_type": ["Tote"],
+        "load_type": ["Tote"],
+        "workflow_capability": ["Goods-to-Person"],
+        "storage_system_type": ["Tote-to-Person"],
+        "picking_mechanism": "Bin-transfer",
+        "throughput_picks_per_hour": 63,
+        "throughput_basis": "Per robot",
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "high",
+      "notes": "Telescopic Grappling-hook ACR, second-generation A42T. BEST-DOCUMENTED product in the range — this is the only HAI page that publishes real battery figures. battery_type from 'LFP 62 Lithium battery' (LFP = LiFePO4, exact vocabulary match). charge_time 39 from '39 minutes to fast charge'. battery_runtime 6.6 from 'Full battery charge life >=6.6h' — note the source states a MINIMUM ('>='), so 6.6 is a floor, not a typical value. max_payload 30 is PER TOTE ('Picks and stores 30kg (66.1 lbs) payloads up to 12m'). onboard_container_count 8 from 'carry up to eight in its multi-storage tray tower'; the hook can haul three interlocking totes at once from the rack. throughput_picks_per_hour 63 from 'Capable of transporting 63 totes per hour' — basis is totes transported per robot per hour, which is close to but not identical with 'picks'; flagged so it is not compared naively against station-based throughput figures from other vendors. NOT RECORDED: 'Lifts its fork at a speed of up to 0.93 m/s' is a MAST/fork lifting speed, not the vehicle's travel speed — it must not be entered as max_speed."
+    },
+    {
+      "product_name": "HaiPick A42-E6S",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/robots/haipick-a42-e6s",
+      "fields": {
+        "max_payload": 300.0,
+        "battery_type": ["LiFePO4"],
+        "autonomous_charging": true,
+        "autonomous_obstacle_bypass": true,
+        "onboard_container_type": ["Tote"],
+        "load_type": ["Tote"],
+        "workflow_capability": ["Goods-to-Person"],
+        "storage_system_type": ["Tote-to-Person"],
+        "picking_mechanism": "Bin-transfer",
+        "industries_served": ["E-Commerce", "3PL", "Retail", "Automotive", "Pharma", "General Manufacturing"]
+      },
+      "confidence": "medium",
+      "notes": "Grappling-hook ACR, designed for single- to triple-deep tote racks. max_payload 300 verbatim ('its maximum payload can reach up to 300 kg'). SEMANTIC FLAG: unlike the A42T/A42T-E2 30 kg figures (per tote), this 300 kg figure is TOTAL onboard capacity across the tray tower. The two numbers are on different bases and must not be compared. This inconsistency is HAI's, not mine. lift_height DELIBERATELY OMITTED — not stated on this page; as a non-telescopic A42-series variant it is probably the 6 m series figure, but 'probably' is not good enough for a spec field. onboard_container_count also not stated. Non-spec facts recorded for context: horizontal case spacing reduced to 30 mm, longitudinal spacing to 0 mm, up to three-deep tote storage (+150% density), LiDAR collision avoidance."
+    },
+    {
+      "product_name": "HaiPick A3",
+      "product_type": "Mobile AMR",
+      "source_url": "https://www.hairobotics.com/robots/haipick-a3",
+      "fields": {
+        "lift_height": 5550,
+        "cleanroom_class": "ISO 1–9",
+        "battery_type": ["LiFePO4"],
+        "autonomous_charging": true,
+        "autonomous_obstacle_bypass": true,
+        "onboard_container_type": ["Tote"],
+        "load_type": ["Tote", "Custom Carrier"],
+        "workflow_capability": ["Goods-to-Person", "Transport"],
+        "storage_system_type": ["Tote-to-Person"],
+        "picking_mechanism": "Bin-transfer",
+        "industries_served": ["Automotive", "General Manufacturing", "E-Commerce", "3PL", "Retail"]
+      },
+      "confidence": "medium",
+      "notes": "Fork-Lifting ACR, aimed at manufacturing rather than pure e-commerce fulfilment. lift_height 5550 corroborated by two sources: the official page ('up to 5.5m (18 feet) picking height') and qviro's spec entry ('Picking Height Range: 450-5550 mm'). Note qviro's same entry lists 'Payload: 0 kg', which is junk data and was ignored — do not backfill payload from there. cleanroom_class: page states 'Class10000 Cleanliness and Anti-static ... suitable for handling goods such as PCBs'. FED-STD-209E Class 10000 corresponds to ISO Class 7, which falls inside the AP0 'ISO 1-9' band — but note the AP0 vocabulary is coarse and cannot express 'ISO 7' specifically, so this value loses precision. load_type includes 'Custom Carrier' because the page states it handles 'goods of different shapes such as tires, trays and foam boxes' and works 'with different types of shelves, conveyors and other docking equipment'. onboard_container_count NOT recorded: qviro lists 'Number of Back Trays: 2/5/8', i.e. it is a variant-dependent build option, not a single model value. max_payload not published. AVAILABILITY NOTE from the page: 'The HaiPick A3 models are not available in Japan.'"
+    }
+  ]
+}

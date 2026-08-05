@@ -1,0 +1,135 @@
+{
+  "company": "Gideon Brothers",
+  "date": "2026-08-01",
+  "status": "COMPLETE",
+  "researcher_notes": "COMPANY CONFIRMED REAL. Legal name 'Gideon Brothers d.o.o.'; the brand now trades simply as 'Gideon' (website gideon.ai; the old gideonbros.ai domain is legacy). Founded 2017 by Josip Cesic, Edin Koco, Kruno Strazanac and Matija Kopic. CEO is Josip Cesic, Ph.D. (Matija Kopic, the founding CEO, is now only a board member).\n\nHQ CORRECTION vs. the task brief: the Croatian registered HQ is OSIJEK, not Zagreb — 'Gideon Brothers d.o.o., Samacka 7, 31000 Osijek, Croatia' (OIB 91855790287, MBS 030183638, court Trgovacki sud u Osijeku), per https://www.gideon.ai/company-information/. Zagreb is a secondary office (Radnicka cesta 177, 10000 Zagreb). The US entity 'Gideon Brothers (USA) Inc.' has its corporate HQ in Dover, DE (3500 South DuPont Highway) and its operating office + manufacturing facility in Bolingbrook, IL (375 W South Frontage Rd, Greater Chicago). Country for the DB record: HR (Croatia). Headcount: '90+ Gideons' per the About us page; LinkedIn band 51-200. Strategic investor/partner: Toyota Industries Corporation; cooperation agreement with Toyota Material Handling Europe; NVIDIA Inception member.\n\nPRODUCT SCOPE: Gideon currently sells exactly ONE product line — TREY, an autonomous counterbalance forklift for trailer loading/unloading — offered in two chassis: TREY Medium Duty and TREY Heavy Duty. https://www.gideon.ai/solutions/ lists no other model. Older Gideon Brothers products that appear in pre-2022 material (the 'Pallet Handling Robot / PHR' brochure on the legacy gideonbros.ai domain, and the early 'Rex'-era research robots) are NOT on the current site and I found no evidence they are still sold — I deliberately did NOT create records for them.\n\nCLASSIFICATION: both TREY variants are typed 'Forklift AGV' (AP0 vehicle type). Gideon itself markets them as 'AMRs' and the spec sheet's 'Navigation Type' row literally reads 'AMR' — but that row is describing the navigation principle (free-ranging autonomous navigation, no fixed guide path), not the AP0 vehicle class. Mechanically these are counterbalance forklift trucks with ITA-class forks and a lifting mast, so 'Forklift AGV' is the correct AP0 type and the Forklift-specific field block applies. Consequently the Mobile-AMR-only field 'throughput_picks_per_hour' was NOT used, even though Gideon publishes '25 pallets/hour' loading/unloading capacity (noted per product instead).\n\nUNITS: Gideon publishes ALL specs in US customary units only (inches, lbs). Every metric value below is my own conversion (1 in = 25.4 mm; 1 lb = 0.45359237 kg), rounded to the nearest whole unit. Conversions are arithmetic, not estimates — but the rounding is mine.\n\nSOURCE QUALITY: excellent for what is published. Two independent official documents (the Sept-2025 Full Line Brochure PDF and the Oct-2025 per-model technical specification PDFs) carry identical spec tables, and the HTML page at /technical-specifications/ mirrors them character-for-character. Everything in 'Confirmed' below is from those.\n\nMAJOR FLAG — HEAVY DUTY PAYLOAD CONFLICT (see product notes): three different payload figures exist for the heavy chassis across Gideon's own current material. I used the most conservative one (2200 kg). This needs a vendor confirmation before it is trusted in a K.O. match.\n\nSYSTEMATICALLY UNAVAILABLE (searched, not published anywhere — left out entirely, do NOT fill): max_speed, min_aisle_width, operating temperature/humidity, ingress_protection_rating, max_gradient, floor_flatness_req, stop_accuracy, all drop_accuracy_* / pick_req_accuracy_* fields, mast_type, fork_spread, special_fork_option, forks_free_floating, max_fleet_size, functional_safety_level. VDA 5050: explicitly searched, NOT confirmed by Gideon or any partner (KINEXON/SYNAOS/NAiSE lists do not name Gideon) — field omitted per the strict 'confirmed only' rule, NOT set to false.\n\n=== ADDENDUM 2026-08-01: 'TED' CHECK + SECOND PRODUCT LINE VERDICT ===\n\n'TED': NO SUCH PRODUCT. A coordinator note referenced a 'TED underride AMR' from prior project research. I searched for it explicitly (WebSearch on \\\"Gideon Brothers\\\" TED, and Gideon TED underride AMR) and checked gideon.ai, the legacy gideonbros.ai material, and the mobile-robots.com vendor directory. Gideon has NEVER had a product called TED, and has never sold an underride/latent-lift AMR of any name. The name is most likely a confusion with another vendor. Nothing was entered for it.\n\nWHAT DOES EXIST (and was still excluded): 'CASEY'. Gideon's second and only other named vehicle is CASEY, launched June 2022 as an 'autonomous case picking and process optimization solution' (PR Newswire, 2022-06-07; Robotics 24/7). It is the productised successor of the 2020 'Pallet Handling Robot (PHR)' brochure on the legacy domain — identical chassis (1345 x 902 x 1100 mm, 318 kg). It is a Mobile AMR (a load-carrying platform, NOT an underride robot): loads are placed on the deck manually or from pallet stands/conveyors, payload 800 kg in the 2020 PHR brochure and 1000 kg as Casey, ~8-10 h autonomy, hot-swappable battery, 2 m/s platform maximum (Gideon notes this is limited to ~1.39 m/s / 5 km/h in most jurisdictions), stereo-camera 3D visual SLAM plus safety-certified LiDAR, browser-based fleet management, WMS integration via a simple API, CE + EU Machinery Directive 2006/42/EC + ISO 3691-4:2020.\n\nDECISION: NO product record created for Casey — it is no longer marketed. This follows the project's stale-directory rule: third-party directories and old press releases are never pruned, so their continued listing of a model is not evidence it is sold. Liveness test applied (product level):\n  1. Legacy domain gideonbros.ai now 301-redirects to gideon.ai — the 2020 PHR brochure is orphaned legacy content, not a live catalogue page.\n  2. Current product list https://www.gideon.ai/solutions/ — TREY only, Casey absent.\n  3. Current spec page https://www.gideon.ai/technical-specifications/ — TREY HD + MD only, Casey absent.\n  4. Gideon Full Line Brochure, Sept 2025, self-described as 'your complete guide' — TREY only, Casey absent.\n  5. Literal string search for 'Casey' across every current gideon.ai page fetched (home, solutions, TREY, technology, about us, brochures, technical specifications, company information) and the on-site search /?s=Casey — ZERO hits.\n  6. All 2024-2026 company news (Loblaws, Dot Foods, Toyota Industries, NVIDIA, Bolingbrook plant) names TREY exclusively.\nSix independent current sources omit it while the company has repositioned wholesale to 'loading bay automation'. A WebSearch summary did claim Casey 'appears to remain available', but that phrasing paraphrases the stale mobile-robots.com directory entry — which is demonstrably out of date, since its TREY entry still carries the superseded 2022 first-generation figures (2500 kg, 4090 x 1500 x 2370 mm) rather than the current HD/MD split. Entering a discontinued vehicle would wrongly include Gideon in tenders it cannot serve today.\n\nIF Gideon later confirms Casey is still orderable, the sourced facts above are sufficient to create a Mobile AMR record (max_payload 1000, vehicle_length 1345, vehicle_width 902, battery_runtime 8.0, battery_swap_capable true, navigation_type Natural Feature (SLAM) + Vision, safety_standard ISO 3691-4, load_type Pallet EUR/Pallet ISO + Tote) — but do NOT enter them until that confirmation exists. Note max_speed would need care: 2 m/s is the platform ceiling, not the deployed speed.\n\nCONCLUSION: Gideon Brothers has exactly TWO currently-sold vehicles, both captured above.",
+  "products": [
+    {
+      "product_name": "TREY Heavy Duty",
+      "product_type": "Forklift AGV",
+      "source_url": "https://www.gideon.ai/technical-specifications/ (spec sheet PDF: https://www.gideon.ai/wp-content/uploads/2025/10/TREY-HD-technical-specifications.pdf ; brochure p.7: https://www.gideon.ai/wp-content/uploads/2025/09/Gideon-Full-Line-Brochure-Sept-2025.pdf)",
+      "fields": {
+        "max_payload": 2200,
+        "vehicle_length": 4087,
+        "vehicle_width": 1501,
+        "min_total_height": 2235,
+        "lifting_height": 1346,
+        "drive_type": "Counterbalanced",
+        "vna_capable": false,
+        "stacking_capability": true,
+        "trailer_loading": true,
+        "trailer_unloading": true,
+        "guidance": [
+          "None"
+        ],
+        "navigation_type": [
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "infrastructure_free": true,
+        "autonomous_obstacle_bypass": true,
+        "omnidirectional_movement": false,
+        "load_type": [
+          "Pallet EUR",
+          "Pallet ISO"
+        ],
+        "multi_load_compatibility": true,
+        "load_detection": [
+          "Camera/Vision"
+        ],
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "battery_runtime": 10.0,
+        "charge_time": 240,
+        "autonomous_charging": true,
+        "safety_standard": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "fleet_management_system": "Proprietary",
+        "integration_capability": [
+          "WMS",
+          "MES"
+        ],
+        "station_applications": [
+          "Floor",
+          "Conveyor",
+          "Dock"
+        ],
+        "industries_served": [
+          "3PL",
+          "Retail",
+          "F&B",
+          "General Manufacturing"
+        ]
+      },
+      "confidence": "high",
+      "notes": "DIRECT SPEC-SHEET VALUES (imperial, converted by me): Dimensions 160.9 in x 59.1 in x 88 in -> 4087 x 1501 x 2235 mm. Max Lifting Height 53 in -> 1346 mm. Weight 10,031 lbs (4550 kg; not a DB field). Forks ITA Class III 5\" x 2\" x 48\". Battery 'Li-Ion, 48V DC, 400Ah'. Operating Time '10+ hours at full charge' -> battery_runtime 10.0 (the '+' means this is a floor, so the field is conservative). Charging Time '4 hours' -> 240 min. Turning Radius F/R 69\" / 95\" (1753 / 2413 mm) — NOT entered: AP0 has no turning-radius field for Forklift AGV (only Tugger/AMR have one).\n\n*** PAYLOAD CONFLICT — READ BEFORE TRUSTING max_payload ***\nThree Gideon-published figures exist for this chassis:\n  (a) 6,000 lbs = 2722 kg — official Oct-2025 spec-sheet PDF AND Sept-2025 brochure p.7 ('Max Payload 6,000 lbs'). Two documents, but likely the same source table.\n  (b) 5,000 lbs = 2,200 kg — the live product page, with Gideon's OWN metric conversion: 'For heavier loads, Heavy-Duty Trey takes it further with a 5,000 lbs (2,200 kg) capacity.' (https://www.gideon.ai/solutions/trey/)\n  (c) 2,500 kg — the April-2022 launch coverage of the first-generation Trey (trade press; dimensions quoted there, 4090 x 1500 x 2370 mm, match this chassis on L/W but not on height).\nI entered (b) = 2200 kg. Reasoning: max_payload is a KO_IF_LT field, so an inflated value wrongly INCLUDES a supplier in tenders it cannot serve — the more expensive error. (b) is also the only figure Gideon states in metric itself, and it is on the page a buyer actually reads. A plausible engineering reading is that 6,000 lbs is the bare chassis rating at standard load centre while 5,000 lbs is the derated autonomous handling capacity — but that is my hypothesis, not a sourced fact. RECOMMENDATION: ask Gideon to confirm; if they confirm 6,000 lbs, raise the field to 2722.\n\nMIN_TOTAL_HEIGHT CAVEAT (medium confidence): 2235 mm is the overall vehicle height 'H' from the dimensions row. For a forklift, min_total_height normally means mast-lowered height h1. TREY carries a sensor tower, so 2235 mm probably includes it and is NOT the bare mast height. It IS however the correct figure for door/trailer clearance, which is what the field is used for in practice. Flagged rather than omitted.\n\nDERIVED / REASONED (labelled, not sourced verbatim):\n- stacking_capability=true (MEDIUM): mechanically certain — a counterbalance truck with a real mast lifting 1346 mm can set a load on top of another. But Gideon's published workflows are trailer floor loading/unloading, and no 'double stack' claim exists; the brochure does say TREY 'automatically identifies and adjusts for dozens of pallets, racks, and cage types', which implies rack/stack interaction. Verify if a tender hinges on it.\n- vna_capable=false (HIGH): 4.1 m long, 1.5 m wide counterbalance truck — physically impossible in a VNA aisle.\n- omnidirectional_movement=false (HIGH): counterbalance chassis with steered wheels, and it publishes distinct front/rear turning radii.\n- guidance=['None'] (HIGH): 'Free-ranging navigation' (technology page); no rail or wire.\n- infrastructure_free=true (HIGH): 'TREY does not require expensive changes to your facility, docks or trailers' (brochure p.3); 'Minimal infrastructure changes thanks to autonomous mapping, localization, obstacle avoidance, and pallet detection'.\n- navigation_type Natural Feature (SLAM) + Vision (HIGH): 'build 3D maps where they can save natural features'; 'They know where they are by constantly comparing features they see to those saved on the map'; 'stereoscopic cameras, 3D-vision and sensor fusion'; trade press confirms '3D SLAM'.\n- autonomous_obstacle_bypass=true (HIGH): 'They can plan routes, avoid obstacles'; 'They'll avoid obstacles, yield the right of way'; 'adapting to changing floor layouts and obstructions'.\n- autonomous_charging=true (HIGH): 'TREY can return to its charger between loads to maximize run-time across multiple shifts' (brochure p.2) + 'Opportunity Charging' in the spec table.\n- multi_load_compatibility=true (HIGH): 'TREY automatically adjusts for 70+ pallet, cage, and tote types' (brochure p.3).\n- load_type ['Pallet EUR','Pallet ISO'] (HIGH but NARROW): trade press lists supported types as CHEP, PECO, GMA, IBC Tote, EPAL1, EPAL3 and others. EPAL1/EPAL3 -> Pallet EUR; GMA/CHEP/PECO -> Pallet ISO. I deliberately did NOT add 'Bulk Bin' (for IBC Tote), 'Tote' or 'Custom Carrier' (for 'cage') — those are my mappings of vague marketing words and load_type is used in subset matching, where over-claiming wrongly includes. Operator may widen this after a vendor check.\n- load_detection ['Camera/Vision'] (HIGH): AI pallet detection via stereo cameras.\n- safety_standard (HIGH): 'CE Marked and compliant with ANSI/ITSDF B56.5-2019, EU Machinery Directive 2006/42/EC, ISO 3691-4:2020' (Gideon launch release / trade press). AP0 has no entry for the Machinery Directive, so only the two applicable standards are listed.\n- fleet_management_system='Proprietary' (HIGH): 'GIDEON Fleet Management platform', 'browser-based fleet interface'. No open/VDA interface published.\n- integration_capability ['WMS','MES'] (HIGH for WMS, MED for MES): 'Seamlessly integrate Trey into your existing WMS/WES/MES'. WES has no AP0 value. No REST/MQTT/OPC-UA/SAP claim found -> not added.\n- station_applications ['Floor','Conveyor','Dock'] (HIGH): Floor + Dock are the core trailer use case; Conveyor from 'Program multi-step sequences: rotate freight, place on conveyor, etc.' (brochure p.4). 'Standard rack' NOT added — 'racks' appears only in a detection sentence, not as a putaway claim.\n- industries_served (HIGH for 3PL/Retail/F&B, MED for General Manufacturing): DB Schenker (3PL, customer + Series A investor), Loblaws (Retail), Dot Foods (F&B) are named customers/partners; 'manufacturing, logistics, warehousing, and retail' is the company's own market statement.\n\nOMITTED ON PURPOSE (do NOT backfill): max_speed (never published); battery_swap_capable (HD lists 'Opportunity Charging & Manual' — Manual refers to manual CHARGING, not swap; absence is not a 'false'); manual_usage (the 2022 chassis was purpose-made by Infinity Machine & Engineering Corp, but whether the current HD has a usable operator station is unverified); vda5050_compatible (not confirmed — see researcher_notes); safety_coverage (genuinely ambiguous: the safety-RATED function is '360° field protection via laser scanner', i.e. a 2D plane, while the 3D coverage — 'wide-angle stereo cameras catch low-lying and overhanging obstacles', '360-degree 3D obstacle detection' — is perception, not certified safety. Choosing between 'Single plane (2D)' and 'Full 3D' would be a guess, so left empty); fleet_control_architecture (central fleet manager + on-board autonomous path planning reads as either Centralized or Hybrid — no basis to choose); outdoor_capable ('rain or shine' on the technology page is about vision robustness, not an outdoor rating).\n\nNot a field, but useful context: throughput is '25 pallets/hour' per robot, 'up to 2x with two forklifts in tandem'. Warranty 1-Year/5,000 h, extended 5-Year/25,000 h. Supported trailers: Dry Van, Refrigerated, Drop Deck, Intermodal."
+    },
+    {
+      "product_name": "TREY Medium Duty",
+      "product_type": "Forklift AGV",
+      "source_url": "https://www.gideon.ai/technical-specifications/ (spec sheet PDF: https://www.gideon.ai/wp-content/uploads/2025/10/TREY-MD-technical-specifications.pdf ; brochure p.6: https://www.gideon.ai/wp-content/uploads/2025/09/Gideon-Full-Line-Brochure-Sept-2025.pdf)",
+      "fields": {
+        "max_payload": 1588,
+        "vehicle_length": 3404,
+        "vehicle_width": 1422,
+        "min_total_height": 2108,
+        "lifting_height": 1651,
+        "drive_type": "Counterbalanced",
+        "vna_capable": false,
+        "stacking_capability": true,
+        "trailer_loading": true,
+        "trailer_unloading": true,
+        "guidance": [
+          "None"
+        ],
+        "navigation_type": [
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "infrastructure_free": true,
+        "autonomous_obstacle_bypass": true,
+        "omnidirectional_movement": false,
+        "load_type": [
+          "Pallet EUR",
+          "Pallet ISO"
+        ],
+        "multi_load_compatibility": true,
+        "load_detection": [
+          "Camera/Vision"
+        ],
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "battery_runtime": 12.0,
+        "charge_time": 210,
+        "autonomous_charging": true,
+        "battery_swap_capable": true,
+        "safety_standard": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "fleet_management_system": "Proprietary",
+        "integration_capability": [
+          "WMS",
+          "MES"
+        ],
+        "station_applications": [
+          "Floor",
+          "Conveyor",
+          "Dock"
+        ],
+        "industries_served": [
+          "3PL",
+          "Retail",
+          "F&B",
+          "General Manufacturing"
+        ]
+      },
+      "confidence": "high",
+      "notes": "DIRECT SPEC-SHEET VALUES (imperial, converted by me): Dimensions 134 in x 56 in x 83 in -> 3404 x 1422 x 2108 mm. Max Lifting Height 65 in -> 1651 mm. Max Payload 3,500 lbs -> 1588 kg. Forks ITA Class II 3.9\" x 1.6\" x 42\". Battery 'Li-Ion, 38V DC, 610Ah'. Operating Time '12+ hours at full charge' -> 12.0. Charging Time '3.5 hours' -> 210 min. Charging Options 'Opportunity Charging & Battery Swap' -> battery_swap_capable=true (HIGH, explicit). Turning Radius F/R 71\" / 67\" (1803 / 1702 mm) — not entered, no AP0 field for Forklift AGV.\n\nPAYLOAD IS CONSISTENT here (unlike the HD): spec sheet and brochure both say 3,500 lbs and the product page agrees ('Medium-Duty Trey handles up to 3,500 lbs (1,600 kg)'). I entered the exact conversion 1588 kg rather than Gideon's rounded 1600 kg — 1588 is both exact and the conservative side for a KO_IF_LT field. Difference is 0.8% and immaterial in practice.\n\nNOTE — MD LIFTS HIGHER THAN HD: 65 in vs. 53 in. Counter-intuitive but it is what both official documents say, consistently, so it is not a transcription error on my side. Different mast per chassis.\n\nFLAG — WEIGHT FIGURE IMPLAUSIBLE IN GIDEON'S OWN SHEET: the MD is listed at 10,620 lbs (4817 kg) while the larger, heavier-rated HD is listed at 10,031 lbs (4550 kg). A 3,500 lb-rated counterbalance truck weighing more than a 6,000 lb-rated one is not credible — one of the two weights (most likely the MD's) is wrong or the two are transposed in Gideon's source table. This does NOT affect any DB field (vehicle weight is not in AP0), but it is a reason for mild caution about the rest of that table and worth raising with the vendor alongside the HD payload question.\n\nALL OTHER FIELDS: identical basis and identical reasoning to TREY Heavy Duty — Gideon states 'Both offer the same autonomy, precision, and intelligence—just scaled to suit your needs' (https://www.gideon.ai/solutions/trey/), so the autonomy stack, navigation, safety, fleet-management and integration facts carry over verbatim. See the TREY Heavy Duty notes for the per-field derivation and for the full list of fields deliberately omitted (max_speed, manual_usage, vda5050_compatible, safety_coverage, fleet_control_architecture, outdoor_capable, min_aisle_width, environmental/IP/gradient, all accuracy fields, mast_type, fork_spread, special_fork_option, functional_safety_level, max_fleet_size).\n\nstacking_capability=true is somewhat better supported here than on the HD: at 1651 mm the mast clears the >1.5 m threshold this project uses as the stacking-capable heuristic. Still MEDIUM — no explicit Gideon stacking claim exists."
+    }
+  ]
+}

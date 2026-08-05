@@ -1,0 +1,171 @@
+{
+  "company": "Vecna Robotics",
+  "date": "2026-08-01",
+  "researcher_notes": "COMPANY CONFIRMED REAL. HQ address printed on every official tear sheet: 425 Waverley Oaks Road, Waltham, MA 02452, USA (phone (617) 444-9263, team@vecnarobotics.com). Country = United States. FOUNDING VERIFIED: Vecna Robotics, Inc. was incorporated in 2018 as a spin-off from parent company Vecna Technologies (itself founded 1998 by MIT alumnus Daniel Theobald); founders of the spin-off are Daniel Theobald and Dan Patt, ~60 employees transferred at spin-out, reincorporated in Delaware, first outside round $13.5M led by Drive Capital (Aug 2018). CEO is Karl Iagnemma. Source: Wikipedia (secondary, citing SEC filing and trade press) -- treat founding details as MEDIUM confidence; the HQ address is independently HIGH because it is printed on Vecna's own tear sheets and About page. Product lineup verified from the company's own page-sitemap.xml -> exactly four vehicle product pages exist: AFL (Autonomous Forklift), ATG (Autonomous Tugger), APT (Autonomous Pallet Truck), CPJ (Co-bot Pallet Jack). All four are genuine load/pallet-transport vehicles and all four are in scope. Vecna also sells 'Pivotal' (orchestration software / Command Center) and 'CaseFlow' (a case-picking solution powered by the CPJ) -- these are software/solution offerings, NOT vehicles, and are deliberately excluded. PRIMARY SOURCES: official 'tear sheet' PDFs linked from each product page, three of which are dated 2026/03 (AFL, ATG, CPJ) and carry both IMPERIAL and METRIC columns -- so all metric values below are the manufacturer's OWN printed metric figures, not my conversions, except where noted. The APT tear sheet is older (uploaded 2022/09, filename 'Workhorse'), so APT data is one generation behind the others. NOTABLE HIGH-VALUE FIND: all four tear sheets explicitly print 'ISO 13849-1:2015 PL=d-rated safety system' -- a published Performance Level, which is rare (most vendors only say 'complies with ISO 13849-1'). functional_safety_level=PLd is therefore HIGH confidence, not inferred. AP0 HINT DEFECT FOUND (see flags in ATG product below): the AP0 hint for turning_radius cites 'Vecna ATG approx 2,900 mm / 9'6\"' as an example of TRACTOR-ALONE turning radius. Vecna's own tear sheet qualifies that number as 'TURNING RADIUS (w/ 3 quadsteer carts)' -- i.e. it is a TRAIN turning radius measured with three carts attached, not the tractor alone. The number itself is correct; its attribution in the AP0 hint is wrong. Recommend the hint's example be corrected or removed. VDA 5050: NOT claimed anywhere on Vecna's site or tear sheets -- omitted on all products, never assumed. ISO 3691-4: NOT claimed (US-market vendor, declares ANSI/ITSDF B56.5 + RIA 15.08) -- only ANSI/ITSDF B56.5 recorded. RIA 15.08 is confirmed on all four but has no AP0 allowed value, so it is not recorded. UNIT/SEMANTIC DECISION on min_aisle_width (affects KO_IF_GT): the AFL and APT tear sheets publish TWO different aisle numbers -- a 'RIGHT ANGLE STACK' figure and a 'MINIMUM AISLE WIDTH AT MAX SPEED' figure. The AP0 hint defines min_aisle_width as the 'min WORKING aisle width', which for a fork truck is the right-angle-stack aisle (Ast), not a transit corridor. I therefore recorded the RIGHT ANGLE STACK value as min_aisle_width and documented the smaller travel-aisle figure in each product's notes. Using the smaller number would wrongly qualify these trucks for tight-aisle tenders they cannot actually work in. For the ATG (tugger, no stacking) and CPJ (pallet jack, no stacking) the published aisle figure IS the working aisle, so it was used directly. Fields left out entirely because no source states them: operating temperature/humidity, IP rating, cleanroom class, outdoor capability, gradient, floor flatness, stop/drop/pick accuracy, max fleet size, omnidirectional movement, obstacle bypass, multi-load compatibility, station applications, industries served. PRODUCT-COMPLETENESS CHECK (finalization pass): Wikipedia's infobox lists a fifth product, 'Tote Retrieval System (TRS)', described there as an AGV doing 'mobile piece-picking from conventional shelves'. TRS is DELIBERATELY EXCLUDED for two independent reasons: (1) it does not exist anywhere on Vecna's current website -- no product page in page-sitemap.xml, no mention on the 'Our Fleet' page -- so it is not a currently-sold product; (2) even if sold, piece-picking from shelves is not pallet/load transport and is out of the requested category. Wikipedia's product list is demonstrably STALE: it also omits the CPJ entirely, which has been sold since 2022. The authoritative product list is the company's own sitemap, which contains exactly four vehicle pages -- AFL, ATG, APT, CPJ -- all four of which are captured here. No fifth current vehicle exists. Also noted: the CPJ was developed in partnership with forklift manufacturer Big Joe (announced 2022). FLEET-WIDE FIELDS APPLIED IN FINALIZATION: autonomous_obstacle_bypass=true and fleet_control_architecture=Centralized were added to all four products from platform-level sources; navigation_type=Natural Feature (SLAM) was confirmed rather than inferred; vda5050_compatible confirmed ABSENT (zero 'VDA'/'5050' hits across all seven sources) and therefore left unset on every product. PLAUSIBILITY FLAG ON max_speed (read before using it for scoring): the AFL and APT are recorded at 3.0 m/s and the ATG at 2.0 m/s because those are the manufacturer's own printed metric figures. However, 3.0 m/s (6.7 mph) is well above the <=1.5 m/s that is customary for vehicles sharing aisles with pedestrians under the European ISO 3691-4 regime. These are US-market trucks certified to ANSI/ITSDF B56.5, where higher rated speeds are normal, and the AFL sheet itself qualifies its aisle spec as 'MINIMUM AISLE WIDTH AT MAX SPEED' -- implying full speed is only used in wider, cleared corridors and that the truck derates elsewhere. So these are unloaded/rated top speeds, NOT the speed sustained in mixed pedestrian traffic. Since max_speed is a scoring field, this will score Vecna favourably against EU vendors that publish conservative derated speeds; that is an apples-to-oranges comparison worth being aware of. No safety-derated figure is published, so nothing was substituted. ALL OTHER PLAUSIBILITY CHECKS PASS: dimensions, payloads and aisles are mutually consistent (e.g. the 3,129 mm-long AFL needing a 4.7 m right-angle-stack aisle, and the longer 2,942 mm APT needing 5.6 m, both track the expected Ast = truck length + load + clearance relationship), and every value validated cleanly against config/fields.json field names and allowed values (0 issues).",
+  "products": [
+    {
+      "product_name": "Vecna AFL (Autonomous Forklift)",
+      "product_type": "Forklift AGV",
+      "source_url": "https://www.vecnarobotics.com/afl-autonomous-forklift/ | spec sheet: https://www.vecnarobotics.com/wp-content/uploads/2026/03/Tear-Sheet-AFL.pdf",
+      "fields": {
+        "max_payload": 1361,
+        "max_speed": 3.0,
+        "lifting_height": 1524,
+        "vehicle_length": 3129,
+        "vehicle_width": 1102,
+        "min_total_height": 2438,
+        "min_aisle_width": 4700,
+        "drive_type": "Counterbalanced",
+        "stacking_capability": true,
+        "vna_capable": false,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true,
+        "battery_type": [
+          "Li-Ion",
+          "Lead-Acid"
+        ],
+        "battery_runtime": 8.0,
+        "charge_time": 120,
+        "autonomous_charging": true,
+        "safety_standard": [
+          "ANSI/ITSDF B56.5"
+        ],
+        "functional_safety_level": "PLd",
+        "manual_usage": true,
+        "barcode_readers": true,
+        "fleet_management_system": "Proprietary",
+        "integration_capability": [
+          "WMS"
+        ],
+        "autonomous_obstacle_bypass": true,
+        "fleet_control_architecture": "Centralized",
+        "load_detection": [
+          "Barcode/DataMatrix"
+        ]
+      },
+      "confidence": "high",
+      "notes": "All numeric values are the manufacturer's OWN printed METRIC column from the 2026/03 tear sheet (imperial/metric side by side), so no conversion error is possible: lift 60 in = 1,524 mm; payload 3,000 lb = 1,361 kg; L x W x H 123.2 x 43.4 x 96 in = 3129 x 1102 x 2438 mm; speed 6.7 mph = 3.0 m/s. min_total_height=2438 is the 'H' of the L x W x H triple (MEDIUM within an otherwise HIGH record -- the sheet does not label it as lowered-mast height, though that is the standard meaning of H in such a triple). min_aisle_width=4700 is the tear sheet's 'RIGHT ANGLE STACK 15 ft 6 in / 4.7 m'. IMPORTANT ALTERNATIVE: the same sheet also prints 'MINIMUM AISLE WIDTH AT MAX SPEED 9 ft / 2.7 m'. I chose 4.7 m because AP0 defines min_aisle_width as the working aisle; 2.7 m is only the corridor in which it can still travel at full speed and does NOT permit right-angle pallet handling. drive_type=Counterbalanced is stated by the product name and by the site ('counterbalanced forklift'). stacking_capability=true: 1,524 mm mast lift, explicitly lifts to/from conveyors, wrappers and risers. battery_type from 'Compatible with standard lead acid, lithium ion, and TPPL batteries' (TPPL = thin-plate pure lead, a lead-acid chemistry, so it folds into Lead-Acid). charge_time=120 is the UPPER bound of the published '1-2 hours charge time' range. autonomous_charging=true, but note it is listed as an ADD-ON accessory ('Autonomous charging with smart scheduling New!'); the base configuration uses manual opportunistic charging (the web page says 'Runs 24/7 using manual opportunistic charging'). barcode_readers=true from 'LPN Scanning -- scans pallet barcodes and sends updates to your WMS'. fleet_management_system=Proprietary (Pivotal Orchestration Engine). integration_capability limited to WMS -- the sheet says 'Remote tablet, WMS, and barcode scanning'; no REST/MQTT/OPC-UA/SAP claim exists, so nothing else was added. NOT SET: load_type (site only says 'a wide range of payloads and pallet types'; US pallet nomenclature does not map cleanly to the EUR/ISO vocabulary), mast_type, special_fork_option, fork_spread, stop/drop/pick accuracy, IP/temp/humidity/gradient -- none published. FORK LENGTH 42 in / 1,066 mm and WEIGHT (less battery) 4,700 lb / 2,132 kg are published but have no AP0 field. [FINALIZATION PASS] navigation_type=Natural Feature (SLAM) upgraded to fully confirmed via the official 'Pivotal Autonomous Navigation' page: Vecna builds 'a virtual map of your entire facility' and states 'Vecna AMRs are not limited to fixed routes and do not require any special infrastructure or markings to navigate'. This matches the AP0 mapping rule ('free navigation'/'marker-free'/'environment mapping' -> Natural Feature (SLAM)). autonomous_obstacle_bypass=true added on the same source: 'Free Space Reasoning(TM) allows AMRs to adjust their route and navigate around obstacles, without requiring assistance from workers', plus 'if congestion is too high on the prescribed route, Vecna's AMRs will pursue alternative available paths'. That is re-routing AROUND obstacles, exactly what the AP0 hint asks for, not merely stop-and-wait. This is a platform-level claim covering the whole fleet. fleet_control_architecture=Centralized added (MEDIUM): the Pivotal Orchestration Engine is a central cloud service that 'connects all routes and synchronizes with all vehicles in your fleet'; no swarm/on-board-negotiation claim exists. vda5050_compatible remains deliberately UNSET: a text scan of all seven Vecna sources collected (4 product pages, 4 tear sheets, navigation page, software-suite page, about page) returned ZERO occurrences of 'VDA' or '5050'. load_detection=['Barcode/DataMatrix'] added from the explicit 'LPN Scanning -- scans pallet barcodes and sends updates to your WMS' feature, which is how this truck identifies/verifies the pallet. Vecna also markets 'smart pallet detection' that 'scans the pickup area to identify the correct pallet ... and adjusts if anything is misaligned', but it never names the SENSOR modality, so 'Camera/Vision' and 'Laser/LiDAR profiling' were NOT added -- that would be guessing at the hardware."
+    },
+    {
+      "product_name": "Vecna ATG (Autonomous Tugger)",
+      "product_type": "Tugger AGV",
+      "source_url": "https://www.vecnarobotics.com/atg-autonomous-tugger/ | spec sheet: https://www.vecnarobotics.com/wp-content/uploads/2026/03/Tear-Sheet-ATG.pdf",
+      "fields": {
+        "towing_capacity": 4500,
+        "max_speed": 2.0,
+        "vehicle_length": 1653,
+        "vehicle_width": 1103,
+        "turning_radius": 2900,
+        "tugger_min_aisle_width": 1800,
+        "train_configuration": "Tugger + trailers",
+        "trailer_compatibility": "Quadsteer carts (tear sheet 'CART TYPE: Quadsteer'); site states it tows a variety of carts at varying train lengths",
+        "auto_hitch": true,
+        "route_type": "Fully Dynamic",
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true,
+        "battery_type": [
+          "Lead-Acid"
+        ],
+        "battery_runtime": 8.0,
+        "charge_time": 120,
+        "autonomous_charging": true,
+        "safety_standard": [
+          "ANSI/ITSDF B56.5"
+        ],
+        "functional_safety_level": "PLd",
+        "manual_usage": true,
+        "fleet_management_system": "Proprietary",
+        "integration_capability": [
+          "WMS"
+        ],
+        "autonomous_obstacle_bypass": true,
+        "fleet_control_architecture": "Centralized"
+      },
+      "confidence": "high",
+      "notes": "Manufacturer's own metric column, 2026/03 tear sheet: TOW CAPACITY 9,920 lbs = 4,500 kg; L x W x H 65.1 x 43.4 x 81.1 in = 1653 x 1103 x 2061 mm; TURNING RADIUS 9 ft 6 in = 2.9 m; MINIMUM AISLE WIDTH 6 ft = 1.8 m. *** AP0 HINT DEFECT *** The AP0 hint for turning_radius reads 'Tugger turning radius (tractor alone). Source: spec turning radius (e.g. Vecna ATG approx 2,900 / 9'6\")'. Vecna's tear sheet actually labels this row 'TURNING RADIUS (w/ 3 quadsteer carts)' -- it is the radius of the tractor PLUS a three-cart train, NOT the tractor alone. The 2,900 mm value is correct and verified; the 'tractor alone' attribution in the hint is not. This matters because a tender comparing tractor-alone radii would be comparing unlike quantities. Recommend correcting the AP0 hint. *** SPEED CONFLICT *** The 2026/03 tear sheet prints 'VEHICLE SPEED 5 mph / 2 m/s', but the live product page headline says '6.0 mph top speed'. I used 2.0 m/s: the tear sheet is the manufacturer's spec document and is corroborated by a third-party directory listing that also states 2 m/s, so two sources agree against the page headline. FLAG for re-check. *** max_payload deliberately NOT set *** The tear sheet gives only TOW capacity; no deck/carry payload is published, and towing capacity must not be written into max_payload. *** max_trailers deliberately NOT set *** '3 quadsteer carts' is the test configuration for the turning-radius measurement, NOT a stated maximum train length; the site only says 'varying train lengths'. Guessing 3 here would be a fabricated KO value. auto_hitch=true is confirmed but is an ADD-ON accessory ('Autonomous hitch and unhitch New!') -- not standard equipment. coupling_type NOT set: no coupling mechanism (pintle/towbar/pin) is named anywhere. autonomous_charging=true is likewise an add-on ('Autonomous charging with smart scheduling New!'); base charging is opportunistic, 1-2 h (charge_time=120 = upper bound). battery_type=Lead-Acid only -- the ATG sheet says 'Compatible with standard lead acid and TPPL batteries' and, unlike the AFL sheet, does NOT list lithium ion; this asymmetry looks deliberate, so no Li-Ion was added. route_type='Fully Dynamic' (MEDIUM within this record) from 'route-free navigation', 'dynamic routing', 'real-time adaptive rerouting' and 'retool paths and destinations quickly'. manual_usage=true from 'Manual Mode: Ride-on with steering tiller'. WEIGHT (less battery) 1,623 lbs / 736 kg published, no AP0 field. NOT SET: trailer_steering_technology (Vecna names the CART as 'Quadsteer' -- a cart type, not a declared steering technology for the AP0 list), load_transfer, auto_hitch_position_tolerance, intersection_management, route_programming. [FINALIZATION PASS] navigation_type=Natural Feature (SLAM) upgraded to fully confirmed via the official 'Pivotal Autonomous Navigation' page: Vecna builds 'a virtual map of your entire facility' and states 'Vecna AMRs are not limited to fixed routes and do not require any special infrastructure or markings to navigate'. This matches the AP0 mapping rule ('free navigation'/'marker-free'/'environment mapping' -> Natural Feature (SLAM)). autonomous_obstacle_bypass=true added on the same source: 'Free Space Reasoning(TM) allows AMRs to adjust their route and navigate around obstacles, without requiring assistance from workers', plus 'if congestion is too high on the prescribed route, Vecna's AMRs will pursue alternative available paths'. That is re-routing AROUND obstacles, exactly what the AP0 hint asks for, not merely stop-and-wait. This is a platform-level claim covering the whole fleet. fleet_control_architecture=Centralized added (MEDIUM): the Pivotal Orchestration Engine is a central cloud service that 'connects all routes and synchronizes with all vehicles in your fleet'; no swarm/on-board-negotiation claim exists. vda5050_compatible remains deliberately UNSET: a text scan of all seven Vecna sources collected (4 product pages, 4 tear sheets, navigation page, software-suite page, about page) returned ZERO occurrences of 'VDA' or '5050'. load_detection deliberately NOT set: no barcode/LPN scanning or named pallet-detection sensor is claimed for this vehicle (the ATG tows carts and has no forks; the CPJ's pick is performed manually by a worker)."
+    },
+    {
+      "product_name": "Vecna APT (Autonomous Pallet Truck)",
+      "product_type": "Forklift AGV",
+      "source_url": "https://www.vecnarobotics.com/apt-autonomous-pallet-truck/ | spec sheet: https://www.vecnarobotics.com/wp-content/uploads/2022/09/Vecna-Robotics-Tear-Sheet-Workhorse.20211109153340268.pdf",
+      "fields": {
+        "max_payload": 3600,
+        "max_speed": 3.0,
+        "vehicle_length": 2942,
+        "vehicle_width": 1102,
+        "min_total_height": 2061,
+        "min_aisle_width": 5600,
+        "drive_type": "Pallet Mover",
+        "stacking_capability": false,
+        "vna_capable": false,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true,
+        "battery_type": [
+          "Lead-Acid"
+        ],
+        "battery_runtime": 8.0,
+        "charge_time": 240,
+        "safety_standard": [
+          "ANSI/ITSDF B56.5"
+        ],
+        "functional_safety_level": "PLd",
+        "manual_usage": true,
+        "barcode_readers": true,
+        "fleet_management_system": "Proprietary",
+        "integration_capability": [
+          "WMS"
+        ],
+        "autonomous_obstacle_bypass": true,
+        "fleet_control_architecture": "Centralized",
+        "load_detection": [
+          "Barcode/DataMatrix"
+        ]
+      },
+      "confidence": "high",
+      "notes": "Manufacturer's own metric column: MAX PAYLOAD 7,936 lbs = 3,600 kg; L x W x H 115.8 x 43.4 x 81 in = 2,942 x 1,102 x 2,061 mm; VEHICLE SPEED 6.7 mph = 3 m/s; RIGHT ANGLE STACK 18 ft 6 in = 5.6 m; MINIMUM AISLE WIDTH AT MAX SPEED 8 ft 6 in = 2.6 m. AGE CAVEAT: this tear sheet was uploaded 2022/09 (internal filename dated 2021-11) while the AFL/ATG/CPJ sheets are 2026/03 -- APT data is one generation older, though the product page is live and the APT is still listed in 'the rest of our fleet'. min_aisle_width=5600 uses the RIGHT ANGLE STACK figure per the AP0 'working aisle' definition; the alternative travel figure is 2.6 m (see company notes for the reasoning). drive_type='Pallet Mover': the sheet describes it as a 'self-driving center rider' pallet truck with forks. stacking_capability=false -- no mast and no lift height is published anywhere; the '8,000 lbs double-stacked pallets' claim on the web page refers to carrying two pallets stacked as a single LOAD, not to stacking into racking (MEDIUM-HIGH within this record). Note that 8,000 lbs slightly exceeds the sheet's own 7,936 lbs max payload; 8,000 is almost certainly marketing rounding of 7,936 lbs (= exactly 3,600 kg), so max_payload stays at the sheet value of 3,600 kg. lifting_height deliberately NOT set: a pallet truck's fork lift stroke is real but is not published, and inventing ~200 mm would be a fabricated KO value. charge_time=240 from '4 hours charge time' -- note this is materially slower than the AFL/ATG's 1-2 h and is consistent with the older generation. battery_type=Lead-Acid ('standard lead acid and TPPL batteries'; no lithium listed). barcode_readers=true from 'LPN Scanning -- scans pallet barcodes and sends updates to your WMS'. autonomous_charging deliberately NOT set: the newer AFL/ATG sheets list it as a 'New!' add-on but this older APT sheet does not mention it at all, so its availability on the APT is genuinely unknown. manual_usage=true from 'Manual Mode: Ride-on with steering tiller'. Also published but with no AP0 field: FORK LENGTH 48 in / 1,219 mm, FORK WIDTH 9.3 in / 235 mm, FORK OUTSIDE SPREAD 27 in / 686 mm, WEIGHT (less battery) 2,164 lbs / 982 kg. The web page additionally advertises 'Task Interleaving' (real-time mission replanning) and handling of 'stringer, block, plastic pallets, with or without bottom boards' -- neither maps to a Forklift-AGV AP0 field (task_interleaving is Mobile-AMR-scoped; the pallet types do not map to the EUR/ISO load_type vocabulary), so both are recorded here in prose only. [FINALIZATION PASS] navigation_type=Natural Feature (SLAM) upgraded to fully confirmed via the official 'Pivotal Autonomous Navigation' page: Vecna builds 'a virtual map of your entire facility' and states 'Vecna AMRs are not limited to fixed routes and do not require any special infrastructure or markings to navigate'. This matches the AP0 mapping rule ('free navigation'/'marker-free'/'environment mapping' -> Natural Feature (SLAM)). autonomous_obstacle_bypass=true added on the same source: 'Free Space Reasoning(TM) allows AMRs to adjust their route and navigate around obstacles, without requiring assistance from workers', plus 'if congestion is too high on the prescribed route, Vecna's AMRs will pursue alternative available paths'. That is re-routing AROUND obstacles, exactly what the AP0 hint asks for, not merely stop-and-wait. This is a platform-level claim covering the whole fleet. fleet_control_architecture=Centralized added (MEDIUM): the Pivotal Orchestration Engine is a central cloud service that 'connects all routes and synchronizes with all vehicles in your fleet'; no swarm/on-board-negotiation claim exists. vda5050_compatible remains deliberately UNSET: a text scan of all seven Vecna sources collected (4 product pages, 4 tear sheets, navigation page, software-suite page, about page) returned ZERO occurrences of 'VDA' or '5050'. load_detection=['Barcode/DataMatrix'] added from the explicit 'LPN Scanning -- scans pallet barcodes and sends updates to your WMS' feature, which is how this truck identifies/verifies the pallet. Vecna also markets 'smart pallet detection' that 'scans the pickup area to identify the correct pallet ... and adjusts if anything is misaligned', but it never names the SENSOR modality, so 'Camera/Vision' and 'Laser/LiDAR profiling' were NOT added -- that would be guessing at the hardware."
+    },
+    {
+      "product_name": "Vecna CPJ (Co-bot Pallet Jack)",
+      "product_type": "Forklift AGV",
+      "source_url": "https://www.vecnarobotics.com/cobot-pallet-jack/ | spec sheet: https://www.vecnarobotics.com/wp-content/uploads/2026/03/Tear-Sheet-CPJ.pdf",
+      "fields": {
+        "max_payload": 1500,
+        "max_speed": 1.2,
+        "vehicle_length": 1740,
+        "vehicle_width": 927,
+        "min_total_height": 2273,
+        "min_aisle_width": 1800,
+        "drive_type": "Pallet Mover",
+        "stacking_capability": false,
+        "vna_capable": false,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true,
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "battery_runtime": 4.0,
+        "charge_time": 120,
+        "battery_swap_capable": true,
+        "autonomous_charging": false,
+        "safety_standard": [
+          "ANSI/ITSDF B56.5"
+        ],
+        "functional_safety_level": "PLd",
+        "manual_usage": true,
+        "fleet_management_system": "Proprietary",
+        "autonomous_obstacle_bypass": true,
+        "fleet_control_architecture": "Centralized"
+      },
+      "confidence": "high",
+      "notes": "Manufacturer's own metric column, 2026/03 tear sheet: MAX PAYLOAD 3,300 lbs = 1,500 kg; L x W x H 68.5 x 36.5 x 89.5 in = 1740 x 927 x 2273 mm; VEHICLE SPEED 2.8 mph = 1.2 m/s. battery_type=Li-Ion is explicit and unusually precise for this vendor: 'Li-ion battery, (24V, 60 A-hr)'. battery_swap_capable=true from 'CHARGING: 2 hours, Hot-swappable' plus the web page's 'Equipment-free, manual battery swap ... for 24/7 availability'. charge_time=120 from that same '2 hours'. *** RUNTIME CONFLICT *** The 2026/03 tear sheet says 'RUN TIME: 4 hours typical', but the live product page headline says '2.5 hrs quick-change battery' and 'manual battery swap every 2.5 hrs'. I used the tear sheet's 4.0 h because it is the spec document and is the newer of the two statements, but this is a genuine unresolved discrepancy -- FLAG. battery_runtime is a scoring field, not a KO field, so the blast radius is limited. autonomous_charging=false (MEDIUM within this record): this is an asserted false rather than a NULL because the evidence is a deliberate contrast -- the same-vintage AFL and ATG sheets both list 'Autonomous charging with smart scheduling New!' under ACCESSORIES while the CPJ sheet's accessory list contains only a rear light kit, stretch wrap holder and label printer mount, and the CPJ's stated 24/7 mechanism is an explicitly MANUAL battery swap. If the parent prefers strict NULL-over-assertion, this is the one field in this record to drop. min_aisle_width=1800 comes from the web page ('6' aisles', 'navigate and stage pallets with less than 6 feet of wiggle room'), not the tear sheet -- 6 ft converted using Vecna's own 6 ft = 1.8 m convention from the ATG sheet. This is MEDIUM confidence within an otherwise HIGH record. It is a legitimate working aisle here (unlike the AFL/APT case) because the CPJ does not stack. manual_usage=true is strongly supported: the sheet's CONTROL block reads 'Autonomous transport and drop off / Manual pick up' and task allocation is 'User-directed via on-robot touchscreen' -- the CPJ is explicitly a collaborative machine where a human performs the pick. stacking_capability=false: pallet jack, no mast, no lift height published. NOT SET: lifting_height, load_type (the page says it moves 'a variety of pallets, carts, racks, bins, and other payloads' -- too vague to map to the AP0 vocabulary without guessing). Also noted but not mapped: the CPJ has an on-board touchscreen UI (onboard_ui would be true, but that field is Mobile-AMR-scoped) and the page states an operating envelope of '< 200 meter' transport distances, which has no AP0 field. The CPJ is the vehicle underneath Vecna's 'CaseFlow' case-picking solution. [FINALIZATION PASS] navigation_type=Natural Feature (SLAM) upgraded to fully confirmed via the official 'Pivotal Autonomous Navigation' page: Vecna builds 'a virtual map of your entire facility' and states 'Vecna AMRs are not limited to fixed routes and do not require any special infrastructure or markings to navigate'. This matches the AP0 mapping rule ('free navigation'/'marker-free'/'environment mapping' -> Natural Feature (SLAM)). autonomous_obstacle_bypass=true added on the same source: 'Free Space Reasoning(TM) allows AMRs to adjust their route and navigate around obstacles, without requiring assistance from workers', plus 'if congestion is too high on the prescribed route, Vecna's AMRs will pursue alternative available paths'. That is re-routing AROUND obstacles, exactly what the AP0 hint asks for, not merely stop-and-wait. This is a platform-level claim covering the whole fleet. fleet_control_architecture=Centralized added (MEDIUM): the Pivotal Orchestration Engine is a central cloud service that 'connects all routes and synchronizes with all vehicles in your fleet'; no swarm/on-board-negotiation claim exists. vda5050_compatible remains deliberately UNSET: a text scan of all seven Vecna sources collected (4 product pages, 4 tear sheets, navigation page, software-suite page, about page) returned ZERO occurrences of 'VDA' or '5050'. load_detection deliberately NOT set: no barcode/LPN scanning or named pallet-detection sensor is claimed for this vehicle (the ATG tows carts and has no forks; the CPJ's pick is performed manually by a worker)."
+    }
+  ]
+}

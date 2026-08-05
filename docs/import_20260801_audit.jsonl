@@ -1,0 +1,166 @@
+{"type": "company", "slug": "gideon_brothers", "airtable_id": "recZ6AePg6dVyUlBv", "company_id": "a9787aa3-2f86-4efa-a303-872ba2a4724c", "name": "Gideon Brothers"}
+{"type": "base_model", "slug": "gideon_brothers", "airtable_id": "rec8A4IjPfCxH9nlU", "base_model_id": "249c4974-5203-4fe0-8725-cde62c8d746b", "name": "TREY Heavy Duty"}
+{"type": "product", "slug": "gideon_brothers", "airtable_id": "recjB8AXVkF7OPOjb", "product_id": "32ee50bb-4a51-44ff-945d-c072f2c9546e", "name": "TREY Heavy Duty"}
+{"type": "extension", "slug": "gideon_brothers", "airtable_id": "recuNcCnVQMeZOnga", "extension_id": "1ec895c4-a5ae-4ba2-867a-4c7c9e3c33fe", "name": "TREY Heavy Duty"}
+{"type": "base_model", "slug": "gideon_brothers", "airtable_id": "rec5qp2Chn7qvb0Y9", "base_model_id": "2cf093b9-1e52-4fac-be06-870cb06a217d", "name": "TREY Medium Duty"}
+{"type": "product", "slug": "gideon_brothers", "airtable_id": "recfoKpB3Y8XDCJTB", "product_id": "f94a6876-ab6d-4e27-b6bd-fc376d1a192a", "name": "TREY Medium Duty"}
+{"type": "extension", "slug": "gideon_brothers", "airtable_id": "recddejgwzFyhnucT", "extension_id": "01bd1ada-20e9-4273-994a-f7472165ac7e", "name": "TREY Medium Duty"}
+{"type": "company", "slug": "youibot", "airtable_id": "recrURiXPGQx791dP", "company_id": "8f68b75e-73e6-41e5-97ed-3b30b8d6b1bc", "name": "Youibot"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recWuUoohL6lfDfWK", "base_model_id": "12682155-7cc6-4473-9138-b7f2e16848bc", "name": "L300-smart"}
+{"type": "product", "slug": "youibot", "airtable_id": "rec0ibhCeymhVEX8d", "product_id": "b3ac39a2-8619-453b-95ac-fa2bed74c50d", "name": "L300-smart"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recd8Dwh8wklg4Kz7", "extension_id": "9d9df9e1-999c-4315-baed-aafb481a19e8", "name": "L300-smart"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recoJuzB2aoJX8pT3", "base_model_id": "98dcb76c-feac-447b-abdd-06e4813157fb", "name": "L600"}
+{"type": "product", "slug": "youibot", "airtable_id": "recEhGJiF1dNMKpKS", "product_id": "c0c23a99-8205-41b0-b987-20af638880ac", "name": "L600"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recGciyxAs0EN5N6m", "extension_id": "d8851f59-41d0-4e48-a7cf-1a809281e038", "name": "L600"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recNzAZTEmUXZuWmR", "base_model_id": "102d70d5-2360-4860-91bd-22ba12b7fb79", "name": "L1000-CE"}
+{"type": "product", "slug": "youibot", "airtable_id": "recYTfAuQjpyFH4Bo", "product_id": "2015dd45-c1bd-4a7a-a792-3efa444967dc", "name": "L1000-CE"}
+{"type": "extension", "slug": "youibot", "airtable_id": "rectzuZ280iWnP0in", "extension_id": "f6ecb564-8b20-40b3-929c-31897d88ae8a", "name": "L1000-CE"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recUwHbLydNXiC33h", "base_model_id": "e35e5e75-c709-4333-9aed-942678f635d8", "name": "L1500"}
+{"type": "product", "slug": "youibot", "airtable_id": "recoETlUZLwBO2R9O", "product_id": "bb343614-da72-4a7d-8bcf-334adf892e89", "name": "L1500"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recbI6oy1WqUmybPh", "extension_id": "949b91f5-9cfa-4521-aefc-45fd7d30ece6", "name": "L1500"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recMMKI0mgd4fFPit", "base_model_id": "36957308-8b97-43fd-a91c-9eaf5f84191e", "name": "P200-CE"}
+{"type": "product", "slug": "youibot", "airtable_id": "recslF2KcuV4YWbhi", "product_id": "fa3a1ee1-1e8b-4ea6-bb87-89df76b004f3", "name": "P200-CE"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recEB6biclnu9P7ME", "extension_id": "e591a78c-654c-4700-83a1-0976041f2725", "name": "P200-CE"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "rec0aEywdLlapoN8m", "base_model_id": "1b999a38-0921-4035-a7e8-59f139c46187", "name": "P300"}
+{"type": "product", "slug": "youibot", "airtable_id": "recqcNgB1E4mKws6B", "product_id": "edb537d8-f153-4404-bd1a-9fee320b785e", "name": "P300"}
+{"type": "extension", "slug": "youibot", "airtable_id": "rechcyk6ooi1GLvzh", "extension_id": "4de267b4-2979-4e1c-a966-d35d9738baf5", "name": "P300"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recAkgTVq27OrhWOi", "base_model_id": "e1a740a8-7d20-4834-945e-6e75dff4a573", "name": "B150"}
+{"type": "product", "slug": "youibot", "airtable_id": "recoY8Y4uepTSu8bm", "product_id": "8a098597-c171-46da-9183-dc8d1acd9bc5", "name": "B150"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recVG221lucFk6h4N", "extension_id": "4c05de29-ad29-487b-b712-bdbc0d741b02", "name": "B150"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "rec1NeWGIy9sJJzw1", "base_model_id": "0d6563e0-4388-4b59-bc59-2c17bfa3abb2", "name": "B300"}
+{"type": "product", "slug": "youibot", "airtable_id": "recRTuEKzCc7QnBRG", "product_id": "becdd74f-c205-4220-b0b9-4e74aa806907", "name": "B300"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recKLZyiSvb5xlO7Y", "extension_id": "ee5d28e4-6a12-494a-b35f-4f2c0cf34a40", "name": "B300"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "reclYeSsbmYSXJVAb", "base_model_id": "885b6d09-5fbf-4a20-bad4-be46c172cda4", "name": "B600"}
+{"type": "product", "slug": "youibot", "airtable_id": "recheXwmnnhNBvXrK", "product_id": "0a3f1f59-83a6-458c-9d71-657ea71b95c1", "name": "B600"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recn8tuExVmliXLco", "extension_id": "2d594947-8778-4899-8637-5d81c7e74054", "name": "B600"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "recdMR2U7lQmvhHlC", "base_model_id": "f9a4bb1a-9364-4ba9-95f0-c4e705e09546", "name": "C101"}
+{"type": "product", "slug": "youibot", "airtable_id": "recZV9WIIan1jljsk", "product_id": "3e5884b9-a921-4c43-97fc-ce756a0a8860", "name": "C101"}
+{"type": "extension", "slug": "youibot", "airtable_id": "rec7s860sCYNA28wC", "extension_id": "cde762a3-3118-481e-b5e7-be967b2491fa", "name": "C101"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "rec3Bk78zCUV8bLlB", "base_model_id": "7d862080-65aa-433d-802b-810fb9d03a5f", "name": "C300"}
+{"type": "product", "slug": "youibot", "airtable_id": "recTqXewb98AyUgjb", "product_id": "da075d8f-d4ac-436e-b674-a250e25afb6a", "name": "C300"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recWfvOPT4JfVDXyA", "extension_id": "2acf9271-410f-44d8-af69-089fc8c325a1", "name": "C300"}
+{"type": "base_model", "slug": "youibot", "airtable_id": "rec5oDgiEfxlu9rpZ", "base_model_id": "43d0199c-0018-4951-9cb1-65585750bb85", "name": "AT100"}
+{"type": "product", "slug": "youibot", "airtable_id": "recRt3M6imqxRYxZS", "product_id": "3d18f6e3-6894-48f4-8250-d70743639239", "name": "AT100"}
+{"type": "extension", "slug": "youibot", "airtable_id": "recQtkz6cxqjC2gQI", "extension_id": "c8cfb0a3-2acb-4bf3-ac5e-a788481f0cd8", "name": "AT100"}
+{"type": "company", "slug": "magazino", "airtable_id": "recgCK3D2eGnr02MB", "company_id": "3b6f03b6-38a0-4c7b-b313-be91e26a386d", "name": "Magazino"}
+{"type": "base_model", "slug": "magazino", "airtable_id": "recs96PhLFU5YEods", "base_model_id": "a64e4bf7-bd31-47e2-afcb-d998d2a1b494", "name": "SOTO"}
+{"type": "product", "slug": "magazino", "airtable_id": "recG1rYp5XAZkJpwB", "product_id": "f49845e8-d16e-4d0e-abb9-64aee6b150a1", "name": "SOTO"}
+{"type": "extension", "slug": "magazino", "airtable_id": "rec89TncQE9YSO8l0", "extension_id": "dcd376e5-3de6-40fb-ab55-66fe8f870770", "name": "SOTO"}
+{"type": "base_model", "slug": "magazino", "airtable_id": "recKJqwShVF9ncq4S", "base_model_id": "60c73325-9c55-471a-92fa-55a3a9573511", "name": "TORU"}
+{"type": "product", "slug": "magazino", "airtable_id": "rec0peTMquYl6BKaA", "product_id": "1fb59deb-82f9-4ea9-bdde-de6075b06bfb", "name": "TORU"}
+{"type": "extension", "slug": "magazino", "airtable_id": "recI3uIMQAIijxCbG", "extension_id": "7526ce17-6603-4a2b-9d56-fdcc1f6b5584", "name": "TORU"}
+{"type": "company", "slug": "vecna", "airtable_id": "recpZFvdNU0ZQpyOr", "company_id": "85df08e3-5905-4d37-acba-1a80aee0899f", "name": "Vecna Robotics"}
+{"type": "base_model", "slug": "vecna", "airtable_id": "recwp11ySCACm2pdJ", "base_model_id": "930f913b-204b-4807-b08d-ef7faa6ab624", "name": "Vecna AFL (Autonomous Forklift)"}
+{"type": "product", "slug": "vecna", "airtable_id": "recMvyBLmUIriuH3n", "product_id": "270542c8-0277-42dd-8fc3-2be213f23865", "name": "Vecna AFL (Autonomous Forklift)"}
+{"type": "extension", "slug": "vecna", "airtable_id": "recmaDc9z80LVHWL9", "extension_id": "44e8853c-be9b-42a4-8ded-6af4218c81df", "name": "Vecna AFL (Autonomous Forklift)"}
+{"type": "base_model", "slug": "vecna", "airtable_id": "recGakXqVdzWjtMiT", "base_model_id": "61340d00-57a7-48c9-a47a-fd77f013eaf5", "name": "Vecna ATG (Autonomous Tugger)"}
+{"type": "product", "slug": "vecna", "airtable_id": "recmEJUGxmfw3Ekoo", "product_id": "0a07c9aa-7f8c-48ee-9df6-c5d40cc492ce", "name": "Vecna ATG (Autonomous Tugger)"}
+{"type": "extension", "slug": "vecna", "airtable_id": "rectE7IM4TDfe82PW", "extension_id": "a703cdc9-5ded-41f7-b51a-1c624b977268", "name": "Vecna ATG (Autonomous Tugger)"}
+{"type": "base_model", "slug": "vecna", "airtable_id": "rec4asw2Ok6WAWDJF", "base_model_id": "dd030631-5b5f-46c0-927e-c8bc883f85a2", "name": "Vecna APT (Autonomous Pallet Truck)"}
+{"type": "product", "slug": "vecna", "airtable_id": "recnKggHVKfM6tgMQ", "product_id": "27e8a218-b1da-4da8-97b7-82b475e50758", "name": "Vecna APT (Autonomous Pallet Truck)"}
+{"type": "extension", "slug": "vecna", "airtable_id": "recIhZ9snL4UfrcNe", "extension_id": "6a65a368-6bb8-4842-ab5f-4b69cb6151c1", "name": "Vecna APT (Autonomous Pallet Truck)"}
+{"type": "base_model", "slug": "vecna", "airtable_id": "recpiaX2ddqV1Y39K", "base_model_id": "dcc1b8d1-6fc9-4a9c-9e79-d8305f07d66f", "name": "Vecna CPJ (Co-bot Pallet Jack)"}
+{"type": "product", "slug": "vecna", "airtable_id": "rec9yDrKTVLXuOP2p", "product_id": "869bba7e-aac5-4af2-861c-af2bea2a95be", "name": "Vecna CPJ (Co-bot Pallet Jack)"}
+{"type": "extension", "slug": "vecna", "airtable_id": "recspw6cy7imCKPaw", "extension_id": "a8b3c657-b38f-4c1b-bc7c-b54985392852", "name": "Vecna CPJ (Co-bot Pallet Jack)"}
+{"type": "company", "slug": "seegrid", "airtable_id": "recXkgajy26wV7Pzx", "company_id": "0b77d1f4-2ca4-4bf9-a779-a4d4d4b1d2d9", "name": "Seegrid"}
+{"type": "base_model", "slug": "seegrid", "airtable_id": "recpc4rKaZOBIRNBE", "base_model_id": "56ca3dd1-331d-4fe4-a7cb-bd501a1df23d", "name": "Lift EL1"}
+{"type": "product", "slug": "seegrid", "airtable_id": "rec0yfW6xdpqSDgYk", "product_id": "a1ac01df-82c9-4823-92c6-4646de53f931", "name": "Lift EL1"}
+{"type": "extension", "slug": "seegrid", "airtable_id": "recLhXPOf6rQ4C3In", "extension_id": "59c84177-604f-4d82-bca6-8e70f67ade52", "name": "Lift EL1"}
+{"type": "base_model", "slug": "seegrid", "airtable_id": "recY745wYLK7j0ap5", "base_model_id": "b01b2d55-3b8e-4079-8b23-04ecff465f20", "name": "Lift RS1"}
+{"type": "product", "slug": "seegrid", "airtable_id": "recjNkAr8QSwtOZbw", "product_id": "5238c013-9f09-427b-b1ba-d71aff05d7ee", "name": "Lift RS1"}
+{"type": "extension", "slug": "seegrid", "airtable_id": "recYlW7rAQyFcoT5a", "extension_id": "f852e0d9-5182-4345-b73c-cf3d4697173e", "name": "Lift RS1"}
+{"type": "base_model", "slug": "seegrid", "airtable_id": "reccixiOldlwHpPxj", "base_model_id": "0cc04456-7d6d-4e44-9d8a-4bb34bbcc33a", "name": "Lift CR1"}
+{"type": "product", "slug": "seegrid", "airtable_id": "recsXCwHxwzd04hUU", "product_id": "1c920e40-1f15-4a5e-8310-f72cd9194ace", "name": "Lift CR1"}
+{"type": "extension", "slug": "seegrid", "airtable_id": "recftPBRHQ0Esdj6u", "extension_id": "1df8b93b-26f8-4bf5-990e-0d1dfbbbfc23", "name": "Lift CR1"}
+{"type": "base_model", "slug": "seegrid", "airtable_id": "rece6akUHJXTDpVic", "base_model_id": "7493beac-ecd6-4990-90a1-3dcf0aa5d677", "name": "Tow Tractor S7"}
+{"type": "product", "slug": "seegrid", "airtable_id": "recjUjkIaVv3x6oWd", "product_id": "c1773ee5-08c4-4618-b70a-7fc97ac59d32", "name": "Tow Tractor S7"}
+{"type": "extension", "slug": "seegrid", "airtable_id": "recrZjLbdsdKwexiw", "extension_id": "85302d13-b3c9-41d8-a2b5-7da0ecbb0d29", "name": "Tow Tractor S7"}
+{"type": "company", "slug": "addverb", "airtable_id": "recHszFON2kUfmtrV", "company_id": "ce00bec8-85a8-4898-95ae-80aeea0e5c06", "name": "Addverb"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "rec2IxVgFs7bhMTk2", "base_model_id": "a841936e-d639-4060-b21b-e35fabae19fe", "name": "Dynamo 100"}
+{"type": "product", "slug": "addverb", "airtable_id": "recrRGq3EuyWWk8Hk", "product_id": "145c0346-13e7-46aa-9721-1f18348021ac", "name": "Dynamo 100"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recPh8p5mvsdFnoTb", "extension_id": "55927db3-6282-4365-a9f2-84be71e51d92", "name": "Dynamo 100"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recayjxNo9mFYl6Ub", "base_model_id": "f3f99dd1-265a-4251-8efc-935fa150f30d", "name": "Dynamo 200"}
+{"type": "product", "slug": "addverb", "airtable_id": "recYZV9mSG3f0bIGi", "product_id": "cb205da6-bb6a-4b65-bd25-0c5dbaede02f", "name": "Dynamo 200"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recs3MZPVFkHVAub9", "extension_id": "d4cf47f1-5ef0-4994-abb4-b9f3f2fd4497", "name": "Dynamo 200"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recrXfyPcY4b59zBp", "base_model_id": "a8918b03-0062-4cbf-b5d7-38f8f0e7896f", "name": "Dynamo 500"}
+{"type": "product", "slug": "addverb", "airtable_id": "recjlAjvoti9xLUwN", "product_id": "9f5ee5cb-1892-4c8e-aeac-21ee0cd26668", "name": "Dynamo 500"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recg4b1USYlqLhTP5", "extension_id": "265bea8d-8718-4d26-9e63-2d74a88776de", "name": "Dynamo 500"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recju95O7VcQgEMLD", "base_model_id": "ed77db9a-6a67-4f91-8a02-04adea66192b", "name": "Dynamo 1000"}
+{"type": "product", "slug": "addverb", "airtable_id": "recbR3KfiTyspds0V", "product_id": "771bead9-bb55-49a6-b397-335a5592dd26", "name": "Dynamo 1000"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recHjd66oOTQ6H38d", "extension_id": "74041034-b833-4c33-b6f1-77e474beced7", "name": "Dynamo 1000"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recZPZvmZ5zKcoTS9", "base_model_id": "7d8c5329-3e2f-4daf-b1ce-00ccf8e2a42a", "name": "Dynamo 1500"}
+{"type": "product", "slug": "addverb", "airtable_id": "recd3nT6NLk6bj8Rs", "product_id": "3c12ab92-63d4-45ac-945d-5f1c98435587", "name": "Dynamo 1500"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recTXCYJMx1qrrjQ5", "extension_id": "a7e3fe3b-8292-4ce9-a4a6-1998292e2f51", "name": "Dynamo 1500"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recxkXxTH7SjKYJJD", "base_model_id": "682e50dd-2cac-4b7c-b496-b951fa96f2d9", "name": "Dynamo 2500"}
+{"type": "product", "slug": "addverb", "airtable_id": "recY32vlIk5N39119", "product_id": "bf34de85-76eb-4151-b352-d1c786b61837", "name": "Dynamo 2500"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recStKVIuW24IrcRn", "extension_id": "f2cad60d-f06d-48d5-b32d-eef5a0a9a38b", "name": "Dynamo 2500"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "rec9JLzNECeDOrlH7", "base_model_id": "651c5cc7-c1e6-4c50-a092-7352cf66ea79", "name": "FlowT 1000"}
+{"type": "product", "slug": "addverb", "airtable_id": "rec4kDHDuiSBUAxnM", "product_id": "6085777c-7bdf-4b8e-bf6c-23ea25b6d7a0", "name": "FlowT 1000"}
+{"type": "extension", "slug": "addverb", "airtable_id": "rechxvmOsims44zHD", "extension_id": "6e17971e-952e-4b77-a1c7-2a5f8d5ec6e2", "name": "FlowT 1000"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recXwAoxQ7NtvT4uV", "base_model_id": "112a218e-08ab-4819-8251-c842c9f6a6c4", "name": "FlowT 1530"}
+{"type": "product", "slug": "addverb", "airtable_id": "recErQ5fN3XNGLZ3I", "product_id": "e9140c21-aa3a-443e-a66b-2451c9604cd4", "name": "FlowT 1530"}
+{"type": "extension", "slug": "addverb", "airtable_id": "rec7fa9TZmChBDw8G", "extension_id": "a84e1f4c-0d8a-4fa7-a8bb-98f8d9fa1ccf", "name": "FlowT 1530"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recyB5tNNUOFn3AgJ", "base_model_id": "bb627a3f-f698-454d-88cc-f6168b4c45cd", "name": "Dash Tug"}
+{"type": "product", "slug": "addverb", "airtable_id": "rec26DGZPBcMMCu04", "product_id": "cfef2f77-53f4-426e-9e12-5fad6864bad1", "name": "Dash Tug"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recruUoWFuGQlhrdc", "extension_id": "7a71c996-b1e5-4f70-b5db-50bf6b79c15d", "name": "Dash Tug"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "recAVdoGGnxU2gyR4", "base_model_id": "116c5a27-3374-440a-9edc-55abc7a8b4a7", "name": "Dash Line"}
+{"type": "product", "slug": "addverb", "airtable_id": "recrqExUG5Bn9YcB0", "product_id": "31b98fcb-709d-4ad4-97d0-25b1e0aa5ad7", "name": "Dash Line"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recZ0NPIBbGheRxTU", "extension_id": "e1feb897-d632-423b-ab78-3caa79ba4426", "name": "Dash Line"}
+{"type": "base_model", "slug": "addverb", "airtable_id": "rec5ZEWeKgvayfBLN", "base_model_id": "f8dc1848-1841-47bf-b4a0-8dd21fb10885", "name": "Veloce"}
+{"type": "product", "slug": "addverb", "airtable_id": "recY69yLHwua3yjUV", "product_id": "0f54ffde-8227-4456-83ee-dd8f22ca5b82", "name": "Veloce"}
+{"type": "extension", "slug": "addverb", "airtable_id": "recuoY6hQCuNISi2U", "extension_id": "dcac050e-02b8-4f9e-a59e-100ac391d5c7", "name": "Veloce"}
+{"type": "company", "slug": "rocla", "airtable_id": "rectYrWRwWs22ow5U", "company_id": "92b08042-93fb-4ba9-9632-1372c28ae0ab", "name": "Rocla"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "reczyoY7Y1tFHCmBI", "base_model_id": "c7ed3d82-0678-4059-9104-022ba2a69d84", "name": "Rocla ART (Automated Reach Truck)"}
+{"type": "product", "slug": "rocla", "airtable_id": "recj8sN5ziyOwR7xi", "product_id": "c68060f8-8351-4306-83b0-5dba3fedd86e", "name": "Rocla ART (Automated Reach Truck)"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recsSBS0pGwAeQvaC", "extension_id": "b7911311-2ba9-4f5d-8315-97bc103e8e11", "name": "Rocla ART (Automated Reach Truck)"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "rec4oC0AYCkLJ0cJe", "base_model_id": "a96ef081-6737-4181-85d7-e2a84595a45d", "name": "Rocla ACT (Automated Compact Truck)"}
+{"type": "product", "slug": "rocla", "airtable_id": "reckRd2qBXHJlfndJ", "product_id": "daac73b7-45fb-4206-ac6d-e9a3ce89e629", "name": "Rocla ACT (Automated Compact Truck)"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recWqLwuKeX16K0pS", "extension_id": "ae9ef9d0-541e-40c6-af8e-b2656d79db96", "name": "Rocla ACT (Automated Compact Truck)"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "recfH4x09oFtD7u06", "base_model_id": "73cb8517-3d9d-412b-9836-340a507735f3", "name": "Rocla Very Narrow Aisle AWT (VNA AWT)"}
+{"type": "product", "slug": "rocla", "airtable_id": "rec9X1TPcHCrS0fLF", "product_id": "afcb1309-5c5c-485e-8fc4-b4b8df976479", "name": "Rocla Very Narrow Aisle AWT (VNA AWT)"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recDFQAldvSHBOfnU", "extension_id": "d9105def-2fcf-4434-a1b4-ce8e69c47097", "name": "Rocla Very Narrow Aisle AWT (VNA AWT)"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "recdmvfYBourhbyNG", "base_model_id": "02532d1f-b3aa-40c9-93ab-a820f185d83d", "name": "Rocla Counterbalance AWT"}
+{"type": "product", "slug": "rocla", "airtable_id": "recZne9Ygrnq7TCLB", "product_id": "cdd1295b-0cb3-4ce2-8154-3f27be9441f8", "name": "Rocla Counterbalance AWT"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recBpMn5EU3plpb4r", "extension_id": "d34edfe2-6cb0-47a9-9bef-71a9d4ada4d9", "name": "Rocla Counterbalance AWT"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "recYoQCvphMFRp6pr", "base_model_id": "56ae833f-5afd-4fb8-906a-e173fd7c6482", "name": "Rocla Straddle AWT"}
+{"type": "product", "slug": "rocla", "airtable_id": "recCEHRO1AzLe1vEK", "product_id": "5df03ee9-a505-402d-9f92-98ec0deaf78e", "name": "Rocla Straddle AWT"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recpHMQ9RUQgwyCLa", "extension_id": "94005837-a50a-43cb-b203-1e5173f9db45", "name": "Rocla Straddle AWT"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "recs2yoRwzUbT0FTL", "base_model_id": "cec3b027-9167-4f67-91b9-d8d0584868d8", "name": "Rocla Conveyor AWT"}
+{"type": "product", "slug": "rocla", "airtable_id": "rechqbGVMMzUto1c4", "product_id": "6563992c-53da-404c-8668-8f57260d5f48", "name": "Rocla Conveyor AWT"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recp92DEjyJmPMnXY", "extension_id": "763cbc99-a5c5-45f2-8f4a-3394aca7f45b", "name": "Rocla Conveyor AWT"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "recw3h04zZ5oETStS", "base_model_id": "55bab915-2afc-4435-9cd6-8ef172c3fa0d", "name": "Rocla Reel Fork AWT"}
+{"type": "product", "slug": "rocla", "airtable_id": "reczh9O7gRKhE0Hp7", "product_id": "87c69f02-0535-4a84-9543-415920b367b5", "name": "Rocla Reel Fork AWT"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recvSxjSIKaiOp1Gu", "extension_id": "9355c98a-5dfb-4980-8a11-db6b11bbde7d", "name": "Rocla Reel Fork AWT"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "recEHGDIyAKCd98Be", "base_model_id": "2059a393-d4be-49dd-824b-49c18b62ce3f", "name": "Rocla Roll Clamp AWT"}
+{"type": "product", "slug": "rocla", "airtable_id": "recSs4p19WZWpsthQ", "product_id": "6d1f0f2d-a81c-44b8-ab9e-f185b8b683f9", "name": "Rocla Roll Clamp AWT"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recBS89PjLsXwwJ7I", "extension_id": "178f0642-811d-40ae-8223-ea5efd0a84ec", "name": "Rocla Roll Clamp AWT"}
+{"type": "base_model", "slug": "rocla", "airtable_id": "rec2wLMkmb7vjAUJ4", "base_model_id": "f9eefda8-0cb6-4a5a-91f3-ff7ece55c4e4", "name": "Rocla Bale Clamp AWT"}
+{"type": "product", "slug": "rocla", "airtable_id": "recJaHPZJ0di6KTxr", "product_id": "4008c8fc-597e-4b40-a17f-75bdbf5b78fe", "name": "Rocla Bale Clamp AWT"}
+{"type": "extension", "slug": "rocla", "airtable_id": "recWZGJfNQmOyuB2D", "extension_id": "2fd8cccf-02b2-46e9-8aed-e714ddc902df", "name": "Rocla Bale Clamp AWT"}
+{"type": "company", "slug": "hai_robotics", "airtable_id": "recg8JqRuX6phGJer", "company_id": "e473cdba-a5ac-4089-9bb3-17f15e53915f", "name": "HAI Robotics"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "recXBWmUWysfHi2je", "base_model_id": "53dda24d-c5d2-4d48-93d3-0fc676dcbd1a", "name": "HAI Robotics K50"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recLNXreczL9psUw5", "product_id": "1ab93b8e-46f0-4b95-aeaf-cd8113c54bdd", "name": "HAI Robotics K50"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recdAdne3WEDVC6lK", "extension_id": "3d3056b7-a0c6-4bad-8445-5f47e7c26c10", "name": "HAI Robotics K50"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "rec854kZaH6fc7e58", "base_model_id": "40951305-26d0-46dd-af56-74c75adb6c2b", "name": "HAI Robotics K600"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "rec0OP2zMQob4Zvwl", "product_id": "75dd69a9-41f4-4bc1-b454-d9cc294b0886", "name": "HAI Robotics K600"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recrjFD34ShoJfJkk", "extension_id": "15911cbd-6cf3-4ded-ab86-3fef9a1820ec", "name": "HAI Robotics K600"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "rec5YJQLLXBIEPtCX", "base_model_id": "529be8f6-1e95-4fe5-be26-1d794f8ccc50", "name": "HAI Robotics K1000"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recEs0xFfVhTq2Riv", "product_id": "d072ef1b-5c70-4e73-acad-3575492715ca", "name": "HAI Robotics K1000"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recVaPMLTmfFvaxJ9", "extension_id": "ab6b13be-9861-4f0d-9913-dec0787ecdfc", "name": "HAI Robotics K1000"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "recV8tOLepdgw3tcS", "base_model_id": "1ce784b0-1652-4827-b152-71dbf37c25d4", "name": "HaiPick A42"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recoCylcPTMdIHty8", "product_id": "5adef40e-5e84-4929-96ec-9bbf1884d871", "name": "HaiPick A42"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "reccdw6S5VuDvg0Of", "base_model_id": "21631487-d974-41a8-adcc-1e3e97fd99ce", "name": "HaiPick A42"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "rec1B6sO6BE536bEg", "product_id": "83306ee4-0ed5-48f7-aa44-5c4387ddd877", "name": "HaiPick A42"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recLPoMd4LS0aQip2", "extension_id": "16998666-3a77-4e8a-b2c9-5aca5cc43309", "name": "HaiPick A42"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "recQT6S6qY1FcNYKp", "base_model_id": "9629f010-7737-4c0d-ba66-2cc173e7d58a", "name": "HaiPick A42T"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recZSL3BmeY7p0Ui4", "product_id": "644a4342-b09e-4cc2-bd08-55847f37b75e", "name": "HaiPick A42T"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recvsgyXS0kzosliL", "extension_id": "23f3c4e9-0197-424a-8593-f6bfc2a13d0e", "name": "HaiPick A42T"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "reckVxDO9MectLdFb", "base_model_id": "8b672d82-8bd0-4d5d-a968-8eb2740ec5f1", "name": "HaiPick A42T-E2"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recm1ncevPwhditm6", "product_id": "6029a4dc-1446-4824-be69-c03dfa5fb923", "name": "HaiPick A42T-E2"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recuq6yKsNL3Moc9C", "extension_id": "fa7b9c9b-89ba-4a0e-b2fd-94083a1b0db5", "name": "HaiPick A42T-E2"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "recb9fpHwom3bTRkb", "base_model_id": "59cba8c3-d215-42fb-a78c-11022411b570", "name": "HaiPick A42-E6S"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recCRjm3eMNWvDVvI", "product_id": "883d58c7-e066-4ba6-925f-65e35872d0cc", "name": "HaiPick A42-E6S"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "rec8m91ROtEDyQfck", "extension_id": "33220451-790e-4870-81cd-0903f5d594ca", "name": "HaiPick A42-E6S"}
+{"type": "base_model", "slug": "hai_robotics", "airtable_id": "recvPdC5DmRJhgNvl", "base_model_id": "207c7797-c174-46cb-b74c-b4895e97bb5c", "name": "HaiPick A3"}
+{"type": "product", "slug": "hai_robotics", "airtable_id": "recjZtCRzXokiaDxF", "product_id": "99c4b4ff-b079-4a73-8faf-984e0d2c0862", "name": "HaiPick A3"}
+{"type": "extension", "slug": "hai_robotics", "airtable_id": "recEd4aKUPP3TiYkj", "extension_id": "51380139-7fd6-40fb-833c-6719e84c82ae", "name": "HaiPick A3"}
