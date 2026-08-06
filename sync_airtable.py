@@ -45,6 +45,7 @@ _SQLITE_SCHEMA = json.loads((BASE_DIR / "config" / "sqlite_schema.json").read_te
 _CO_COLUMNS    = _SQLITE_SCHEMA.get("companies_columns", [])
 _PROD_COLUMNS  = _SQLITE_SCHEMA.get("products_columns", [])
 _EXT_COLUMNS   = _SQLITE_SCHEMA.get("extensions_columns", [])
+_BM_COLUMNS    = _SQLITE_SCHEMA.get("base_models_columns", [])
 
 # Airtable-specific setup — only needed in live-sync mode (not --local)
 _LOCAL_MODE = "--local" in sys.argv
@@ -282,7 +283,7 @@ def check_header_guard(table: str, schema_columns: list[str], csv_headers: list[
 
 # Type coercion sets — loaded from generated schema, not hardcoded.
 # Extra fields that are structural/non-extension but need coercion are added explicitly.
-BOOL_FIELDS  = set(_SQLITE_SCHEMA.get("bool_fields",  [])) | {"is_oem_product", "active"}
+BOOL_FIELDS  = set(_SQLITE_SCHEMA.get("bool_fields",  [])) | {"is_oem_product", "active", "oem_link_public"}
 INT_FIELDS   = set(_SQLITE_SCHEMA.get("int_fields",   [])) | {"min_project_value_eur", "max_project_value_eur"}
 FLOAT_FIELDS = set(_SQLITE_SCHEMA.get("float_fields", []))
 
@@ -312,15 +313,22 @@ def _airtable_to_uuid(rec_dict: dict, field: str):
     return rec_dict.get(field) or None
 
 
+_LARGE_PURGE_RATIO = 0.25
+_LARGE_PURGE_FLOOR = 5
+
+
 def import_to_sqlite(
     companies_csv: Path,
     products_csv: Path,
     extensions_csv: Path,
+    base_models_csv: Path,
+    allow_large_purge: bool = False,
 ):
     # Header guard runs first — before any CREATE/ALTER/INSERT touches the DB.
     check_header_guard("companies", _CO_COLUMNS, _csv_headers(companies_csv))
     check_header_guard("products", _PROD_COLUMNS, _csv_headers(products_csv))
     check_header_guard("base_model_extensions", _EXT_COLUMNS, _csv_headers(extensions_csv))
+    check_header_guard("base_models", _BM_COLUMNS, _csv_headers(base_models_csv))
 
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
@@ -384,10 +392,43 @@ def import_to_sqlite(
         at_id_to_co_uuid[row.get("airtable_id", "")] = row.get("company_id", "")
 
     # Build lookup: airtable_id → base_model_id UUID (from extensions/base_models)
-    bm_rows = csv_rows(DATA_RAW / "base_models.csv")
+    bm_rows = csv_rows(base_models_csv)
     at_id_to_bm_uuid: dict[str, str] = {}
     for row in bm_rows:
         at_id_to_bm_uuid[row.get("airtable_id", "")] = row.get("base_model_id", "")
+
+    # Base models — dynamic INSERT from config/sqlite_schema.json base_models_columns (OI-119)
+    assert _BM_COLUMNS, "sqlite_schema.json missing 'base_models_columns' — run generate_all.py"
+    _BM_DEFAULTS = {
+        "base_model_name": "UNKNOWN",
+        "product_type": "unknown",
+        "oem_link_public": "false",  # NOT NULL column, blank on most CSV rows
+        "last_updated": "unknown",
+    }
+    bm_sql = (
+        f"INSERT OR REPLACE INTO base_models ({','.join(_BM_COLUMNS)}) "
+        f"VALUES ({','.join('?' * len(_BM_COLUMNS))})"
+    )
+    _bm_skipped = 0
+    for row in bm_rows:
+        bmid = row.get("base_model_id") or ""
+        if not bmid:
+            # A handful of pre-existing Airtable rows have no computed base_model_id
+            # (separate, older formula-field gap — out of scope here). Skipping avoids
+            # inserting junk rows under a blank TEXT PRIMARY KEY.
+            _bm_skipped += 1
+            continue
+        raw_oem = row.get("oem_company_id", "")
+        oem_uuid = at_id_to_co_uuid.get(raw_oem) or raw_oem or None
+        _fk = {"base_model_id": bmid, "oem_company_id": oem_uuid}
+        vals = [
+            _fk[col] if col in _fk
+            else _coerce(col, row.get(col) or _BM_DEFAULTS.get(col, ""))
+            for col in _BM_COLUMNS
+        ]
+        cur.execute(bm_sql, vals)
+    print(f"  SQLite base_models: {len(bm_rows) - _bm_skipped} rows"
+          + (f" ({_bm_skipped} skipped — blank base_model_id)" if _bm_skipped else ""))
 
     # Products — dynamic INSERT from config/sqlite_schema.json products_columns
     assert _PROD_COLUMNS, "sqlite_schema.json missing 'products_columns' — run generate_all.py"
@@ -448,8 +489,160 @@ def import_to_sqlite(
         )
     print(f"  SQLite extensions: {len(exts)} rows")
 
+    # Purge (OI-118): deactivate/delete rows whose Airtable record was deleted
+    # upstream. sync_airtable.py only ever INSERT OR REPLACEs — a row deleted
+    # in Airtable would otherwise stay in the local DB forever.
+    #
+    # products: soft-delete via the existing `active` column (the only column
+    # every production read path filters on: src/data_loader.py JOIN_SQL/
+    # _NULL_ID_SQL, app.py's load_suppliers()-backed routes) rather than a
+    # hard DELETE, so tender_run_match_results' historical rows (product_id
+    # has no FK there, product_name is denormalized) stay inspectable. A
+    # re-created Airtable record with the same product_id self-heals back to
+    # active=1 on the next sync via the INSERT OR REPLACE above.
+    #
+    # base_model_extensions: hard DELETE — this table has no `active` column
+    # to soft-delete with, and unlike products, leaving a stale extension row
+    # behind is NOT harmless dead weight: if its product survives (only the
+    # extension was deleted upstream, e.g. de-duplicating a bad Airtable
+    # record) the row would linger with no owning purge signal. The opposite
+    # and more dangerous case — an extension row deleted while its product
+    # stays active — makes that product vanish from src/data_loader.py's
+    # INNER JOIN entirely, silently, with zero error and zero log line: it
+    # just stops appearing in match results, indistinguishable from "this
+    # supplier never matched this tender". Found live on 2026-08-06: two
+    # base models (idealworks iw.hub, iw.hub + Pallet Dock) each had two
+    # linked extension rows in Airtable; deleting the stale ones by hand and
+    # resyncing would have left them orphaned forever without this purge.
+    fresh_product_ids = {row.get("product_id") for row in prods}
+    fresh_product_ids.discard(None)
+    fresh_product_ids.discard("")
+    if not fresh_product_ids:
+        # An empty/truncated fetch must never be interpreted as "everything was
+        # deleted" — that would deactivate all products. Abort instead; nothing
+        # committed yet at this point in the transaction.
+        sys.exit(
+            "ERROR: fresh product_id set is empty — refusing to purge (would "
+            "deactivate every product). Check the Airtable fetch / products.csv."
+        )
+    active_before = cur.execute("SELECT COUNT(*) FROM products WHERE active = 1").fetchone()[0]
+    placeholders = ",".join("?" * len(fresh_product_ids))
+    cur.execute(
+        f"SELECT product_id, product_name FROM products "
+        f"WHERE active = 1 AND product_id NOT IN ({placeholders})",
+        list(fresh_product_ids),
+    )
+    to_purge_products = cur.fetchall()
+    if to_purge_products and not allow_large_purge:
+        ratio = len(to_purge_products) / max(active_before, 1)
+        if len(to_purge_products) > _LARGE_PURGE_FLOOR and ratio > _LARGE_PURGE_RATIO:
+            sys.exit(
+                f"ERROR: this sync would deactivate {len(to_purge_products)} of "
+                f"{active_before} active products ({ratio:.0%}) — refusing without "
+                f"--allow-large-purge. This usually means a truncated/partial "
+                f"Airtable fetch, not {len(to_purge_products)} real deletions. "
+                f"If this many deletions are genuinely intended, re-run with "
+                f"--allow-large-purge."
+            )
+    if to_purge_products:
+        cur.execute(
+            f"UPDATE products SET active = 0 "
+            f"WHERE active = 1 AND product_id NOT IN ({placeholders})",
+            list(fresh_product_ids),
+        )
+        print(f"  [PURGE] {cur.rowcount} product(s) deactivated (deleted upstream in Airtable):")
+        for pid, pname in to_purge_products:
+            print(f"    - {pname} ({pid})")
+    else:
+        print("  [PURGE] 0 products deactivated")
+
+    fresh_extension_ids = {row.get("extension_id") for row in exts}
+    fresh_extension_ids.discard(None)
+    fresh_extension_ids.discard("")
+    if not fresh_extension_ids:
+        sys.exit(
+            "ERROR: fresh extension_id set is empty — refusing to purge (would "
+            "delete every extension row). Check the Airtable fetch / "
+            "base_model_extensions.csv."
+        )
+    bmid_to_name = {row.get("base_model_id"): row.get("base_model_name") for row in bm_rows}
+    active_bm_ids = {r[0] for r in cur.execute("SELECT DISTINCT base_model_id FROM products WHERE active = 1")}
+    ext_placeholders = ",".join("?" * len(fresh_extension_ids))
+    cur.execute(
+        f"SELECT extension_id, base_model_id FROM base_model_extensions "
+        f"WHERE extension_id NOT IN ({ext_placeholders})",
+        list(fresh_extension_ids),
+    )
+    to_purge_extensions = cur.fetchall()
+    if to_purge_extensions and not allow_large_purge:
+        ratio = len(to_purge_extensions) / max(len(exts) or 1, 1)
+        if len(to_purge_extensions) > _LARGE_PURGE_FLOOR and ratio > _LARGE_PURGE_RATIO:
+            sys.exit(
+                f"ERROR: this sync would delete {len(to_purge_extensions)} extension "
+                f"row(s) ({ratio:.0%} of the fresh set) — refusing without "
+                f"--allow-large-purge. If this many deletions are genuinely "
+                f"intended, re-run with --allow-large-purge."
+            )
+    purged_extensions = []
+    if to_purge_extensions:
+        cur.execute(
+            f"DELETE FROM base_model_extensions WHERE extension_id NOT IN ({ext_placeholders})",
+            list(fresh_extension_ids),
+        )
+        print(f"  [PURGE] {cur.rowcount} extension row(s) deleted (deleted upstream in Airtable):")
+        for ext_id, bm_id in to_purge_extensions:
+            bm_name = bmid_to_name.get(bm_id, "?")
+            danger = " !! PRODUCT STILL ACTIVE — was silently invisible to matching !!" if bm_id in active_bm_ids else ""
+            print(f"    - {bm_name} ({bm_id}) ext={ext_id}{danger}")
+            purged_extensions.append({
+                "extension_id": ext_id, "base_model_id": bm_id, "base_model_name": bm_name,
+                "orphaned_active_product": bm_id in active_bm_ids,
+            })
+    else:
+        print("  [PURGE] 0 extension rows deleted")
+
+    # Integrity check (does not abort — 3 pre-existing rows are a known,
+    # separate Airtable formula-field gap, see OI-119): every active
+    # product's base_model_id should resolve to a real base_models row.
+    dangling = cur.execute(
+        "SELECT p.product_name, p.base_model_id FROM products p "
+        "LEFT JOIN base_models bm ON p.base_model_id = bm.base_model_id "
+        "WHERE p.active = 1 AND bm.base_model_id IS NULL"
+    ).fetchall()
+    if dangling:
+        print(f"  [WARN] {len(dangling)} active product(s) reference a base_model_id "
+              f"with no base_models row: {dangling}")
+
     con.commit()
     con.close()
+
+    # Returned to main() so it can (a) print an unmissable end-of-run banner —
+    # the inline [PURGE] lines above are easy to miss, buried mid-scroll in
+    # "Step 4: Importing to SQLite..." — and (b) append a durable record to
+    # data/raw/purge_log.jsonl, since terminal scrollback isn't persisted.
+    return {
+        "products": [{"product_id": pid, "product_name": pname} for pid, pname in to_purge_products],
+        "extensions": purged_extensions,
+    }
+
+
+def _log_purge(purged: dict, local_mode: bool) -> None:
+    """Append a durable, always-checkable record of every row this sync run
+    deactivated/deleted (OI-118) — terminal output scrolls away and is easy
+    to miss; this file doesn't. One JSON line per sync run that purged
+    anything; runs that purge nothing write no line, so the file stays
+    meaningful. `purged` is {"products": [...], "extensions": [...]}."""
+    import datetime
+    entry = {
+        "ts": datetime.datetime.now().isoformat(timespec="seconds"),
+        "mode": "local" if local_mode else "live",
+        "products_count": len(purged.get("products", [])),
+        "extensions_count": len(purged.get("extensions", [])),
+        "purged": purged,
+    }
+    log_path = DATA_RAW / "purge_log.jsonl"
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -460,6 +653,13 @@ def main():
     parser.add_argument(
         "--local", action="store_true",
         help="Rebuild DB from committed CSVs in data/raw/ without Airtable credentials"
+    )
+    parser.add_argument(
+        "--allow-large-purge", action="store_true",
+        help=f"Allow a single sync to deactivate/delete more than {_LARGE_PURGE_FLOOR} rows "
+             f"AND more than {_LARGE_PURGE_RATIO:.0%} of the fresh set in one table. Without "
+             f"this flag such a purge aborts — it's far more likely to be a truncated/partial "
+             f"Airtable fetch than that many genuine deletions."
     )
     args = parser.parse_args()
 
@@ -491,11 +691,15 @@ def main():
     ok = validate_csvs(DATA_RAW / "export_validation_report.txt")
 
     print("\nStep 4: Importing to SQLite...")
-    import_to_sqlite(
+    purged = import_to_sqlite(
         DATA_RAW / "companies.csv",
         DATA_RAW / "products.csv",
         DATA_RAW / "base_model_extensions.csv",
+        DATA_RAW / "base_models.csv",
+        allow_large_purge=args.allow_large_purge,
     )
+    if purged["products"] or purged["extensions"]:
+        _log_purge(purged, local_mode=args.local)
 
     if not args.local:
         n_co  = len(all_records["companies"])
@@ -530,6 +734,19 @@ def main():
     print(f"Database: {DB_PATH}")
     if not ok:
         print("WARNING: Validation found issues — see data/raw/export_validation_report.txt")
+    if purged["products"] or purged["extensions"]:
+        print("!" * 60)
+        if purged["products"]:
+            print(f"!! {len(purged['products'])} PRODUCT(S) DEACTIVATED — deleted upstream in Airtable this run:")
+            for p in purged["products"]:
+                print(f"!!   - {p['product_name']} ({p['product_id']})")
+        if purged["extensions"]:
+            print(f"!! {len(purged['extensions'])} EXTENSION ROW(S) DELETED — deleted upstream in Airtable this run:")
+            for e in purged["extensions"]:
+                danger = "  <-- product still active, was silently invisible to matching" if e["orphaned_active_product"] else ""
+                print(f"!!   - {e['base_model_name']} ({e['base_model_id']}){danger}")
+        print("!! Full history: data/raw/purge_log.jsonl")
+        print("!" * 60)
     print("=" * 60)
 
 

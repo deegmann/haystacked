@@ -744,6 +744,7 @@ def read_sqlite_schema(wb, data_sheets) -> dict:
         [e["column"] for e in ext_struct]
         + [f for f, _ in ext_fields]
     )
+    base_models_columns = [e["column"] for e in bm_struct]
 
     # Step 5 invariant: no Company/Product fields may appear in extensions
     _denorm_check = (set(extensions_columns) - set(e["column"] for e in ext_struct)) & (set(companies_columns) | set(products_columns))
@@ -762,6 +763,7 @@ def read_sqlite_schema(wb, data_sheets) -> dict:
         "companies_columns":          companies_columns,
         "products_columns":           products_columns,
         "extensions_columns":         extensions_columns,
+        "base_models_columns":        base_models_columns,
     }
 
 

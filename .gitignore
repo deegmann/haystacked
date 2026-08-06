@@ -50,3 +50,9 @@ offline_supplier_research.zip
 
 # ── Local design files ────────────────────────────────────────────────────────
 design/
+
+# ── Per-machine sync telemetry (OI-118) ────────────────────────────────────────
+# The durable record of what a purge deleted is `active=0` in the committed
+# DB itself; this file is per-operator run history and would conflict across
+# clones/machines if committed.
+data/raw/purge_log.jsonl

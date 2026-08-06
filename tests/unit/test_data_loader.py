@@ -109,22 +109,31 @@ def test_U_D_DB_01_no_active_products_without_product_id():
     )
 
 
-def test_U_D_DB_02_no_duplicate_product_ids():
-    """Each product_id must be unique across active products.
+def test_U_D_DB_02_no_duplicate_extensions_per_base_model():
+    """Each active product's base_model_id must resolve to exactly one
+    base_model_extensions row.
 
-    Duplicate IDs arise when the JOIN (products ⋈ extensions) returns multiple
-    extension rows for the same product — data_loader silently drops the extras.
-    Fix: remove duplicate extension records in Airtable, then resync.
+    JOIN_SQL (src/data_loader.py) joins products to base_model_extensions on
+    base_model_id, not product_id — product_id is a TEXT PRIMARY KEY and can
+    never duplicate, so grouping on it (the previous version of this test)
+    always passes even when the real fan-out condition is present. When a
+    base_model has two extension rows (e.g. an old duplicate left over in
+    Airtable), the JOIN returns two rows for that product and data_loader
+    silently keeps whichever came back first — an arbitrary, undetected pick
+    between two different sets of field values.
+    Fix: remove the duplicate extension record in Airtable, then resync.
     """
     con = sqlite3.connect(DB_PATH)
     rows = con.execute(
-        "SELECT product_id, COUNT(*) as cnt FROM products "
-        "WHERE active = 1 AND product_id IS NOT NULL "
-        "GROUP BY product_id HAVING cnt > 1"
+        "SELECT p.base_model_id, COUNT(*) as cnt "
+        "FROM products p "
+        "JOIN base_model_extensions bme ON p.base_model_id = bme.base_model_id "
+        "WHERE p.active = 1 AND p.product_id IS NOT NULL "
+        "GROUP BY p.base_model_id HAVING cnt > 1"
     ).fetchall()
     con.close()
     dupes = {r[0]: r[1] for r in rows}
     assert not dupes, (
-        f"Duplicate product_ids found (product_id → count): {dupes}. "
-        "Remove duplicate extension records in Airtable, then run sync_airtable.py."
+        f"base_model_id(s) with multiple extension rows (base_model_id → count): {dupes}. "
+        "Remove the duplicate extension record in Airtable, then run sync_airtable.py."
     )

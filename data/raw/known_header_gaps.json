@@ -1,6 +1,7 @@
 {
   "_comment": "Baseline allowlist for sync_airtable.py's header guard (see check_header_guard()). Lists sqlite_schema.json columns that are declared in the schema but have never had a populated value in any Airtable record, so write_csv()'s record-data-union approach never emits a CSV header for them. This is expected/non-destructive and NOT a rename-mismatch bug. Verified live against data/raw/*.csv on 2026-07-31 (OI-115c Phase 3B). If a future Airtable field rename removes a column that WAS populated, that will surface as a new, un-allowlisted gap and the guard will abort — do not add such a column here to silence it; investigate the rename instead. To refresh after a genuine new always-empty AP0 field: re-run the diff (schema_columns - csv_headers) per table and update the corresponding list below.",
   "companies": [],
+  "base_models": [],
   "products": [
     "lead_time_weeks",
     "max_project_value_eur",

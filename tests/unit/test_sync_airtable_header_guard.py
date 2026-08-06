@@ -44,6 +44,9 @@ def test_real_committed_csvs_pass_cleanly():
         sync_airtable._EXT_COLUMNS,
         _real_csv_headers("base_model_extensions"),
     )
+    sync_airtable.check_header_guard(
+        "base_models", sync_airtable._BM_COLUMNS, _real_csv_headers("base_models")
+    )
 
 
 def test_missing_business_column_triggers_system_exit():
