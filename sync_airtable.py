@@ -451,11 +451,26 @@ def import_to_sqlite(
         co_uuid = at_id_to_co_uuid.get(raw_co) or raw_co or None
         bm_uuid = at_id_to_bm_uuid.get(raw_bm) or raw_bm or None
         _fk = {"company_id": co_uuid, "base_model_id": bm_uuid}
-        vals = [
-            _fk[col] if col in _fk
-            else _coerce(col, row.get(col) or _PROD_DEFAULTS.get(col, ""))
-            for col in _PROD_COLUMNS
-        ]
+        vals = []
+        for col in _PROD_COLUMNS:
+            if col in _fk:
+                vals.append(_fk[col])
+            elif col == "active":
+                # Airtable Checkbox fields are OMITTED from the API response (and
+                # thus exported as "" in the CSV) when unchecked — that is a real,
+                # intentional False, not missing data. row.get(col) or default
+                # would treat that blank the same as the column being entirely
+                # absent from the CSV and silently reactivate every deactivated
+                # product on every sync. Only fall back to the default when the
+                # column is truly missing (row.get returns None, e.g. an old CSV
+                # exported before this field existed).
+                raw = row.get(col)
+                if raw is None:
+                    vals.append(1 if str(_PROD_DEFAULTS["active"]).lower() in ("true", "1", "yes") else 0)
+                else:
+                    vals.append(1 if str(raw).lower() in ("true", "1", "yes") else 0)
+            else:
+                vals.append(_coerce(col, row.get(col) or _PROD_DEFAULTS.get(col, "")))
         cur.execute(prod_sql, vals)
     print(f"  SQLite products: {len(prods)} rows")
 

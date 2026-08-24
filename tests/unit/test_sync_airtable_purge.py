@@ -78,6 +78,25 @@ def _import(csvs, allow_large_purge=False):
     )
 
 
+def _force_all_active(csvs, path_key="products.csv"):
+    """Normalize every row's `active` cell to "true" in-place.
+
+    The real committed products.csv legitimately contains a handful of
+    already-deactivated rows (blank `active` cell — see
+    test_blank_active_cell_deactivates_not_reactivates). Purge-mechanism
+    tests below seed a DB and then remove rows to observe the purge count;
+    that count must be decoupled from how many seed rows happen to already
+    be inactive in today's real data, or the test breaks every time the
+    real dataset's active/inactive mix changes. Call this right after
+    _copy_real_csvs() when a test needs "every seed row starts active".
+    """
+    rows, fieldnames = _read_csv(csvs[path_key])
+    for row in rows:
+        row["active"] = "true"
+    _write_csv(csvs[path_key], fieldnames, rows)
+    return rows, fieldnames
+
+
 # ── Products purge ──────────────────────────────────────────────────────────
 
 
@@ -111,7 +130,7 @@ def test_purge_deactivates_product_removed_from_csv(tmp_db, tmp_path):
 
 def test_purge_leaves_present_products_active(tmp_db, tmp_path):
     csvs = _copy_real_csvs(tmp_path)
-    rows, _ = _read_csv(csvs["products.csv"])
+    rows, _ = _force_all_active(csvs)
     kept_id = rows[1]["product_id"]
 
     _import(csvs)
@@ -120,6 +139,52 @@ def test_purge_leaves_present_products_active(tmp_db, tmp_path):
     row = con.execute("SELECT active FROM products WHERE product_id=?", (kept_id,)).fetchone()
     con.close()
     assert row[0] == 1
+
+
+def test_blank_active_cell_deactivates_not_reactivates(tmp_db, tmp_path):
+    """A present-but-blank `active` CSV cell must import as active=0, not 1.
+
+    Airtable Checkbox fields are omitted from the API response (and thus
+    exported as "" in the CSV) when unchecked — that's a real, intentional
+    False, not missing data. The old code applied _PROD_DEFAULTS["active"]
+    ("true") via `row.get(col) or default`, which can't distinguish a blank-
+    but-present column from a column missing entirely, silently reactivating
+    every product deactivated through the Airtable checkbox on every sync.
+    Found 2026-08-24 verifying the datasheet-import deactivations actually
+    stuck: 3 Linde rows patch-deactivated in Airtable came back active=1 in
+    SQLite after a fresh sync_airtable.py run.
+    """
+    csvs = _copy_real_csvs(tmp_path)
+    rows, fieldnames = _read_csv(csvs["products.csv"])
+    target = dict(rows[0])
+    target["active"] = "true"
+    rows[0] = target
+    _write_csv(csvs["products.csv"], fieldnames, rows)
+    _import(csvs)  # seed sync: target starts out active=1 in the DB
+
+    con = sqlite3.connect(tmp_db)
+    seeded = con.execute(
+        "SELECT active FROM products WHERE product_id=?", (target["product_id"],)
+    ).fetchone()
+    con.close()
+    assert seeded[0] == 1
+
+    deactivated = dict(target)
+    deactivated["active"] = ""  # simulate Airtable checkbox unchecked → omitted → blank in CSV export
+    rows[0] = deactivated
+    _write_csv(csvs["products.csv"], fieldnames, rows)
+    _import(csvs)
+
+    con = sqlite3.connect(tmp_db)
+    row = con.execute(
+        "SELECT active FROM products WHERE product_id=?", (target["product_id"],)
+    ).fetchone()
+    con.close()
+    assert row[0] == 0, (
+        "blank active cell (present column, empty value) must import as 0 — "
+        "it must not fall back to the _PROD_DEFAULTS['active']='true' default, "
+        "which is reserved for the column being entirely absent from the CSV"
+    )
 
 
 def test_purge_ignores_blank_product_id_rows_in_fresh_set(tmp_db, tmp_path):
@@ -256,7 +321,7 @@ def test_large_product_purge_aborts_without_flag(tmp_db, tmp_path):
 
 def test_large_product_purge_proceeds_with_flag(tmp_db, tmp_path):
     csvs = _copy_real_csvs(tmp_path)
-    rows, fieldnames = _read_csv(csvs["products.csv"])
+    rows, fieldnames = _force_all_active(csvs)
 
     _import(csvs)  # seed
 
@@ -270,7 +335,7 @@ def test_small_product_purge_does_not_require_flag(tmp_db, tmp_path):
     """A handful of genuine deletions (today's actual use case) must not be
     blocked by the large-purge guard — only an implausibly large fraction is."""
     csvs = _copy_real_csvs(tmp_path)
-    rows, fieldnames = _read_csv(csvs["products.csv"])
+    rows, fieldnames = _force_all_active(csvs)
 
     _import(csvs)  # seed
 
