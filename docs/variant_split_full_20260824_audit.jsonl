@@ -1,0 +1,123 @@
+{"ts": "2026-08-24", "op": "create_base_model", "name": "AGILOX ONE (Doppelscherenhub)", "base_model_id": "ae99537f-bc0b-4d02-b10a-9a0e4b0c174d", "airtable_id": "reciYyLXD02X0l4NR"}
+{"ts": "2026-08-24", "op": "create_product", "name": "AGILOX ONE (Doppelscherenhub)", "product_id": "c9aa8afc-fe40-427a-9213-421a08bb540f", "airtable_id": "recF9bjoK4w02rXCc"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "AGILOX ONE (Doppelscherenhub)", "extension_id": "c1bafd99-63c5-4d89-bd4b-62bc91b3ed0c", "airtable_id": "recduQAI6UVYuuqUt"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "AGILOX ODM 600", "base_model_id": "cdeaf96d-fb66-442e-b77e-7fb19f299bef", "airtable_id": "recAFLvNbgrWM77wf"}
+{"ts": "2026-08-24", "op": "create_product", "name": "AGILOX ODM 600", "product_id": "cf194614-5631-4cbe-9714-15223d1a5045", "airtable_id": "recMYcWeOaLwRiwVR"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "AGILOX ODM 600", "extension_id": "b9a87e6a-f090-4ddb-ba37-5814715faa68", "airtable_id": "rec1P8RN5atomWB42"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "AGILOX ODM 800", "base_model_id": "71e022a6-86cf-4212-8fe9-59832939bc01", "airtable_id": "recibb8cmdOhl141O"}
+{"ts": "2026-08-24", "op": "create_product", "name": "AGILOX ODM 800", "product_id": "f6ff5e34-d506-425d-954f-03d56627aa02", "airtable_id": "recmGE0yrHx1pUM3H"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "AGILOX ODM 800", "extension_id": "aea7ee1e-9e61-4b95-b7f4-aa86a1a0aa9f", "airtable_id": "recN5Zm2r0b1WfV7i"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "LOWY", "base_model_id": "a2188ad0-3826-4a8b-99a1-2d4936957967", "airtable_id": "reczQ0Nzu60IKd2UN"}
+{"ts": "2026-08-24", "op": "create_product", "name": "LOWY", "product_id": "c909990d-8a73-47b0-b195-fb9c59d99067", "airtable_id": "recq7VUWhhLkAdT3B"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "LOWY", "extension_id": "30a99e55-670b-436d-b181-dac3d6ad5696", "airtable_id": "recMuWQBISGegPO5j"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "LOWY HD", "base_model_id": "c441d97a-fc3a-4867-8550-c2e721a27ded", "airtable_id": "recd6X7nxyojPzX98"}
+{"ts": "2026-08-24", "op": "create_product", "name": "LOWY HD", "product_id": "d494735c-8160-498f-add5-ec4b02f5701c", "airtable_id": "recrWooqEEfCETqPk"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "LOWY HD", "extension_id": "59b1a876-665d-4e5b-9b47-b6634903ee7c", "airtable_id": "recgtFBQTFPAaU1WU"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "Linde C-MATIC 10", "base_model_id": "980fe5fe-47ef-457e-b540-ccd5ce5c52a6", "airtable_id": "reclINLp5Q3rbZmNc"}
+{"ts": "2026-08-24", "op": "create_product", "name": "Linde C-MATIC 10", "product_id": "d12fd1e9-d192-43ba-84b2-e495420d9985", "airtable_id": "recO81AR8HfShfykF"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "Linde C-MATIC 10", "extension_id": "291df6dc-16ff-4e14-a2da-642186a1648b", "airtable_id": "recVZdIRD5GH16HK1"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG L2 lift", "base_model_id": "6297e2b0-6379-4244-a55c-7e07b5d7af0d", "airtable_id": "rec0mVYz4WlUDrD88"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG L2 lift", "product_id": "39b7d3ad-10c1-4f42-b25a-3e30cc45f8cd", "airtable_id": "recx6WXYnz7qEkHPA"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG L2 lift", "extension_id": "3f2c48e2-d799-49a5-a329-f6ee471f6816", "airtable_id": "recS2jwbaDkknQCs3"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG L2 core", "base_model_id": "f04033ab-a7e3-4bf6-ac11-0790df0a1dca", "airtable_id": "recC1dj8vUfslzwKn"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG L2 core", "product_id": "eea93913-91b8-49c2-9db4-15ba2bf2fc98", "airtable_id": "receiP1oeGiIYK7DC"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG L2 core", "extension_id": "3700d3ff-4154-4ad9-b406-fec6b63b2005", "airtable_id": "rec5u6174pmXpq2Dz"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG M4 core", "base_model_id": "5d2e2f04-a005-4454-bfa2-cce165725c3a", "airtable_id": "recWS0nT1caBcDLAl"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG M4 core", "product_id": "15dbb823-6b4b-458c-ac35-ddc8abeece0d", "airtable_id": "recIJ66cnHBHnJFjv"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG M4 core", "extension_id": "1f2b104a-d5c1-4246-a3e7-c8f7d83417fb", "airtable_id": "recagxcLLmKTvxwj0"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG M4 lift", "base_model_id": "b7d67f99-b31e-4a87-b72a-fc7436495142", "airtable_id": "recLvElOCMqYQMBLU"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG M4 lift", "product_id": "3d7342fa-3ab5-43b5-955b-06f265517ca8", "airtable_id": "recUaVUeCT7QK0F0D"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG M4 lift", "extension_id": "043b9d1b-048d-4323-9ac6-eb796ebb66a4", "airtable_id": "rece0JrZKtox9w3Us"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG M4 tow", "base_model_id": "e181584d-822e-40a5-8384-3f7c8f47a005", "airtable_id": "recOoQ8UqFIvNC7Ua"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG M4 tow", "product_id": "f7747189-0172-4663-9d8f-51081c6180d8", "airtable_id": "recfeVWxj44W8mYfw"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG M4 tow", "extension_id": "ee76e5b0-e6d9-4865-a315-c77e85c461b0", "airtable_id": "rec8xzzVNbxYcRR36"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG S3 tow", "base_model_id": "16e99267-d6bb-40d5-bf90-038a44508897", "airtable_id": "recO3upvAGq7hVcER"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG S3 tow", "product_id": "f44df8fe-6d99-4bbb-a17f-f393845822f7", "airtable_id": "recqUYFAtPt60cPwn"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG S3 tow", "extension_id": "3713e179-7292-42c7-ace8-479aeda20da5", "airtable_id": "recnd9SslR4OIfCMb"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG S3 core", "base_model_id": "4ac06b35-9ae2-4885-b2d9-9d85b6b4169d", "airtable_id": "rec8z9ozOuOcHrwU9"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG S3 core", "product_id": "e55020ae-a9fd-4d40-be43-279edfd08be5", "airtable_id": "recMWEd8xOxmjK0Ai"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG S3 core", "extension_id": "b928804a-64d9-485a-b39d-1fc2cd55bebf", "airtable_id": "reciurugFgvaqI4zN"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG X1 lift 1200", "base_model_id": "a672a2c7-7d27-4de8-bbf3-3b0b251067a3", "airtable_id": "rectOahmdnm34nZ9D"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG X1 lift 1200", "product_id": "742a2b5c-ec4f-496f-9cce-393906647f93", "airtable_id": "rec3fRI751RwihpXw"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG X1 lift 1200", "extension_id": "c63b1071-e300-43d9-8183-78c6a45ac04e", "airtable_id": "recKFcdkhgRESMc1A"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG X1 spin", "base_model_id": "0347f4a6-484d-47fe-a4ae-b23aeeee0a17", "airtable_id": "recN6hG4moFOwOLJT"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG X1 spin", "product_id": "e6fd8b3b-3fcb-41c4-a22d-47d6ee88bf1e", "airtable_id": "recva2hurMJRXAo1q"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG X1 spin", "extension_id": "f6058a60-f4bb-4818-84f0-8d8006fb3107", "airtable_id": "recCwfDFz5CHdBb9k"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "SAFELOG X1 core", "base_model_id": "57457288-093e-4010-875c-6829658dbc74", "airtable_id": "recTdPkSesrAPwEFO"}
+{"ts": "2026-08-24", "op": "create_product", "name": "SAFELOG X1 core", "product_id": "cebf1e53-4c25-4eed-92ac-cc3d7f828cce", "airtable_id": "recYuKgCmij9loRoN"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "SAFELOG X1 core", "extension_id": "f278f312-7644-41d6-9850-5ea11cc98ea3", "airtable_id": "recWlt6C0ElSg7Xnw"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "Toyota Staxio SAE160 Autopilot (Triplex Hi-Lo)", "base_model_id": "b1fe72e9-55a5-47d1-a732-6828c3e9c791", "airtable_id": "recmb2tH9D5oGWqAH"}
+{"ts": "2026-08-24", "op": "create_product", "name": "Toyota Staxio SAE160 Autopilot (Triplex Hi-Lo)", "product_id": "dde70057-36f1-4c48-a147-adeb1e82223b", "airtable_id": "recuMZRYUZA72alyd"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "Toyota Staxio SAE160 Autopilot (Triplex Hi-Lo)", "extension_id": "454541bc-e692-4e0e-85a5-95ffdae0322b", "airtable_id": "recvePM0xf2iSv2xI"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "Toyota Staxio SAE160 Autopilot (Duplex Tele)", "base_model_id": "6100bd97-6430-4062-ab80-0c79db180c97", "airtable_id": "rec616VP0rThgjyby"}
+{"ts": "2026-08-24", "op": "create_product", "name": "Toyota Staxio SAE160 Autopilot (Duplex Tele)", "product_id": "b2bd53ca-a45b-4e85-bcec-15a630e06486", "airtable_id": "recREOa1hgr8I31Mc"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "Toyota Staxio SAE160 Autopilot (Duplex Tele)", "extension_id": "6d856e95-4496-4515-ae72-d9fb99428a39", "airtable_id": "recSeSbozkPTrsHJj"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNSL14(V)-07", "base_model_id": "1f3b00a2-aac9-4468-ac7c-e6f26f7a0f78", "airtable_id": "recVFCMrZlNDB5T9q"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNSL14(V)-07", "product_id": "38d7615f-c82d-4f9e-a60c-cab3a968cefe", "airtable_id": "recKfqpe1kBxjBiLv"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNSL14(V)-07", "extension_id": "f6bee993-8b59-414e-97ae-45df7fb4d92a", "airtable_id": "rectmyEK2yFHcKCnO"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNSL14(VL)-07", "base_model_id": "2c553fa1-8ddb-46e3-a705-ab9d29c559f2", "airtable_id": "rec2hIj1XH3qzGonR"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNSL14(VL)-07", "product_id": "485d46cf-1e57-4209-a7b3-48d1243bf4c3", "airtable_id": "recXMGbZPqaLZq8GM"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNSL14(VL)-07", "extension_id": "d9c785e7-9ecf-409f-9a30-510a93b7d83d", "airtable_id": "rec9yK1hJ8MWAPcZn"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNP15(V)-07", "base_model_id": "4c02211d-1500-4ae1-ad56-4f6694b96bbc", "airtable_id": "rec9zkCeQl78lwWVj"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNP15(V)-07", "product_id": "8ff18987-4b50-4e9d-8e14-9c44bc7a4272", "airtable_id": "recQD4Datsz0zsOO0"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNP15(V)-07", "extension_id": "ea66130d-0876-4859-8517-ad98f10e3e59", "airtable_id": "recU0PnNCYHg2y4WG"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNP15(VL)-07", "base_model_id": "7ad28c1e-745a-4430-b00d-ef6a68b145ac", "airtable_id": "recpUTpLHDNF48awA"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNP15(VL)-07", "product_id": "8f931d12-3f90-4b5f-9a12-ccbec85e2fbb", "airtable_id": "recdiFQAFH8zJjII3"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNP15(VL)-07", "extension_id": "4f336520-9a07-4525-b65f-7bdb7a6ba0ee", "airtable_id": "recha5eU7GRNfCbcS"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNQ50(VL)-01", "base_model_id": "8ae2e6af-1252-418d-b0b8-5f2d2a2a8a80", "airtable_id": "reczqveJ0XbJF8DdF"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNQ50(VL)-01", "product_id": "20783eec-efe9-44a9-8939-6ff3e821c2ef", "airtable_id": "rec6XuGAAMmwIjPkP"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNQ50(VL)-01", "extension_id": "c488e884-8142-4101-bb54-3cbcd905249b", "airtable_id": "recBCPtpkPvF1PfAj"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNE40(VL)-07", "base_model_id": "9b76658f-bb77-4fde-8f2f-e799b1d1fe0a", "airtable_id": "rec496vhPrerXrtJC"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNE40(VL)-07", "product_id": "ade0788f-87f7-4ac0-8abe-15e51a4d9e99", "airtable_id": "recQQz25y0aTbiQoN"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNE40(VL)-07", "extension_id": "d120f033-d4db-4bef-8eca-a82d4b33b298", "airtable_id": "receUR0wPYeW9mw5p"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNE20(VL)-07", "base_model_id": "e38cdc35-02e7-4985-b7f2-1496f9dd8f83", "airtable_id": "recSteSi98fhGqoE6"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNE20(VL)-07", "product_id": "f448acf4-68ad-4996-8dd8-52f322593100", "airtable_id": "recOLaRAnhCxxgYxs"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNE20(VL)-07", "extension_id": "b447b7ad-2d90-4052-8704-f87997deae0f", "airtable_id": "recwN8EZBoLK2VbW6"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNST20(VL)-66", "base_model_id": "8369c52e-6fc2-4160-bc73-347754d03560", "airtable_id": "recGY3yK4wJGXhF4k"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNST20(VL)-66", "product_id": "3c5f1802-7859-4211-82f5-c7c18c8890c5", "airtable_id": "recJt5exXMMjzeM3m"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNST20(VL)-66", "extension_id": "858840a2-ba40-42dd-960b-337f63d08edb", "airtable_id": "recc0fiHhNNdso5Kk"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNR16(V)-01", "base_model_id": "13261240-230a-4542-b12b-48d26ccc3b68", "airtable_id": "rec1WyBKXOh9QRvCg"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNR16(V)-01", "product_id": "f8b34df9-a1ba-4bf7-8e84-59c04f998082", "airtable_id": "recniDlTceC6dkmAw"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNR16(V)-01", "extension_id": "4b4b8e66-4ff5-43ae-bf28-3c7aceb5ffcc", "airtable_id": "recepPcsapbCw5Vge"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNR16(V)-07 (Manual Handheld)", "base_model_id": "b0b723ea-c27f-4670-a960-79c17df33fef", "airtable_id": "recMTMNN7fP58BROn"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNR16(V)-07 (Manual Handheld)", "product_id": "d4d57a71-199d-4a45-ad0a-b6806ca79934", "airtable_id": "rec5m9xrXhZ1gTJFg"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNR16(V)-07 (Manual Handheld)", "extension_id": "65d956ba-ff9f-44df-94cb-f0a872415e4b", "airtable_id": "recchjecw4tizON7Q"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNR16(V)-07 (Manual Seated)", "base_model_id": "24e86cba-d5ef-418c-a0d9-1b3adedc2bad", "airtable_id": "rec0Vo93etE5haLLC"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNR16(V)-07 (Manual Seated)", "product_id": "c2b2f971-4c16-4d47-bc58-22461556ead8", "airtable_id": "rec1EJxQOh8pUFnSd"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNR16(V)-07 (Manual Seated)", "extension_id": "0f611f05-b65c-424c-af17-c45cf7f0f0de", "airtable_id": "recGUr44y0uufmWGg"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNR16(VL)-01", "base_model_id": "358325fa-0912-493c-b653-f3bfe3d380ed", "airtable_id": "reciJCBNW2ddp14fv"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNR16(VL)-01", "product_id": "df27d0b6-56e1-4383-b812-8bbe03802629", "airtable_id": "recqGAuaE8RuguO8u"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNR16(VL)-01", "extension_id": "d54d6dc7-197b-4f56-aea9-35afcc63c209", "airtable_id": "rec7H3u9mXsQby6xZ"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNP20(V)-07", "base_model_id": "fab1b52f-1153-4475-9c65-674363aa3354", "airtable_id": "recsKtyIfyfeku1wO"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNP20(V)-07", "product_id": "0da9cd97-ba10-4bb2-bd34-4e4f85f12214", "airtable_id": "recDtrvKcJgitVrV9"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNP20(V)-07", "extension_id": "5bcd5933-4ade-4928-a8e4-ddfcbf7065c8", "airtable_id": "recXlb7BAuKt8iKb4"}
+{"ts": "2026-08-24", "op": "create_base_model", "name": "VisionNav VNP20(VL)-07", "base_model_id": "56b4a961-40e9-4d66-8510-a36e5bbf29a9", "airtable_id": "rec7kaYxTMinaDUOx"}
+{"ts": "2026-08-24", "op": "create_product", "name": "VisionNav VNP20(VL)-07", "product_id": "93c110c7-dc24-4091-8525-db2f9e8a182e", "airtable_id": "rec6cR1WFJI1Nm6ID"}
+{"ts": "2026-08-24", "op": "create_extension", "name": "VisionNav VNP20(VL)-07", "extension_id": "c25ddf76-b79b-4469-887c-6fd605a65185", "airtable_id": "rec5M6aZ81M92Y81d"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNSL14", "entity": "Base Model", "field": "vehicle_length", "new": 1642, "old": 1650, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNSL14", "entity": "Base Model", "field": "vehicle_width", "new": 994, "old": 1000, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNP15", "entity": "Base Model", "field": "vehicle_length", "new": 2543, "old": 2693, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNP15", "entity": "Base Model", "field": "min_aisle_width", "new": 3150, "old": 3350, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNQ50", "entity": "Base Model", "field": "vehicle_length", "new": 1560, "old": 1650, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNQ50", "entity": "Base Model", "field": "vehicle_width", "new": 900, "old": 860, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNQ50", "entity": "Base Model", "field": "turning_radius", "new": 1150, "old": 1300, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNQ50", "entity": "Base Model", "field": "max_gradient", "new": 3.5, "old": 5.0, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNE40", "entity": "Base Model", "field": "vehicle_width", "new": 1402, "old": 1430, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNE40", "entity": "Base Model", "field": "max_gradient", "new": 13, "old": 12.0, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNE20", "entity": "Base Model", "field": "vehicle_length", "new": 3230, "old": 3460, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNE20", "entity": "Base Model", "field": "vehicle_width", "new": 1200, "old": 1250, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNE20", "entity": "Base Model", "field": "min_total_height", "new": 2150, "old": 2040, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNST20", "entity": "Base Model", "field": "vehicle_length", "new": 1600, "old": 1620, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNST20", "entity": "Base Model", "field": "vehicle_width", "new": 815, "old": 800, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNST20", "entity": "Base Model", "field": "min_total_height", "new": 1650, "old": 1830, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNST20", "entity": "Base Model", "field": "drop_accuracy_angle", "new": 0.5, "old": 0, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "ANCHOR PATCHES", "company": "VisionNav Robotics", "db_row": "VisionNav VNST20", "entity": "Base Model", "field": "max_gradient", "new": 6.1, "old": 5.0, "table_hint": "extensions"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "AGILOX Services GmbH", "db_row": "AGILOX ODM 600/800", "product_id": "03893023-b951-441e-ae15-d15e0dccbc63", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "Balyo", "db_row": "LOWY / LOWY HD", "product_id": "ce405eb4-875d-432a-bad6-e091ba97b2ba", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "SAFELOG GmbH", "db_row": "SAFELOG AGV L2", "product_id": "94221129-41e1-4c02-8b67-db2e6ef97078", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "SAFELOG GmbH", "db_row": "SAFELOG AGV M4", "product_id": "26679072-03e3-47db-bd24-93f7c7bf370d", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "SAFELOG GmbH", "db_row": "SAFELOG AGV S3", "product_id": "120ffbbc-5846-4a6b-9c4c-5827654aba0e", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "SAFELOG GmbH", "db_row": "SAFELOG AGV X1", "product_id": "25198045-bbeb-4782-896c-41f2ab8fae77", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "Toyota Material Handling Europe", "db_row": "Toyota Staxio SAE160 Autopilot", "product_id": "455f700a-8c08-4674-ac32-fba975eed726", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "VisionNav Robotics", "db_row": "VisionNav VNR16", "product_id": "354bb533-9f9f-4346-891c-9c0b702d69a5", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}
+{"ts": "2026-08-24", "op": "patch", "bucket": "PRODUCT DEACTIVATIONS", "company": "VisionNav Robotics", "db_row": "VisionNav VNP20", "product_id": "db898f75-2ef2-4bc8-9028-1dd6d4ad4494", "field": "active", "old": true, "new": false, "reason": "FULL-RETIRE variant split -- superseded by new per-variant rows (docs/variant_split_full_plan_20260824.md)"}

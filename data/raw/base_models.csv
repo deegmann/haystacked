@@ -1,10 +1,13 @@
 airtable_id,Base Model Extensions,Products,base_model_id,product_type,base_model_name,oem_company_id,last_updated,oem_link_public
 rec06rtbvRakwF5Tb,recGk4yGHY3miCZoO,recYnxUBL1KpnvJF3,8db78fbb-459c-4ee7-9acd-580c8ed3b37c,Mobile AMR,STILL ACH 06 iGo,,,
 rec07pcWvTRHn06XI,recV72Moaiphi3JOt,recFIpZcidPIxatlj,e91913b3-2d0f-4519-b317-9a5932939e36,Mobile AMR,Hikrobot TP1-50UM-B,rec8puMCz7RojpCwA,2026-08-24,true
+rec0Vo93etE5haLLC,recGUr44y0uufmWGg,rec1EJxQOh8pUFnSd,24e86cba-d5ef-418c-a0d9-1b3adedc2bad,Forklift AGV,VisionNav VNR16(V)-07 (Manual Seated),recukyJanezH7UdIk,2026-08-24,true
 rec0aEywdLlapoN8m,rechcyk6ooi1GLvzh,recqcNgB1E4mKws6B,1b999a38-0921-4035-a7e8-59f139c46187,Mobile AMR,P300,recrURiXPGQx791dP,2026-08-05,true
+rec0mVYz4WlUDrD88,recS2jwbaDkknQCs3,recx6WXYnz7qEkHPA,6297e2b0-6379-4244-a55c-7e07b5d7af0d,Mobile AMR,SAFELOG L2 lift,recFnzzgpAvw62jDy,2026-08-24,true
 rec1BqgdLzrnMBiSU,rec33DiQVU7aOiWr7,recSKOe7cPWoZYNQD,94fded76-8709-4cff-9e7c-aa8d2e8c6b9d,Mobile AMR,Hikrobot Q7-1000E,,,
 rec1NeWGIy9sJJzw1,recKLZyiSvb5xlO7Y,recRTuEKzCc7QnBRG,0d6563e0-4388-4b59-bc59-2c17bfa3abb2,Mobile AMR,B300,recrURiXPGQx791dP,2026-08-05,true
 rec1R7qiEwT4DywjK,recEPHkVCTjOJH5Ml,recSOWm3vTMO6zFrH,7f84bef8-680b-4dc9-b468-7257773f0ef3,Forklift AGV,Toyota OAE120CB Autopilot,,,
+rec1WyBKXOh9QRvCg,recepPcsapbCw5Vge,recniDlTceC6dkmAw,13261240-230a-4542-b12b-48d26ccc3b68,Forklift AGV,VisionNav VNR16(V)-01,recukyJanezH7UdIk,2026-08-24,true
 rec1k4PsnsvVXc7Qk,recOzHXKsBLfom6NY,rec94Pn8uvIukPfl5,ea61fe9c-e739-443a-9240-f5b1a889e3d2,Mobile AMR,Hikrobot Q3S-600A,rec8puMCz7RojpCwA,2026-08-24,true
 rec1kPgYb9nFB7uNO,rec1MgoaOAnLmA6Vr,receEbW22WooBZAEk,28670caa-ba80-43b8-af0c-a9a89f121d26,Forklift AGV,VisionNav VNP20,,,
 rec1xzKXrGWQjE7Kp,recg7QNlgQgyltTup,recRoj14l8g8JKyB8,c7ecad13-3cdb-4eb0-8018-7d0f47e467a3,Forklift AGV,Hikrobot F4-3000,rec8puMCz7RojpCwA,2026-08-24,true
@@ -16,6 +19,7 @@ rec2R1yZKGjq8psS9,rec691GQcUNjWGqsv,recfdraQR3Kpi2WcK,b725ced6-fdd1-40c9-ade2-20
 rec2Vn6bJpLSvTp6d,rec3b3HCslXekuA2B,recBo0OThLh3bxU2W,18394345-99ee-4c54-a29a-5f2530a7298b,Mobile AMR,Omron HD-1500,,,
 rec2ejSKlcLfgIyoM,recpoYE16wxTbo1x5,recVvRckJyCjMIMua,09c14244-77f3-4ec1-b45d-3d6be2e26914,Mobile AMR,Hikrobot HR8-2000A,rec8puMCz7RojpCwA,2026-08-24,true
 rec2fb9FzQa0CTG5k,recJeDduq9eB9VecD,recRuuelHtm5sbvmq,ed1c1ba8-65d3-4989-a824-c8ad6046b1e9,Mobile AMR,MiR1200 Pallet Jack,,,
+rec2hIj1XH3qzGonR,rec9yK1hJ8MWAPcZn,recXMGbZPqaLZq8GM,2c553fa1-8ddb-46e3-a705-ab9d29c559f2,Forklift AGV,VisionNav VNSL14(VL)-07,recukyJanezH7UdIk,2026-08-24,true
 rec2uenygLNSh1e9Y,recRuG3djJBE9sEq0,recfcRxcQIaJqdy3A,,Mobile AMR,CompactMover Conveyor U 400,,2026-06-30,true
 rec2wLMkmb7vjAUJ4,recWZGJfNQmOyuB2D,recJaHPZJ0di6KTxr,f9eefda8-0cb6-4a5a-91f3-ff7ece55c4e4,Forklift AGV,Rocla Bale Clamp AWT,rectYrWRwWs22ow5U,2026-08-05,true
 rec32LgT6GSQACqgC,recHU9OBWqHt6e9o7,recDwbdBIJb7Rk7hc,6c587793-5965-4af9-9777-8ed449ecd4a4,Mobile AMR,Hikrobot TP1-50DC-A,rec8puMCz7RojpCwA,2026-08-24,true
@@ -28,6 +32,7 @@ rec3grxh9z8yowH9h,recMTxuEuw8LF0aQA,recSo6DB1znV2jx2K,affcdac2-c9d4-450f-82a4-c4
 rec3ivjESdsqhWZiO,reclrl367t3uguXqQ,recjFjiwOGE3qQNHv,862a9b0b-e5fb-4e60-b21c-1b2a94733d07,Mobile AMR,Geek+ RoboShuttle RS8-DA,,,
 rec3wDsp527CTf2eJ,recpMmC5ktew3EMqK,recEnznLyxuJY6CiT,a240eff1-6e7f-492e-a0ef-f5daa948c2d0,Mobile AMR,ER-FLEX-MAX,recekfXPZRcWV7So0,2026-08-24,true
 rec42NUgeoXd8kcYT,recOBrm1P6yhkgqTY,recD4giYBivH6oCr5,2498c3c6-917b-45a2-abdc-288c6fcef267,Mobile AMR,ek robotics X MOVE 600,,,
+rec496vhPrerXrtJC,receUR0wPYeW9mw5p,recQQz25y0aTbiQoN,9b76658f-bb77-4fde-8f2f-e799b1d1fe0a,Forklift AGV,VisionNav VNE40(VL)-07,recukyJanezH7UdIk,2026-08-24,true
 rec4TE7c7GTwzZrLB,recKe0h9WWq1LnLda,recmbicmJy4sUt709,48bf9b58-26a3-4b77-a12e-99d92775bb1f,Mobile AMR,Geek+ MP1000R,,,
 rec4asw2Ok6WAWDJF,recIhZ9snL4UfrcNe,recnKggHVKfM6tgMQ,dd030631-5b5f-46c0-927e-c8bc883f85a2,Forklift AGV,Vecna APT (Autonomous Pallet Truck),recpZFvdNU0ZQpyOr,2026-08-05,true
 rec4oC0AYCkLJ0cJe,recWqLwuKeX16K0pS,reckRd2qBXHJlfndJ,a96ef081-6737-4181-85d7-e2a84595a45d,Forklift AGV,Rocla ACT (Automated Compact Truck),rectYrWRwWs22ow5U,2026-08-05,true
@@ -42,6 +47,7 @@ rec5oDgiEfxlu9rpZ,recQtkz6cxqjC2gQI,recRt3M6imqxRYxZS,43d0199c-0018-4951-9cb1-65
 rec5qp2Chn7qvb0Y9,recddejgwzFyhnucT,recfoKpB3Y8XDCJTB,2cf093b9-1e52-4fac-be06-870cb06a217d,Forklift AGV,TREY Medium Duty,recZ6AePg6dVyUlBv,2026-08-05,true
 rec5uVrli3rir5q5H,rec1dbUceohssIQ8N,recMVGJxvyJhvpbFK,da37f73a-cb30-4a7a-a37c-ab52c9103c22,Forklift AGV,VNA MOVE 1350,rec1ZqbEZI1N1xhER,2026-08-24,true
 rec60ypl6OBKhU8C0,rec7AVCHseUlwa28G,recbWjYrDa0fvWn6L,d4dd45bc-1fa6-4817-ad7d-b7e6b588cb32,Mobile AMR,Geek+ RoboShuttle RS5-D,recAt0MsnmNI40XJ6,2026-08-24,true
+rec616VP0rThgjyby,recSeSbozkPTrsHJj,recREOa1hgr8I31Mc,6100bd97-6430-4062-ab80-0c79db180c97,Forklift AGV,Toyota Staxio SAE160 Autopilot (Duplex Tele),recxPqJCeWxlTqf4V,2026-08-24,true
 rec6AltmygpSpDhFz,rec1g3cOwQQ1kZ8bi,recvYeXA1tJU9MrDo,062f63d4-b153-4169-a805-137a839ad66c,Forklift AGV,Stäubli FL1500,,,
 rec6DCegcXTgpokxN,recbLzZwAgg2gKx61,reciyGeh0rnADM6OK,79c41628-b401-461c-84bd-e498240a13e5,Mobile AMR,Linde C-MATIC HP,,,
 rec6gLXAHVPXCoQ8J,recKbwew3rSmFYow1,recGizdd9YCk4hF6M,be3e736a-ce9c-4ef6-bcd2-698acd19a38f,Mobile AMR,Movu ifollow iL300,,,
@@ -52,6 +58,7 @@ rec72KRQ6gfzEB0Qe,recqqnQVKpAhGxyKU,recdVzrwsnyO01rAh,b35f1f29-1a43-4b5e-9e89-3a
 rec7RkpZ2w66HTvD7,recS68ADJQlEwZk5K,recb3TBtafSxKjihz,f16d99e3-8251-4965-afc9-7874bd8a543a,Mobile AMR,Hikrobot CHA-1200,rec8puMCz7RojpCwA,2026-08-24,true
 rec7Yc8urpem7Kv5C,rec9C0VlsF5kPKpFS,rec5hBlq5T5WZntL0,fc4eb38f-9be9-44ef-bddf-e984b3add3e5,Mobile AMR,Hikrobot HL10-10000A,rec8puMCz7RojpCwA,2026-08-24,true
 rec7bXxQfqhzplhwc,recCuJwR8Iy7pLEgT,recr8JKtP8ckqCeva,1eea6db9-366b-41e9-9977-167688e25634,Forklift AGV,ek robotics HEAVY MOVE (series),rec1ZqbEZI1N1xhER,2026-08-24,true
+rec7kaYxTMinaDUOx,rec5M6aZ81M92Y81d,rec6cR1WFJI1Nm6ID,56b4a961-40e9-4d66-8510-a36e5bbf29a9,Forklift AGV,VisionNav VNP20(VL)-07,recukyJanezH7UdIk,2026-08-24,true
 rec7mYoTY7385sLpj,rec9LW3i7bi3FBtNd,recN2Ty53NhifVrfk,66ee8db5-fdf9-4be2-a306-5bfec5171834,Forklift AGV,Jungheinrich ERE 225a,,,
 rec7qDQNeF1vZ2xEh,recKS6t3yWhPfnFZu,recMOwYpMmQcEtCwm,8b9d7841-2043-430c-a8d3-eeb91ef99840,Mobile AMR,SAFELOG AGV X1,,,
 rec7tpbXiRh3wMomK,recUvqBaVx5RHsxMJ,rec2UVukgFrZ9nDeB,bd14b4ae-ed9c-4084-acaa-51c51613a0ae,Mobile AMR,MiR250 Hook + Top Modules,,,
@@ -63,14 +70,17 @@ rec8HS3eAvI8AYAQ8,recFXAROlC3T9A6CT,recMVsChwMpNQG3Lw,d153699f-e1f0-47e3-864b-9d
 rec8Msw5GBuVC1J3g,rec3ET7L78I80uavS,rec3LAWOnptQyA0Qd,b3ea7255-6368-4b7b-bce1-19524c4c8a2a,Forklift AGV,Toyota Staxio SAE160 Autopilot,,,
 rec8sdOpj0tTxk1iW,rec7U6IeQdZEXaWN1,rec4S6ilZaI2uq2dc,f278d069-03a6-46bb-a32f-feb216b10415,Mobile AMR,Hikrobot TP5-50DTH,rec8puMCz7RojpCwA,2026-08-24,true
 rec8t7dsVYV12reli,recFNgv9hvZxK6WJp,recwqHi3tcaj5CifK,962c9986-febb-46b0-8937-4688b72e1d94,Forklift AGV,Balyo TRUCKY,,,
+rec8z9ozOuOcHrwU9,reciurugFgvaqI4zN,recMWEd8xOxmjK0Ai,4ac06b35-9ae2-4885-b2d9-9d85b6b4169d,Mobile AMR,SAFELOG S3 core,recFnzzgpAvw62jDy,2026-08-24,true
 rec8zY21zPMVdGgE1,rec8rDxh8ozTOTGa3,rec01r83BKFPGXYj4,ea3dc83b-28a3-4793-bf7c-5d711839d138,Forklift AGV,DS ARNY Duplex,recjVkDGpP36pQokQ,2026-08-06,true
 rec9IMSdG4Unnlte3,reciiBii3TbQDEIBX,recHhzgkWTAYXlu3y,8366913c-e12a-4876-b117-60278c876bde,Forklift AGV,DS ARNY Triplex,recjVkDGpP36pQokQ,2026-08-06,true
 rec9JLzNECeDOrlH7,rechxvmOsims44zHD,rec4kDHDuiSBUAxnM,651c5cc7-c1e6-4c50-a092-7352cf66ea79,Forklift AGV,FlowT 1000,recHszFON2kUfmtrV,2026-08-05,true
 rec9Uhjs9Bt74NUBY,recyZxmFMeSfjQTcm,rechzvvBe2lPK0HPA,d12ec830-e5c1-4238-a746-969d4449764b,Forklift AGV,Balyo REACHY (Linde Reach),,,
 rec9lUF6ydnL5VEFH,rec5GMoVss9iJzmat,recMUWtYTirgMUjGf,cdeb4923-c0f2-4de6-b58a-3ee067d5667d,Mobile AMR,Hikrobot Q7-1500E,rec8puMCz7RojpCwA,2026-08-24,true
 rec9wKPUYC9UYzpqd,recyIOzGMGDv97cFo,reccdsLJCfTfvtqVF,65d3cea7-7bc1-4b22-82fe-4aaf88fe1805,Mobile AMR,Movu ifollow iL 1200,,,
+rec9zkCeQl78lwWVj,recU0PnNCYHg2y4WG,recQD4Datsz0zsOO0,4c02211d-1500-4ae1-ad56-4f6694b96bbc,Forklift AGV,VisionNav VNP15(V)-07,recukyJanezH7UdIk,2026-08-24,true
 recA5z0LOKPckVhTk,reckNoTYnRPv59zCY,rec6p6yzB3sPFh14S,a17bd24c-e38f-4033-9fca-8368ebeab5d0,Mobile AMR,MiR1350,,,
 recABqzS8cYLvlQlb,recwvkXhXRaUfGxU9,recNbOUpi6JQGdjlR,af713319-5940-4d4c-85d4-fe3cc8390482,Mobile AMR,Omron MD-900,,,
+recAFLvNbgrWM77wf,rec1P8RN5atomWB42,recMYcWeOaLwRiwVR,cdeaf96d-fb66-442e-b77e-7fb19f299bef,Mobile AMR,AGILOX ODM 600,reczVbLhhjMOYTRDU,2026-08-24,true
 recAKRwvVTCmjQkcQ,rec6WZyWenl6llTed,recwVsMZLvxT5lkVK,fc24f937-d2e9-42a6-887a-d5864fa41345,Mobile AMR,Geek+ S20C V3.0,recAt0MsnmNI40XJ6,2026-08-24,true
 recAVdoGGnxU2gyR4,recZ0NPIBbGheRxTU,recrqExUG5Bn9YcB0,116c5a27-3374-440a-9edc-55abc7a8b4a7,Mobile AMR,Dash Line,recHszFON2kUfmtrV,2026-08-05,true
 recAXDR5MOrG2gvMK,recNkqCQK2dsdXRpa,reckcipVbYvSb3Hdm,77f7bc48-afc8-4738-9ddd-10b95e0633dc,Mobile AMR,Hikrobot Q1M-80A,rec8puMCz7RojpCwA,2026-08-24,true
@@ -81,6 +91,7 @@ recAyJIeYSgoSKSh2,recLJSteFQD2krIws,receDzyP6XtozyJ31,8af7fafe-2db0-495a-b87b-35
 recBRLRX7O1SE1Bev,rectEzJRVANSlguAs,recPpqKjuqToEPFon,de062744-0ae0-4e85-a8df-337babecb70e,Mobile AMR,Geek+ S100C V2.0,recAt0MsnmNI40XJ6,2026-08-24,true
 recBsUlw1p4LZ4iXa,recAHgITJRyP4yrkP,recudHiD0Hr6vFWt7,e1fd59ec-ced4-46c4-9825-400d22938a3f,Forklift AGV,Balyo LOWY CB (Linde CB),,,
 recByAF2z4AHfBxro,recMBdUzjeCfiGhOe,recjsellHp0jWGX0s,0e4d444e-cae2-4794-9a00-62bfcc084cc8,Forklift AGV,Hikrobot QF3-600O-P1,rec8puMCz7RojpCwA,2026-08-24,true
+recC1dj8vUfslzwKn,rec5u6174pmXpq2Dz,receiP1oeGiIYK7DC,f04033ab-a7e3-4bf6-ac11-0790df0a1dca,Mobile AMR,SAFELOG L2 core,recFnzzgpAvw62jDy,2026-08-24,true
 recCJq3CX4PJ8Wgtc,rec7ECDTRnWOMUlw5,recHd7b0EYq4WALPy,6da9225a-3952-4036-9667-6f5fb3fa1e92,Mobile AMR,Stäubli Sterimove,rec8FExjRRo6svtHS,2026-08-24,true
 recCMEGkzXynOqLIH,rec1oziIyl9sJIH3c,recscBzwEZ4jwJywP,b247e29c-0cf6-4f40-adb2-77bb1c8b4244,Tugger AGV,Kivnon K11 Two-Way,,,
 recCNpYnJ0zOl8BX3,rec8ZXhz2is2khKng,recMbLLjK4yANcqqV,33eca325-4260-41eb-9f3c-d0e6173aef1a,Forklift AGV,MaxMover CB D2000,,,
@@ -110,6 +121,7 @@ recFs8W8bsA0V7qx9,recGIgIKNbDGYAZ3y,recSTkyTmQMzfTIK5,41a709fb-4414-4617-abc5-6c
 recGKO4tOPFdA6zrI,rec08AK7OubFmSFhl,recybwJ0X2lTzRuqE,9fb4f599-6cad-4a78-a2d4-a1da49b378a7,Forklift AGV,Hikrobot F4-1500,rec8puMCz7RojpCwA,2026-08-24,true
 recGM5MRsdA35zkKS,recspVbg6ZC9PB70V,recAlc4xa4qrup1x2,246a8a65-17e1-449c-91fc-aac801cca41b,Forklift AGV,E80 Clamp/Reel LGV (Unicorn/Elephant),,,
 recGRxYR08ibxQpLV,recBhTgJkExhuf3HD,recYLyc4kI2mGeWVQ,ed13014d-a1b4-4f33-9b20-3d9b23b7ba1a,Forklift AGV,Jungheinrich EKX 514a,recoAvZXd1iBbz0KJ,2026-08-06,true
+recGY3yK4wJGXhF4k,recc0fiHhNNdso5Kk,recJt5exXMMjzeM3m,8369c52e-6fc2-4160-bc73-347754d03560,Forklift AGV,VisionNav VNST20(VL)-66,recukyJanezH7UdIk,2026-08-24,true
 recGakXqVdzWjtMiT,rectE7IM4TDfe82PW,recmEJUGxmfw3Ekoo,61340d00-57a7-48c9-a47a-fd77f013eaf5,Tugger AGV,Vecna ATG (Autonomous Tugger),recpZFvdNU0ZQpyOr,2026-08-05,true
 recGpIjmVzxVku5cS,recoLb79ZuN3ejqf2,recFnQ4RbedtXGUyl,50013460-63eb-47db-832a-5b34699ce457,Mobile AMR,Geek+ RoboShuttle RS11-DA,,,
 recHJ4MvoOUGxpoPZ,recPESsCPVygETCRa,recf7TPCKdonpdOVB,f12e66da-71be-4aac-8103-86b9f4eda317,Mobile AMR,DS OSCAR Omni,recjVkDGpP36pQokQ,2026-08-06,true
@@ -133,14 +145,17 @@ recLQir0LqGEbgeh5,recLmyVn99UPIRAnH,rec6l7hHHd9QYp1fr,0c74d39c-68a8-458e-a411-06
 recLX9bsbFucj8MnT,recSgUZaiuX0BrZ8C,reciWbkfHHUstsHnA,5871400f-fcee-4259-a65a-56b14e49e439,Industrial Refrigeration,GEA BluAstrum NH3 Chiller Plant,,,
 recLZWh2R638zFsaH,recD8yf73TeWgQTng,recfOtKPu2HfJtC59,c5077811-585a-490b-8700-8d3cf0991e8d,Tugger AGV,Hikrobot CT5-1500,rec8puMCz7RojpCwA,2026-08-24,true
 recLunhsGTuIFvO3j,recuKpkKHeanMiCTJ,recHFGjs1oVUhtneB,c0f66788-a53a-4a45-b104-ff67de2af0e2,Mobile AMR,MiR1000,,,
+recLvElOCMqYQMBLU,rece0JrZKtox9w3Us,recUaVUeCT7QK0F0D,b7d67f99-b31e-4a87-b72a-fc7436495142,Mobile AMR,SAFELOG M4 lift,recFnzzgpAvw62jDy,2026-08-24,true
 recMBQ9Vxk8uqzN5w,recWFZZL6OFKj5mJ7,recBnlfL3B8iN4Pk0,3ef91dc5-e0d6-42a9-abd6-08d4dd83b33c,Forklift AGV,Balyo VEENY (Linde VNA),,,
 recMMKI0mgd4fFPit,recEB6biclnu9P7ME,recslF2KcuV4YWbhi,36957308-8b97-43fd-a91c-9eaf5f84191e,Mobile AMR,P200-CE,recrURiXPGQx791dP,2026-08-05,true
+recMTMNN7fP58BROn,recchjecw4tizON7Q,rec5m9xrXhZ1gTJFg,b0b723ea-c27f-4670-a960-79c17df33fef,Forklift AGV,VisionNav VNR16(V)-07 (Manual Handheld),recukyJanezH7UdIk,2026-08-24,true
 recMWhG6rcqDdioc9,recWheQIaInrCVRNS,recEQ0wpgb5AG6lto,856c3b87-f931-4480-b74b-42d9d2fe770a,Mobile AMR,Hikrobot HL8-2000B,rec8puMCz7RojpCwA,2026-08-24,true
 recMiZJ9ZUkT2pUkk,receDsgE8RvQ2H5Kq,recJnDsKXqXUyk66V,ca2cbdff-5372-4bf6-8dda-90b81541eec4,Mobile AMR,KNAPP Open Shuttle 50,rec6rUDyeGz1KEUZR,2026-08-24,true
 recMnPDBfdwk8C3I6,recyEOqQ33PbrhR0x,recXfVOyDLGBma0nV,86d4157f-6763-4042-b965-7757b73ef091,Forklift AGV,"Linde K-MATIC (low lift, 7.2m mast)",rec8aaW4EIEDGlEe0,2026-08-24,true
 recMuOVmWWCtUhZoW,recJ1Gu4pdjgSkzhd,recJi7YiOMXJO835n,b2188f41-0f0d-4986-87b8-3cb5d9c60bf4,Forklift AGV,Alstef GL,,,
 recN1gJcy0p6usjy0,recaoXOGKMXryUpWG,recAtuP0bnL11axXw,54553440-ee52-4c04-b79e-60c94b544fa7,Tugger AGV,Hikrobot F2-2000,rec8puMCz7RojpCwA,2026-08-24,true
 recN6I5FdPY0Iy7HM,recvp7LfRg1ZSPSy2,recJtrvNXm0f5feag,5a71e1c5-734c-4b3a-9b23-4efb66aef0a8,Mobile AMR,STILL ACH 15 iGo,,,
+recN6hG4moFOwOLJT,recCwfDFz5CHdBb9k,recva2hurMJRXAo1q,0347f4a6-484d-47fe-a4ae-b23aeeee0a17,Mobile AMR,SAFELOG X1 spin,recFnzzgpAvw62jDy,2026-08-24,true
 recN8C963O2myhOwc,recJBy4TH74DnLx8C,rec3e9PxMuGAcPOuP,2a666d11-dea3-4fde-9151-91fec068ebe9,Mobile AMR,Hikrobot CU1-300,rec8puMCz7RojpCwA,2026-08-24,true
 recNOmm3VyDfhttw6,recuVF92NHcsfngCR,rec1LYS1VJxlfxmrB,c6c0cd6d-aa2f-45e1-8391-e85f0c68617c,Forklift AGV,Linde L-MATIC HD k,,,
 recNZIkhEmKOf1ipN,rec5twJBEVj8wcCJo,rec9f9eIJso42yw80,d1a5ef13-5c26-4241-8dae-08cdec45767e,Mobile AMR,Jungheinrich arculee S,,,
@@ -148,6 +163,7 @@ recNnn8CPU8F4fSd8,recGy9fHoqkPyXUrh,rect7khzOmK3tDiNZ,5e68bcbf-7cb4-4027-be3d-c5
 recNxNMNqv3DOPlhe,recsS2uEEiW58WGjr,rectDGFHnuugivHVD,1f07ef72-ed49-4279-b156-12f7567a8920,Tugger AGV,Balyo TUGGY (Linde Tractor),,,
 recNzAZTEmUXZuWmR,rectzuZ280iWnP0in,recYTfAuQjpyFH4Bo,102d70d5-2360-4860-91bd-22ba12b7fb79,Mobile AMR,L1000-CE,recrURiXPGQx791dP,2026-08-05,true
 recNzT1m5qyTWyvzW,recNSMXHzLCKZj7hA,recwATOVffa9uIUed,241692af-f59f-4da1-ba62-c4a564d25308,Industrial Refrigeration,Güntner GASC-AHE Cold Store Unit,,,
+recO3upvAGq7hVcER,recnd9SslR4OIfCMb,recqUYFAtPt60cPwn,16e99267-d6bb-40d5-bf90-038a44508897,Tugger AGV,SAFELOG S3 tow,recFnzzgpAvw62jDy,2026-08-24,true
 recO4sejQmTPHC78x,recbxDVkzAgYbqGrk,rec6HeqGUNqbwcVgW,dcab1c5d-4f40-4832-9ee9-8a5c14898237,Mobile AMR,Hikrobot CHF-50,rec8puMCz7RojpCwA,2026-08-24,true
 recOI0Ic08XdpQSB5,recLVLj2jw1DxTfIb,reclw8cUNcXvRhivV,ee81109f-4bad-4af5-89ee-eff05996d0aa,Forklift AGV,Linde R-MATIC k (R-MATIC 17 k),,,
 recOL5G6cCGsheeUf,recJxnU8x1A7E83kc,recRwpZqdx6NzXpHI,d3c76678-ccdc-48d7-ac3a-a7d755b60195,Forklift AGV,"Linde K-MATIC (medium lift, 11.55m mast)",rec8aaW4EIEDGlEe0,2026-08-24,true
@@ -157,6 +173,7 @@ recOZRi9E2pusKzLW,reccAqjbbW4nMaDGD,rec2umRTNef76xAOh,a2fe049a-f83e-4aa6-b5f7-79
 recOaX47RST2c545R,rec1h7P3Wlb8Kr7Il,recGkc7ZPQjkNkDeO,8cf8f357-1e36-4854-b59e-7bcb97e19eee,Forklift AGV,Linde R-MATIC,,,
 recOknsEPQIu4WsPL,recLwycfgjf2BhyjY,reczR3ReXIRS4xjzK,bcbe2761-92b3-4b7e-be6e-977eebe8d29b,Mobile AMR,DS SALLY Rollgang,recjVkDGpP36pQokQ,2026-08-06,true
 recOmxxd9CN3nbEBS,reclswT2lHGbfp2Us,recnH3ITBGXrP0mc1,865ea304-7d67-4cf5-b2d5-167d6c9840d5,Forklift AGV,E80 Micro LGV,,,
+recOoQ8UqFIvNC7Ua,rec8xzzVNbxYcRR36,recfeVWxj44W8mYfw,e181584d-822e-40a5-8384-3f7c8f47a005,Tugger AGV,SAFELOG M4 tow,recFnzzgpAvw62jDy,2026-08-24,true
 recP6U5SgtqSwCSbz,recli9k2ZbtdKJkTF,recJh6VpBf7pF9pAd,fac1bd2f-511c-4bbc-acad-3c2a430099f3,Mobile AMR,MiR100,,,
 recP9p8qgd0xM4MWZ,recxYo7hYac9icyRX,recEcy5XFVnbJ0cg6,7fd244dc-2d03-4b3a-a9ce-bd2c33fcaeb2,Tugger AGV,Kivnon K32 Tractor,,,
 recPJSS4WwBcudXK8,rec79PIXrFPw8CjG3,recXzSJ5hlaGq566a,9b47d2f0-6788-41bd-83f2-dff9a2211b19,Tugger AGV,E80 Tugger Train LGV,,,
@@ -174,10 +191,12 @@ recR8RwHC1wCEgGnV,recOVxBpo2Gy5mlIy,recoPBGdnXYOXacbP,66fc7bc9-a039-468f-82f6-31
 recS8A4IcKftKBUNc,rec5Rjl1uyISvGJF2,recTcRPF4cV0c7vWi,4830f075-4f79-4aa3-bda7-432ed0c50e5b,Forklift AGV,Hikrobot F1-300T-A,,,
 recSKwIYGWLbU3j2Q,recGjBIZGv5tIdpnz,recT8iyRBRd8FM7It,3f678cb7-9bf7-4852-a944-8445397488b2,Mobile AMR,MiR200,,,
 recSbUdWDBAWlvdi5,rec6xsoibJcaQC3TN,recEWCnL1inidt25k,5625175e-085d-43da-b12f-95aef4c01b5c,Mobile AMR,Geek+ S20C V2.0,recAt0MsnmNI40XJ6,2026-08-24,true
+recSteSi98fhGqoE6,recwN8EZBoLK2VbW6,recOLaRAnhCxxgYxs,e38cdc35-02e7-4985-b7f2-1496f9dd8f83,Forklift AGV,VisionNav VNE20(VL)-07,recukyJanezH7UdIk,2026-08-24,true
 recSxyWJmHB7DsbVd,rec1Pcqnvh9jRY3bC,recgWjVqNEpTtHUYL,f2688d15-4c93-4cbc-95c2-c04de8c61721,Mobile AMR,Hikrobot STU MR-TP6-30SCW,rec8puMCz7RojpCwA,2026-08-24,true
 recTSF95HMjgbbJEL,recQTs4rZSymlCEfn,reczJMqavdWe69Foc,76d9af06-a60a-4d5d-a5d2-7795ea98b2e1,Mobile AMR,Hikrobot Q2-400D,rec8puMCz7RojpCwA,2026-08-24,true
 recTT9Nz68B3fLITl,recCJzFtza8rRt6Wy,recPCc8hyuhhfqRv9,c7384315-75de-41ee-989c-a3e1fc281f17,Mobile AMR,AGILOX NFK,,,
 recTTxNZmxi6DHnwu,recdkYsZ5fmyl37Ry,recaVRWaNUTMx5b6c,6d0ed70b-877c-4f88-98b6-2c59042e1df2,Forklift AGV,ek robotics COMPACT MOVE CB 10,,,
+recTdPkSesrAPwEFO,recWlt6C0ElSg7Xnw,recYuKgCmij9loRoN,57457288-093e-4010-875c-6829658dbc74,Mobile AMR,SAFELOG X1 core,recFnzzgpAvw62jDy,2026-08-24,true
 recTsTXec3P9jHKS0,recCa0Dkdrto4EjJ8,rec2IUfk95Z2WJfCu,86e1424c-9cf7-402b-81eb-e7241d3b180a,Forklift AGV,ek robotics COMPACT MOVE CB 25,,,
 recTtuxBh1j59fR8b,recK7S3FZYyGiuKJd,rechDUvrirLzXLq84,6c3cb110-c5b8-4735-a13c-0fcf1566f015,Mobile AMR,DS ROLLGANG Mono,recjVkDGpP36pQokQ,2026-08-06,true
 recUFI9bK8LfVd8iy,reckpufQ79nABmALF,recDFPUOb6yt5jCE6,4352c1de-e7f0-4f9c-ae2e-359f8c8aa4b9,Forklift AGV,OTTO Lifter,,,
@@ -189,8 +208,10 @@ recV11VZDaJgvUNkk,recUHPFnA7Plz3tct,recFArbJyHX26ccaT,c953d16c-5a77-4d64-a717-28
 recV3N2Qv8vwb8drc,recdqLeMwDvubEkXw,recO0o8nTnxhyrdF3,e49eb240-7bed-4f61-93cf-481257af3a27,Industrial Refrigeration,BITZER COSS Transcritical CO2 System,,,
 recV8UYophsPw7GHc,recmsRoRu8lqb4Xoq,recJFSPBhYlG3A0AG,28ef1db7-d1ce-4246-aafe-4f324f1a3b3e,Forklift AGV,VisionNav VNSL14,,,
 recVDoo9fzpCL3B2h,recAufWM8cqr7ikiE,rec0Ymc9tS12ix0Nd,c0476389-133f-41c1-bc34-ef2db8b14a1b,Forklift AGV,Linde L-MATIC AC 1.2t,rec8aaW4EIEDGlEe0,2026-08-24,true
+recVFCMrZlNDB5T9q,rectmyEK2yFHcKCnO,recKfqpe1kBxjBiLv,1f3b00a2-aac9-4468-ac7c-e6f26f7a0f78,Forklift AGV,VisionNav VNSL14(V)-07,recukyJanezH7UdIk,2026-08-24,true
 recVVvZ1svGenczKu,recnIlKiGE4k7ifQ9,recM9jb2bDGCIKT7n,9afdd727-ff79-4108-89e3-70031d7500d0,Forklift AGV,STILL FM-X iGo,,,
 recWGstUi6TddD3TN,recpgLHi9af5LGpX0,reckOgzwebrLFqv36,bacaee49-0dd7-40cc-b250-02b154efc337,Mobile AMR,DS AMY Deck,recjVkDGpP36pQokQ,2026-08-06,true
+recWS0nT1caBcDLAl,recagxcLLmKTvxwj0,recIJ66cnHBHnJFjv,5d2e2f04-a005-4454-bfa2-cce165725c3a,Mobile AMR,SAFELOG M4 core,recFnzzgpAvw62jDy,2026-08-24,true
 recWjch4z6R5HAUKL,recHZSDzTwZS3tmV6,recMIsLkeDqtHXZWX,76f91354-d5ee-4e59-8d55-7644bd833d75,Forklift AGV,Toyota RAE160 Autopilot,,,
 recWuUoohL6lfDfWK,recd8Dwh8wklg4Kz7,rec0ibhCeymhVEX8d,12682155-7cc6-4473-9138-b7f2e16848bc,Mobile AMR,L300-smart,recrURiXPGQx791dP,2026-08-05,true
 recX2xGIfinkPlxey,recUTsLEbrRSlh5fc,rec6RZNgNykFCpoJL,5c4ffd59-47a8-4a69-bd1d-d6bde0d59fde,Tugger AGV,Kivnon K10P One-Way,,,
@@ -243,6 +264,7 @@ reccixiOldlwHpPxj,recftPBRHQ0Esdj6u,recsXCwHxwzd04hUU,0cc04456-7d6d-4e44-9d8a-4b
 reccnfAvA3yIKy0KF,recFvuLLRN3xBnceg,recSNut1rFCUS4AQj,9fccefaf-d8b2-4da4-a38a-a64198a5435d,Mobile AMR,ER-FLEX 250,recekfXPZRcWV7So0,2026-08-24,true
 reccteW3JMdujS8KR,recEJTuW34UTVQeKv,recRyTidRAmDaCODd,db8020a1-67a8-4ec9-8486-ec3fbc82f0c8,Tugger AGV,Jungheinrich EZS 350a,,,
 recczv6eiqoQYYFvw,rec20JBXYHgSroU20,recWhlTEyoo2tbs6S,b27d0a4b-3458-4d36-8a70-7bc23d4b6839,Mobile AMR,MAXOLUTION LA005,,,
+recd6X7nxyojPzX98,recgtFBQTFPAaU1WU,recrWooqEEfCETqPk,c441d97a-fc3a-4867-8550-c2e721a27ded,Forklift AGV,LOWY HD,recpyJUHIF3IrIj3I,2026-08-24,true
 recdDBhefMEDpyVa1,rectOVSxrduSG5uRh,recxjUyEsy2XJXILJ,bafc4a66-4bb9-489a-b953-d41b537531ee,Forklift AGV,FM-X 17 iGo,recOxIAGR6tkmh8Sc,2026-08-24,true
 recdF9PIdFzrKQHQv,reciib2foONqcJeg7,recV7jCiGf0qnVPXi,993c7d9e-311c-43cd-9c15-e563eebe211a,Mobile AMR,Hikrobot Q7-1500D,,,
 recdMR2U7lQmvhHlC,rec7s860sCYNA28wC,recZV9WIIan1jljsk,f9a4bb1a-9364-4ba9-95f0-c4e705e09546,Mobile AMR,C101,recrURiXPGQx791dP,2026-08-05,true
@@ -277,9 +299,12 @@ rechsTHGttzNhCp6G,rec5REd6lP5mW3wMw,recdB44mq761enREV,bc312694-029b-4c88-8df4-22
 rechwQ53dBKQFz1iE,recvVQkGVHeNd4hiK,recOalDyslLTMjZ8a,59813d5e-2648-47e3-afda-5b81d0cddff0,Mobile AMR,DS SALLY Kurier,recjVkDGpP36pQokQ,2026-08-06,true
 reci0hBts5UlsN4of,recnGprTUeDfOX7bJ,recdpkK3cfvLvDzQl,562978da-8eec-4f30-a8d7-58b9a1953c58,Mobile AMR,Stäubli PF3 OMNI,rec8FExjRRo6svtHS,2026-08-24,true
 reciADJpeY7qcTrFI,reczowoJVjfoO0LWf,recq7Z5SDdy8uWe01,bcfb49d2-56a3-4ed4-bc97-18f87262b220,Forklift AGV,VisionNav VNE20,,,
+reciJCBNW2ddp14fv,rec7H3u9mXsQby6xZ,recqGAuaE8RuguO8u,358325fa-0912-493c-b653-f3bfe3d380ed,Forklift AGV,VisionNav VNR16(VL)-01,recukyJanezH7UdIk,2026-08-24,true
 reciNH2C7LWCgCSNZ,rec405MTZXtbECeFz,rec3zAZBQvVDJWoiH,f3548fb5-90a8-44a9-851b-d298df400faa,Mobile AMR,Hikrobot Q3-600D,rec8puMCz7RojpCwA,2026-08-24,true
 reciQb55Spd8aogfa,recBJQcWSLbNindoy,recmdWNzGY4fdbzGK,c8c22aaf-7165-47b6-90a7-8acaad594fad,Forklift AGV,VisionNav VNT20(V)-01,recukyJanezH7UdIk,2026-08-24,true
 reciRL7RnYzbsJ06d,recXcbPEt2Ia4JDQi,reccBLY9iW4QQRt2K,450e27c9-c48b-4cb6-b724-693c24ef307f,Tugger AGV,Kivnon K10HP One-Way,,,
+reciYyLXD02X0l4NR,recduQAI6UVYuuqUt,recF9bjoK4w02rXCc,ae99537f-bc0b-4d02-b10a-9a0e4b0c174d,Mobile AMR,AGILOX ONE (Doppelscherenhub),reczVbLhhjMOYTRDU,2026-08-24,true
+recibb8cmdOhl141O,recN5Zm2r0b1WfV7i,recmGE0yrHx1pUM3H,71e022a6-86cf-4212-8fe9-59832939bc01,Mobile AMR,AGILOX ODM 800,reczVbLhhjMOYTRDU,2026-08-24,true
 recinrGfFwdRkPoJN,recDpeU4xbY6wAtP2,recme9OpLiKnNVU5k,1a4f7987-7aeb-435a-9424-255b54ac22e2,Mobile AMR,Hikrobot HC7-1000,rec8puMCz7RojpCwA,2026-08-24,true
 recj1FHon8zoeAynP,rec0d0GfEvd2g7VMv,recbQVJSASiyqrjSj,cadb6cdc-d8ad-443e-b34a-dee01256164c,Forklift AGV,Hikrobot F3P-1500,rec8puMCz7RojpCwA,2026-08-24,true
 recj8dKhGz8GBSxIv,rec7EDblCGmYr1vWe,recOS6DjZAcYOusV5,b21828c0-f273-4cec-bcd7-44e78a006cf2,Mobile AMR,Hikrobot TP5-50DGH(T),rec8puMCz7RojpCwA,2026-08-24,true
@@ -295,6 +320,7 @@ reckYuAcsEEqPFZJq,recGnQNmEUxhCALzP,rec66qWw2vewVocy4,54c2fe6a-d40e-4ba1-9f9d-78
 reckiJPGK7CSqKpYc,recvtbEZ8DnJdUBEa,recb5SCrQR8Q6vM82,e3750fd4-e88e-4142-9cd0-9285dc01ec15,Mobile AMR,Geek+ X1200Z,recAt0MsnmNI40XJ6,2026-08-24,true
 recklFhR8Q0DQ2sZz,reczfpgOxBGmc9pYC,recPnPju29c5Lje4V,2bcf8f77-f567-4b0c-93e9-f04b06a6c720,Mobile AMR,OTTO 1500,,,
 recl8TnpPVwx8oXkA,recCLKUp83TEyrWAO,recTU15WIPucbCLoc,ef3fd11a-76a7-465d-bd71-f44663753b00,Mobile AMR,Hikrobot Q7-1000D,,,
+reclINLp5Q3rbZmNc,recVZdIRD5GH16HK1,recO81AR8HfShfykF,980fe5fe-47ef-457e-b540-ccd5ce5c52a6,Mobile AMR,Linde C-MATIC 10,rec8aaW4EIEDGlEe0,2026-08-24,true
 reclQgPRP6BhU3Why,recJCnNpOEeczTAII,recSuKKyO2nfkRP1h,4f2e3ce3-3db4-46eb-8c0c-39d9a1a07bf9,Mobile AMR,Hikrobot CU4-200,rec8puMCz7RojpCwA,2026-08-24,true
 reclRnCEUyVFW484Y,recQHU8kCDd73VvBb,recdyBvH9MMT2kie2,36edee03-c022-450a-aea9-5489c0e90008,Forklift AGV,Hikrobot F5-1600,,,
 reclYeSsbmYSXJVAb,recn8tuExVmliXLco,recheXwmnnhNBvXrK,885b6d09-5fbf-4a20-bad4-be46c172cda4,Mobile AMR,B600,recrURiXPGQx791dP,2026-08-05,true
@@ -306,6 +332,7 @@ recmGG5bq5FA9QZuX,recrNpBPSQLnwXaYW,recl4e6dWdAuHvXJ9,1de7e133-6a19-42c3-9a5b-24
 recmVWjlnbMloX9xR,recYwvuRzqvtKIiEA,recsa41VyLfwCxQMM,bddd20f8-8c84-4e2f-8907-af76dea069ca,Forklift AGV,Balyo LOWY / LOWY HD (Linde Stacker),,,
 recmWrEoOVNCK0g0L,recKUtxbe4c53mcOo,recOKjuG0d3CM4QGb,d614b90f-a1ab-4303-8eeb-6f4b148e37ae,Forklift AGV,STILL EXV iGo,,,
 recmXgV1bKn8cKoez,recBwo0rknWbDRY4B,recfIa7IdtYYmc5ul,58a0d649-73be-4d6f-895c-648005dd3ab2,Mobile AMR,Hikrobot CHA-1100,rec8puMCz7RojpCwA,2026-08-24,true
+recmb2tH9D5oGWqAH,recvePM0xf2iSv2xI,recuMZRYUZA72alyd,b1fe72e9-55a5-47d1-a732-6828c3e9c791,Forklift AGV,Toyota Staxio SAE160 Autopilot (Triplex Hi-Lo),recxPqJCeWxlTqf4V,2026-08-24,true
 recmicdSL1E0TiTTL,recia7Fp4tnXMLQAu,recBBqUSZt8j1X0G7,1462aaa3-b9d6-413e-8bb4-9c6a0c51e294,Forklift AGV,VisionNav VNR16,,,
 recmvSWuJV3lheZc1,rec7GxF8zHnjhHcXv,recdhMtuQsR9AW0HA,10b79235-19a0-4a66-90a2-32ffb12459ad,Forklift AGV,Hikrobot QF3-1000O-P3,rec8puMCz7RojpCwA,2026-08-24,true
 recn2H4jPiMfQdIiF,recM9iwUdEuV3mhlb,recgdjZT2U6ymCFTW,3d8f7aaf-8d3d-4184-9afd-b21d48d3031b,Mobile AMR,Hikrobot CHS-50,rec8puMCz7RojpCwA,2026-08-24,true
@@ -331,6 +358,7 @@ recp05yoZHxjmmq2M,recExsHJrNynezNih,reckrPx3cNsjSqVeM,f5cbe689-ceed-465d-872b-1b
 recp1D01P7Ug4iYVw,recx7YLDnNHrPDGJG,recsA0NVGwoZGYSD9,3b42c54f-9131-4fa7-8e98-05f025aa947c,Forklift AGV,VisionNav VNP15A(V)-07,recukyJanezH7UdIk,2026-08-24,true
 recpC505GWj75rLFK,recJ2hkKdhWpNXGwE,recJ3iujQEbOuQDiS,8a6aa2c6-b49e-4a73-af4b-1a93c35a07bd,Mobile AMR,Movu ifollow iL 600,,,
 recpS3nydgZpHFe0o,recBg5aczoHpBxv6f,recU85zHdhcA5nF7C,c4eecaa4-6f44-432b-95c3-0bdcd83ccc49,Mobile AMR,MLR Mayesto,,,
+recpUTpLHDNF48awA,recha5eU7GRNfCbcS,recdiFQAFH8zJjII3,7ad28c1e-745a-4430-b00d-ef6a68b145ac,Forklift AGV,VisionNav VNP15(VL)-07,recukyJanezH7UdIk,2026-08-24,true
 recpc4rKaZOBIRNBE,recLhXPOf6rQ4C3In,rec0yfW6xdpqSDgYk,56ca3dd1-331d-4fe4-a7cb-bd501a1df23d,Forklift AGV,Lift EL1,recXkgajy26wV7Pzx,2026-08-05,true
 recpeNis3EC3zoKTz,recKDlvrE1idUeZYH,rec5VgErvHkq3gLya,49973613-40bd-447d-acee-bb79188f9156,Forklift AGV,Grenzebach FF1200S,,,
 recpiaX2ddqV1Y39K,recspw6cy7imCKPaw,rec9yDrKTVLXuOP2p,dcc1b8d1-6fc9-4a9c-9e79-d8305f07d66f,Forklift AGV,Vecna CPJ (Co-bot Pallet Jack),recpZFvdNU0ZQpyOr,2026-08-05,true
@@ -346,12 +374,14 @@ recrXfyPcY4b59zBp,recg4b1USYlqLhTP5,recjlAjvoti9xLUwN,a8918b03-0062-4cbf-b5d7-38
 recrdi9kXsRB8kSs1,rec3cCMqMyG9FtMXE,recjhG3pLc2zfWkT5,0c297d1f-05f5-4d6b-b77e-6dd327bcc9f3,Forklift AGV,E80 Trilateral LGV,,,
 recs2yoRwzUbT0FTL,recp92DEjyJmPMnXY,rechqbGVMMzUto1c4,cec3b027-9167-4f67-91b9-d8d0584868d8,Forklift AGV,Rocla Conveyor AWT,rectYrWRwWs22ow5U,2026-08-05,true
 recs96PhLFU5YEods,rec89TncQE9YSO8l0,recG1rYp5XAZkJpwB|rec5pSZVLhKClBMUk,a64e4bf7-bd31-47e2-afcb-d998d2a1b494,Mobile AMR,SOTO,recgCK3D2eGnr02MB,2026-08-05,true
+recsKtyIfyfeku1wO,recXlb7BAuKt8iKb4,recDtrvKcJgitVrV9,fab1b52f-1153-4475-9c65-674363aa3354,Forklift AGV,VisionNav VNP20(V)-07,recukyJanezH7UdIk,2026-08-24,true
 recsb5p7AYhWT4D01,rec8Az8ZcVEqE5OZ2,rec36RtbqHfBt5pZV,6af07095-0a72-4db4-8b6d-9608c714a3a6,Forklift AGV,Hikrobot QF3-1000D-P5,rec8puMCz7RojpCwA,2026-08-24,true
 recsiflKW2A7lbcn0,recXIzAVC7Q6dpOLg,recSKKwcURuzQ7Fs2,cbea1f5f-3a3b-413f-8eed-8e4ecf464a98,Forklift AGV,KIVNON K55B Pallet Mover,rec7yndnVdYy5eTUb,2026-08-24,true
 recssfAku7LKmmbUL,recGJFEuX9OnrpgKp,rec2pdtFaaPu5hbPe,5729ddf2-3181-471f-8a65-9383f3aee210,Forklift AGV,VisionNav VNL16(V)-01,recukyJanezH7UdIk,2026-08-24,true
 recsvkJ4SuHPF2vC4,reckYIICO5FIBQC2I,rec0aDuAd3Rjj0ASZ,30b3e73b-2c25-458a-80bb-5c2267fe5303,Mobile AMR,ek robotics FAST MOVE,,,
 recsxhr2GK1FahM7K,recpdmx88oV1qPTXe,recY9E9FYs1A9a1R1,5d8e370d-d8fb-46e7-9fc8-f75931281e9d,Forklift AGV,Toyota Reflex RAE250 Autopilot,,,
 rectILP9CgKw2wlOY,reccMHq5rHXxQiYsZ,recgD0ZK9EDjVYcU7,d6fe1687-17a7-4507-a3a1-bea30005269f,Forklift AGV,MLR Phoenix,,,
+rectOahmdnm34nZ9D,recKFcdkhgRESMc1A,rec3fRI751RwihpXw,a672a2c7-7d27-4de8-bbf3-3b0b251067a3,Mobile AMR,SAFELOG X1 lift 1200,recFnzzgpAvw62jDy,2026-08-24,true
 rectPC5hYTH4YaTCq,recJGwzzSttkvUppB,recp3wwBVefoBjwsb,233e332b-5f07-482d-8e42-9f1f1e18fdc7,Mobile AMR,Geek+ P1200R,,,
 rectbPilKOG7GMMMn,reciwPmaxlpwu1VbJ,recSg3JojuMr6FgZy,b92e0837-01a9-408d-b194-191a15631ff4,Mobile AMR,Omron LD-250,,,
 recthFT7H9feXiDqH,recrbZ9qVzdr7N8qd,recWnqUoTsi66apto,138c8820-525a-4e48-bd5f-188e62371651,Mobile AMR,DS SALLY,recjVkDGpP36pQokQ,2026-08-06,true
@@ -396,8 +426,10 @@ recym7bglQms1SxK2,recIZBCE93kGA0J1z,rec1m5FgRi1nkjilv,56986575-e163-44e7-8faf-8f
 recyxRaBX2TQruv30,recS090MQAs0jV7Kp,recpHbENKVJ2wEByQ,82dc60ea-1525-455b-b62c-c815f3340a71,Tugger AGV,MLR Caesar,,,
 recz07YvRVfD4RrLd,rec5UA045WkmBqlgB,recVFJSFy3mQNmkbv,2882cd24-89d5-483d-b7dd-1cd387cf7795,Tugger AGV,Linde P-MATIC,,,
 reczDq4v43DtAAqSh,recvQyGKfNtVIaCQt,recyMxl97RQuPImPf,b2ad3069-4e8f-4a58-b111-1095b7016d0e,Mobile AMR,Grenzebach OL1200S,,,
+reczQ0Nzu60IKd2UN,recMuWQBISGegPO5j,recq7VUWhhLkAdT3B,a2188ad0-3826-4a8b-99a1-2d4936957967,Forklift AGV,LOWY,recpyJUHIF3IrIj3I,2026-08-24,true
 reczfO5uYbRmD2iVk,recdXScBCcjqB2kyb,rec308mo84Q3VzCIx,9497adb6-c15b-416c-9fd7-d8525a9454a9,Mobile AMR,Geek+ RoboShuttle RS11-DX,recAt0MsnmNI40XJ6,2026-08-24,true
 reczj4p0WenDSQbOE,reckevLvtAaBRkdlB,recfwNCI8tzbSpPtU,afef22cb-cdab-45d1-8176-5e02d4b77994,Forklift AGV,Hikrobot F1-1000U-A,,,
 reczpGk72pwX6R2D6,rec3LttvHkIcTxuW3,rec5z8ExkdkfmlpWQ,2b08b172-bdc8-4000-81b5-29b5f33fc1b6,Forklift AGV,KIVNON K60-S1516 Stacker,rec7yndnVdYy5eTUb,2026-08-24,true
+reczqveJ0XbJF8DdF,recBCPtpkPvF1PfAj,rec6XuGAAMmwIjPkP,8ae2e6af-1252-418d-b0b8-5f2d2a2a8a80,Tugger AGV,VisionNav VNQ50(VL)-01,recukyJanezH7UdIk,2026-08-24,true
 recztKFCjIL71drbA,reczdK2KVEvH8eezv,rec16GpPl15rmvPyM,c25f82aa-bd21-47b3-bf97-23b69bf7a517,Forklift AGV,KIVNON K50-S2002 Pallet Mover,rec7yndnVdYy5eTUb,2026-08-24,true
 reczyoY7Y1tFHCmBI,recsSBS0pGwAeQvaC,recj8sN5ziyOwR7xi,c7ed3d82-0678-4059-9104-022ba2a69d84,Forklift AGV,Rocla ART (Automated Reach Truck),rectYrWRwWs22ow5U,2026-08-05,true
