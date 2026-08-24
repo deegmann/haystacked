@@ -5,6 +5,26 @@
 **Companion file:** `docs/datasheet_db_status_final.json` (per-product db_status + the machine-readable conflict list).  
 **Nothing was written to Airtable, `data/haystacked.db` was not modified, and no file in `Datasheets/AGV_AMR/` was moved.**
 
+> **UPDATE 2026-08-24 — 10 of the 13 UNRESOLVED items below are now resolved.** Verifying the
+> live import surfaced that several "UNRESOLVED" verdicts were blocked only by the original
+> text-only PDF extraction pass missing a graphic-rendered stat block or image-only table — not
+> by the underlying evidence actually being ambiguous. Re-reading each cited source directly
+> (multimodal page images) resolved: Balyo VEENY `max_speed`, Balyo LOWY CB `min_aisle_width`,
+> Hikrobot F3-1500 `min_aisle_width`+`max_speed`, Linde L-MATIC `lifting_height`, Toyota Reflex
+> RAE250 `vehicle_length`+`load_detection`, Toyota SAI125CB `load_type`, ek robotics COMPACT
+> MOVE CB 25 `lifting_height`, and VisionNav VNE40 `max_payload` (the last 3 resolved as "keep
+> DB", confirmed rather than changed). Applied live via
+> `scripts/unresolved_conflict_fixes_20260824.py`, audit log
+> `docs/unresolved_conflict_fixes_20260824_audit.jsonl`, commit `ad637b2`. The individual
+> entries below are left as originally written (historical record of the 2026-08-21 triage
+> state) — see the audit log for the actual applied resolution and exact citation.
+>
+> **3 items remain genuinely unresolved:** Linde L-MATIC `max_payload` (the source document's
+> own footnote supports a third candidate, 2000kg, that neither the original DB value 1600 nor
+> the extracted 1200 proposed — needs a Tech Lead decision, not a data re-read) and Linde
+> L-MATIC AC k / HD k `lifting_height` (blocked on the pre-existing open AP0 policy question:
+> Hub vs Einlagerungshöhe convention — an architecture ruling, not a data question).
+
 ## How `db_status` was re-derived
 
 The pre-merge `db_status_sonnet` / `db_status_opus` fields were ignored as stale. For every merged product, each field was compared against the live DB value:
