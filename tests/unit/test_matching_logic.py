@@ -432,6 +432,145 @@ def test_U_M_36_aisle_width_m_auto_healed_to_mm():
     )
 
 
+# ── AP0 Tier 2 Batch 1 (2026-08-21): plausibility floor lowering ──────────────
+# Floors derived from REAL values observed in data/haystacked.db (not synthetic
+# fixtures), per docs/ap0_tier2_batch1_plan_20260821.md DoD. mm→m auto-conversion
+# is threshold=30/factor=1000, independent of the floor (see plausibility.json).
+
+def test_U_M_58_lifting_height_real_db_min_now_accepted():
+    """required_lifting_height floor lowered 500 -> 40 (Spec/haystacked_AP0_field_spec_v0_10.xlsx,
+    AGV_Forklift sheet). 40 is the real observed minimum in data/haystacked.db
+    (STILL AXH 10 iGo). Previously this genuine value would have been nulled."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_lifting_height": 40})
+    assert result["required_lifting_height"] == pytest.approx(40.0), (
+        "A real observed lift height of 40 mm (STILL AXH 10 iGo) must be accepted, not nulled"
+    )
+    assert not warnings
+
+
+def test_U_M_59_lifting_height_near_zero_artifact_still_rejected():
+    """A raw value below the new floor's conversion cutoff (40/1000 = 0.04) must
+    still be nulled — the floor lowering does not disable implausibility filtering
+    for genuine near-zero extraction artifacts."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_lifting_height": 0.01})
+    assert result["required_lifting_height"] is None, (
+        "0.01 (implausible near-zero artifact, converts to 10 mm < new floor of 40) must be rejected"
+    )
+    assert warnings
+
+    result2, _ = validate_domain_criteria({"required_lifting_height": 35})
+    assert result2["required_lifting_height"] is None, (
+        "35 mm (direct literal, below new floor of 40, no unit conversion applies since >= threshold 30) "
+        "must still be rejected"
+    )
+
+
+def test_U_M_60_lift_height_real_db_min_now_accepted():
+    """required_lift_height floor lowered 100 -> 60 (AGV_AMR sheet). 60 is the
+    real observed minimum in data/haystacked.db (Grenzebach L1200S / L1000-CE /
+    Grenzebach OL1200S)."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_lift_height": 60})
+    assert result["required_lift_height"] == pytest.approx(60.0), (
+        "A real observed lift height of 60 mm (Grenzebach L1200S) must be accepted, not nulled"
+    )
+    assert not warnings
+
+
+def test_U_M_61_lift_height_near_zero_artifact_still_rejected():
+    """Same guard as lifting_height: a value below the new floor's conversion
+    cutoff (60/1000 = 0.06) must still be nulled."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_lift_height": 0.01})
+    assert result["required_lift_height"] is None, (
+        "0.01 (implausible near-zero artifact, converts to 10 mm < new floor of 60) must be rejected"
+    )
+    assert warnings
+
+    result2, _ = validate_domain_criteria({"required_lift_height": 45})
+    assert result2["required_lift_height"] is None, (
+        "45 mm (direct literal, below new floor of 60) must still be rejected"
+    )
+
+
+def test_U_M_62_min_turning_radius_genuine_zero_now_accepted():
+    """required_min_turning_radius floor lowered 100 -> 0 (AGV_AMR sheet, own hint:
+    '0 if omnidirectional'). 18 of 21 real data/haystacked.db rows for this field
+    are exactly 0 (e.g. AGILOX ONE). Previously a genuine omnidirectional 0 tender
+    requirement would have been nulled by the old floor of 100."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_min_turning_radius": 0})
+    assert result["required_min_turning_radius"] == 0, (
+        "A genuine omnidirectional turning radius of 0 must be accepted, not nulled"
+    )
+    # 0 happens to satisfy the mm->m auto-conversion gate too (0 * 1000 == 0), so a
+    # cosmetic "automatically converted" info message fires alongside the accepted
+    # value — harmless (0 -> 0), but real, so assert its presence rather than absence.
+    assert warnings and "konvertiert" in warnings[0]
+
+
+def test_U_M_63_min_turning_radius_real_nonzero_db_value_unaffected():
+    """A real non-zero observed value (P200-CE, 562 mm) must pass through
+    unaffected by the floor change."""
+    from app import validate_domain_criteria
+    result, _ = validate_domain_criteria({"required_min_turning_radius": 562})
+    assert result["required_min_turning_radius"] == pytest.approx(562.0)
+
+
+def test_U_M_64_min_turning_radius_negative_still_rejected():
+    """A negative turning radius is physically impossible and must still be
+    rejected — floor=0 is a lower bound, not an open range. Note (documented
+    residual risk, see docs/ap0_tier2_batch1_plan_20260821.md): with floor=0 a
+    simple [min,max] range check can no longer distinguish a genuine 0 from an
+    implausible small positive artifact (e.g. 1-99 mm) — that trade-off is the
+    explicit, evidence-based cost of accepting the real 0 case and is accepted
+    per plan direction, not a bug."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_min_turning_radius": -5})
+    assert result["required_min_turning_radius"] is None, (
+        "A negative turning radius must still be rejected"
+    )
+    assert warnings
+
+
+def test_U_M_65_turning_radius_genuine_zero_now_accepted():
+    """required_turning_radius (Tugger scope) floor lowered 100 -> 0. Unlike
+    min_turning_radius, this field's own AP0 hint does not document a zero case
+    (SA-ruling correction, see plan) — floor=0 here rests on independent
+    evidence: data/haystacked.db has a genuine required_turning_radius=0 for a
+    real Tugger AGV (Addverb 'Dash Tug'), showing omnidirectional/mecanum-drive
+    tuggers with a true zero turning radius exist in the market even though the
+    field's hint text does not spell this out."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_turning_radius": 0})
+    assert result["required_turning_radius"] == 0, (
+        "A genuine zero turning radius (Addverb Dash Tug precedent) must be accepted, not nulled"
+    )
+    # Same cosmetic auto-conversion side-effect as min_turning_radius (0 * 1000 == 0).
+    assert warnings and "konvertiert" in warnings[0]
+
+
+def test_U_M_66_turning_radius_real_nonzero_db_value_unaffected():
+    """A real non-zero observed value (Veloce, 895 mm) must pass through
+    unaffected by the floor change."""
+    from app import validate_domain_criteria
+    result, _ = validate_domain_criteria({"required_turning_radius": 895})
+    assert result["required_turning_radius"] == pytest.approx(895.0)
+
+
+def test_U_M_67_turning_radius_negative_still_rejected():
+    """A negative turning radius is physically impossible and must still be
+    rejected, same reasoning as test_U_M_64."""
+    from app import validate_domain_criteria
+    result, warnings = validate_domain_criteria({"required_turning_radius": -5})
+    assert result["required_turning_radius"] is None, (
+        "A negative turning radius must still be rejected"
+    )
+    assert warnings
+
+
 def test_U_M_37_integration_capability_ko_subset_mismatch_disqualifies():
     """Step 6: integration_capability is now COND_KO / KO_SUBSET.
 
