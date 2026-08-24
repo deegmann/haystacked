@@ -1,0 +1,235 @@
+{
+  "company": "SAFELOG GmbH",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "11 source files (+1 byte-identical duplicate of XS1-IntelliCart, moved together), all a uniform 4pp datasheet template. This is a strong variant-completion case: the DB has 6 generic product rows (L2, M4, S3, X1, XS1, GT1 spin) but the source documents 11 named sub-variants (L2-core/lift, M4-core/lift/tow, S3-core/tow, X1-core/lift-1200/spin, XS1-IntelliCart, GT1-spin). Mapping used: the '-core' (or, for XS1/GT1, the only available) variant of each family enriches the existing generic DB row; every other named sub-variant becomes a NEW product. EXCEPTION/FLAG: the DB's existing 'SAFELOG AGV M4' row is already classified product_type=Tugger AGV (not Mobile AMR like its siblings) -- since M4-tow (not M4-core) is the sub-variant that actually matches a Tugger's towing function, this run enriches 'SAFELOG AGV M4' with the M4-TOW datasheet instead of M4-core, and creates M4-core and M4-lift as two NEW Mobile AMR products instead. By the same logic, a NEW 'SAFELOG AGV S3 tow' was independently classified Tugger AGV here (its own fresh judgment call, since S3 tow has no existing DB row to inherit from) even though the existing 'SAFELOG AGV S3' row (enriched from S3-core here) is Mobile AMR -- flagging this split for Tech Lead review. Turning-radius footnote figures in the technical-data table extracted ambiguously/unreliably across several files (a superscript-footnote-marker digit appears to merge with the actual value in the linearized text) -- turning_radius/min_turning_radius was ONLY filled where a plain-prose body-text statement existed (M4 family: 'turning radius of 1m'), and deliberately left null everywhere else rather than trust the ambiguous table footnote. S3's body text states a rotation DIAMETER ('less than 90cm') rather than a radius -- not converted to min_turning_radius, per the same radius/diameter caution already flagged for VisionNav VNK15/Magazino SOTO/Geek+ this run. 'Conformity CE, FCC' (and IP54 on several models) is a recurring Company-level fact, not written to any Base Model field (certifications_generic is Company-entity scope).",
+  "products": [
+    {
+      "product_name": "SAFELOG AGV L2",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_L2-core_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 1500, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 30, "battery_runtime": 1.7,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"], "omnidirectional_movement": true
+      },
+      "field_sources": {
+        "max_payload": "'Topload level (kg) 1,500'", "max_speed": "'Speed 0.02-1/1.6 (w/o load)' -- loaded value used",
+        "battery_type": "'Battery type and quantity LiFePO4 (2)'", "charge_time": "'Charging time 20-80%: 30min'",
+        "battery_runtime": "'Continuous driving (w/[o]load)(h) [3.0] 1.7' -- loaded value used",
+        "operating_temp": "'Temperature +5 to +35°C'", "max_gradient": "'Max. grade (%) 5'", "stop_accuracy": "'Positioning accuracy +/-5mm'",
+        "navigation_type": "'Localization: Magnetic track, RFID, LiDAR (LLS), inductive sensor' (Standard column; 'grid codes' listed as Optional-only, not included)",
+        "omnidirectional_movement": "body text 'omnidirectional travel mode and the ability to turn on the spot'"
+      },
+      "notes": "Topload level up to 1,500kg for pallets/pallet cages, 'without active load handling' -- lift_height correctly left null (source table itself shows a dash for 'Lifting height (platform)')."
+    },
+    {
+      "product_name": "SAFELOG AGV L2 lift",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_L2-lift_EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "lift_height": 160, "max_payload": 1500, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 30, "battery_runtime": 1.7,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"], "omnidirectional_movement": true
+      },
+      "field_sources": {
+        "lift_height": "'Lifting height (platform)(mm) 160' + body text 'maximum travel of the lift table is 160mm'",
+        "max_payload": "'Topload level (kg) 1,500'", "max_speed": "'0.02-1/1.6 (w/o load)' -- loaded used",
+        "battery_type": "'LiFePO4 (2)'", "charge_time": "'30min'", "battery_runtime": "'[3.0] 1.7' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "same Standard localization list as sibling L2-core", "omnidirectional_movement": "shared L2-family body text"
+      },
+      "notes": "Uses a scissor lift table for active load handling, unlike L2-core."
+    },
+    {
+      "product_name": "SAFELOG AGV M4 core",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_M4-core_EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1460, "max_payload": 300, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.2,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"]
+      },
+      "field_sources": {
+        "vehicle_length": "body text 'a length of 1.46m'", "max_payload": "'Topload level (kg) 300'",
+        "max_speed": "'0.02-1/1.6 (w/o load)' -- loaded used", "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'",
+        "battery_runtime": "'[2.4] 1.2' loaded", "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "'Localization: Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard column)"
+      },
+      "notes": "Body text: 'variable superstructures ... can also be optionally equipped with conveyor technology'; used as assembly platform. NEW product created because DB's existing 'SAFELOG AGV M4' row is classified Tugger AGV (matches M4-tow content instead) -- see researcher_notes."
+    },
+    {
+      "product_name": "SAFELOG AGV M4 lift",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_M4-lift_EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1460, "lift_height": 40, "max_payload": 1000, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.2,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"]
+      },
+      "field_sources": {
+        "vehicle_length": "shared M4-family body text '1.46m'", "lift_height": "'Lifting height (scissor lift)(mm) 40'",
+        "max_payload": "'Topload level (kg) 1,000' + body text 'lift standard market racks, elevated pallets and load carriers weighing up to 1,000kg'",
+        "max_speed": "'0.02-1/1.6 (w/o load)' loaded", "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[2.4] 1.2' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'", "navigation_type": "same Standard localization list as M4-core"
+      },
+      "notes": "Uses 'two lifting rails mounted on the long side' for even weight distribution when lifting racks/pallets."
+    },
+    {
+      "product_name": "SAFELOG AGV M4",
+      "product_type": "Tugger AGV",
+      "source_file": "SAFELOG_Datasheet_M4-tow_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1460, "towing_capacity": 1500, "turning_radius": 1000, "coupling_type": ["Automatic"],
+        "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.2,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5
+      },
+      "field_sources": {
+        "vehicle_length": "shared M4-family body text '1.46m'",
+        "towing_capacity": "table row 'Topload level (kg) 1,500' -- source's own table header is literally 'Topload' (reused template label) despite this variant's actual function being to tow trolleys/trailers, not carry a top load; body text confirms 'particularly suitable for transporting trolleys and trailers' -- 1,500kg interpreted as the rated towed load and mapped to towing_capacity rather than max_payload, flagged for reviewer sanity-check",
+        "turning_radius": "body text 'with a turning radius of 1m the M4 provides a stable platform'",
+        "coupling_type": "body text 'via a system consisting of an electric lifting bolt and snap latch ... Automatic pickup and delivery of the trailer load' -- mapped to AP0's 'Automatic' allowed_value",
+        "max_speed": "'0.02-1/1.6 (w/o load)' loaded", "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[2.4] 1.2' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'"
+      },
+      "notes": "See researcher_notes for the rationale of enriching the existing Tugger-classified 'SAFELOG AGV M4' row from the -tow sub-variant instead of -core."
+    },
+    {
+      "product_name": "SAFELOG AGV S3",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_S3-core_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 150, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.5,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"]
+      },
+      "field_sources": {
+        "max_payload": "'Topload level (kg) 150'", "max_speed": "'0.02-1/1.6 (w/o load)' loaded",
+        "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[3] 1.5' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "'Localization: Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard column)"
+      },
+      "notes": "Body text: 'can rotate on the spot in a space less than 90cm' -- explicitly a diameter figure, NOT converted to min_turning_radius (see researcher_notes radius/diameter caution)."
+    },
+    {
+      "product_name": "SAFELOG AGV S3 tow",
+      "product_type": "Tugger AGV",
+      "source_file": "SAFELOG_Datasheet_S3-tow_EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "towing_capacity": 500, "coupling_type": ["Automatic"], "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.5,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5
+      },
+      "field_sources": {
+        "towing_capacity": "table row 'Towload level (kg) 500' -- this file's own table uses 'Towload' (unlike M4-tow's reused 'Topload' label), a clean direct match",
+        "coupling_type": "body text 'trailer load is picked up and released automatically via an electric lifting bolt'",
+        "max_speed": "'0.02-1/1.6 (w/o load)' loaded", "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[3] 1.5' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'"
+      },
+      "notes": "Fresh product_type judgment (Tugger AGV) independent of sibling 'SAFELOG AGV S3' row's Mobile AMR classification -- see researcher_notes."
+    },
+    {
+      "product_name": "SAFELOG AGV X1",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_X1-core_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 1500, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.7,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"]
+      },
+      "field_sources": {
+        "max_payload": "'Topload level (kg) 1,500'", "max_speed": "'0.02-1/1.6 (w/o load)' loaded",
+        "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[3.5] 1.7' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "'Localization: Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard); 'grid codes'/2D camera listed Optional-only"
+      },
+      "notes": "Body text: 'focus ... on its use as an assembly platform', optional superstructures."
+    },
+    {
+      "product_name": "SAFELOG AGV X1 lift 1200",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_X1-lift-1200_EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "lift_height": 80, "max_payload": 1200, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.7,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"]
+      },
+      "field_sources": {
+        "lift_height": "'Lifting height (lifting unit)(mm) 80'", "max_payload": "'Topload level (kg) 1,200'",
+        "max_speed": "'0.02-1/1.6 (w/o load)' loaded", "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[3.5] 1.7' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "same Standard localization list as X1-core"
+      },
+      "notes": "Body text: 'picks up the load via a central lifting unit ... equipped with various attachments for transporting pallets, shelves or other load carriers ... primarily used as a goods-to-person platform'."
+    },
+    {
+      "product_name": "SAFELOG AGV X1 spin",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_X1-spin_EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "lift_height": 80, "max_payload": 1200, "max_speed": 1.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 1.7,
+        "operating_temp_min": 5, "operating_temp_max": 35, "max_gradient": 5, "stop_accuracy": 5,
+        "navigation_type": ["Magnetic Tape", "Inductive Loop", "Natural Feature (SLAM)"], "rotation_capable": true
+      },
+      "field_sources": {
+        "lift_height": "'Lifting height (lifting unit)(mm) 80'", "max_payload": "'Topload level (kg) 1,200'",
+        "max_speed": "'0.02-1/1.6 (w/o load)' loaded", "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[3.5] 1.7' loaded",
+        "operating_temp": "'+5 to +35°C'", "max_gradient": "'5'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "same Standard localization list as X1-core",
+        "rotation_capable": "body text 'the central lifting unit can rotate independently of the robot. This allows the transported goods to be realigned even in confined spaces'"
+      },
+      "notes": "Otherwise identical spec sheet to X1 lift 1200 -- the distinguishing feature is the independently-rotating lift platform."
+    },
+    {
+      "product_name": "SAFELOG AGV XS1",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 50, "max_speed": 3.0, "battery_type": ["LiFePO4"], "charge_time": 20, "battery_runtime": 4.5,
+        "operating_temp_min": 5, "operating_temp_max": 35, "stop_accuracy": 5,
+        "navigation_type": ["QR/DM Code"], "onboard_container_type": ["Bin"], "top_module_type": ["Shelf Carrier"]
+      },
+      "field_sources": {
+        "max_payload": "'Topload (kg) 50' + body text 'load capacity of up to 50kg'", "max_speed": "'Speed 0.1-3.0'",
+        "battery_type": "'LiFePO4 (1)'", "charge_time": "'20min'", "battery_runtime": "'[6] 4.5' loaded",
+        "operating_temp": "'+5 to +35°C'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "'Localization: Odometry, grid codes' (Standard column; LiDAR (LLS) listed Optional-only)",
+        "onboard_container_type": "body text 'designed to accommodate standard KLTs and boxes' -- KLT (small-parts container) mapped to AP0's 'Bin'",
+        "top_module_type": "body text 'height-adjustable shelves' -> 'Shelf Carrier'"
+      },
+      "notes": "Semi-automated person-to-goods picking cart with tablet display and per-compartment LED highlighting -- not a fully autonomous pick robot itself (human picks/places, robot transports)."
+    },
+    {
+      "product_name": "SAFELOG AGV GT1 spin",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datenblatt_GT1-spin_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1200, "vehicle_width": 830, "lift_height": 70, "max_payload": 1300, "max_speed": 2.0,
+        "battery_type": ["LiFePO4"], "charge_time": 30, "battery_runtime": 3.7,
+        "operating_temp_min": 5, "operating_temp_max": 35, "operating_humidity_max": 90, "stop_accuracy": 5,
+        "navigation_type": ["QR/DM Code"], "rotation_capable": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "body text 'compact dimensions of 1200x830mm (LxW)'", "lift_height": "'Lifting height (platform)(mm) 70' + body text 'lift them up to 70mm'",
+        "max_payload": "'Topload (kg) 1,300' + body text 'maximum top load capacity is 1,300kg'",
+        "max_speed": "body text 'Under full load, the robot can reach a top speed of up to 2.0m/s' (3.0m/s unloaded, not used)",
+        "battery_type": "'LiFePO4 (4)'", "charge_time": "'30min'", "battery_runtime": "'[6.3] 3.7' loaded",
+        "operating_temp": "'+5 to +35°C'", "operating_humidity_max": "'Humidity (%RH) 0 to 90 (non-cond.)'", "stop_accuracy": "'+/-5mm'",
+        "navigation_type": "'Localization: Odometry, grid codes' (Standard column; LiDAR (LLS) Optional-only)",
+        "rotation_capable": "body text 'equipped with a turntable, allowing the transported goods to be independently adjusted without moving the robot itself'"
+      },
+      "notes": "Goods-to-Person (GTP) / Shelf-to-Person solution; height of just 275mm to drive under standard market shelves (underride pattern, consistent with existing DB Mobile AMR classification). Conformity listed as '(planned) CE, FCC, IP54' -- not yet certified at time of datasheet, worth noting for a reviewer."
+    }
+  ]
+}

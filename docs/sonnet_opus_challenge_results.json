@@ -1,0 +1,1773 @@
+{
+  "task": "sonnet vs opus datasheet-extraction reconciliation",
+  "date": "2026-08-19",
+  "reviewer": "opus (agv-datasheet-ingestor), re-reading the source PDFs in Datasheets/AGV_AMR/Done with Opus/",
+  "verdict_legend": {
+    "CONFIRM": "opus value correct, sonnet wrong",
+    "CONCEDE": "sonnet value correct or better, opus wrong",
+    "REVISED": "neither value fully right; correct_value holds the new value"
+  },
+  "companies": {
+    "AGILOX Services GmbH": [
+      {
+        "sonnet_product": "AGILOX OCF",
+        "opus_product": "AGILOX OCF",
+        "field": "vehicle_length",
+        "sonnet_value": 2784,
+        "opus_value": 2795,
+        "verdict": "CONFIRM",
+        "correct_value": 2795,
+        "reasoning": "Re-read agilox-corporate-folder-o-de_02_2026_web.pdf p.17, spec matrix 'KRITERIEN | ONE (+NFK) | OFL | OCF | ODM', row 'ABMESSUNGEN (L X B X H)'. The OCF column prints '2.795 x 1.200 x 2.566 mm'. 2795 is what the PDF corpus states. Sonnet's 2784 is not in any PDF in the corpus — its own field_sources names 'AGILOX  OCF.html', i.e. a scraped web page, not a datasheet. Within the scope of this datasheet corpus, 2795 is the only sourced value.",
+        "pattern_match": "non-PDF source leak (sonnet cited an .html web page, not a datasheet in the corpus)"
+      }
+    ],
+    "Balyo": [
+      {
+        "sonnet_product": "VEENY",
+        "opus_product": "VEENY",
+        "field": "lifting_height",
+        "sonnet_value": 14710,
+        "opus_value": 14510,
+        "verdict": "CONCEDE",
+        "correct_value": 14710,
+        "reasoning": "Veeny_-_VNA_Datasheet_-_11112021.pdf p.1 FOCUS text: 'can pick pallets up to a height of 14710mm / 579.1 in, and drop pallets up to 14510mm / 571.2 in'; the (overprinted) FEATURES table carries both a 'Maximum picking height' and a 'Maximum stacking height' row. The AP0 hint for lifting_height is explicit: 'the height the forks travel, NOT building height, rack height or STORAGE height'. 14510 mm is a drop/stacking = storage height, which the hint excludes by name; 14710 mm is the maximum fork travel. My opus reading picked the more conservative figure for a KO field, but conservatism does not override the field definition here.",
+        "pattern_match": "dual lift-height convention (pick/fork-travel vs drop/storage height) — same family as the unresolved 'Hub vs Einlagerhöhe' question on the VDI Typenblätter"
+      },
+      {
+        "sonnet_product": "LOWY / LOWY HD",
+        "opus_product": "LOWY",
+        "field": "min_aisle_width",
+        "sonnet_value": 2950,
+        "opus_value": 2900,
+        "verdict": "CONFIRM",
+        "correct_value": 2900,
+        "reasoning": "Two separate one-pagers: 'LOWY, Robotic Stacker...' p.1 headline block reads 'FROM 2.9m / 10ft — Aisle width'; 'LOWY HD, Robotic Heavy Duty Stacker...' p.1 headline block reads 'FROM 2950mm / 9'8\" — Aisle width'. These are two distinct products with two distinct stated values. Sonnet merged them into one record ('LOWY / LOWY HD') and then took the worse-case 2950 for the merged entry. For the product named LOWY, the sheet says 2.9 m = 2900 mm. The disagreement is a product-granularity difference, not a reading error: sonnet's 2950 is correct for LOWY HD, wrong for LOWY.",
+        "pattern_match": "merge-vs-split granularity (sonnet merged sibling variants and took worst-case; opus kept them as separate products)"
+      }
+    ],
+    "Jungheinrich AG": [
+      {
+        "sonnet_product": "EKX 514a",
+        "opus_product": "EKX 514a",
+        "field": "vehicle_width",
+        "sonnet_value": 1210,
+        "opus_value": 1450,
+        "verdict": "CONFIRM",
+        "correct_value": 1450,
+        "reasoning": "ekx-5a-20xx-specsheet-de-2026-08-pdf-data.pdf p.8 VDI table prints BOTH '4.21.1 Gesamtbreite b1 mm 1210' and '4.21.2 Gesamtbreite b2 mm 1450'. Both rows are literally labelled 'Gesamtbreite' (overall width); neither is the vehicle's only width. The AP0 hint for vehicle_width says it 'drives min aisle/door clearance', so the governing figure is the wider overall width, 1450 mm (b1 1210 is the narrower chassis-only width). CAVEAT for the Tech Lead: this is a genuine unruled b1/b2 ambiguity, structurally identical to the Hub-vs-Einlagerhöhe question; a ruling would settle several Jungheinrich/STILL/Linde VDI rows at once.",
+        "pattern_match": "VDI dual-dimension row (two values under one label: b1/b2, h3/h4, Hub/Einlagerhöhe) — no AP0 rule for which one to store"
+      },
+      {
+        "sonnet_product": "EAE 212a",
+        "opus_product": "EAE 212a",
+        "field": "min_total_height",
+        "sonnet_value": 2470,
+        "opus_value": 1891,
+        "verdict": "CONFIRM",
+        "correct_value": 1891,
+        "reasoning": "eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf p.3 VDI row '4.2.1 Gesamthöhe h15 mm 2470', and p.4 footnote 'VDI-Nr. 4.2.1: Gesamthöhe mit Optionsbügel eingeklappt: 1891 mm; ausgeklappt: 2470 mm'. Both figures verified verbatim. The AP0 field is min_total_height, hint 'LOWEST overall vehicle height (mast collapsed)' — it asks for the lowest achievable configuration precisely so it can be compared against door/sprinkler clearance, and the manufacturer publishes 1891 mm as exactly that. CAVEAT: if the option bracket cannot legally be driven folded, 1891 would wrongly pass a door-height COND_KO; the datasheet does not say either way.",
+        "pattern_match": "lowest-configuration vs standard-configuration dimension (footnote publishes a folded/retracted alternative to the headline VDI row)"
+      }
+    ],
+    "KIVNON Logística S.L.": [
+      {
+        "sonnet_product": "KIVNON K07",
+        "opus_product": "KIVNON K07",
+        "field": "max_speed",
+        "sonnet_value": 2.1,
+        "opus_value": 2.5,
+        "verdict": "CONFIRM",
+        "correct_value": 2.5,
+        "reasoning": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf p.9 (K07 TWISTER SERIES) prints the headline stat 'MAX. SPEED. 2,5 m/s' and, in the spec list below, 'MAX. SPEED 2,1 – 2,5 m/s no load'. The 2,1–2,5 range spans the three configurations K07-SQ600 / SQ1000 / SQ1500 (heavier config = slower). The AP0 max_speed hint is 'Top travel speed (capture rated/unloaded if only one given)' — so the field wants the top figure, 2.5, which is also what the manufacturer prints as the headline. Sonnet took the low end of the range as a conservatism choice; max_speed is a SCORING field, not a KO field, so conservatism is not warranted here.",
+        "pattern_match": "speed printed as a range — conservative-low-end (sonnet) vs stated top figure (opus); sibling of the seeded max_speed pattern"
+      }
+    ],
+    "Omron Mobile Robotics": [
+      {
+        "sonnet_product": "Omron MD-650",
+        "opus_product": "Omron MD-650",
+        "field": "charge_time",
+        "sonnet_value": 20,
+        "opus_value": 30,
+        "verdict": "CONFIRM",
+        "correct_value": 30,
+        "reasoning": "Two documents, two different charge-window definitions, both verified: md-series_leaflet_en.pdf p.2 product spec table row 'Charge Time (5%-95%) | < 30 minutes'; i885_md_series_amr_datasheet_en.pdf p.6 battery accessory block 'Recharge Time 19.6 minutes (from 20% to 80%)*1'. The 19.6 min figure is a 60%-of-capacity partial charge attached to the battery part number 73330-100, not to the robot; the leaflet's <30 min covers 5–95% (90% of capacity) and is the robot-level headline spec. For a cross-supplier SCORING comparison the near-full window is the comparable one. Note the stored 30 is an upper bound ('<30'), which is the conservative direction for this field.",
+        "pattern_match": "two documents state the same field over different measurement windows (partial 20-80% vs near-full 5-95% charge)"
+      },
+      {
+        "sonnet_product": "Omron MD-900",
+        "opus_product": "Omron MD-900",
+        "field": "charge_time",
+        "sonnet_value": 20,
+        "opus_value": 30,
+        "verdict": "CONFIRM",
+        "correct_value": 30,
+        "reasoning": "Same evidence as the MD-650 item: md-series_leaflet_en.pdf p.2 is a shared MD-series spec table ('Maximum payload capacity 650 kg / 900 kg') whose 'Charge Time (5%-95%) < 30 minutes' row covers both MD-650 and MD-900. Same reasoning applies.",
+        "pattern_match": "two documents state the same field over different measurement windows (partial 20-80% vs near-full 5-95% charge)"
+      }
+    ],
+    "Hikrobot": [
+      {
+        "sonnet_product": "Hikrobot QF-1000D",
+        "opus_product": "Hikrobot Q7-1000D",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Natural Feature (SLAM)",
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "reasoning": "'QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf' p.2 (image-only page, read by rendering at 150 dpi) Key Feature bullet: 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes.' V-SLAM is visual (camera-based) SLAM and L-SLAM is laser SLAM — the document names two physically different sensing modalities, and the AP0 hint maps 'vision'/'camera-based' → 'Vision' as well as 'SLAM' → 'Natural Feature (SLAM)'. navigation_type is a Multi-Select and the hint says 'If multiple navigation types are required, list all', so dropping 'Vision' loses a real, stated capability. SEPARATE ERROR TO FIX (not a dossier field): opus recorded the model names as 'Q7-600D'/'Q7-1000D'; the flyer's table header prints 'QF-600D' and 'QF-1000D' — sonnet's naming is correct.",
+        "pattern_match": null
+      },
+      {
+        "sonnet_product": "Hikrobot QF-600D",
+        "opus_product": "Hikrobot Q7-600D",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Natural Feature (SLAM)",
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "reasoning": "Same p.2 bullet, same shared flyer — the QF-600D and QF-1000D columns share every non-payload row. Same reasoning as the 1000D item.",
+        "pattern_match": null
+      },
+      {
+        "sonnet_product": "Hikrobot QF-600D",
+        "opus_product": "Hikrobot Q7-600D",
+        "field": "max_speed",
+        "sonnet_value": 2.0,
+        "opus_value": 1.8,
+        "verdict": "CONCEDE",
+        "correct_value": 2.0,
+        "reasoning": "Re-read the rendered p.2: table row 'Rated Running Speed (Empty/Rated Load) (mm/s) — 1800/2000' AND Key Feature bullet 'Max. running speed for differential AMR type is 2 m/s'. My opus value of 1.8 was chosen as 'conservative', but that is wrong twice over: (a) the AP0 hint for max_speed is 'Top travel speed', explicitly the top figure, and max_speed is SCORING not KO so there is no KO risk to hedge against; (b) the flyer's own headline independently states 2 m/s, so 2.0 is corroborated by two places on the same page. Sonnet's 2.0 is correct.",
+        "pattern_match": "opus over-applied conservatism to a SCORING field where the AP0 hint asks for the maximum — inverse of the seeded max_speed pattern"
+      },
+      {
+        "sonnet_product": "Hikrobot STU Series",
+        "opus_product": "Hikrobot STU MR-TP6-30SCH",
+        "field": "max_payload",
+        "sonnet_value": 50,
+        "opus_value": 30,
+        "verdict": "CONCEDE",
+        "correct_value": 50,
+        "reasoning": "STU_flyer_eng_cemat_v2.pdf p.2, table row 'Basic Parameters | Execution Structure Rated Load(kg)' reads '30/50' under BOTH model columns (MR-TP6-30SCH and MR-TP6-30SCW) — so 30/50 is two selectable execution-structure options within each model, not a per-model split. The AP0 max_payload hint is unambiguous: 'If a range or several load types are given, report the heaviest stated number.' That is 50. My opus value of 30 contradicts the field's own written rule; conservatism is not the convention AP0 chose for this field.",
+        "pattern_match": "opus over-applied conservatism against an explicit AP0 'report the heaviest' instruction"
+      }
+    ],
+    "Enabled Robotics ApS": [
+      {
+        "sonnet_product": "ER-FLEX-MAX",
+        "opus_product": "ER-FLEX-MAX",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Vision"
+        ],
+        "opus_value": [
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Vision"
+        ],
+        "reasoning": "er-flex-max-specifications-sheet-with-cable.pdf is a single page and states, under ER-ABILITY, 'Vision system for precise localization to marker' and 'Reading of QR and bar-code', and under Safety 'Laser Scanners — detects objects from afar, 360°'. It nowhere states map-building, SLAM, or natural-feature navigation. My opus entry admitted in its own source note that SLAM was 'inherited from the shared ER-FLEX platform description' in er-flex-brochure-2024_digital.pdf — but that brochure is titled and specced for the ER-FLEX 250 series (p.4 'ER-FLEX 250 series', footprint 800x580 mm, UR5e/UR10e/UR16e), a different and much smaller chassis than the MAX (1350x910 mm, UR20/UR30). Attributing a value across a variant boundary from a document that does not cover the variant is exactly the inference this agent is supposed to refuse. Sonnet's ['Vision'] is the literally-stated subset.",
+        "pattern_match": "cross-document / cross-variant attribution — opus inherited a platform-level value onto a variant whose own datasheet does not state it"
+      },
+      {
+        "sonnet_product": "ER-FLEX",
+        "opus_product": "ER-FLEX 250",
+        "field": "top_module_type",
+        "sonnet_value": [
+          "Cobot arm"
+        ],
+        "opus_value": [
+          "Cobot arm",
+          "Shelf Carrier"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Cobot arm"
+        ],
+        "reasoning": "er-flex-brochure-2024_digital.pdf p.4 has the actual configuration list, headed 'FLEXIBLE CONFIGURATION', and the only module option it names is 'Arm options: UR5e / UR10e / UR16e'. The 'Shelf Carrier' value I added came from p.3's CARGO MANAGER blurb ('lets you control onboard racks and shelves automatically... define pick and place routines for your racks'), which is a software feature describing control of racks, not a stated interchangeable top module. The AP0 hint scopes this field to 'Interchangeable top modules the platform accepts. Source: top modules / accessories'. Checked p.5 as well — no rack/shelf module list anywhere in the brochure. Sonnet's ['Cobot arm'] is right.",
+        "pattern_match": "software-feature prose read as a hardware option (opus upgraded a capability blurb into a module value)"
+      },
+      {
+        "sonnet_product": "ER-FLEX",
+        "opus_product": "ER-FLEX 250",
+        "field": "integration_capability",
+        "sonnet_value": [
+          "ERP",
+          "WMS",
+          "MES",
+          "REST API",
+          "OPC-UA"
+        ],
+        "opus_value": [
+          "ERP",
+          "MES",
+          "WMS",
+          "REST API",
+          "OPC-UA"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "ERP",
+          "MES",
+          "WMS",
+          "REST API",
+          "OPC-UA"
+        ],
+        "reasoning": "NOT A REAL DISAGREEMENT — the two lists are the same set, differing only in element order (sonnet: ERP, WMS, MES, REST API, OPC-UA; opus: ERP, MES, WMS, REST API, OPC-UA). Both derive from er-flex-brochure-2024_digital.pdf p.2 ('communication with your ERP, WES, MES or WMS systems') and p.3 COMMUNICATION ('through OPC UA or REST. It also exposes a REST API'), and both correctly dropped 'WES' (no AP0 allowed value) and canonicalised 'OPC UA' to 'OPC-UA'. Recorded as CONFIRM only because the results schema needs a verdict; the real finding is that the diff tool compared Multi-Select values order-sensitively and produced a false positive.",
+        "pattern_match": "false-positive diff: Multi-Select values compared order-sensitively rather than as sets"
+      },
+      {
+        "sonnet_product": "ER-FLEX",
+        "opus_product": "ER-FLEX 250",
+        "field": "workflow_capability",
+        "sonnet_value": [
+          "Transport",
+          "Picking support"
+        ],
+        "opus_value": [
+          "Transport"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Transport"
+        ],
+        "reasoning": "er-flex-brochure-2024_digital.pdf p.2 lists four use-case tiles: PICK N' PLACE, MACHINE TENDING, INSPECTION & DOCUMENTATION, LINESIDE DELIVERY. Sonnet's own cited justification derives 'Picking support' from the INSPECTION & DOCUMENTATION tile ('Picking support-adjacent quality/documentation task') — inspection and documentation is not a picking workflow under any reading, and the AP0 hint says 'output null unless the tender explicitly specifies the AMR workflow... Do NOT infer from general automation context.' The robot picks with its own UR arm (machine tending / lab automation); it does not support a human order-picker, which is what 'Picking support' means in the README's person-to-goods sense (§4). 'Transport' is supported directly by LINESIDE DELIVERY ('continuous replenishment of parts and items').",
+        "pattern_match": null
+      }
+    ],
+    "Grenzebach Maschinenbau GmbH": [
+      {
+        "sonnet_product": "Grenzebach FF1200S",
+        "opus_product": "Grenzebach FF1200S",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Contour"
+        ],
+        "opus_value": [
+          "Natural Feature (SLAM)"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Contour"
+        ],
+        "reasoning": "Grenzebach_Intralogistics_Data_Sheet_FF1200S_en.pdf p.2: prose 'The free contour navigation...' and spec row 'Navigation | Contour navigation (Safety scanner scans the environment and compares with previously charted map)'. The word SLAM appears nowhere in this document. Two reasons my opus value was wrong: (1) 'Contour' is itself a literal AP0 allowed_value for navigation_type, sitting right there, and the vendor prints exactly that word — the AP0 hint's mapping rule \"'contour-based' -> 'Natural Feature (SLAM)'\" is written for TENDER-side normalisation of buyer prose and, applied on the supplier side, makes the 'Contour' allowed value unreachable; (2) the parenthetical actually describes localisation against a PREVIOUSLY CHARTED map, i.e. not simultaneous mapping, so SLAM is not even technically implied. The industry README §2 also lists 'Natural-Feature / SLAM, contour, vision' as three separate members of the free-navigating group, confirming Contour is a distinct value and not a synonym for SLAM. Sonnet is right.",
+        "pattern_match": "AP0 defect: the navigation_type hint maps 'contour-based' -> 'Natural Feature (SLAM)' while 'Contour' is simultaneously an allowed value — opus followed the hint, sonnet followed the literal allowed value"
+      },
+      {
+        "sonnet_product": "Grenzebach OL1200S",
+        "opus_product": "Grenzebach OL1200S",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Contour",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Natural Feature (SLAM)"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Contour",
+          "Natural Feature (SLAM)"
+        ],
+        "reasoning": "Grenzebach_Intralogistics_OL1200S_Brochure_EN.pdf states BOTH terms for the same product: p.2 prose 'With smart sensors and SLAM navigation, the OL1200S reduces static peripheral requirements...' and p.4 spec row 'Navigation | Contour navigation (safety scanner detects surrounding and compares with internal map)'. navigation_type is a Multi-Select and the hint says to list all. I dropped 'Contour' even though the spec table names it verbatim — that discards a stated value for no reason once the SLAM term is also present. Sonnet's two-value list is the complete, literal reading.",
+        "pattern_match": "AP0 defect: the navigation_type hint maps 'contour-based' -> 'Natural Feature (SLAM)' while 'Contour' is simultaneously an allowed value — opus followed the hint, sonnet followed the literal allowed value"
+      }
+    ],
+    "KNAPP AG": [
+      {
+        "sonnet_product": "KNAPP Open Shuttle 100",
+        "opus_product": "KNAPP Open Shuttle 100",
+        "field": "top_module_type",
+        "sonnet_value": [
+          "Roller"
+        ],
+        "opus_value": [
+          "Roller",
+          "Conveyor"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Roller"
+        ],
+        "reasoning": "'KNAPP-Folder Open Shuttle Productinfo de-2.pdf' p.15, STANDARD FEATURES row for Open Shuttle 100: the badge reads 'Rollenfördertechnik' with the sub-label 'Lastaufnahmemittel'. That is ONE German compound naming ONE physical load-handling module: a roller deck. AP0 lists 'Roller' and 'Conveyor' as two SEPARATE allowed values, so they are meant to be distinguishable module types (roller deck vs belt conveyor); emitting both from a single 'Rollenfördertechnik' badge double-counts one module and falsely implies the platform accepts two interchangeable top modules. The brochure's ADD-ON row on the same page lists the genuinely optional extras (Integrierter Hub, Blue-Light, Bürsten, Stellplatzsensor, Top-Scanner) and no second conveyor variant. Sonnet's single 'Roller' is right.",
+        "pattern_match": "opus split one compound German term into two AP0 values (Rollenfördertechnik -> Roller + Conveyor), inflating a Multi-Select"
+      },
+      {
+        "sonnet_product": "KNAPP Open Shuttle 100",
+        "opus_product": "KNAPP Open Shuttle 100",
+        "field": "onboard_container_type",
+        "sonnet_value": [
+          "Bin"
+        ],
+        "opus_value": [
+          "Tote"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Tote"
+        ],
+        "reasoning": "p.14 (Open Shuttle 100): 'Ladungsträger: Behälter, Kartons, Trays', 'Max. Ladungsträgergröße 900 x 650 mm', 'Max. Anzahl Ladungsträger 2 bei 650 x 450 mm'. AP0 offers Tote/Bin/Pallet/Shelf/None here, and its sister field load_type distinguishes 'Tote' from 'Plastic Bin' and 'Bulk Bin' — so in AP0's own vocabulary 'Bin' denotes a bin/bulk container, while the standard stackable transport container (KLT/Behälter, here 650x450 and 600x400 formats on the sibling models) is a 'Tote'. LOW CONVICTION, and I want to flag it rather than pretend otherwise: 'Behälter' is a genuine translation coin-flip and this same call decides 4 of KNAPP's 9 items. A one-line mapping rule in the AP0 hint (German 'Behälter'/'KLT' -> Tote) would settle all four deterministically.",
+        "pattern_match": "AP0 gap: 'Tote' vs 'Bin' is under-specified for German 'Behälter'; drives 4 of the 9 KNAPP disagreements on its own"
+      },
+      {
+        "sonnet_product": "KNAPP Open Shuttle Boxgrip",
+        "opus_product": "KNAPP Open Shuttle Boxgrip",
+        "field": "onboard_container_type",
+        "sonnet_value": [
+          "Bin"
+        ],
+        "opus_value": [
+          "Tote"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Tote"
+        ],
+        "reasoning": "p.18 (Open Shuttle Boxgrip): 'Ladungsträger: Behälter mit seitlichen Öffnungen zum Greifen', 'Max. Ladungsträgergröße 600 x 400 mm', 'Max. Nutzlast 25 kg pro Behälter'. 600x400 with moulded side grip openings is the textbook KLT/tote geometry, which makes this the strongest of the four Behälter items for 'Tote'. Same AP0-vocabulary reasoning as the Open Shuttle 100 item.",
+        "pattern_match": "AP0 gap: 'Tote' vs 'Bin' is under-specified for German 'Behälter'; drives 4 of the 9 KNAPP disagreements on its own"
+      },
+      {
+        "sonnet_product": "KNAPP Open Shuttle 50 ASG",
+        "opus_product": "KNAPP Open Shuttle 50 ASG",
+        "field": "top_module_type",
+        "sonnet_value": [
+          "Roller"
+        ],
+        "opus_value": [
+          "Roller",
+          "Conveyor"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Roller"
+        ],
+        "reasoning": "p.23, STANDARD FEATURES for Open Shuttle 50 ASG — identical badge row to p.15 and p.11: 'Rollenfördertechnik | Lastaufnahmemittel'. Same reasoning as the Open Shuttle 100 item: one compound term, one module, 'Roller' is the specific AP0 value. (The ADD-ON row here adds an 'Integrierte Breitenverstellung' for varying magazine/container widths — still not a second top-module type.)",
+        "pattern_match": "opus split one compound German term into two AP0 values (Rollenfördertechnik -> Roller + Conveyor), inflating a Multi-Select"
+      },
+      {
+        "sonnet_product": "KNAPP Open Shuttle 50 ASG",
+        "opus_product": "KNAPP Open Shuttle 50 ASG",
+        "field": "onboard_container_type",
+        "sonnet_value": [
+          "Bin"
+        ],
+        "opus_value": [
+          "Tote"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Tote"
+        ],
+        "reasoning": "p.22 (Open Shuttle 50 ASG): 'Ladungsträger: Leiterplatten-Magazine, Trays, Behälter, Kartons'; carrier sizes printed as 'Magazine 410 x 400 mm' and 'Behälter 600 x 400 mm'. The Behälter is again the 600x400 KLT format -> 'Tote' on the same AP0-vocabulary reading. Note both passes silently dropped the PCB magazines and trays because AP0 has no allowed value for them — that is a real, shared coverage gap in onboard_container_type for electronics-industry carriers, not a sonnet/opus difference.",
+        "pattern_match": "AP0 gap: 'Tote' vs 'Bin' is under-specified for German 'Behälter'; drives 4 of the 9 KNAPP disagreements on its own"
+      },
+      {
+        "sonnet_product": "Open Shuttle Fork",
+        "opus_product": "KNAPP Open Shuttle Fork",
+        "field": "load_type",
+        "sonnet_value": [
+          "Pallet EUR",
+          "Half-Euro",
+          "Custom Carrier"
+        ],
+        "opus_value": [
+          "Pallet EUR",
+          "Pallet ISO",
+          "Half-Euro",
+          "Custom Carrier"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Pallet EUR",
+          "Pallet ISO",
+          "Half-Euro",
+          "Custom Carrier"
+        ],
+        "reasoning": "p.6 (Open Shuttle Fork): 'Ladungsträger: Paletten (Euro-, Industrie-, Halb- und Chep-Paletten), Gestelle, Regale, Sonderladungsträger'. Sonnet's own source note says it could find no mapping for 'Industrie-/Chep-Paletten' — but AP0's load_type allowed_values include 'Pallet ISO', which is exactly the 1200x1000 Industriepalette. Dropping it loses a stated, matchable capability on a KO field, which is the costly direction. Euro->Pallet EUR, Industrie->Pallet ISO, Halb->Half-Euro, Gestelle/Regale/Sonderladungsträger->Custom Carrier.",
+        "pattern_match": "sonnet dropped a stated load carrier because it did not recognise the matching AP0 allowed value (Industriepalette = Pallet ISO)"
+      },
+      {
+        "sonnet_product": "Open Shuttle Fork",
+        "opus_product": "KNAPP Open Shuttle Fork",
+        "field": "min_aisle_width",
+        "sonnet_value": 1400,
+        "opus_value": 1950,
+        "verdict": "CONCEDE",
+        "correct_value": 1400,
+        "reasoning": "p.9 is a dedicated aisle-geometry page for the OPEN SHUTTLE FORK printing four figures plus the speed definitions: 'Einbahn (vmin) 1.400 mm', 'Einbahn (vmax) 1.950 mm', 'Gegenverkehr (vmin) 2.700 mm', 'Gegenverkehr (vmax) 3.500 mm', 'Drehkreis 2.700 mm', with 'Minimalgeschwindigkeit (vmin) = <= 0,3 m/s' and 'Maximalgeschwindigkeit (vmax) = 1,5 m/s'. The AP0 field is min_aisle_width and the manufacturer explicitly publishes 1.400 mm as the narrowest aisle this vehicle operates in — the vmin figure is a speed derating, not a different vehicle. Storing 1950 understates a genuine, stated capability and would wrongly K.O. this product on any tender with an aisle between 1400 and 1950 mm. My opus note said it 'collapsed a 2x2 matrix'; the correct collapse for a field named 'minimum' is the minimum of the printed cells, and here that also happens to be the value the vendor leads with. Worth carrying into the findings notes: the 1400 mm figure is only reachable at <= 0.3 m/s.",
+        "pattern_match": "configuration-matrix collapse: for a field whose semantics are 'minimum', opus's blanket worst-case rule picked the wrong cell"
+      },
+      {
+        "sonnet_product": "Open Shuttle",
+        "opus_product": "KNAPP Open Shuttle 50",
+        "field": "top_module_type",
+        "sonnet_value": [
+          "Roller"
+        ],
+        "opus_value": [
+          "Roller",
+          "Conveyor"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "Roller"
+        ],
+        "reasoning": "p.11, STANDARD FEATURES for Open Shuttle 50: 'Rollenfördertechnik | Lastaufnahmemittel' — the same single badge as p.15 and p.23. Same reasoning as the other two: one module, 'Roller'.",
+        "pattern_match": "opus split one compound German term into two AP0 values (Rollenfördertechnik -> Roller + Conveyor), inflating a Multi-Select"
+      },
+      {
+        "sonnet_product": "Open Shuttle",
+        "opus_product": "KNAPP Open Shuttle 50",
+        "field": "onboard_container_type",
+        "sonnet_value": [
+          "Bin"
+        ],
+        "opus_value": [
+          "Tote"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Tote"
+        ],
+        "reasoning": "p.10 (Open Shuttle 50): 'Ladungsträger: Behälter (-Stapel), Kartons, Trays', 'Max. Ladungsträgergröße 600 x 400 mm', 'Max. Anzahl Ladungsträger 2 bei 300 x 400 mm'. Again the 600x400 KLT format, and the '-Stapel' (stack) note confirms stackable transport containers -> 'Tote'. Same AP0-vocabulary reasoning, same low conviction, same request for a hint rule.",
+        "pattern_match": "AP0 gap: 'Tote' vs 'Bin' is under-specified for German 'Behälter'; drives 4 of the 9 KNAPP disagreements on its own"
+      }
+    ],
+    "Linde Material Handling": [
+      {
+        "sonnet_product": "Linde L-MATIC AC",
+        "opus_product": "Linde L-MATIC AC",
+        "field": "vehicle_length",
+        "sonnet_value": 2900,
+        "opus_value": 3270,
+        "verdict": "REVISED",
+        "correct_value": {
+          "L-MATIC AC 1,2 t": 2900,
+          "L-MATIC AC 1,6 t": 3270
+        },
+        "reasoning": "DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf p.2 is a FOUR-column VDI table whose row 1.2 reads 'L-MATIC AC 1,2 t | L-MATIC AC 1,6 t | L-MATIC AC 1,2 t | L-MATIC AC 1,6 t' (the last two are the tall-mast versions, h1 2665 vs 1515). Row '4.19 Gesamtlänge l1 (mm) 2900 | 3270 | 2900 | 3270' — so length is a function of the CAPACITY variant, not a single product value. Neither pass is wrong about the number; both are wrong to force one product record over two models. Recommend splitting into L-MATIC AC 1,2 t and L-MATIC AC 1,6 t. Extra finding for the reviewer: sonnet's single record is internally inconsistent across columns — it stored max_payload 1200 and l1 2900 (the 1,2 t column) but lifting_height 1844, which is row 4.4's 1,6 t figure (the 1,2 t column prints 1924).",
+        "pattern_match": "variant-collapse: one VDI Typenblatt covers several capacity models under one type name, and a single product record forces an arbitrary column choice"
+      },
+      {
+        "sonnet_product": "Linde L-MATIC AC",
+        "opus_product": "Linde L-MATIC AC",
+        "field": "vehicle_width",
+        "sonnet_value": 790,
+        "opus_value": 890,
+        "verdict": "CONFIRM",
+        "correct_value": 890,
+        "reasoning": "Same sheet, p.2 row '4.21 Gesamtbreite b1/b2 (mm) 790/890 | 790/890 | 793/890 | 794/890'. Unlike the length row, b2 = 890 is identical across all four columns, so no variant question arises — the disagreement is purely which of the two 'Gesamtbreite' figures to store. b1 is the chassis width, b2 the width over the wheel arms; both are vehicle structure (not load), so the vehicle's overall width is 890. AP0's vehicle_width hint says it 'drives min aisle/door clearance', which the wider figure governs. Same ruling as I applied to the Jungheinrich EKX b1/b2 item, for consistency.",
+        "pattern_match": "VDI dual-dimension row (b1/b2) — no AP0 rule for which of two same-named values to store"
+      },
+      {
+        "sonnet_product": "Linde L-MATIC AC k",
+        "opus_product": "Linde L-MATIC AC k",
+        "field": "vehicle_length",
+        "sonnet_value": 2768,
+        "opus_value": 3133,
+        "verdict": "REVISED",
+        "correct_value": {
+          "L-MATIC 12 AC k": 2768,
+          "L-MATIC 16 AC k": 3133
+        },
+        "reasoning": "DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf p.2 row 1.2 names TWO distinct models: 'L-MATIC 12 AC k' (Q 1,0 t, l1 2768) and 'L-MATIC 16 AC k' (Q 1,4 t, l1 3133). Both passes stored one record called 'L-MATIC AC k' and picked a different column. Recommend splitting. If the reviewer prefers to keep one record: the existing/sonnet record carries max_payload 1000, which pins it to the 12 AC k, so 2768 would be the internally coherent choice for THAT record — i.e. sonnet's number is right for the record as it stands, and mine silently mixed a 1,4 t dimension into a 1,0 t product.",
+        "pattern_match": "variant-collapse: one VDI Typenblatt covers several capacity models under one type name, and a single product record forces an arbitrary column choice"
+      },
+      {
+        "sonnet_product": "Linde L-MATIC",
+        "opus_product": "Linde L-MATIC",
+        "field": "min_aisle_width",
+        "sonnet_value": 2739,
+        "opus_value": 2868,
+        "verdict": "CONCEDE",
+        "correct_value": 2739,
+        "reasoning": "DE_tb_l_matic_br133_de_a_0516.pdf p.2: '4.33 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast (mm) 2868 (2774)' and '4.34 Arbeitsgangbreite bei Palette 800 x 1200 längs Ast (mm) 2739 (2694)'. I took the larger row on a blanket 'worst-case for a KO field' rule; that rule is a tie-breaker and must yield to the field's own semantics. The field is named min_aisle_width and its hint reads 'MINIMUM working aisle width', and AP0's precedent on the sibling KO field max_payload is explicitly capability-maximal ('report the heaviest stated number') — so the supplier-side convention is 'the narrowest aisle this truck can work in', i.e. 2739. NOTE FOR THE REVIEWER: footnote 2) on this sheet reads 'Eingeklammerte Werte bei Initialhub', so the bracketed 2694 mm is the Ast with the initial lift engaged, i.e. an even narrower documented figure. (Sonnet's own source note misread that footnote as 'autonomous mode', though it did not act on it.) I am deliberately NOT proposing 2694 — whether every load can be carried on the initial lift is not stated.",
+        "pattern_match": "min_aisle_width has a pallet-size/orientation axis with no AP0 field; 'smallest documented Ast' vs 'worst-case Ast' is unruled and decides 5 items across Linde + STILL"
+      },
+      {
+        "sonnet_product": "Linde K-MATIC",
+        "opus_product": "Linde K-MATIC",
+        "field": "vehicle_length",
+        "sonnet_value": 3843,
+        "opus_value": 4258,
+        "verdict": "REVISED",
+        "correct_value": {
+          "7.2 m mast config": 3843,
+          "11.55 m mast config": 4158,
+          "14.35 m mast config": 4258
+        },
+        "reasoning": "EN_ds_k_matic_5231_en_a_0224_view.pdf p.2 is a three-column table where all three columns are named 'K-MATIC' and differ only by mast: row '4.4 Lift h3 (mm) 7200 | 11550 | 14350', with '4.19 Overall length l1 (mm) 3843 | 4158 | 4258'. So length is a function of the mast configuration. Sonnet's record is at least internally coherent (it stored lifting_height 7200 alongside l1 3843 and b1 1450 — all column 1). My 4258 was taken from column 3 to match a 14 m lift held elsewhere, but my own Linde findings file records lifting_height as null for K-MATIC, so nothing in my own output pins the column. The honest answer is that a single K-MATIC record cannot carry these dimensions; the mast configurations should be separate variants (or the record must declare which one it describes).",
+        "pattern_match": "variant-collapse: mast configuration silently changes footprint dimensions within one product name"
+      },
+      {
+        "sonnet_product": "Linde K-MATIC",
+        "opus_product": "Linde K-MATIC",
+        "field": "vehicle_width",
+        "sonnet_value": 1450,
+        "opus_value": 1750,
+        "verdict": "REVISED",
+        "correct_value": {
+          "7.2 m mast config": 1600,
+          "11.55 m mast config": 1650,
+          "14.35 m mast config": 1750
+        },
+        "reasoning": "Same p.2, row '4.21 Overall width b1/b2 (mm) 1450/1600 | 1450/1650 | 1450/1750'. Two independent problems compound here: (a) b1 vs b2 — b2 is the overall width over the reach legs and is the figure that governs clearance (same ruling as the L-MATIC AC and Jungheinrich EKX items), so 1450 (sonnet) is the wrong column of the pair; (b) b2 itself varies with the mast configuration, so my single 1750 silently commits the record to the 14.35 m variant. Correct handling is per-configuration b2 values as listed.",
+        "pattern_match": "variant-collapse compounded with the VDI b1/b2 dual-dimension question"
+      },
+      {
+        "sonnet_product": "Linde R-MATIC",
+        "opus_product": "Linde R-MATIC",
+        "field": "vehicle_width",
+        "sonnet_value": 1290,
+        "opus_value": 1570,
+        "verdict": "CONFIRM",
+        "correct_value": 1570,
+        "reasoning": "EN_ds_r_matic_1120_en_b_0623_view.pdf p.2 lists four columns ('R 16 HD automated config. 1..4') but row '4.21 Overal width front b1/b2 (mm)' prints 1290/1570 identically in ALL four — so there is no variant question, only the b1/b2 choice. b2 = 1570 is the width over the reach legs (row 4.10 'Height of reach legs h8' confirms this is a reach truck), i.e. the vehicle's true overall width and the one that governs door/aisle clearance. Consistent with the L-MATIC AC, K-MATIC and Jungheinrich EKX rulings.",
+        "pattern_match": "VDI dual-dimension row (b1/b2) — no AP0 rule for which of two same-named values to store"
+      }
+    ],
+    "STILL GmbH": [
+      {
+        "sonnet_product": "EXV iGo",
+        "opus_product": "EXV iGo",
+        "field": "min_aisle_width",
+        "sonnet_value": 2925,
+        "opus_value": 3075,
+        "verdict": "CONCEDE",
+        "correct_value": 2925,
+        "reasoning": "iGo_systems_DE_TD.pdf p.6 (EXV iGo, single-column table): '4.34.1 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast mm 3075' and '4.34.2 Arbeitsgangbreite bei Palette 800 x 1200 längs Ast mm 2925'. Same reasoning as the Linde L-MATIC item: the field is min_aisle_width / 'MINIMUM working aisle width', and AP0's capability-maximal precedent on the sibling KO field max_payload points to the narrowest documented Ast, 2925. Also worth recording: sonnet did not blindly take a fixed VDI row — across the four Ast items it switched between 4.34.1 and 4.34.2 to take whichever was smaller, which is a deliberate and consistent rule.",
+        "pattern_match": "min_aisle_width has a pallet-size/orientation axis with no AP0 field; 'smallest documented Ast' vs 'worst-case Ast' is unruled and decides 5 items across Linde + STILL"
+      },
+      {
+        "sonnet_product": "EXV iGo",
+        "opus_product": "EXV iGo",
+        "field": "min_total_height",
+        "sonnet_value": 2443,
+        "opus_value": 1915,
+        "verdict": "CONCEDE",
+        "correct_value": 2443,
+        "reasoning": "iGo_systems_DE_TD.pdf p.6: '4.2 Höhe Hubgerüst eingefahren h1 mm 1915' and '4.7 Höhe Schutzdach h6 mm 2443'. min_total_height is 'LOWEST OVERALL vehicle height (mast collapsed)' — the parenthetical fixes the STATE (mast down), it does not say the value equals the mast height. With the mast down the vehicle's tallest fixed point is the guard/automation structure at 2443 mm, so the overall height is 2443. Decisive corroboration from the same document: on the FM-X page (p.10) STILL prints a dedicated row '4.6.1 Höhe Schutzdach inkl. Automatisierung h6.1 mm 2475' ABOVE '4.2 h1 2450' — i.e. STILL itself flags that on the automated variants the guard/automation box, not the mast, is the tallest point. My 1915 would understate this truck by 528 mm on a COND_KO field that exists precisely to check door and sprinkler clearance — the dangerous direction. PLAUSIBILITY FLAG (affects neither verdict): this table's row '4.5 Höhe Hubgerüst ausgefahren h4 mm 1915' is clearly corrupted — it repeats h1 although Hub h3 is 2844.",
+        "pattern_match": "'overall height' read as mast height only, ignoring a taller fixed superstructure (overhead guard / automation box)"
+      },
+      {
+        "sonnet_product": "FM-X 12 iGo",
+        "opus_product": "FM-X 12 iGo",
+        "field": "min_aisle_width",
+        "sonnet_value": 2975,
+        "opus_value": 3000,
+        "verdict": "CONCEDE",
+        "correct_value": 2975,
+        "reasoning": "iGo_systems_DE_TD.pdf p.10, FM-X 12 iGo column: '4.34.1 ... 1000 x 1200 quer Ast mm 2975' and '4.34.2 ... 800 x 1200 längs Ast mm 3000'. Narrowest documented Ast = 2975. Same reasoning as the EXV and Linde L-MATIC items. (Note this is the case where the 1000x1200-quer row is the SMALLER one, which is why 'always take row 4.34.2' would be the wrong rule and 'take the smaller' is the right one.)",
+        "pattern_match": "min_aisle_width has a pallet-size/orientation axis with no AP0 field; 'smallest documented Ast' vs 'worst-case Ast' is unruled and decides 5 items across Linde + STILL"
+      },
+      {
+        "sonnet_product": "FM-X 12 iGo",
+        "opus_product": "FM-X 12 iGo",
+        "field": "lifting_height",
+        "sonnet_value": 5532,
+        "opus_value": 9450,
+        "verdict": "REVISED",
+        "correct_value": 9582,
+        "reasoning": "Neither value is right. p.10's VDI row '4.4 Hub h3 mm 5532' is only the STANDARD mast (the page also prints 'Maximale Einlagerhöhe mm 5400' beside it), so sonnet's 5532 understates the product. But p.11's mast table 'FM-X 12 iGo – FM-X 14 iGo / Dreifach-Hubgerüst' runs the full range and its tallest column reads 'Hub h3 mm ... 9582' with 'Einlagerhöhe mm ... 9450'. My 9450 took the Einlagerhöhe row — and the AP0 lifting_height hint excludes exactly that by name: 'the height the forks travel, NOT building height, rack height or STORAGE height'. Einlagerhöhe IS the storage height. The correct value is the maximum fork travel, Hub h3 = 9582 mm. HONESTY AMENDMENT after re-reading the full AP0 hint: the hint's exclusion list reads 'Do NOT confuse with transfer station height, conveyor height, rack height, or building height — these are SITE dimensions', so its earlier phrase 'NOT ... storage height' most likely targets the rack's storage height, not the truck's own Einlagerhöhe. I therefore do NOT claim the Hub-vs-Einlagerhöhe question is settled: the 132 mm between 9582 (Hub h3) and 9450 (Einlagerhöhe) is still an open AP0 ruling. What IS settled by this item regardless of that ruling is the much larger error: both candidate values come from the p.11 mast table, and sonnet's 5532 is the standard-mast-only figure from the p.10 VDI base table, understating the product by ~4 m on a K.O. field.",
+        "pattern_match": "Hub (fork travel) vs Einlagerhöhe (storage height) — STILL UNRULED in AP0; separately and more importantly, the VDI base table's standard-mast Hub understates the documented mast range by ~4 m"
+      },
+      {
+        "sonnet_product": "FM-X 14 iGo",
+        "opus_product": "FM-X 14 iGo",
+        "field": "min_aisle_width",
+        "sonnet_value": 3000,
+        "opus_value": 3025,
+        "verdict": "CONCEDE",
+        "correct_value": 3000,
+        "reasoning": "iGo_systems_DE_TD.pdf p.10, FM-X 14 iGo column: '4.34.1 ... 3000' and '4.34.2 ... 3025'. Narrowest documented Ast = 3000. Same reasoning as the other Ast items.",
+        "pattern_match": "min_aisle_width has a pallet-size/orientation axis with no AP0 field; 'smallest documented Ast' vs 'worst-case Ast' is unruled and decides 5 items across Linde + STILL"
+      },
+      {
+        "sonnet_product": "FM-X 14 iGo",
+        "opus_product": "FM-X 14 iGo",
+        "field": "lifting_height",
+        "sonnet_value": 5532,
+        "opus_value": 9450,
+        "verdict": "REVISED",
+        "correct_value": 9582,
+        "reasoning": "Same as the FM-X 12 item — p.11's mast table is headed 'FM-X 12 iGo – FM-X 14 iGo' and covers both models, tallest column 'Hub h3 mm 9582' / 'Einlagerhöhe mm 9450'. Sonnet's 5532 is the standard mast only; my 9450 is the storage height that AP0's hint explicitly excludes. Correct = 9582 mm fork travel. HONESTY AMENDMENT after re-reading the full AP0 hint: the hint's exclusion list reads 'Do NOT confuse with transfer station height, conveyor height, rack height, or building height — these are SITE dimensions', so its earlier phrase 'NOT ... storage height' most likely targets the rack's storage height, not the truck's own Einlagerhöhe. I therefore do NOT claim the Hub-vs-Einlagerhöhe question is settled: the 132 mm between 9582 (Hub h3) and 9450 (Einlagerhöhe) is still an open AP0 ruling. What IS settled by this item regardless of that ruling is the much larger error: both candidate values come from the p.11 mast table, and sonnet's 5532 is the standard-mast-only figure from the p.10 VDI base table, understating the product by ~4 m on a K.O. field.",
+        "pattern_match": "Hub (fork travel) vs Einlagerhöhe (storage height) — STILL UNRULED in AP0; separately and more importantly, the VDI base table's standard-mast Hub understates the documented mast range by ~4 m"
+      },
+      {
+        "sonnet_product": "FM-X 17 iGo",
+        "opus_product": "FM-X 17 iGo",
+        "field": "lifting_height",
+        "sonnet_value": 5532,
+        "opus_value": 9450,
+        "verdict": "CONCEDE",
+        "correct_value": 5532,
+        "reasoning": "Verified on the document: p.11 carries exactly three mast tables, headed 'FM-X 12 iGo – FM-X 14 iGo', 'FM-X 20 iGo' and 'FM-X 25 iGo'. There is NO FM-X 17 mast table. The only lift figure this document prints for the FM-X 17 iGo column is p.10's '4.4 Hub h3 mm 5532'. My 9450 was carried over from the neighbouring models by assumption — that is precisely the inference this agent is not allowed to make, and it compounds the Einlagerhöhe error on top. Sonnet's 5532 is the only sourced value. FLAG FOR THE REVIEWER: this will leave FM-X 17 at 5532 while its 12/14/20/25 siblings sit at 9582, which looks wrong and almost certainly is — but the fix is a better source document for the FM-X 17, not a carried-over number.",
+        "pattern_match": "cross-variant carry-over: opus inherited a value onto a model the document does not cover"
+      },
+      {
+        "sonnet_product": "FM-X 20 iGo",
+        "opus_product": "FM-X 20 iGo",
+        "field": "lifting_height",
+        "sonnet_value": 5362,
+        "opus_value": 9450,
+        "verdict": "REVISED",
+        "correct_value": 9582,
+        "reasoning": "p.11 mast table 'FM-X 20 iGo / Dreifach-Hubgerüst', tallest column: 'Hub h3 mm ... 9582', 'Einlagerhöhe mm ... 9450'. Sonnet's 5362 is p.10's standard-mast Hub for the FM-X 20 column only; my 9450 is the excluded storage height. Correct = 9582 mm. HONESTY AMENDMENT after re-reading the full AP0 hint: the hint's exclusion list reads 'Do NOT confuse with transfer station height, conveyor height, rack height, or building height — these are SITE dimensions', so its earlier phrase 'NOT ... storage height' most likely targets the rack's storage height, not the truck's own Einlagerhöhe. I therefore do NOT claim the Hub-vs-Einlagerhöhe question is settled: the 132 mm between 9582 (Hub h3) and 9450 (Einlagerhöhe) is still an open AP0 ruling. What IS settled by this item regardless of that ruling is the much larger error: both candidate values come from the p.11 mast table, and sonnet's 5532 is the standard-mast-only figure from the p.10 VDI base table, understating the product by ~4 m on a K.O. field.",
+        "pattern_match": "Hub (fork travel) vs Einlagerhöhe (storage height) — STILL UNRULED in AP0; separately and more importantly, the VDI base table's standard-mast Hub understates the documented mast range by ~4 m"
+      },
+      {
+        "sonnet_product": "MX-X iGo",
+        "opus_product": "MX-X iGo",
+        "field": "max_speed",
+        "sonnet_value": 3.0,
+        "opus_value": 1.2,
+        "verdict": "CONCEDE",
+        "correct_value": 3.0,
+        "reasoning": "iGo_systems_DE_TD.pdf p.12 (MX-X iGo), row '5.1 Fahrgeschwindigkeit (abhängig vom Sicherheitskonzept) m/s 1,2/2,0/3,0' — printed identically in all three MX-X columns, and repeated for reverse travel in row 5.1.1. These are three speed tiers selectable by safety concept, not three products. AP0's max_speed hint is 'TOP travel speed... check safety-derated speed too', i.e. store the top and treat the derated tiers as context; max_speed is a SCORING field, so there is no K.O. risk that would justify hedging to the bottom tier. My 1.2 stored the most-derated tier as if it were the vehicle's capability, which understates this truck by a factor of 2.5. Sonnet is right.",
+        "pattern_match": "opus over-applied conservatism to max_speed where the AP0 hint asks for the top figure — the same error as the Hikrobot QF item, and the inverse of the seeded 'opus reads higher' max_speed pattern"
+      }
+    ],
+    "Toyota Material Handling Europe": [
+      {
+        "sonnet_product": "Toyota RAE160 Autopilot",
+        "opus_product": "Toyota RAE160 Autopilot",
+        "field": "load_detection",
+        "sonnet_value": [
+          "Mechanical/Tactile",
+          "Camera/Vision"
+        ],
+        "opus_value": [
+          "Camera/Vision",
+          "Barcode/DataMatrix"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Mechanical/Tactile",
+          "Camera/Vision",
+          "Barcode/DataMatrix"
+        ],
+        "reasoning": "747505-040.pdf p.5 'Truck features' lists ALL of: 'Barcode scanner (optional)', 'Load presence and push detection', 'Advanced vision aided load handling (optional)', 'Multi load detection (optional)'. Sonnet captured the tactile + vision pair and dropped the barcode scanner; I captured the vision + barcode pair and dropped 'Load presence and push detection' (Mechanical/Tactile). Neither is complete — the correct value is the union of the three. load_detection is a Multi-Select CONTEXT field, so there is no reason for either pass to have chosen a subset.",
+        "pattern_match": "partial Multi-Select coverage — each pass captured a different subset of the SAME feature list, so the union is correct and both single answers are incomplete"
+      },
+      {
+        "sonnet_product": "Toyota RAE160 Autopilot",
+        "opus_product": "Toyota RAE160 Autopilot",
+        "field": "min_aisle_width",
+        "sonnet_value": 2694,
+        "opus_value": 3096,
+        "verdict": "REVISED",
+        "correct_value": 2683,
+        "reasoning": "747505-040.pdf p.4 'Aisle width Auto mode' is a 4-axis matrix, wider than either pass explored: mode (Ast 'Rotate on point, PPS Muted' vs 'Rotate with radius 400 mm, PPS Muted') x load geometry (800x1200 / 1000x1200 / 1200x800 / 1200x1000) x battery compartment (275/347/419/491 mm) x mast. The full RAE160 275 mm row reads '2694 2831 2888 2934 | 2683 2860 3001 3018'. Sonnet searched only the rotate-on-point half and found its minimum, 2694; I took a near-worst-case cell, 3096. The smallest documented figure for this model is 2683 mm (rotate with radius 400 mm, 800x1200 load, 275 mm battery compartment), which is what min_aisle_width means on the supplier side (same ruling as the Linde/STILL Ast items). Sonnet was directionally right and only 11 mm off; my value was ~400 mm too high, which on a K.O. field would wrongly disqualify this truck from most of its real aisle range. NOTE: the 275 mm battery compartment carries footnote 1) 'Max lift height 7500mm' on p.3, so the 2683 mm figure comes with a lift-height trade-off worth recording in notes.",
+        "pattern_match": "configuration-matrix collapse on min_aisle_width — and a reminder that the matrix had a mode axis neither pass fully enumerated"
+      },
+      {
+        "sonnet_product": "Toyota RAE200 Autopilot",
+        "opus_product": "Toyota RAE200 Autopilot",
+        "field": "lifting_height",
+        "sonnet_value": 9500,
+        "opus_value": 10000,
+        "verdict": "CONFIRM",
+        "correct_value": 10000,
+        "reasoning": "747505-040.pdf p.3. The footnote sonnet relied on is '2) Max lift height 9500mm', and the battery-compartment header row shows precisely which columns carry it: RAE200 reads '347 2) | 419 2) | 491 2)' under Triplex Hi-Lo - B, then '419 | 491' under Triplex Hi-Lo - C with NO footnote marker. So the 9500 cap applies only to the Hi-Lo B configurations; the RAE200's mast table runs to 'Lift height h23 mm ... 10000' and the Hi-Lo C columns are uncapped. 10000 mm is therefore documented as achievable for the RAE200. Sonnet applied the footnote to the whole model rather than to the marked columns.",
+        "pattern_match": "footnote scoped to specific table columns, mis-applied to the whole model"
+      },
+      {
+        "sonnet_product": "Toyota RAE200 Autopilot",
+        "opus_product": "Toyota RAE200 Autopilot",
+        "field": "load_detection",
+        "sonnet_value": [
+          "Mechanical/Tactile",
+          "Camera/Vision"
+        ],
+        "opus_value": [
+          "Camera/Vision",
+          "Barcode/DataMatrix"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Mechanical/Tactile",
+          "Camera/Vision",
+          "Barcode/DataMatrix"
+        ],
+        "reasoning": "Same p.5 feature list — the 747505-040.pdf feature page is shared across RAE160/RAE200/RAE250. Same reasoning as the RAE160 item: the union of 'Load presence and push detection' (Mechanical/Tactile), 'Advanced vision aided load handling (optional)' (Camera/Vision) and 'Barcode scanner (optional)' (Barcode/DataMatrix) is correct; each pass dropped a different one.",
+        "pattern_match": "partial Multi-Select coverage — each pass captured a different subset of the SAME feature list, so the union is correct and both single answers are incomplete"
+      },
+      {
+        "sonnet_product": "Toyota RAE200 Autopilot",
+        "opus_product": "Toyota RAE200 Autopilot",
+        "field": "min_aisle_width",
+        "sonnet_value": 2801,
+        "opus_value": 3145,
+        "verdict": "REVISED",
+        "correct_value": 2781,
+        "reasoning": "Same p.4 matrix. The RAE200 rows read: 'Triplex hilo - B 347 mm: 2801 2932 2983 3031 | 2781 2954 3092 3110', '419 mm: 2845 ... | 2841 ...', '491 mm: 2893 ... | 2904 ...', 'Triplex hilo - C 419 mm: 2866 ... | 2870 ...', '491 mm: 2916 ... | 2934 ...'. The smallest documented auto-mode aisle width for the RAE200 is 2781 mm (Hi-Lo B, 347 mm battery, rotate with radius 400 mm, 800x1200 load). Sonnet's 2801 is the minimum of the rotate-on-point half only; my 3145 was a near-worst-case cell. Same ruling as the RAE160 item.",
+        "pattern_match": "configuration-matrix collapse on min_aisle_width — and a reminder that the matrix had a mode axis neither pass fully enumerated"
+      },
+      {
+        "sonnet_product": "Toyota Autopilot SAI125CB",
+        "opus_product": "Toyota Autopilot SAI125CB",
+        "field": "load_detection",
+        "sonnet_value": "Mechanical/Tactile",
+        "opus_value": [
+          "Barcode/DataMatrix",
+          "RFID",
+          "Mechanical/Tactile"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Barcode/DataMatrix",
+          "RFID",
+          "Mechanical/Tactile"
+        ],
+        "reasoning": "tmha_sai125cb_brochure.pdf p.4 'Truck features' lists 'Barcode scanner (optional)', 'RFID scanner (optional)' and 'Load detection & fork tip sensors' — three distinct load-identification mechanisms, all three mappable to AP0 allowed values. Sonnet captured only the fork-tip sensors. SCHEMA NOTE for the import author: sonnet stored this as the bare string 'Mechanical/Tactile' rather than a list, although load_detection is a Multi-Select — worth a validation check on the sonnet findings files generally.",
+        "pattern_match": "partial Multi-Select coverage — sonnet captured one of three stated detection mechanisms"
+      }
+    ],
+    "Mobile Industrial Robots A/S (MiR)": [
+      {
+        "sonnet_product": "MiR1200 Pallet Jack",
+        "opus_product": "MiR1200 Pallet Jack",
+        "field": "operating_temp_max",
+        "sonnet_value": 40,
+        "opus_value": 25,
+        "verdict": "CONFIRM",
+        "correct_value": 25,
+        "reasoning": "MiR1200 Pallet Jack specifications.pdf p.1, Environment block: 'Ambient temperature range, operation — 5–25 | 41–77°F, 40°C | 104°F for up to 1 hour'. The AP0 hint says the field holds the upper bound of the stated operating RANGE; the stated range is 5–25 °C, and 40 °C is explicitly a one-hour excursion, not a range bound. operating_temp_max is COND_KO — storing 40 would let this robot pass a tender requiring sustained operation at 30-40 °C, which the manufacturer explicitly does not support. Sonnet took the excursion figure.",
+        "pattern_match": "MiR dual temperature statement: continuous-use range vs 1-hour peak excursion (4 items, one shared document convention)"
+      },
+      {
+        "sonnet_product": "MiR250",
+        "opus_product": "MiR250",
+        "field": "min_ground_clearance",
+        "sonnet_value": 25,
+        "opus_value": 300,
+        "verdict": "CONFIRM",
+        "correct_value": 300,
+        "reasoning": "This is an AP0 field-NAME trap, and the hint settles it: min_ground_clearance reads 'ROBOT HEIGHT / clearance needed to drive UNDER the carrier (undercarriage workflows). SOURCE: VEHICLE HEIGHT SPEC. Must be less than the carrier's underside gap — classic undercarriage K.O.' It is the robot's overall height, not the chassis-to-floor gap. MiR250 Specifications 2.99.pdf p.1 Dimensions: 'Height 300 mm' (and separately 'Ground clearance 25–28 mm'). Sonnet matched the field's NAME to the document's 'Ground clearance' row; the value that makes the K.O. work ('must be less than the carrier's underside gap') is 300 mm — a 25 mm value would make every under-ride K.O. pass trivially. RECOMMENDATION: this field name should be changed in AP0 (e.g. to robot_height_under_carrier); it will keep producing this exact error in both LLM extraction and human entry.",
+        "pattern_match": "AP0 field name contradicts its own hint (min_ground_clearance actually holds robot height) — 3 MiR items, and a latent trap for every AMR supplier"
+      },
+      {
+        "sonnet_product": "MiR250",
+        "opus_product": "MiR250",
+        "field": "safety_standard",
+        "sonnet_value": [
+          "ISO 3691-4"
+        ],
+        "opus_value": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "reasoning": "MiR250 Specifications 2.99.pdf p.11 Compliance: 'Design based on principles in safety standards for industrial vehicles — ISO 3691-4 (Except Clause 4.4, 4.9.4, 5.1, 6, and Annex A), ISO 13849-1, ISO 13850, ISO 12100, ITSDF B56-5, RIA R15.08-1'. ITSDF B56-5 is named verbatim in the same row and AP0 has an exact allowed value for it ('ANSI/ITSDF B56.5'), so dropping it discards a stated standard. The 'design based on principles' hedge and the clause exclusions apply equally to ISO 3691-4, which both passes DID record — so the hedge cannot justify keeping one and dropping the other. (The hedge itself is worth carrying into notes for both values.)",
+        "pattern_match": "sonnet dropped a stated standard that has an exact AP0 allowed value"
+      },
+      {
+        "sonnet_product": "MiR250",
+        "opus_product": "MiR250",
+        "field": "operating_temp_max",
+        "sonnet_value": 40,
+        "opus_value": 25,
+        "verdict": "CONFIRM",
+        "correct_value": 25,
+        "reasoning": "MiR250 Specifications 2.99.pdf p.11: 'Ambient temperature range, operation — 5–25 °C for continuous use, maximum 40 °C for 1 hour'. Same reasoning as the MiR1200 item: the range is 5–25, the 40 is a one-hour excursion.",
+        "pattern_match": "MiR dual temperature statement: continuous-use range vs 1-hour peak excursion (4 items, one shared document convention)"
+      },
+      {
+        "sonnet_product": "MiR1350",
+        "opus_product": "MiR1350",
+        "field": "min_ground_clearance",
+        "sonnet_value": 25,
+        "opus_value": 322,
+        "verdict": "CONFIRM",
+        "correct_value": 322,
+        "reasoning": "MiR1350 Specifications 2.99.pdf p.1: 'Height 322 mm' and, separately, 'Ground clearance 25–27 mm'. Same AP0 field-name trap as the MiR250 item — the hint defines this field as the robot height for under-ride workflows, sourced from the vehicle height spec.",
+        "pattern_match": "AP0 field name contradicts its own hint (min_ground_clearance actually holds robot height) — 3 MiR items, and a latent trap for every AMR supplier"
+      },
+      {
+        "sonnet_product": "MiR1350",
+        "opus_product": "MiR1350",
+        "field": "safety_standard",
+        "sonnet_value": [
+          "ISO 3691-4"
+        ],
+        "opus_value": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "reasoning": "MiR1350 Specifications 2.99.pdf p.9-10: 'Compliant with ... ISO 3691-4 (except Clause 4.4, 4.9.4, 5.1, 5.2, 6, and Annex A)' plus 'Design based on principles in safety standards for industrial vehicles — ITSDF B56-5 and RIA R15.08-1' (verified verbatim on p.10). Same reasoning as the MiR250 item; here ITSDF B56-5 even sits in its own row.",
+        "pattern_match": "sonnet dropped a stated standard that has an exact AP0 allowed value"
+      },
+      {
+        "sonnet_product": "MiR1350",
+        "opus_product": "MiR1350",
+        "field": "operating_temp_max",
+        "sonnet_value": 40,
+        "opus_value": 25,
+        "verdict": "CONFIRM",
+        "correct_value": 25,
+        "reasoning": "MiR1350 Specifications 2.99.pdf p.9: 'Ambient temperature range, operation — 5–25 °C for continuous use, maximum 40 °C for 1 hour'. Same reasoning as the other MiR temperature items.",
+        "pattern_match": "MiR dual temperature statement: continuous-use range vs 1-hour peak excursion (4 items, one shared document convention)"
+      },
+      {
+        "sonnet_product": "MiR600",
+        "opus_product": "MiR600",
+        "field": "min_ground_clearance",
+        "sonnet_value": 25,
+        "opus_value": 322,
+        "verdict": "CONFIRM",
+        "correct_value": 322,
+        "reasoning": "MiR600 Specifications 2.99.pdf p.1: 'Height 322 mm', 'Ground clearance 25–27 mm'. Same AP0 field-name trap; the hint asks for robot height.",
+        "pattern_match": "AP0 field name contradicts its own hint (min_ground_clearance actually holds robot height) — 3 MiR items, and a latent trap for every AMR supplier"
+      },
+      {
+        "sonnet_product": "MiR600",
+        "opus_product": "MiR600",
+        "field": "safety_standard",
+        "sonnet_value": [
+          "ISO 3691-4"
+        ],
+        "opus_value": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "ISO 3691-4",
+          "ANSI/ITSDF B56.5"
+        ],
+        "reasoning": "MiR600 Specifications 2.99.pdf p.9 Compliance block: ISO 3691-4 with the clause exclusions, plus 'Design based on principles in safety standards for industrial vehicles — ITSDF B56-5 and RIA R15.08-1' (verified verbatim). Same reasoning as MiR250/MiR1350.",
+        "pattern_match": "sonnet dropped a stated standard that has an exact AP0 allowed value"
+      },
+      {
+        "sonnet_product": "MiR600",
+        "opus_product": "MiR600",
+        "field": "operating_temp_max",
+        "sonnet_value": 40,
+        "opus_value": 25,
+        "verdict": "CONFIRM",
+        "correct_value": 25,
+        "reasoning": "MiR600 Specifications 2.99.pdf p.9: 'Ambient temperature range, operation — 5–25 °C for continuous use, maximum 40 °C for 1 hour'. Same reasoning as the other MiR temperature items. All four MiR products share one house convention, so this should be ruled once and applied to all of them (and to operating_temp_min, which both passes agreed on).",
+        "pattern_match": "MiR dual temperature statement: continuous-use range vs 1-hour peak excursion (4 items, one shared document convention)"
+      }
+    ],
+    "VisionNav Robotics": [
+      {
+        "sonnet_product": "VisionNav VNP15",
+        "opus_product": "VisionNav VNP15",
+        "field": "min_aisle_width",
+        "sonnet_value": 3200,
+        "opus_value": 3150,
+        "verdict": "CONFIRM",
+        "correct_value": 3150,
+        "reasoning": "1688613405.pdf is a 4-page sheet that actually documents TWO configurations of the same model code VNP15(L)-07: pp.1-2 (body weight 2900 kg, dimensions 2543x1344x2085, Min. Turning Radius 1423 mm, 'Automatic / Manual Handheld') with 'Min. Stacking Aisle Width (Pallet Size L*W:1200*1000mm, Across Forks On Length) 3150mm', and pp.3-4 (2950 kg, 2596x1351x2085, turning radius 1529 mm, 'Automatic / Stand-up Manual') with 3200mm. Both headline blocks (p.1 and p.3) print their own figure. Under the min_aisle_width ruling I applied to Linde/STILL/Toyota — the field means the narrowest aisle the vehicle can work in — the correct single-record value is 3150. NOTE: sonnet's larger figure is not a misreading, it is the second configuration; the cleanest fix is to split VNP15 into the handheld and stand-up variants, which would also resolve the vehicle_length/turning-radius differences on this product.",
+        "pattern_match": "one model code, two configurations printed in the same sheet — a variant split hiding inside a single datasheet"
+      },
+      {
+        "sonnet_product": "VisionNav VNP15",
+        "opus_product": "VisionNav VNP15",
+        "field": "max_speed",
+        "sonnet_value": 1.3,
+        "opus_value": 1.5,
+        "verdict": "CONFIRM",
+        "correct_value": 1.5,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN, and the datasheet resolves it in favour of the higher figure. 1688613405.pdf pp.2 and 4, MOTION PERFORMANCE: 'Straight Forward Speed (Full-Load/Empty-Load) 1.3m/s, 1.5m/s' — sonnet took the full-load figure, I took the empty-load one. Two things settle it: (a) the AP0 max_speed hint is 'TOP travel speed (capture rated/unloaded if only one given)', which asks for the top and, in the tie-break clause, names the unloaded figure as the intended one; (b) VisionNav's own headline stat block on p.1 and p.3 prints '1.5m/s — Max. Safety Driving Speed', i.e. the manufacturer itself publishes 1.5 as THE speed of this vehicle. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. RECOMMENDATION for the project-wide policy question: store the top/unloaded figure (it is what vendors headline and what the hint asks for) and, if the loaded figure matters for cycle-time scoring, add a separate AP0 field rather than overloading this one.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "VisionNav VNQ40-07",
+        "opus_product": "VisionNav VNQ40(VM)-07",
+        "field": "max_speed",
+        "sonnet_value": 1.3,
+        "opus_value": 1.5,
+        "verdict": "CONFIRM",
+        "correct_value": 1.5,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. 1657089341.pdf p.17 (Q Series autonomous tow tractor), and the row-group label is decisive: the block is headed 'Maximum Driving Speed' and its first row reads 'Straight Forward (Head Direction) Full-Load/Empty-Load  1.3m/s, 1.5m/s'. The vendor's own label for the block is 'MAXIMUM driving speed', so the maximum of the pair, 1.5, is what the row is publishing. Same AP0-hint reasoning as VNP15. (Naming note: the sheet prints 'VNQ40(VM)-07'; sonnet's 'VNQ40-07' drops the nav-package suffix.)",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "VisionNav VNQ60-07",
+        "opus_product": "VisionNav VNQ60(VM)-07",
+        "field": "max_speed",
+        "sonnet_value": 1.3,
+        "opus_value": 1.5,
+        "verdict": "CONFIRM",
+        "correct_value": 1.5,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. Same p.17 table — the VNQ40(VM)-07 and VNQ60(VM)-07 columns share every motion-performance row, so 'Maximum Driving Speed / Straight Forward (Head Direction) Full-Load/Empty-Load 1.3m/s, 1.5m/s' applies to the VNQ60 too. Same reasoning.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      }
+    ],
+    "SAFELOG GmbH": [
+      {
+        "sonnet_product": "SAFELOG AGV L2 lift",
+        "opus_product": "SAFELOG L2 lift",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_L2-lift_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV L2 lift",
+        "opus_product": "SAFELOG L2 lift",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "QR/DM Code"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), inductive sensor' and Optional = 'grid codes (only with LLS)'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV M4 core",
+        "opus_product": "SAFELOG M4 core",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_M4-core_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV M4 core",
+        "opus_product": "SAFELOG M4 core",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' and Optional = '2D camera'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV M4 lift",
+        "opus_product": "SAFELOG M4 lift",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_M4-lift_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV M4 lift",
+        "opus_product": "SAFELOG M4 lift",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' and Optional = '2D camera'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV S3 tow",
+        "opus_product": "SAFELOG S3 tow",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_S3-tow_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV X1 lift 1200",
+        "opus_product": "SAFELOG X1 lift 1200",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_X1-lift-1200_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV X1 lift 1200",
+        "opus_product": "SAFELOG X1 lift 1200",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' and Optional = '2D camera, grid codes'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV X1 spin",
+        "opus_product": "SAFELOG X1 spin",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_X1-spin_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV X1 spin",
+        "opus_product": "SAFELOG X1 spin",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' and Optional = '2D camera, grid codes'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV GT1 spin",
+        "opus_product": "SAFELOG GT1 spin",
+        "field": "max_speed",
+        "sonnet_value": 2.0,
+        "opus_value": 3.0,
+        "verdict": "CONFIRM",
+        "correct_value": 3.0,
+        "reasoning": "SAFELOG_Datenblatt_GT1-spin_EN.pdf p.2 prose is explicit: 'Under full load, the robot can reach a top speed of up to 2.0 m/s, while speeds of up to 3 m/s are possible without a payload.' p.3 row reads 'Speed ([non]safe) (m/s) 0.02 - 2.0 [3.0]'. Same AP0 reasoning as the other SAFELOG speed items — the hint asks for the top/unloaded figure. IMPORTANT CAVEAT that belongs in notes and that I did not flag first time round: the p.3 row label '[non]safe' means the bracketed 3.0 is the NON-safety-rated speed, so this vehicle's 3.0 m/s is both unloaded AND outside the monitored-safety envelope (industry README puts human-shared operation at <= 1.5 m/s). The AP0 hint's own instruction 'check safety-derated speed too' is the right home for the 2.0 figure. If the Tech Lead rules that max_speed must be a safety-rated speed, this one item flips to sonnet's 2.0 — but that ruling would have to be applied consistently, not just here.",
+        "pattern_match": "SEEDED PATTERN 1 variant — the bracketed higher figure is BOTH unloaded and explicitly non-safety-rated"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV L2",
+        "opus_product": "SAFELOG L2 core",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_L2-core_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV L2",
+        "opus_product": "SAFELOG L2 core",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "QR/DM Code"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), inductive sensor' and Optional = 'grid codes (only with LLS)'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV M4",
+        "opus_product": "SAFELOG M4 tow",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_M4-tow_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV S3",
+        "opus_product": "SAFELOG S3 core",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_S3-core_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV S3",
+        "opus_product": "SAFELOG S3 core",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' and Optional = '2D camera'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV X1",
+        "opus_product": "SAFELOG X1 core",
+        "field": "max_speed",
+        "sonnet_value": 1.0,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "SAFELOG_Datasheet_X1-core_EN.pdf p.3, TECHNICAL DATA / PERFORMANCE, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)' (Standard column; the Optional column is '-'). MATCHES THE SEEDED DUAL-SPEED PATTERN: sonnet read the loaded figure (1.0), I read the unloaded figure (1.6). The AP0 max_speed hint asks for 'TOP travel speed (capture rated/unloaded if only one given)', which points to the unloaded value both directly (top) and via its tie-break clause (unloaded). SAFELOG's own product prose corroborates it: the X1 family page (p.2) reads 'driving speeds from 0.02 to 1.6 m/s' with no load qualifier at all. max_speed is a SCORING field, so storing the top figure carries no K.O. risk. Recommend recording the 1.0 m/s loaded figure in notes.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV X1",
+        "opus_product": "SAFELOG X1 core",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)"
+        ],
+        "opus_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "verdict": "REVISED",
+        "correct_value": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Natural Feature (SLAM)",
+          "Vision",
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, but it cuts the other way from the Grenzebach case: here I did not over-interpret, I UNDER-recorded. p.3 row 'Localization' prints Standard = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' and Optional = '2D camera, grid codes'. 'LiDAR (LLS)' is a STANDARD entry and I left it unmapped as too ambiguous — but dropping it turns a LiDAR-localising robot into a purely infrastructure-bound one (magnetic tape + inductive loop only), which directly corrupts the AGV-vs-AMR / infrastructure_free reasoning in industry README section 2. Checked every SAFELOG datasheet in the corpus: the words 'SLAM', 'reflector', 'contour' and 'natural feature' appear NOWHERE, and no reflector infrastructure is mentioned anywhere, so a marker-free LiDAR localisation is the only consistent reading — which is the AP0 hint's 'marker-free' / 'environment mapping' route to 'Natural Feature (SLAM)'. Sonnet's mapping was right. My own list was additionally incoherent: I included two OPTIONAL-column entries while dropping a STANDARD-column one. Correct value = the union: all Standard entries mapped, plus the Optional ones. TECH LEAD DECISION NEEDED: if AP0 should record Standard-only navigation, this collapses to exactly sonnet's list ['Magnetic Tape', 'Inductive Loop', 'Natural Feature (SLAM)'] — i.e. sonnet would be fully right on all 8 SAFELOG navigation items. Either way, 'LiDAR (LLS)' must be mapped.",
+        "pattern_match": "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type"
+      },
+      {
+        "sonnet_product": "SAFELOG AGV XS1",
+        "opus_product": "SAFELOG XS1 IntelliCart",
+        "field": "onboard_container_type",
+        "sonnet_value": [
+          "Bin"
+        ],
+        "opus_value": [
+          "Tote",
+          "Bin"
+        ],
+        "verdict": "CONFIRM",
+        "correct_value": [
+          "Tote",
+          "Bin"
+        ],
+        "reasoning": "SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf p.2: 'With a load capacity of up to 50 kg, the IntelliCart is an ideal picking solution for small parts. Maximum flexibility is ensured by height-adjustable shelves, which are designed to accommodate standard KLTs and boxes.' Two carrier kinds are named, so a two-value Multi-Select is the faithful reading: KLT (Kleinladungstraeger) -> 'Tote' and 'boxes' -> 'Bin' as the closest generic container bucket. Sonnet mapped KLT -> 'Bin', which conflicts with the mapping I applied to KNAPP's 'Behaelter' items in this same review (KLT/600x400 container -> Tote) — and consistency matters more than either choice in isolation. This is the SAME underlying AP0 gap as the KNAPP items: 'Tote' vs 'Bin' has no written mapping rule.",
+        "pattern_match": "AP0 gap: 'Tote' vs 'Bin' is under-specified for KLT / German 'Behaelter' — same root cause as 4 of the KNAPP items"
+      }
+    ],
+    "Geek+ (Geekplus Technology Co.)": [
+      {
+        "sonnet_product": "Geek+ P500R",
+        "opus_product": "Geek+ P500R",
+        "field": "max_speed",
+        "sonnet_value": 1.5,
+        "opus_value": 2.0,
+        "verdict": "CONFIRM",
+        "correct_value": 2.0,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. P-series.pdf p.1, row 'BaseTravel Speed' = 'No-load 2m/s, full-load 1.5m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ P500R",
+        "opus_product": "Geek+ P500R",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. P-series.pdf p.1, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ P800R",
+        "opus_product": "Geek+ P800R",
+        "field": "max_speed",
+        "sonnet_value": 2.0,
+        "opus_value": 2.3,
+        "verdict": "CONFIRM",
+        "correct_value": 2.3,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. P-series.pdf p.2, row 'BaseTravel Speed' = 'No-load 2.3m/s, full-load 2m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ P800R",
+        "opus_product": "Geek+ P800R",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. P-series.pdf p.2, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ P1200R",
+        "opus_product": "Geek+ P1200R",
+        "field": "max_speed",
+        "sonnet_value": 2.2,
+        "opus_value": 2.6,
+        "verdict": "CONFIRM",
+        "correct_value": 2.6,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. P-series.pdf p.3, row 'BaseTravel Speed' = 'No-load 2.6m/s, full-load 2.2m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ P1200R",
+        "opus_product": "Geek+ P1200R",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. P-series.pdf p.3, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle P40",
+        "opus_product": "Geek+ RoboShuttle P40",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. RS-series-1.pdf p.6, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ X1200Z",
+        "opus_product": "Geek+ X1200Z",
+        "field": "operating_temp_min",
+        "sonnet_value": -10,
+        "opus_value": -25,
+        "verdict": "CONFIRM",
+        "correct_value": -25,
+        "reasoning": "X-series.pdf p.1, 'Safety & Environmental Adaptability' block, 'Operating Conditions / Temperature: Room Temperature: -10~45 C; Cold Storage: 0~-25 C'. The same page splits Battery Type and Run Time along the same axis ('Room Temperature: 48V 40Ah' vs 'Cold Storage: 48V 30Ah'), so Geek+ documents two builds of the X1200Z. AP0's operating_temp_min is 'the LOWEST rated operating temperature the vehicle must sustain', and the lowest rating Geek+ publishes for this model is -25 C — capability-maximal, consistent with AP0's explicit 'report the heaviest' rule on the sibling field max_payload. NOTES REQUIRED: the -25 C figure is only reachable in the Cold Storage build, which also has a smaller battery and shorter run time (6-8 h vs 8-10 h) — a variant split would be cleaner than one record. Citation-discipline observation: the dossier shows sonnet recorded no source at all for its -10 value on this field.",
+        "pattern_match": "cold-store vs ambient build documented as two columns of one product — capability-maximal reading vs default-build reading"
+      },
+      {
+        "sonnet_product": "Geek+ X1200Z",
+        "opus_product": "Geek+ X1200Z",
+        "field": "max_speed",
+        "sonnet_value": 1.5,
+        "opus_value": 1.6,
+        "verdict": "CONFIRM",
+        "correct_value": 1.6,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. X-series.pdf p.1, row 'BaseTravel Speed' = 'No-load 1.6m/s, full-load 1.5m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS5-D",
+        "opus_product": "Geek+ RoboShuttle RS5-D",
+        "field": "max_speed",
+        "sonnet_value": 1.5,
+        "opus_value": 1.8,
+        "verdict": "CONFIRM",
+        "correct_value": 1.8,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. RS-series-1.pdf p.1, row 'BaseTravel Speed' = 'No-load 1.8m/s, full-load 1.5m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS5-D",
+        "opus_product": "Geek+ RoboShuttle RS5-D",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. RS-series-1.pdf p.1, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS8-DA",
+        "opus_product": "Geek+ RoboShuttle RS8-DA",
+        "field": "max_speed",
+        "sonnet_value": 1.5,
+        "opus_value": 1.8,
+        "verdict": "CONFIRM",
+        "correct_value": 1.8,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. RS-series-1.pdf p.2, row 'BaseTravel Speed' = 'No-load 1.8m/s, full-load 1.5m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS8-DA",
+        "opus_product": "Geek+ RoboShuttle RS8-DA",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. RS-series-1.pdf p.2, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS8-DX",
+        "opus_product": "Geek+ RoboShuttle RS8-DX",
+        "field": "max_speed",
+        "sonnet_value": 1.5,
+        "opus_value": 1.8,
+        "verdict": "CONFIRM",
+        "correct_value": 1.8,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. RS-series-1.pdf p.3, row 'BaseTravel Speed' = 'No-load 1.8m/s, full-load 1.5m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS8-DX",
+        "opus_product": "Geek+ RoboShuttle RS8-DX",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. RS-series-1.pdf p.3, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS11-DA",
+        "opus_product": "Geek+ RoboShuttle RS11-DA",
+        "field": "max_speed",
+        "sonnet_value": 1.2,
+        "opus_value": 1.8,
+        "verdict": "CONFIRM",
+        "correct_value": 1.8,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. RS-series-1.pdf p.4, row 'BaseTravel Speed' = 'No-load 1.8 m/s, full-load 1.2 m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS11-DA",
+        "opus_product": "Geek+ RoboShuttle RS11-DA",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. RS-series-1.pdf p.4, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS11-DX",
+        "opus_product": "Geek+ RoboShuttle RS11-DX",
+        "field": "max_speed",
+        "sonnet_value": 1.2,
+        "opus_value": 1.8,
+        "verdict": "CONFIRM",
+        "correct_value": 1.8,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN. RS-series-1.pdf p.5, row 'BaseTravel Speed' = 'No-load 1.8 m/s, full-load 1.2 m/s' — sonnet took the full-load figure, I took the no-load figure. The AP0 max_speed hint reads 'TOP travel speed (capture rated/unloaded if only one given)': it asks for the top, and its tie-break clause names the unloaded figure as the intended one. max_speed is SCORING, not K.O., so there is no disqualification risk in storing the top figure. Recommend the loaded figure goes into notes — across Geek+ the gap is large (up to 0.6 m/s) and matters for cycle-time expectations.",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ RoboShuttle RS11-DX",
+        "opus_product": "Geek+ RoboShuttle RS11-DX",
+        "field": "navigation_type",
+        "sonnet_value": [
+          "QR/DM Code"
+        ],
+        "opus_value": [
+          "QR/DM Code",
+          "Vision"
+        ],
+        "verdict": "CONCEDE",
+        "correct_value": [
+          "QR/DM Code"
+        ],
+        "reasoning": "MATCHES THE SEEDED NAVIGATION PATTERN, and I was the one over-interpreting. RS-series-1.pdf p.5, 'Core Features & Performance' block, row 'Navigation System' = 'Inertia + QR code visual navigation'. 'QR code visual navigation' is ONE compound term naming ONE technique — navigating by optically reading QR codes on the floor — not two independent navigation types. Splitting it into 'QR/DM Code' + 'Vision' is the identical error I conceded on KNAPP's 'Rollenfoerdertechnik' -> Roller + Conveyor: one vendor compound inflated into two AP0 Multi-Select values. It also materially misrepresents the robot: adding 'Vision' implies camera-based free navigation, when this is a grid-code robot that cannot navigate without floor codes (industry README section 2 classes QR/DM floor codes as infrastructure-BOUND). Verified across the corpus: the phrase is printed identically on every P-series and RS-series page. Note both passes correctly dropped 'Inertia' (IMU/odometry), which has no AP0 allowed value. Sonnet's ['QR/DM Code'] is right.",
+        "pattern_match": "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation"
+      },
+      {
+        "sonnet_product": "Geek+ F12ML",
+        "opus_product": "Geek+ F12ML",
+        "field": "max_payload",
+        "sonnet_value": 1000,
+        "opus_value": 1500,
+        "verdict": "CONFIRM",
+        "correct_value": 1500,
+        "reasoning": "F12ML.pdf p.1, 'Payload' block: '0-2 m: 1500 kg / 2-2.5 m: 1200 kg / 2.5-3 m: 1000 kg' — a lift-height derating curve. AP0's max_payload hint is explicit and leaves no discretion: 'If a range or several load types are given, report the HEAVIEST stated number.' That is 1500 kg. This is the same rule under which I CONCEDED the Hikrobot STU item (where I had taken the conservative 30 kg instead of the stated 50 kg) — applying it consistently means confirming 1500 here even though max_payload is a K.O. field and the derating is real. NOTES REQUIRED: the full derating curve must be recorded, because a tender needing 1200 kg at 2.8 m lift would match this product on max_payload alone and be wrong. This is a genuine AP0 modelling gap (payload-vs-lift-height curve) worth raising separately from this reconciliation.",
+        "pattern_match": "payload derating curve collapsed to one number — AP0's 'report the heaviest' rule wins, but the K.O. field then overstates capability at height"
+      },
+      {
+        "sonnet_product": "Geek+ S20T",
+        "opus_product": "Geek+ S20T V2.0",
+        "field": "max_speed",
+        "sonnet_value": 2.0,
+        "opus_value": 2.5,
+        "verdict": "CONFIRM",
+        "correct_value": 2.5,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN, and here the vendor's own row LABELS settle it. S-series-1.pdf p.1 prints two separate labelled rows: 'Robot Max Speed: 2.5m/s' and 'Fully Loaded Speed: 2.0m/s'. AP0's field is max_speed and its hint says 'Top travel speed'; Geek+ literally calls 2.5 m/s the 'Robot Max Speed'. Storing the fully-loaded figure under a field named max_speed contradicts both labels. (Corroboration that these are genuinely distinct rows and not a mis-parse: on p.3 and p.5 of the same file the two rows read 2.0 / 2.0, and on p.6 they read 2.5 / 2.5 — the pair varies independently by model.)",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ S20C",
+        "opus_product": "Geek+ S20C V2.0",
+        "field": "max_speed",
+        "sonnet_value": 2.0,
+        "opus_value": 2.5,
+        "verdict": "CONFIRM",
+        "correct_value": 2.5,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN, and here the vendor's own row LABELS settle it. S-series-1.pdf p.2 prints two separate labelled rows: 'Robot Max Speed: 2.5m/s' and 'Fully Loaded Speed: 2.0m/s'. AP0's field is max_speed and its hint says 'Top travel speed'; Geek+ literally calls 2.5 m/s the 'Robot Max Speed'. Storing the fully-loaded figure under a field named max_speed contradicts both labels. (Corroboration that these are genuinely distinct rows and not a mis-parse: on p.3 and p.5 of the same file the two rows read 2.0 / 2.0, and on p.6 they read 2.5 / 2.5 — the pair varies independently by model.)",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      },
+      {
+        "sonnet_product": "Geek+ S20C-A",
+        "opus_product": "Geek+ S20C-A V2.0",
+        "field": "max_speed",
+        "sonnet_value": 2.0,
+        "opus_value": 2.5,
+        "verdict": "CONFIRM",
+        "correct_value": 2.5,
+        "reasoning": "MATCHES THE SEEDED DUAL-SPEED PATTERN, and here the vendor's own row LABELS settle it. S-series-1.pdf p.4 prints two separate labelled rows: 'Robot Max Speed: 2.5m/s' and 'Fully Loaded Speed: 2.0m/s'. AP0's field is max_speed and its hint says 'Top travel speed'; Geek+ literally calls 2.5 m/s the 'Robot Max Speed'. Storing the fully-loaded figure under a field named max_speed contradicts both labels. (Corroboration that these are genuinely distinct rows and not a mis-parse: on p.3 and p.5 of the same file the two rows read 2.0 / 2.0, and on p.6 they read 2.5 / 2.5 — the pair varies independently by model.)",
+        "pattern_match": "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure"
+      }
+    ]
+  },
+  "running_totals": {
+    "CONFIRM": 60,
+    "CONCEDE": 27,
+    "REVISED": 19
+  },
+  "items_done": 106,
+  "summary": {
+    "by_company": {
+      "AGILOX Services GmbH": {
+        "CONFIRM": 1
+      },
+      "Balyo": {
+        "CONCEDE": 1,
+        "CONFIRM": 1
+      },
+      "Jungheinrich AG": {
+        "CONFIRM": 2
+      },
+      "KIVNON Logística S.L.": {
+        "CONFIRM": 1
+      },
+      "Omron Mobile Robotics": {
+        "CONFIRM": 2
+      },
+      "Hikrobot": {
+        "CONFIRM": 2,
+        "CONCEDE": 2
+      },
+      "Enabled Robotics ApS": {
+        "CONCEDE": 2,
+        "CONFIRM": 2
+      },
+      "Grenzebach Maschinenbau GmbH": {
+        "CONCEDE": 2
+      },
+      "KNAPP AG": {
+        "CONCEDE": 4,
+        "CONFIRM": 5
+      },
+      "Linde Material Handling": {
+        "REVISED": 4,
+        "CONFIRM": 2,
+        "CONCEDE": 1
+      },
+      "STILL GmbH": {
+        "CONCEDE": 6,
+        "REVISED": 3
+      },
+      "Toyota Material Handling Europe": {
+        "REVISED": 4,
+        "CONFIRM": 2
+      },
+      "Mobile Industrial Robots A/S (MiR)": {
+        "CONFIRM": 10
+      },
+      "VisionNav Robotics": {
+        "CONFIRM": 4
+      },
+      "SAFELOG GmbH": {
+        "CONFIRM": 12,
+        "REVISED": 8
+      },
+      "Geek+ (Geekplus Technology Co.)": {
+        "CONFIRM": 14,
+        "CONCEDE": 9
+      }
+    },
+    "by_field": {
+      "max_speed": {
+        "CONFIRM": 27,
+        "CONCEDE": 2
+      },
+      "navigation_type": {
+        "CONFIRM": 2,
+        "CONCEDE": 12,
+        "REVISED": 8
+      },
+      "min_aisle_width": {
+        "CONFIRM": 2,
+        "CONCEDE": 5,
+        "REVISED": 2
+      },
+      "lifting_height": {
+        "CONCEDE": 2,
+        "REVISED": 3,
+        "CONFIRM": 1
+      },
+      "onboard_container_type": {
+        "CONFIRM": 5
+      },
+      "vehicle_length": {
+        "CONFIRM": 1,
+        "REVISED": 3
+      },
+      "vehicle_width": {
+        "CONFIRM": 3,
+        "REVISED": 1
+      },
+      "top_module_type": {
+        "CONCEDE": 4
+      },
+      "operating_temp_max": {
+        "CONFIRM": 4
+      },
+      "load_detection": {
+        "REVISED": 2,
+        "CONFIRM": 1
+      },
+      "min_ground_clearance": {
+        "CONFIRM": 3
+      },
+      "safety_standard": {
+        "CONFIRM": 3
+      },
+      "min_total_height": {
+        "CONFIRM": 1,
+        "CONCEDE": 1
+      },
+      "charge_time": {
+        "CONFIRM": 2
+      },
+      "max_payload": {
+        "CONCEDE": 1,
+        "CONFIRM": 1
+      },
+      "integration_capability": {
+        "CONFIRM": 1
+      },
+      "workflow_capability": {
+        "CONFIRM": 1
+      },
+      "load_type": {
+        "CONFIRM": 1
+      },
+      "operating_temp_min": {
+        "CONFIRM": 1
+      }
+    },
+    "pattern_counts": {
+      "SEEDED PATTERN 1 — dual-figure speed printing (loaded vs unloaded/top): sonnet stored the loaded figure, opus stored the unloaded/top figure": 25,
+      "SEEDED PATTERN 2 — opus over-interpreted a vendor compound term ('QR code visual navigation') into an extra AP0 value; same root cause as the KNAPP 'Rollenfoerdertechnik' -> Roller + Conveyor inflation": 9,
+      "SEEDED PATTERN 2 (inverted) — opus refused to map the ambiguous vendor term 'LiDAR (LLS)' and thereby dropped a STANDARD navigation capability, while still including OPTIONAL ones; also exposes an unruled Standard-vs-Optional question for navigation_type": 8,
+      "AP0 gap: 'Tote' vs 'Bin' is under-specified for German 'Behälter'; drives 4 of the 9 KNAPP disagreements on its own": 4,
+      "min_aisle_width has a pallet-size/orientation axis with no AP0 field; 'smallest documented Ast' vs 'worst-case Ast' is unruled and decides 5 items across Linde + STILL": 4,
+      "MiR dual temperature statement: continuous-use range vs 1-hour peak excursion (4 items, one shared document convention)": 4,
+      "opus split one compound German term into two AP0 values (Rollenfördertechnik -> Roller + Conveyor), inflating a Multi-Select": 3,
+      "Hub (fork travel) vs Einlagerhöhe (storage height) — AP0's hint excludes storage height by name; separately, the VDI base table's standard mast understates the documented mast range": 3,
+      "AP0 field name contradicts its own hint (min_ground_clearance actually holds robot height) — 3 MiR items, and a latent trap for every AMR supplier": 3,
+      "sonnet dropped a stated standard that has an exact AP0 allowed value": 3,
+      "two documents state the same field over different measurement windows (partial 20-80% vs near-full 5-95% charge)": 2,
+      "AP0 defect: the navigation_type hint maps 'contour-based' -> 'Natural Feature (SLAM)' while 'Contour' is simultaneously an allowed value — opus followed the hint, sonnet followed the literal allowed value": 2,
+      "variant-collapse: one VDI Typenblatt covers several capacity models under one type name, and a single product record forces an arbitrary column choice": 2,
+      "VDI dual-dimension row (b1/b2) — no AP0 rule for which of two same-named values to store": 2,
+      "partial Multi-Select coverage — each pass captured a different subset of the SAME feature list, so the union is correct and both single answers are incomplete": 2,
+      "configuration-matrix collapse on min_aisle_width — and a reminder that the matrix had a mode axis neither pass fully enumerated": 2,
+      "non-PDF source leak (sonnet cited an .html web page, not a datasheet in the corpus)": 1,
+      "dual lift-height convention (pick/fork-travel vs drop/storage height) — same family as the unresolved 'Hub vs Einlagerhöhe' question on the VDI Typenblätter": 1,
+      "merge-vs-split granularity (sonnet merged sibling variants and took worst-case; opus kept them as separate products)": 1,
+      "VDI dual-dimension row (two values under one label: b1/b2, h3/h4, Hub/Einlagerhöhe) — no AP0 rule for which one to store": 1,
+      "lowest-configuration vs standard-configuration dimension (footnote publishes a folded/retracted alternative to the headline VDI row)": 1,
+      "speed printed as a range — conservative-low-end (sonnet) vs stated top figure (opus); sibling of the seeded max_speed pattern": 1,
+      "opus over-applied conservatism to a SCORING field where the AP0 hint asks for the maximum — inverse of the seeded max_speed pattern": 1,
+      "opus over-applied conservatism against an explicit AP0 'report the heaviest' instruction": 1,
+      "cross-document / cross-variant attribution — opus inherited a platform-level value onto a variant whose own datasheet does not state it": 1,
+      "software-feature prose read as a hardware option (opus upgraded a capability blurb into a module value)": 1,
+      "false-positive diff: Multi-Select values compared order-sensitively rather than as sets": 1,
+      "sonnet dropped a stated load carrier because it did not recognise the matching AP0 allowed value (Industriepalette = Pallet ISO)": 1,
+      "configuration-matrix collapse: for a field whose semantics are 'minimum', opus's blanket worst-case rule picked the wrong cell": 1,
+      "variant-collapse: mast configuration silently changes footprint dimensions within one product name": 1,
+      "variant-collapse compounded with the VDI b1/b2 dual-dimension question": 1,
+      "'overall height' read as mast height only, ignoring a taller fixed superstructure (overhead guard / automation box)": 1,
+      "cross-variant carry-over: opus inherited a value onto a model the document does not cover": 1,
+      "opus over-applied conservatism to max_speed where the AP0 hint asks for the top figure — the same error as the Hikrobot QF item, and the inverse of the seeded 'opus reads higher' max_speed pattern": 1,
+      "footnote scoped to specific table columns, mis-applied to the whole model": 1,
+      "partial Multi-Select coverage — sonnet captured one of three stated detection mechanisms": 1,
+      "one model code, two configurations printed in the same sheet — a variant split hiding inside a single datasheet": 1,
+      "SEEDED PATTERN 1 variant — the bracketed higher figure is BOTH unloaded and explicitly non-safety-rated": 1,
+      "AP0 gap: 'Tote' vs 'Bin' is under-specified for KLT / German 'Behaelter' — same root cause as 4 of the KNAPP items": 1,
+      "cold-store vs ambient build documented as two columns of one product — capability-maximal reading vs default-build reading": 1,
+      "payload derating curve collapsed to one number — AP0's 'report the heaviest' rule wins, but the K.O. field then overstates capability at height": 1
+    }
+  }
+}

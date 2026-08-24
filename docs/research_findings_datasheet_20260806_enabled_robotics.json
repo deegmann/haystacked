@@ -1,0 +1,90 @@
+{
+  "company": "Enabled Robotics ApS",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. NEW SUPPLIER CANDIDATE -- 'Enabled Robotics ApS' does not match any of the 38 companies currently in the DB (checked by normalized name against the pre-flight snapshot; no partial-name overlap either). HQ address printed on the brochure: Agerhatten 27A, Entrance 4, DK-5220 Odense SØ, Denmark. Two files describe the ER-FLEX product family: 'er-flex-brochure-2024_digital.pdf' (5pp marketing brochure, covers the base 'ER-FLEX 250 series') and 'er-flex-max-specifications-sheet-with-cable.pdf' (1pp technical spec sheet for a distinct, larger sibling product 'ER-FLEX-MAX'). These are NOT the same product despite sharing the ER-FLEX name and platform/software (ER-ABILITY) -- weight (161-174kg vs 460kg), transport payload (up to 186kg vs 380kg), IP rating (IP20 vs IP52/IP54) and cobot-arm options (UR5e/UR10e/UR16e vs UR20/UR30) all differ substantially, so two separate product entries were created rather than one grouped extraction. Both are mobile bases with a collaborative robot arm on top -- classified as Mobile AMR per the industry README (light-to-moderate payload, SLAM-based auto-mapped navigation, no standard floor pallet pickup; it is a pick-and-place/machine-tending cobot on wheels, not a fork/pallet handler). integration_capability is genuinely richer for the base ER-FLEX (its brochure explicitly names ERP/WES/MES/WMS/REST/OPC-UA) than what is restated on the one-page ER-FLEX-MAX spec sheet (which only explicitly lists REST/OPC-UA) -- since both run the same ER-ABILITY software platform the broader integration list is very likely also true for ER-FLEX-MAX, but per this agent's source-grounding rule I only recorded what each file itself states and flagged the likely broader applicability in ER-FLEX-MAX's notes rather than assuming it.",
+  "products": [
+    {
+      "product_name": "ER-FLEX",
+      "product_type": "Mobile AMR",
+      "source_file": "er-flex-brochure-2024_digital.pdf",
+      "db_status": "new",
+      "variant_group": "ER-FLEX family (mobile base + collaborative robot arm) -- lighter/smaller sibling of ER-FLEX-MAX; different chassis weight class, not the same physical machine",
+      "fields": {
+        "max_payload": 186,
+        "max_speed": 2.0,
+        "navigation_type": ["Natural Feature (SLAM)", "Vision"],
+        "top_module_type": ["Cobot arm"],
+        "workflow_capability": ["Transport", "Picking support"],
+        "picking_mechanism": "Autonomous arm",
+        "battery_runtime": 4.5,
+        "charge_time": 40,
+        "ingress_protection_rating": "IP20",
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "integration_capability": ["ERP", "WMS", "MES", "REST API", "OPC-UA"],
+        "barcode_readers": true,
+        "load_detection": ["Camera/Vision"]
+      },
+      "field_sources": {
+        "max_payload": "p.4 spec table 'Payload: Up to 186 kg'",
+        "max_speed": "p.4 spec table 'Max speed: 2.0 m/s'",
+        "navigation_type": "p.2 'It can set up a site map of the location in a few minutes' (SLAM/auto-mapping) + p.3 'the integrated vision system ensures precision on every task' / 'uses markers to calibrate the position before performing a task' (Vision)",
+        "top_module_type": "p.2 'The ER-FLEX combines mobility and handling in one robot' -- mobile base with an onboard collaborative robot arm (arm options confirmed p.4)",
+        "workflow_capability": "p.2 use-case list: 'PICK N' PLACE', 'MACHINE TENDING', 'LINESIDE DELIVERY' (Transport + item handling) and 'INSPECTION & DOCUMENTATION' (Picking support-adjacent quality/documentation task)",
+        "picking_mechanism": "p.2 'Make the robot pick an item from a rack, go to the machine, place the item in the machine, take it out and repeat' -- performed by the onboard arm autonomously",
+        "battery_runtime": "p.4 spec table 'Operating time: 4.5 hours - 100% to 10%'",
+        "charge_time": "p.4 spec table 'Charge time: 40 minutes - 20% to 80%'",
+        "ingress_protection_rating": "p.4 spec table 'Environment: 5-40°C IP20'",
+        "operating_temp_min": "p.4 spec table 'Environment: 5-40°C IP20'",
+        "operating_temp_max": "p.4 spec table 'Environment: 5-40°C IP20'",
+        "operating_humidity_max": "p.4 spec table '(humidity 10-95% non-condensing)'",
+        "integration_capability": "p.2 'it allows for communication with your ERP, WES, MES or WMS systems, production machines, doors and elevators'; p.3 'The ER-FLEX can communicate with machines, electrical doors, elevators and other systems through OPC UA or REST. It also exposes a REST API for communication with your in-house ERP, WES, MES or WMS systems' -- WES has no matching AP0 allowed value and was not mapped to anything",
+        "barcode_readers": "p.3 'Placing barcodes and QR codes on shelves, boxes or machines will let you know the exact time and place of e.g. delivery, pick or quality control' -- implies the robot reads these codes",
+        "load_detection": "p.3 'the integrated vision system ensures precision on every task' + 'ultra-precise camera and uses markers to calibrate the position'"
+      },
+      "notes": "Company-level field country='DK' (ISO 3166) can be derived from the printed HQ address 'DK-5220 Odense SØ, Denmark' -- recorded at company level in the company_wide_context-adjacent note here since this findings schema scopes 'fields' per product; import script should also set Company.country='DK' for Enabled Robotics ApS. lift_height intentionally left null (not 0): the ER-FLEX is a fixed-arm-height mobile cobot base, not a lifting-type AMR -- there is no stated lift function, so null (unknown/not-applicable) is used rather than 0, consistent with Blank ≠ Zero. Vehicle dimension figures appear on the p.4 diagram (357/840/517/364/800/580 mm) but are unlabeled callout numbers on an image without a legend in the extracted text -- NOT used for vehicle_length/vehicle_width to avoid misattributing an unlabeled number to the wrong field; a page-image read of the labelled diagram could resolve this in a future pass if precise footprint is needed. battery_type intentionally left null: 'Battery 34.2 Ah / 1.63 kWh' capacity is stated but chemistry (Li-Ion etc.) is never named on this brochure. autonomous_charging intentionally left null: brochure says only 'smart charging' without confirming autonomous docking."
+    },
+    {
+      "product_name": "ER-FLEX-MAX",
+      "product_type": "Mobile AMR",
+      "source_file": "er-flex-max-specifications-sheet-with-cable.pdf",
+      "db_status": "new",
+      "variant_group": "ER-FLEX family (mobile base + collaborative robot arm) -- heavier/larger sibling of ER-FLEX; different chassis weight class, not the same physical machine",
+      "fields": {
+        "max_payload": 380,
+        "max_speed": 2.0,
+        "vehicle_length": 1350,
+        "vehicle_width": 910,
+        "battery_runtime": 4.0,
+        "ingress_protection_rating": "IP52",
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "integration_capability": ["REST API", "OPC-UA"],
+        "barcode_readers": true,
+        "load_detection": ["Camera/Vision"],
+        "navigation_type": ["Vision"],
+        "top_module_type": ["Cobot arm"]
+      },
+      "field_sources": {
+        "max_payload": "spec sheet 'Transport Payload: 380 kg' (distinct from 'Arm Payload' 20kg/30kg for the UR20/UR30 arm options, which has no matching AP0 field and is documented only in notes)",
+        "max_speed": "spec sheet 'Max Driving Speed: 2 m/s'",
+        "vehicle_length": "spec sheet 'Foot print: 1350 x 910 mm' -- used as length x width",
+        "vehicle_width": "spec sheet 'Foot print: 1350 x 910 mm' -- used as length x width",
+        "battery_runtime": "spec sheet 'Operation*: 4 hours (100% - 10%)'",
+        "ingress_protection_rating": "spec sheet 'IP rating: IP52 (Arm and Tower - IP54)' -- IP52 used as the primary/base-unit rating (valid AP0 allowed_value); the higher IP54 for arm/tower sub-assembly is noted here, not a separate allowed value",
+        "operating_temp_min": "spec sheet 'Ambient temperature: 5 - 40°C'",
+        "operating_temp_max": "spec sheet 'Ambient temperature: 5 - 40°C' (note: 'Max ambient temp for 1 h' qualifier present but no second number given for that condition)",
+        "operating_humidity_max": "spec sheet 'Humidity: 10-95% non-condensing'",
+        "integration_capability": "spec sheet feature list 'Communication with external IT systems through REST or OPC-UA'",
+        "barcode_readers": "spec sheet feature list 'Reading of QR and bar-code'",
+        "load_detection": "spec sheet feature list '3D Cameras - Detects objects taller than 40 cm' + 'Vision system for precise localization to marker'",
+        "navigation_type": "spec sheet feature list 'Vision system for precise localization to marker'",
+        "top_module_type": "product name/positioning as a mobile base + arm (UR20/UR30 options) matching the ER-FLEX family design"
+      },
+      "notes": "Sibling of 'ER-FLEX' (250 series) documented in the same session from 'er-flex-brochure-2024_digital.pdf' -- that brochure states broader integration_capability (ERP/WMS/MES in addition to REST/OPC-UA) for the same ER-ABILITY software platform, which very likely also applies to ER-FLEX-MAX, but this one-page MAX spec sheet itself only explicitly names REST and OPC-UA -- recorded conservatively per-source rather than assumed; reviewer may want to add ERP/WMS/MES here too after confirming with the vendor. navigation_type here is limited to 'Vision' (explicitly stated on this sheet); SLAM/auto-mapping is documented for the base ER-FLEX brochure but not explicitly restated on this MAX spec sheet, so not added here to stay strictly source-grounded per file. Laser Scanners ('Detects objects from afar, 360°') and Proximity sensors are safety features, not navigation, and have no direct AP0 field mapping beyond what functional_safety_level/safety_standard would need (neither of which is stated with an explicit PL/SIL rating or named standard, so both left null)."
+    }
+  ]
+}

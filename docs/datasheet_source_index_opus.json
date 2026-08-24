@@ -1,0 +1,1718 @@
+{
+ "_meta": {
+  "purpose": "Local, cumulative index of which datasheet PDF documents which vehicle/company, for the OPUS REDO pass (2026-08-08+). Parallel to docs/datasheet_source_index.json (the original sonnet-era index) — kept separate so the two passes stay independently comparable. Maintained by agv-datasheet-ingestor as a standing deliverable per processed group.",
+  "status": "LOCAL STAGING ONLY - not yet an AP0 field or an Airtable column. FINAL: opus redo pass complete 2026-08-10 (138 PDFs). CLOSEOUT 2026-08-19: the last 2 never-extracted PDFs (deferred by every prior pass on size/budget grounds) processed - corpus now fully covered, Datasheets/AGV_AMR/New/ empty.",
+  "updated": "2026-08-19"
+ },
+ "entries": [
+  {
+   "pdf_file": "SAFELOG_Datasheet_M4-lift_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG M4 lift"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_M4-core_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG M4 core"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_M4-tow_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG M4 tow"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_L2-lift_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG L2 lift"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_L2-core_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG L2 core"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_X1-lift-1200_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG X1 lift 1200"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_X1-core_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG X1 core"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_X1-spin_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG X1 spin"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_S3-core_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG S3 core"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_S3-tow_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG S3 tow"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datenblatt_GT1-spin_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG GT1 spin"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG XS1 IntelliCart"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "SAFELOG_Datasheet_XS1-IntelliCart_EN-2.pdf",
+   "company": "SAFELOG GmbH",
+   "products": [
+    "SAFELOG XS1 IntelliCart"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_safelog.json",
+   "date_processed": "2026-08-08",
+   "note": "byte-identical duplicate of SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf; content already captured, no separate extraction pass"
+  },
+  {
+   "pdf_file": "Grenzebach_Data_Sheet_L1200S-Li_en.pdf",
+   "company": "Grenzebach Maschinenbau GmbH",
+   "products": [
+    "Grenzebach L1200S-Li"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_grenzebach.json",
+   "date_processed": "2026-08-08",
+   "note": "file is titled L1200S-Li; DB row is plain 'Grenzebach L1200S' — same-product-or-not is unresolved"
+  },
+  {
+   "pdf_file": "Grenzebach_Intralogistics_Data_Sheet_FF1200S_en.pdf",
+   "company": "Grenzebach Maschinenbau GmbH",
+   "products": [
+    "Grenzebach FF1200S"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_grenzebach.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "Grenzebach_Intralogistics_OL1200S_Brochure_EN.pdf",
+   "company": "Grenzebach Maschinenbau GmbH",
+   "products": [
+    "Grenzebach OL1200S"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_grenzebach.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "FL1500-data-sheet-EN.pdf",
+   "company": "Stäubli",
+   "products": [
+    "Stäubli FL1500"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_staubli.json + docs/research_findings_opus_20260808_staubli_addendum.json",
+   "date_processed": "2026-08-08",
+   "note": "lifting_height (KO) not recoverable — lives only on an unrenderable CAD drawing; poppler/pdftoppm unavailable | 2026-08-08 addendum: lifting_height gap CLOSED via pdftoppm 200dpi render of the p.2 CAD drawings - DUPLEX MAST 3205 mm (confirms the DB), MONO MAST 1835 mm (missing variant)."
+  },
+  {
+   "pdf_file": "PF3-data-sheet-EN.pdf",
+   "company": "Stäubli",
+   "products": [
+    "Stäubli PF3"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_staubli.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "MiR250 Specifications 2.99.pdf",
+   "company": "Mobile Industrial Robots A/S (MiR)",
+   "products": [
+    "MiR250"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_mir.json",
+   "date_processed": "2026-08-08",
+   "note": "also documents a 'MiR250 Dynamic' configuration; differences are operational-space only, no AP0 field — not split into a variant"
+  },
+  {
+   "pdf_file": "MiR600 Specifications 2.99.pdf",
+   "company": "Mobile Industrial Robots A/S (MiR)",
+   "products": [
+    "MiR600"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_mir.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "MiR1350 Specifications 2.99.pdf",
+   "company": "Mobile Industrial Robots A/S (MiR)",
+   "products": [
+    "MiR1350"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_mir.json",
+   "date_processed": "2026-08-08",
+   "note": "shares chassis with MiR600 — base-model grouping candidate"
+  },
+  {
+   "pdf_file": "MiR1200 Pallet Jack specifications.pdf",
+   "company": "Mobile Industrial Robots A/S (MiR)",
+   "products": [
+    "MiR1200 Pallet Jack"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_mir.json",
+   "date_processed": "2026-08-08",
+   "note": "product_type Mobile AMR vs Forklift AGV flagged for Tech Lead decision"
+  },
+  {
+   "pdf_file": "mir_palletjack_1_pager.pdf",
+   "company": "Mobile Industrial Robots A/S (MiR)",
+   "products": [
+    "MiR1200 Pallet Jack"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_mir.json",
+   "date_processed": "2026-08-08",
+   "note": "second file for the same product (marketing one-pager); contradicts the spec sheet on lift height and mislabels mm as cm"
+  },
+  {
+   "pdf_file": "F3-1500_flyer_eng_cemat_v2.pdf",
+   "company": "Hikrobot",
+   "products": [
+    "Hikrobot F3-1500"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_hikrobot.json",
+   "date_processed": "2026-08-08"
+  },
+  {
+   "pdf_file": "STU_flyer_eng_cemat_v2.pdf",
+   "company": "Hikrobot",
+   "products": [
+    "Hikrobot STU MR-TP6-30SCH",
+    "Hikrobot STU MR-TP6-30SCW"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_hikrobot.json",
+   "date_processed": "2026-08-08",
+   "note": "two model columns in one table; tote-to-person CTU robots, no STU product exists in the DB"
+  },
+  {
+   "pdf_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf",
+   "company": "Hikrobot",
+   "products": [
+    "Hikrobot Q7-600D",
+    "Hikrobot Q7-1000D"
+   ],
+   "db_status": "new+enrich",
+   "findings_file": "docs/research_findings_opus_20260808_hikrobot.json",
+   "date_processed": "2026-08-08",
+   "note": "BROKEN TEXT LAYER — no ToUnicode CMap; recovered by substitution-cipher analysis. Model-name prefix (Q7 vs QF) and one height digit unverified. Needs human check against a rendered page."
+  },
+  {
+   "pdf_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng-2.pdf",
+   "company": "Hikrobot",
+   "products": [
+    "Hikrobot Q7-600D",
+    "Hikrobot Q7-1000D"
+   ],
+   "db_status": "new+enrich",
+   "findings_file": "docs/research_findings_opus_20260808_hikrobot.json",
+   "date_processed": "2026-08-08",
+   "note": "byte-identical duplicate of 'QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf'; content already captured, no separate extraction pass"
+  },
+  {
+   "pdf_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf",
+   "company": "KNAPP AG",
+   "products": [
+    "KNAPP Open Shuttle Fork",
+    "KNAPP Open Shuttle 50",
+    "KNAPP Open Shuttle 100",
+    "KNAPP Open Shuttle Boxgrip",
+    "KNAPP Open Shuttle 50 ASG"
+   ],
+   "db_status": "new+enrich",
+   "findings_file": "docs/research_findings_opus_20260808_knapp.json",
+   "date_processed": "2026-08-08",
+   "note": "34-page multi-product catalog covering 5 vehicles + KiSoft FCS fleet software + accessories; imprint names KNAPP Industry Solutions GmbH, not KNAPP AG"
+  },
+  {
+   "pdf_file": "KNAPP-Folder Open Shuttle Productinfo de-2-2.pdf",
+   "company": "KNAPP AG",
+   "products": [
+    "KNAPP Open Shuttle Fork",
+    "KNAPP Open Shuttle 50",
+    "KNAPP Open Shuttle 100",
+    "KNAPP Open Shuttle Boxgrip",
+    "KNAPP Open Shuttle 50 ASG"
+   ],
+   "db_status": "new+enrich",
+   "findings_file": "docs/research_findings_opus_20260808_knapp.json",
+   "date_processed": "2026-08-08",
+   "note": "byte-identical duplicate of 'KNAPP-Folder Open Shuttle Productinfo de-2.pdf'; no separate extraction pass"
+  },
+  {
+   "pdf_file": "KNAPP-Folder Open Shuttle Productinfo de-2-3.pdf",
+   "company": "KNAPP AG",
+   "products": [
+    "KNAPP Open Shuttle Fork",
+    "KNAPP Open Shuttle 50",
+    "KNAPP Open Shuttle 100",
+    "KNAPP Open Shuttle Boxgrip",
+    "KNAPP Open Shuttle 50 ASG"
+   ],
+   "db_status": "new+enrich",
+   "findings_file": "docs/research_findings_opus_20260808_knapp.json",
+   "date_processed": "2026-08-08",
+   "note": "byte-identical duplicate of 'KNAPP-Folder Open Shuttle Productinfo de-2.pdf'; no separate extraction pass"
+  },
+  {
+   "pdf_file": "download-technical-data-amr-soto-data.pdf",
+   "company": "Magazino",
+   "products": [
+    "SOTO",
+    "Jungheinrich SOTO"
+   ],
+   "db_status": "enrich+new",
+   "findings_file": "docs/research_findings_opus_20260808_magazino.json",
+   "date_processed": "2026-08-08",
+   "note": "Jungheinrich-published spec sheet for the Magazino SOTO; standing 'extra brand' decision applied"
+  },
+  {
+   "pdf_file": "download-product-advantages-amr-soto-data.pdf",
+   "company": "Magazino",
+   "products": [
+    "SOTO",
+    "Jungheinrich SOTO"
+   ],
+   "db_status": "enrich+new",
+   "findings_file": "docs/research_findings_opus_20260808_magazino.json",
+   "date_processed": "2026-08-08",
+   "note": "second file for the same product (Jungheinrich-branded benefits brochure)"
+  },
+  {
+   "pdf_file": "lae250-technicky-list.pdf",
+   "company": "Toyota Material Handling Europe",
+   "products": [
+    "BT Levio LAE250 Autopilot"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_toyota_part1.json",
+   "date_processed": "2026-08-08",
+   "note": "VDI 2198 spec sheet, 2019; battery x fork-length configuration matrix on p.3"
+  },
+  {
+   "pdf_file": "sae160-technicky-list.pdf",
+   "company": "Toyota Material Handling Europe",
+   "products": [
+    "Toyota Staxio SAE160 Autopilot (Triplex Hi-Lo)",
+    "Toyota Staxio SAE160 Autopilot (Duplex Tele)"
+   ],
+   "db_status": "enrich+new",
+   "findings_file": "docs/research_findings_opus_20260808_toyota_part1.json",
+   "date_processed": "2026-08-08",
+   "note": "two mast columns = two variants; existing single DB row maps to the Triplex. Footnote 3: automode load-station height is h23-200mm"
+  },
+  {
+   "pdf_file": "tae500-technicky-list-003.pdf",
+   "company": "Toyota Material Handling Europe",
+   "products": [
+    "Toyota Movit TAE500 Autopilot"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_toyota_part2.json",
+   "date_processed": "2026-08-08",
+   "note": "VDI 2198 sheet, 2018 (749993-040 v3). turning_radius 1597mm newly available. max_trailers NOT stated. Towing-ball coupling option has no clean AP0 value."
+  },
+  {
+   "pdf_file": "tmha_sai125cb_brochure.pdf",
+   "company": "Toyota Material Handling Europe",
+   "products": [
+    "Toyota Autopilot SAI125CB"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_toyota_part2.json",
+   "date_processed": "2026-08-08",
+   "note": "Issued by Toyota Material Handling AUSTRALIA, not Europe. Two mast columns share model designation SAI125CB -> NOT split. Payload derates 1250->900 kg over the lift range."
+  },
+  {
+   "pdf_file": "LOWY, Robotic Stacker, AGV:AMR | BALYO.pdf",
+   "company": "Balyo",
+   "products": [
+    "LOWY"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_balyo.json",
+   "date_processed": "2026-08-08",
+   "note": "Print-to-PDF of a balyo.com product page (no VDI table, no page numbers). Conflicts: min_aisle_width 2900 vs DB 2700; safety_coverage Full 3D vs DB Single plane (2D)."
+  },
+  {
+   "pdf_file": "LOWY HD, Robotic Heavy Duty Stacker, AGV:AMR | BALYO.pdf",
+   "company": "Balyo",
+   "products": [
+    "LOWY HD"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_balyo.json",
+   "date_processed": "2026-08-08",
+   "note": "Proposed split out of the merged DB row 'LOWY / LOWY HD'. Page H1 is identical to the plain LOWY page ('LOWY Stacker AGV/AMR') - likely why they were merged."
+  },
+  {
+   "pdf_file": "LOWY CB, Robotic Counterbalanced Stacker, AGV:AMR | BALYO.pdf",
+   "company": "Balyo",
+   "products": [
+    "LOWY CB"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_balyo.json",
+   "date_processed": "2026-08-08",
+   "note": "Conflict: min_aisle_width 3400 vs DB 3800. Source has an internal 4m/12ft vs 4m/13ft typo; metric figure unaffected."
+  },
+  {
+   "pdf_file": "TUGGY, Robotic Tugger Truck, AGV:AMR | BALYO.pdf",
+   "company": "Balyo",
+   "products": [
+    "TUGGY"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_balyo.json",
+   "date_processed": "2026-08-08",
+   "note": "Best enrichment of the group: auto_hitch (COND_KO, was NULL), max_speed, vehicle L/W, autonomous_charging, Lead-Acid added. coupling_type 'Automatic (verify)' now verified."
+  },
+  {
+   "pdf_file": "Veeny_-_VNA_Datasheet_-_11112021.pdf",
+   "company": "Balyo",
+   "products": [
+    "VEENY"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_balyo.json",
+   "date_processed": "2026-08-08",
+   "note": "Real datasheet (01/2020). Corrupted embedded text layer - read via pdftoppm 160dpi render. Conflicts: lifting_height 14510 vs DB 17200; battery_type Lead-Acid vs DB Li-Ion."
+  },
+  {
+   "pdf_file": "Agilox One.pdf",
+   "company": "AGILOX Services GmbH",
+   "products": [
+    "AGILOX ONE",
+    "AGILOX ONE (Doppelscherenhub)",
+    "AGILOX NFK"
+   ],
+   "db_status": "conflict+new",
+   "findings_file": "docs/research_findings_opus_20260808_agilox.json",
+   "date_processed": "2026-08-08",
+   "note": "Print-to-PDF of an agilox.net product page. TECHNISCHE DETAILS has TWO columns (Einfach-/Doppelscherenhub) - the Doppelscherenhub (750 kg / 1100 mm lift) is missing from the DB."
+  },
+  {
+   "pdf_file": "Agilox OFL.pdf",
+   "company": "AGILOX Services GmbH",
+   "products": [
+    "AGILOX OFL"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_agilox.json",
+   "date_processed": "2026-08-08",
+   "note": "Print-to-PDF of an agilox.net product page. vehicle_length 1655 here vs 1635 in the corporate folder p.17 (imperial cross-check favours 1655). 1200 kg payload option flagged, not written."
+  },
+  {
+   "pdf_file": "Agilox ODM.pdf",
+   "company": "AGILOX Services GmbH",
+   "products": [
+    "AGILOX ODM 600",
+    "AGILOX ODM 800"
+   ],
+   "db_status": "conflict+new",
+   "findings_file": "docs/research_findings_opus_20260808_agilox.json",
+   "date_processed": "2026-08-08",
+   "note": "Print-to-PDF of an agilox.net product page. WARNING: it mislabels MIN. DURCHFAHRTSBREITE (1000 mm) as MIN. GANGBREITE; the corporate folder p.17 gives Gangbreite 1300 mm. charge_time 11 min newly available."
+  },
+  {
+   "pdf_file": "agilox-corporate-folder-o-de_02_2026_web.pdf",
+   "company": "AGILOX Services GmbH",
+   "products": [
+    "AGILOX ONE",
+    "AGILOX OFL",
+    "AGILOX OCF",
+    "AGILOX ODM 600",
+    "AGILOX ODM 800",
+    "(company-wide)"
+   ],
+   "db_status": "conflict+new",
+   "findings_file": "docs/research_findings_opus_20260808_agilox.json",
+   "date_processed": "2026-08-08",
+   "note": "20-page corporate brochure, 02/2026. p.17 is a 4-product x 12-criterion comparison matrix (ODM spans 2 columns) - the highest-value page in the AGILOX set; verified by pdftoppm render. Also the sole source for the OCF. Company-wide: UL 3100, Contour navigation, ERP/MES integration, modification_process."
+  },
+  {
+   "pdf_file": "P-series.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "Geek+ P500R",
+    "Geek+ P800R",
+    "Geek+ P1200R"
+   ],
+   "db_status": "enrich+conflict",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "3 pp, one model per page. No manufacturer name printed anywhere - attribution via the Tech Lead standing decision plus internal '-EWE/-EWS' and 'Popick' references. Conflict: P800R max_payload 1000 vs DB 600."
+  },
+  {
+   "pdf_file": "X-series.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "Geek+ X1200Z"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "Whole X-Series absent from the DB. Cold Storage build rated 0~-25 C - the only sub -10 C Geek+ machine in the corpus. 'Navigation System: Motor-driven' looks like a template fill error."
+  },
+  {
+   "pdf_file": "S-series-1.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "Geek+ S20T V2.0",
+    "Geek+ S20C V2.0",
+    "Geek+ S20C V3.0",
+    "Geek+ S20C-A V2.0",
+    "Geek+ S20C-H-SNE V3.0",
+    "Geek+ S100C V2.0"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "6 pp, 6 models, none in the DB. 8-100 kg payloads - below the AMR plausibility floor; needs a scope decision. No 'Navigation System' row on any page."
+  },
+  {
+   "pdf_file": "S-series-2.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "(duplicate)"
+   ],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "md5-identical to S-series-1.pdf (8998b72b9ef90753190dbde9553c6c87). Not extracted separately."
+  },
+  {
+   "pdf_file": "RS-series-1.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "Geek+ RoboShuttle RS5-D",
+    "Geek+ RoboShuttle RS8-DA",
+    "Geek+ RoboShuttle RS8-DX",
+    "Geek+ RoboShuttle RS11-DA",
+    "Geek+ RoboShuttle RS11-DX",
+    "Geek+ RoboShuttle P40"
+   ],
+   "db_status": "enrich+new",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "6 pp. NOTE p.6 is headed 'P-Series Robots P40R' despite the filename. RS5-D / RS8-DX / RS11-DX are new; the -DX variants are indistinguishable from the -DA on every AP0-storable field."
+  },
+  {
+   "pdf_file": "RS-series-1-2.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "(duplicate)"
+   ],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "md5-identical to RS-series-1.pdf (468d7c8da19bb5597ad63009265d79c7). Not extracted separately."
+  },
+  {
+   "pdf_file": "RS-series-1-3.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "(duplicate)"
+   ],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "md5-identical to RS-series-1.pdf (468d7c8da19bb5597ad63009265d79c7). Not extracted separately."
+  },
+  {
+   "pdf_file": "RS-series-3.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "(duplicate)"
+   ],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "md5-identical to RS-series-1.pdf (468d7c8da19bb5597ad63009265d79c7). Not extracted separately."
+  },
+  {
+   "pdf_file": "F12ML.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "Geek+ F12ML"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "1 p. lifting_height 2300 mm vs DB 120 mm - the F12ML/F20MT rows appear mixed up. Also max_payload derates 1500/1200/1000 kg over the lift range; DB holds 1400, matching no cell."
+  },
+  {
+   "pdf_file": "F20MT.pdf",
+   "company": "Geek+ (Geekplus Technology Co.)",
+   "products": [
+    "Geek+ F20MT"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_geekplus.json",
+   "date_processed": "2026-08-08",
+   "note": "1 p. lifting_height 120 mm vs DB 3244 mm (which matches neither document). drive_type 'Counterbalanced' questioned - 120 mm lift + fork spread = pallet mover."
+  },
+  {
+   "pdf_file": "747505-040.pdf",
+   "company": "Toyota Material Handling Europe",
+   "products": [
+    "Toyota RAE160 Autopilot",
+    "Toyota RAE200 Autopilot",
+    "Toyota Reflex RAE250 Autopilot"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_toyota_part3.json",
+   "date_processed": "2026-08-08",
+   "note": "5 p. VDI-2198 Typenblatt covering RAE160/RAE200/RAE250 in parallel. RAE200 is NEW (middle column of a table whose outer columns are both already in the DB). Conflicts: RAE250 max_speed 2.5 vs 2.0 m/s, RAE250 lifting_height 12000 vs 10000, RAE160 lifting_height 11000 vs 10000. Payload derates hard with lift height (p.4)."
+  },
+  {
+   "pdf_file": "Reach Truck Gen 2-Black Truck-Datasheet-EN.pdf",
+   "company": "Balyo",
+   "products": [
+    "REACHY"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_balyo_addendum.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p., dated 01/2020. Conflicts: lifting_height 11000 (DB) vs 11455 (stated 3x), battery_type Li-Ion (DB) vs lead-acid/TPPL only. Publishes payload derating as its own table row (1600 kg -> 1100 kg at max stacking height). Bold rows have doubled glyphs; de-interleaved values verified against the sheet's printed imperial twins."
+  },
+  {
+   "pdf_file": "Sterimove-datasheet-EN.pdf",
+   "company": "Stäubli",
+   "products": [
+    "Stäubli Sterimove"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_staubli_addendum2.json",
+   "date_processed": "2026-08-08",
+   "note": "3 p., (c) Staubli 02/2026 V1, doc 40729181D. Cleanroom/aseptic Mobile AMR, NOT in the DB. Stamped 'Preliminary data'. Company identifiable only from the last page's legal footer. p.2 two-column spec block needed extract_tables()."
+  },
+  {
+   "pdf_file": "Mobile-Robotics-portfolio-EN.pdf",
+   "company": "Stäubli",
+   "products": [
+    "Stäubli FL1500",
+    "Stäubli Sterimove",
+    "Stäubli PF3",
+    "Stäubli PF3 OMNI",
+    "Stäubli PF6"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_staubli_addendum2.json",
+   "date_processed": "2026-08-08",
+   "note": "4 p., (c) Staubli 03/2026 V15, doc 40978181D. Range overview. Surfaces PF3 (Tricycle) vs PF3 OMNI (Omnidirectional) as two products where the DB has one; and metric 3t/6t ratings vs the DB's imperial-derived 2721/5443 kg."
+  },
+  {
+   "pdf_file": "Training-brochure-mobile robotics-EN.pdf",
+   "company": "Stäubli",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_staubli_addendum2.json",
+   "date_processed": "2026-08-08",
+   "note": "6 p., (c) Staubli 02/2025 V2, doc 40749181D. Staubli Academy course catalogue - no vehicle specs. Staged as company_wide_context (installation_process, modification_process, integration_capability MES); must be fanned out per base model."
+  },
+  {
+   "pdf_file": "er-flex-brochure-2024_digital.pdf",
+   "company": "Enabled Robotics ApS",
+   "products": [
+    "ER-FLEX 250"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_enabled_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "5 p., 2024. NEW SUPPLIER, not in DB. Previously mis-attributed to Vecna on the 'er-flex' filename. Company identity on p.5 only (Odense SO, Denmark). Mobile manipulator (AMR base + UR cobot arm)."
+  },
+  {
+   "pdf_file": "er-flex-max-specifications-sheet-with-cable.pdf",
+   "company": "Enabled Robotics ApS",
+   "products": [
+    "ER-FLEX-MAX"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_enabled_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "1 p. Carries NO company name anywhere - attributable only via shared ER-FLEX/ER-ABILITY branding with the brochure. 380 kg transport payload vs 20/30 kg arm payload on the same sheet."
+  },
+  {
+   "pdf_file": "AMADEUS-OnePager-2025-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "AMADEUS Classic",
+    "AMADEUS Counter",
+    "AMADEUS Wide",
+    "AMADEUS Low"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p., 2025 series sheet (classic/counter/wide/low/grip). Duplex mast max 2.800 mm vs DB 2880 on Classic/Wide/Grip."
+  },
+  {
+   "pdf_file": "AMADEUS_Grip_Onepager_2022_DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "AMADEUS Grip"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p., 2022 APPLICATION paper for insulation-board production, not a generic product sheet. 800 kg / 85-600 mm / Magnet vs DB 2000 kg / 2880 mm / Laser+SLAM. Adds special_fork_option Clamp."
+  },
+  {
+   "pdf_file": "Arny-OnePager-2026-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "ARNY Mono",
+    "ARNY Duplex",
+    "ARNY Triplex",
+    "ARNY HD Triplex"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p., 4-variant table. HEADLINE: min_aisle_width 3700 mm ('enge Gassen ab 3,7 m Breite'), a hard KO field currently null on all four. All payloads and lift heights confirm the DB exactly."
+  },
+  {
+   "pdf_file": "Lucy-OnePager-2026-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "LUCY"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p. Enrich max_speed 1.6 (currently null) and battery_type + Lead-Acid."
+  },
+  {
+   "pdf_file": "Amy-FourPager-2025-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "AMY Deck",
+    "AMY Lift"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "3 pp. content. Dimensions 638x428x349 match neither DB row. Lists THREE load-handling modules where the DB has two products."
+  },
+  {
+   "pdf_file": "OSCAR-OnePager-2025-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "OSCAR Spin 180",
+    "OSCAR Spin 360",
+    "OSCAR Omni"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p., 3-variant table. Spin 360 dims 1620x712 vs DB 1670x700 (height 295 matches). Confirms the 'min_ground_clearance = vehicle height' convention. OSCAR Omni XL not covered."
+  },
+  {
+   "pdf_file": "SALLY-OnePager-2024-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "SALLY",
+    "SALLY Rollgang"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p. Enrich ingress_protection_rating IP44 (null on all three SALLY rows) and onboard_ui."
+  },
+  {
+   "pdf_file": "SALLY_Kurier-OnePager-2024-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [
+    "SALLY Kurier"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p. Hospital robot. Enrich task_interleaving true, navigation + Natural Feature (SLAM), safety_coverage. AP0 has no healthcare vertical."
+  },
+  {
+   "pdf_file": "Navios-OnePager-2025-DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "2 p. NAVIOS fleet manager. Company-wide: multi_fleet_capable true (null on all 24 DS rows), VDA 5050, ERP/WMS integration."
+  },
+  {
+   "pdf_file": "Planbare_Autonomie_Broschuere_DE.pdf",
+   "company": "DS Automotion GmbH",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+   "date_processed": "2026-08-08",
+   "note": "12 p. ARCOS vehicle software. Company-wide: proposes fleet_control_architecture Centralized -> Hybrid on all 24 rows; autonomous_obstacle_bypass true."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics COMPACT MOVE CB 10",
+    "ek robotics COMPACT MOVE CB 25"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "Series brochure. 2500 kg / 8 m / 2 m/s series ceilings. Missing variants CB 12, CB 18, CLAMP. p.7 carries the company-wide industries list, 400+ installations and the 'a NEURA brand' statement."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_VARIO_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics VARIO MOVE CB"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "CONFLICT lifting_height DB 5000 vs 5,25 m = 5250 mm. Missing variants L, AS, CT, CTO."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_X_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics X MOVE 600",
+    "ek robotics X MOVE 1200"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "Only ek brochure with real per-variant specs. Confirms every DB value exactly. Enrich min_ground_clearance 320 and top_module_type Lift/Roller. X MOVE 300 absent from the brochure."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_VNA_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics VNA MOVE 1350",
+    "ek robotics VNA MOVE 1500"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "ENTIRE VNA SERIES MISSING FROM THE DB. 1350/1500 kg, 12 m, 2/3-stage mast, telescopic or swing-reach forks, rail or inductive in-aisle guidance. vna_capable drives KO_BOOL_EXCLUSIVE, so this gap excludes ek robotics from all VNA tenders."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_MEDI_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics MEDI MOVE"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "NEW. Hospital underride AMR, 500 kg, 140 mm lift, 1.7 m/s. AP0 has no healthcare vertical and no multi-floor/lift field."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_OUT_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics OUT MOVE"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "NEW. Outdoor 16 t transporter, roller/chain conveyor load handling. product_type genuinely ambiguous - recorded Forklift AGV as least-bad fit, flagged for review."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_BHL_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics BHL MOVE"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "NEW. 4-way chassis for bulky/heavy/long loads, 8 m+ transfer height. max_payload deliberately left NULL ('Massgeschneiderte Tragfaehigkeit', no figure published)."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_HEAVY_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics HEAVY MOVE"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "NEW. 12 t at 10 m, five variants AS/SG/CB/CT/CTO with no per-variant specs. Heaviest forklift-class machine in the whole corpus."
+  },
+  {
+   "pdf_file": "NMR_ek_robotics_CUSTOM_MOVE_Broschuere_de.pdf",
+   "company": "ek robotics",
+   "products": [
+    "ek robotics CUSTOM MOVE"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "NEW but flagged as a MODELLING QUESTION - bespoke-engineering service, not a model. 35 t ceiling; six documented builds recorded verbatim. Recommendation: do not create as a normal product row."
+  },
+  {
+   "pdf_file": "NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf",
+   "company": "ek robotics",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+   "date_processed": "2026-08-08",
+   "note": "8 p. customer requirements FORM. Carries the group's most valuable find: p.2 prints the standard environmental ratings as parentheticals - '(Standard: 5 C ... 40 C)' and '(Standard: 45 % ... 90 %)' - stated in none of the nine brochures. Also a cleanroom and Ex-protection tick-box."
+  },
+  {
+   "pdf_file": "Intralogistics_Brochure_EN-2023.pdf",
+   "company": "Grenzebach Maschinenbau GmbH",
+   "products": [
+    "Grenzebach L600",
+    "Grenzebach OL1200S",
+    "Grenzebach L1200S",
+    "Grenzebach FF1200S"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_grenzebach_addendum.json",
+   "date_processed": "2026-08-08",
+   "note": "14 p. solution brochure, 2023, no spec table. Company identifiable only from the last-page imprint. Surfaces a new model L600 (one line, Swiss Post case study, no specs - do not import). CONFLICT OL1200S safety_coverage 2D vs a 3D vision system named for that model on p.9. FF1200S stores a forklift turning radius in the Tugger-scope turning_radius field, same corruption as Toyota RAE250."
+  },
+  {
+   "pdf_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+   "company": "KIVNON Logistica S.L.",
+   "products": [
+    "K05 (Underride)",
+    "KIVNON K07 SQ600",
+    "KIVNON K07",
+    "KIVNON K07 SQ1500",
+    "K10HP One-Way",
+    "K11 Two-Way",
+    "K32 Tractor",
+    "KIVNON K50-S2002 Pallet Mover",
+    "KIVNON K50-S3002 Pallet Mover",
+    "KIVNON K50 Pallet Truck",
+    "K55A Pallet Stacker",
+    "KIVNON K55B Pallet Mover",
+    "KIVNON K60-S1516 Stacker",
+    "KIVNON K60-S1530 Stacker",
+    "KIVNON K60 Stacker"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_kivnon.json",
+   "date_processed": "2026-08-09",
+   "note": "23 p. Edition-2026 product catalogue, EN. Covers all 8 current models with per-model spec blocks + a portfolio map on p.7 that repeats payload/speed/nav (values usable as an independent second citation). Company section p.4 conflicts with the DB on founding_year (2008 vs 2009) and hq_city (Mataro vs Barbera del Valles). K41 Platform and K10P One-Way are absent from the catalogue entirely - discontinued-product candidates. Suspected catalogue copy-paste error: K32 p.12 prints the K10's exact dimension string."
+  },
+  {
+   "pdf_file": "Kivnon-Catalogo-2026-—-Editable-ENG-2.pdf",
+   "company": "KIVNON Logistica S.L.",
+   "products": [],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_kivnon.json",
+   "date_processed": "2026-08-09",
+   "note": "Byte-identical duplicate of Kivnon-Catalogo-2026---Editable-ENG.pdf (md5 e5936bcb1bb6d83b199d3e448c921368). Not extracted separately."
+  },
+  {
+   "pdf_file": "iGo_systems_DE_TD.pdf",
+   "company": "STILL GmbH",
+   "products": [
+    "EXV iGo",
+    "FM-X 12 iGo",
+    "FM-X 14 iGo",
+    "FM-X 17 iGo",
+    "FM-X 20 iGo",
+    "FM-X iGo (=FM-X 25 iGo)",
+    "MX-X iGo",
+    "MX-X iGo mit Teleskoptisch"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_still.json",
+   "date_processed": "2026-08-09",
+   "note": "18 p. 'STILL iGo Technische Daten' - the only file in the STILL group with real VDI 2198 Typenblaetter plus full mast tables. Source of the series-wide finding that every automated FM-X is rated 100 kg BELOW its model number (12->1100, 25->2400) and that MX-X iGo needs 1800 mm aisle, not the DB's 1480. EXV p.7 carries a payload-vs-lift-height derating chart with two fork-thickness curves."
+  },
+  {
+   "pdf_file": "AGV-Overview_DE_Flyer.pdf",
+   "company": "STILL GmbH",
+   "products": [
+    "AXH/ACH iGo",
+    "AXL iGo",
+    "LTX 50 iGo",
+    "STILL AXV 12 iGo",
+    "EXV iGo",
+    "EXV-CB iGo",
+    "FM-X iGo",
+    "MX-X iGo"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_still.json",
+   "date_processed": "2026-08-09",
+   "note": "2 p. flyer but the densest page in the group: a portfolio comparison MATRIX across 8 model lines (payload / lift height / max speed / 'Dualer Betrieb' / person protection). Introduces EXV-CB iGo (no DB row). Its 'Dualer Betrieb: nicht moeglich' for AXH/ACH, AXL and AXV contradicts manual_usage=1 on those DB rows."
+  },
+  {
+   "pdf_file": "Automation_DE_Brochure.pdf",
+   "company": "STILL GmbH",
+   "products": [
+    "Counterbalance iGo",
+    "Heavy Counterbalance iGo",
+    "Conveyor Transfer iGo",
+    "Straddle Stacker iGo",
+    "Cold Store Stacker iGo",
+    "EXV-CB iGo",
+    "STILL ACH 10 iGo",
+    "STILL ACH 15 iGo",
+    "STILL AXH 10 iGo",
+    "LTX 50 iGo",
+    "OPX-L 20 S iGo neo"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_still.json",
+   "date_processed": "2026-08-09",
+   "note": "15 p. FTS overview. p.9 'BRANCHENSPEZIFISCHE FTS' introduces FIVE models found in no other file and no DB row, incl. Heavy Counterbalance iGo (4.0 t - highest STILL payload in the corpus) and Cold Store Stacker iGo (-25 C continuous). Also the company-wide ISO 3691-4 and VDA 5050 statements and the iGo flow / STILL WXS fleet software."
+  },
+  {
+   "pdf_file": "AXL-iGo_DE_Brochure.pdf",
+   "company": "STILL GmbH",
+   "products": [
+    "AXL iGo"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_still.json",
+   "date_processed": "2026-08-09",
+   "note": "8 p. single-product brochure, truck loading/unloading. Confirms 1500 kg / 125 mm / 2 m/s (with an internally consistent 7,2 km/h conversion). Documents 3D Visual SLAM + LiDAR-in-trailer navigation and a throughput claim (30 pallets in 35 min with two AGVs) that Forklift scope cannot store."
+  },
+  {
+   "pdf_file": "Intralogistic-Systems_DE_Brochure.pdf",
+   "company": "STILL GmbH",
+   "products": [
+    "LTX 50 iGo",
+    "MX-X iGo"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_still.json",
+   "date_processed": "2026-08-09",
+   "note": "15 p., mostly MANUAL trucks - handle with care. Its 'MX-X in bis zu 18 Meter Hoehe' and '1.500 kg' figures describe the MANUAL MX-X and must NOT be mapped to MX-X iGo (whose automatic-mode ceiling is 14000 mm / 1400 kg). Useful for the LiftRunner frame catalogue (6 frame types, E/B/C/BX/PE/PH, 1000-1600 kg) behind LTX 50 iGo's trailer_compatibility."
+  },
+  {
+   "pdf_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [
+    "Omron LD-60",
+    "Omron LD-90",
+    "Omron LD-90x",
+    "Omron LD-250"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "14 p. LD-series datasheet, two spec tables (LD-60/90/90x p.6-7, LD-250 p.7-8) + battery/docking/accessory specs p.9 + dimension drawings p.10. Surfaces LD-90x (cart-transporter variant, no DB row) and the payload-dependent gradient (8.3% only up to 60 kg, 'level floor only' above). Its Run Time row required word x-coordinate analysis to attribute correctly - see findings."
+  },
+  {
+   "pdf_file": "i855_hd-series_mobile_robot_datasheet_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [
+    "Omron HD-1500"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "HD-1500 datasheet. Lists EN ISO 3691-4 + CAN/UL 3100 and does NOT list EN 1525 or ANSI B56.5 - the exact two values the DB row stores. Turn Radius 0 mm; Swing Radius 982 mm."
+  },
+  {
+   "pdf_file": "i854_hd-1500_leaflet_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [
+    "Omron HD-1500"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "2 p. leaflet, (c) 2020 (I854-E-01 0420) - older than the datasheet. Carries the corpus's cleanest charge_time illustration: '35 minutes for full battery charge' vs the datasheet's '24 min. (20% to 80%)'. Also disagrees on vehicle weight (585 vs 506 kg)."
+  },
+  {
+   "pdf_file": "i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [
+    "Omron MD-650",
+    "Omron MD-900"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "MD-series datasheet. IP22 (no AP0 allowed value), cleanroom ISO 4/Class 10, Turn Radius 0 mm, floor flatness FF25 + levelness FL25 + compressive strength 7.2/9.4 MPa. battery LiFePO4 (DB says Li-Ion)."
+  },
+  {
+   "pdf_file": "md-series_leaflet_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [
+    "Omron MD-650",
+    "Omron MD-900"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "2 p. leaflet, (c) 2023 (I891-E-03). Source of MD dimensions (1194 x 944 x 320) and of all three charge_time trap shapes in one paragraph: an 8 h runtime, a '<30 minutes (5%-95%)' charge, and an 'industry-best 16:1 uptime ratio'."
+  },
+  {
+   "pdf_file": "OMRON FLOW Core 3.1.1 Release Notes.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [
+    "Omron LD-130CT"
+   ],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "Fleet-software release notes, July 2023. p.2 compatibility matrix spans Lynx / LD-60/90/CT / LD-250 / HD-1500 / EM2100 - the only evidence in the group that LD-130CT is still supported, and evidence of a procurement constraint (whole-fleet FLOW Core version alignment) AP0 cannot express. Names EM2100, a legacy model with no DB row."
+  },
+  {
+   "pdf_file": "72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "52 p. wireless technical guide - the most completely specified wireless-infrastructure requirement in the whole corpus and AP0 has nowhere to put any of it. p.12 table: 50 Kbps/AMR (500 Kbps monitored), latency <=10 ms recommended / 50 ms max, -40 dBm ideal / -60 dBm minimum, 802.11a/b/g, WPA-PSK to EAP-TLS, 2.4/5 GHz."
+  },
+  {
+   "pdf_file": "2022519_call-_door_box_13029-802_discontinuation_notice_en.pdf",
+   "company": "Omron Mobile Robotics",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_omron.json",
+   "date_processed": "2026-08-09",
+   "note": "Accessory discontinuation notice, 3 March 2023. Call/Door Box 13029-802 -> Mobile I/O Box 23419-802 + separate power supply 23419-812; requires FLOW Core 3.1.0+. No product-field impact; the Call/Door Box is the door/call-station integration accessory, a station_applications value AP0 does not have."
+  },
+  {
+   "pdf_file": "DE_tb_c_matic_8925_dt_e_1025_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde C-MATIC",
+    "Linde C-MATIC 10"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p. VDI Typenblatt, C-MATIC 10 + 15 on one chassis. Cleanest radius/diameter cross-check in the corpus: row 4.35 'Wenderadius Wa 618,5' with footnote 5 printing the matching 1237 mm rotation DIAMETER. Requires purpose-built QR-tagged load tables (p.4). Same machine as STILL ACH 10/15 iGo."
+  },
+  {
+   "pdf_file": "DE_tb_c_matic_hp_10_8928_dt_a_0523_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde C-MATIC HP"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "8 p. VDI Typenblatt. Ast 2948 / speed 2.2 / lift 40 / payload 1000 all match the STILL AXH 10 iGo DB row exactly - same machine under two KION brands."
+  },
+  {
+   "pdf_file": "DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde L-MATIC AC"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., 4-column Typenblatt (1.2/1.6 t x low/high mast). CONFLICTS: max_speed DB 2.0 vs 1.7 in all four columns; min_aisle_width DB 3400 vs 3800 for the matching build."
+  },
+  {
+   "pdf_file": "DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde L-MATIC AC k"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., 2 columns (L-MATIC 12/16 AC k = 1.0/1.4 t - designation does not match rating). CONFLICT: lifting_height DB 3800 vs Hub h3 2844; the DB value is close to h4 (3639), suggesting mast height stored where lift belongs. Unusually thin VDI sheet - no section 5 at all."
+  },
+  {
+   "pdf_file": "DE_tb_l_matic_core_1195_01_dt_b_0425_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde L-MATIC core"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p. Same machine as STILL AXV 12 iGo (1200 kg / 1844 mm / 2480 mm aisle all match). p.1 states the Hub-vs-Einlagerhoehe distinction explicitly: 'maximale Hubhoehe bis zu 1,84 Metern (Einlagerungshoehe: 1,78 Meter)'."
+  },
+  {
+   "pdf_file": "DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde L-MATIC HD k",
+    "Linde L-MATIC HD (new)"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., 2 columns. CONCLUSIVE evidence that Linde L-MATIC HD k == STILL EXV iGo: 19 identical VDI values incl. battery weight 333 kg and the same '+75 mm mit 4PzS' footnote. CONFLICT: lifting_height DB 3000 vs Hub 2844."
+  },
+  {
+   "pdf_file": "DE_tb_l_matic_br133_de_a_0516.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde L-MATIC"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "4 p. LEGACY (05/2016). Row 1.1 reads 'LINDE/BALYO' - establishes the Balyo technology relationship. None of its numbers match the DB's Linde L-MATIC row (1,2/2,0 t vs 1600; Hub 1924 vs 2900), raising a generation question about what that row represents."
+  },
+  {
+   "pdf_file": "DE_tb_p_matic_br1190_dt_a_0416.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde P-MATIC"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "4 p. LEGACY (04/2016), the only P-MATIC coverage in the corpus. Second 'LINDE/BALYO' citation plus 'Geo-Navigation Driven by BALYO'. CONFLICT on dimensions with a clean imperial forensic: DB 1778x914 mm = exactly 70.0 x 36.0 inches vs the German sheet's 1750 x 798."
+  },
+  {
+   "pdf_file": "DE_tb_r_matic_k_5190_dt_a_0425_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde R-MATIC k (R-MATIC 17 k)",
+    "Linde R-MATIC 12 k (new)",
+    "Linde R-MATIC 25 k (new)"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., 3 variants. Carries the corpus's clearest statement of the Hub-vs-Einlagerhoehe problem: the p.4 mast table has a dedicated row 'h*: Maximale automatisierte Einlagerhoehe' = 9974 where the DB stores the Hub 10274. Its DB row holds NINE wrong-scope fields - the worst single row in the whole redo."
+  },
+  {
+   "pdf_file": "EN_ds_k_matic_5231_en_a_0224_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde K-MATIC"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., 3 mast configs, VNA man-up. CONFLICT: min_aisle_width DB 1800 vs 1850-2000 printed (the 14 m build needs 2000). Shares the STILL MX-X iGo platform (identical h6 2555, h7 460, 7.0/24.0 kW motors, 1863/2178 kg batteries). 16 m lift available on request."
+  },
+  {
+   "pdf_file": "EN_ds_r_matic_1120_en_b_0623_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [
+    "Linde R-MATIC"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "8 p., 4 configs, 'based on R16 HD'. CONFLICT: min_aisle_width DB 2900 vs 2990 minimum / 3240 worst case, all already AUTOMATIC-mode figures. Row 4.35 label is unusually explicit: 'Front turning radius auto mode'."
+  },
+  {
+   "pdf_file": "EN_p_robotics_en_a_0216.pdf",
+   "company": "Linde Material Handling",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "16 p. range brochure (2016), no spec tables. Establishes the MATIC positioning as converted STANDARD trucks with geoguidance rather than native AGVs, and the infrastructure-free navigation claim."
+  },
+  {
+   "pdf_file": "b_automatisierungsloesungen_dt_a_1023_view.pdf",
+   "company": "Linde Material Handling",
+   "products": [],
+   "db_status": "company_wide",
+   "findings_file": "docs/research_findings_opus_20260808_linde.json",
+   "date_processed": "2026-08-09",
+   "note": "5 p. German automation brochure (10/2023). Its p.3 portfolio panel resolves the STILL ACH 06 question from the Linde side ('Traglasten von 600 kg, 1.000 kg und 1.500 kg') and advertises builds with no Typenblatt: a 2000 kg L-MATIC HD and a 16 m K-MATIC."
+  },
+  {
+   "pdf_file": "eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EAE 212a"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "5 p. VDI Typenblatt (08/2026) for a model with NO DB row - Jungheinrich's newest Mobile Robot line. Carries a REAL zero: row 5.7 Steigfaehigkeit '0 / 0 %' in automatic mode (3/3 % manual), a hard ramp disqualifier that must not be confused with null."
+  },
+  {
+   "pdf_file": "eae-2a-2024-specsheet-de-2026-08-pdf-data-2.pdf",
+   "company": "Jungheinrich AG",
+   "products": [],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Byte-identical duplicate of eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf (md5 03b45cf1a61e12b46bcbdf0d8d90a6f9)."
+  },
+  {
+   "pdf_file": "eae-2a-2024-specsheet-de-2026-08-pdf-data-3.pdf",
+   "company": "Jungheinrich AG",
+   "products": [],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Byte-identical duplicate of eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf (md5 03b45cf1a61e12b46bcbdf0d8d90a6f9). Three copies of this file were in the folder."
+  },
+  {
+   "pdf_file": "eae-2a-2024-factsheet-de-2026-08-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EAE 212a"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "3 p. factsheet half of the EAE pair. Source of the marker-free navigation, autonomous obstacle bypass, 3D pallet detection and over-the-air-update claims."
+  },
+  {
+   "pdf_file": "eaea-flyer-de-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EAE 212a"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "3 p. marketing flyer, EAE 212a. Adds nothing the factsheet does not already say; retained for completeness."
+  },
+  {
+   "pdf_file": "download-factsheet-amr-arculee-m-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "arculee M"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "3 p. AMR factsheet with a brand-free filename - attribution rests on p.2 'Mobile Robots von Jungheinrich' and p.3 heading 'Jungheinrich arculee M'. CONFLICT: max_payload DB 1200 vs 1.300 kg stated three times. Obstacle bypass is explicitly '(optional)'. New gap: 'Lasthoehe 2,1 m' (carried-load height envelope for an underride AMR) has no AP0 field."
+  },
+  {
+   "pdf_file": "eks-215a-2021-specsheet-de-2026-08-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EKS 215a"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., VDI table + a 9-option mast table. Confirms every stored K.O. value, but the VDI footnote 'Die Werte in der Tabelle gelten fuer Hubgeraet ZT3500 mm' means the row mixes masts: stored min_total_height 2730 belongs to the 3500 mm mast while stored lifting_height 6000 needs a mast whose h1 is 3890."
+  },
+  {
+   "pdf_file": "eks-215a-2021-specsheet-de-2026-08-pdf-data-2.pdf",
+   "company": "Jungheinrich AG",
+   "products": [],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Byte-identical duplicate of eks-215a-2021-specsheet-de-2026-08-pdf-data.pdf (md5 3e9de95479fbe64173299572d6bc8760)."
+  },
+  {
+   "pdf_file": "eks-215a-2021-factsheet-de-2026-08-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EKS 215a"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Factsheet half. THE reason the DB's battery_type=Li-Ion is correct despite the specsheet's VDI row saying '5 PzS 775' lead-acid: 'Das 24-V-Energiekonzept mit Lithium-Ionen-Batterie und Automatik-Ladefunktion'. Worked example of the read-both-halves rule."
+  },
+  {
+   "pdf_file": "erc-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "ERC 213a",
+    "ERC 217a"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p., covers both ERC models with SEPARATE mast tables stacked on p.3. CONFLICT: ERC 217a lifting_height DB 4400 vs a 217a mast programme that stops at 3540 - 4400 is the 213a's maximum from the table directly above. Most actionable conflict in the group."
+  },
+  {
+   "pdf_file": "erc-2a-2019-specsheet-de-2026-05-pdf-data-2.pdf",
+   "company": "Jungheinrich AG",
+   "products": [],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Byte-identical duplicate of erc-2a-2019-specsheet-de-2026-05-pdf-data.pdf (md5 3aa153e6fda8cf32adab706a6a322b5e)."
+  },
+  {
+   "pdf_file": "erc-2a-2019-factsheet-de-2026-05-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "ERC 213a",
+    "ERC 217a"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Factsheet half. Navigation detail that matters for infrastructure_free: 'Reflektoren am Fahrweg ODER eine Kombination aus Reflektoren und Umgebungsmerkmalen' - never features alone."
+  },
+  {
+   "pdf_file": "ere-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "Jungheinrich ERE 225a"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "5 p. VDI Typenblatt. Confirms all stored K.O. values. Its 2450 mm forks + 1200 mm load centre mean it carries TWO Euro pallets in line - a decisive throughput capability with no AP0 field (2nd instance of the dual-load gap after ek robotics CUSTOM MOVE)."
+  },
+  {
+   "pdf_file": "ere-2a-2019-factsheet-de-2026-05-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "Jungheinrich ERE 225a"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Factsheet half. Notes an asymmetric safety envelope: the ERE scans drive direction and cornering but NOT load direction (the ERC scans all three)."
+  },
+  {
+   "pdf_file": "ekx-5a-20xx-specsheet-de-2026-08-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EKX 514a",
+    "EKX 516a",
+    "EKX 516ka"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "9 p., three models and FOUR model-scoped mast tables. TWO conflicts: EKX 514a lifting_height DB 13000 vs a 9500 mm ceiling, and EKX 516ka DB 12000 vs 10500 - both models are excluded from the 11000-14500 mm table, which is headed 'EKX 516a' only. Complicated by p.1's family-level header 'Hubhoehe: 11000-13000 mm'."
+  },
+  {
+   "pdf_file": "ekx-5a-20xx-factsheet-de-2026-08-pdf-data.pdf",
+   "company": "Jungheinrich AG",
+   "products": [
+    "EKX 514a",
+    "EKX 516a",
+    "EKX 516ka"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_jungheinrich.json",
+   "date_processed": "2026-08-09",
+   "note": "Factsheet half. Two capabilities with no AP0 field: 360 sensing is OPTIONAL and is what permits an un-fenced narrow-aisle deployment, and 'Paletten- und Freiraumerkennung' enables retrofit into existing manually-served racking."
+  },
+  {
+   "pdf_file": "1785316235.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNE20"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "4 p. newer-generation ('FULL SPECTRUM') VNE20 sheet. Best safety_coverage evidence in the corpus: separate Forward/Reverse/TOP/Side safety rows with 3D LiDAR on all four -> Full 3D. CONFLICT: min_aisle_width DB 3760 vs 3800 (this sheet) / 3900 (older catalog). Prints its own aisle-width FORMULA on p.2."
+  },
+  {
+   "pdf_file": "1785316235-2.pdf",
+   "company": "VisionNav Robotics",
+   "products": [],
+   "db_status": "duplicate",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "Byte-identical duplicate of 1785316235.pdf (md5 2099dccf6ddf373870e63859b2599bbd)."
+  },
+  {
+   "pdf_file": "1775593635.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNE40"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "4 p. VNE40. THE payload-derating artefact of the whole redo: row 9 reads 'Rated Load Capacity 2800kg (4000mm)' - the derated capacity printed AS the rated capacity, with its lift height in brackets, in both metric and imperial. Also lifting_height DB 3000 vs 7000."
+  },
+  {
+   "pdf_file": "1775596770.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNQ50"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "3 p. autonomous tractor. Largest numeric error in the redo: DB towing_capacity 19958 vs 'Rated Traction Capacity 5000kg | 11023.1lb'. No unit explanation exists for 19958. Also the 5000 sits in max_payload, which is the wrong field for a tow tractor with no payload row."
+  },
+  {
+   "pdf_file": "1775597593.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNK15"
+   ],
+   "db_status": "enrich",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "3 p. platform AMR. SETTLES the long-running VNK15 turning-radius question: the p.2 drawing's 'phi1200' is a DIAMETER, and the footprint-diagonal check (1150x820 -> 1412 mm swept diameter) shows 1200 mm cannot be the vehicle's swept circle - it is the lift platform's. Do not map it. The one VisionNav model with 0 C / 90 % RH limits rather than -5 C / 95 %."
+  },
+  {
+   "pdf_file": "1775592252.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNKQ20"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "3 p. 'tunnelling AMR'. Second instance of the traction-vs-payload semantic error: DB max_payload 2000 is the 'Rated Traction Capacity'; the sheet publishes no payload row and the vehicle has a tow pin. Raises a product_type question (AMR per the manufacturer vs Tugger per the machine), which decides which AP0 fields are even in scope."
+  },
+  {
+   "pdf_file": "1688464515.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNSL14"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "2 p. older-generation slim pallet stacker (VNSL14(L)-07). Both conflicts run CONSERVATIVE: lifting_height DB 1600 vs 3000, min_aisle_width DB 2250 vs 2100 - the record would lose tenders this truck can serve."
+  },
+  {
+   "pdf_file": "1688613405.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNP15"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "4 p. older-generation counterbalance stacker (VNP15(L)-07). lifting_height DB 3000 vs 4500. Exposes the pattern: the DB holds a flat 3000 mm on all three VNP rows AND all four VNE rows - a series-wide placeholder, so every VisionNav lifting_height needs re-checking."
+  },
+  {
+   "pdf_file": "1688618048.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNR14"
+   ],
+   "db_status": "new",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav.json",
+   "date_processed": "2026-08-09",
+   "note": "6 p. reach truck VNR14(V)-01, no DB row. At 1400 kg / 8555 mm it out-reaches both the heavier VNR16 (5500 mm) and VNR20 (7000 mm), which casts doubt on those two stored lift heights."
+  },
+  {
+   "pdf_file": "1657089341.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNT20(V)-01",
+    "VisionNav VNT20(V)-07",
+    "VisionNav VNL14(V)-01",
+    "VisionNav VNL16(V)-01",
+    "VisionNav VNSL14(V)-07",
+    "VisionNav VNP15(V)-07",
+    "VisionNav VNP15A(V)-07",
+    "VisionNav VNP20(V)-07",
+    "VisionNav VNE20(VL)-07",
+    "VisionNav VNR14(V)-01",
+    "VisionNav VNR16(V)-01",
+    "VisionNav VNR16(V)-07 (Manual Handheld)",
+    "VisionNav VNR16(V)-07 (Manual Seated)",
+    "VisionNav VNR25(V)-07 (Standing Tiller)",
+    "VisionNav VNR25(V)-07 (Manual Seated)",
+    "VisionNav VNQ40(VM)-07",
+    "VisionNav VNQ60(VM)-07"
+   ],
+   "db_status": "mixed (9 new / 2 enrich / 5 conflict)",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav_catalogs.json",
+   "date_processed": "2026-08-10",
+   "note": "18 p. English full-range catalog, older -01/-07 generation. SEVEN model series (T/L/SLIM/P/E/R/Q) in 17 spec blocks - densest single document in the redo. Holds the group's only max_fleet_size figure (p.3, 'up to 150 AGVs') plus the company-wide fleet/integration/industries block. Model-code suffix decodes the navigation package: (V)=vision, (VL)=vision+3D laser, (VM)=vision+magnetic. MODEL-CODE COLLISION: VNR16(V)-07 and VNR25(V)-07 each appear TWICE on physically different machines, disambiguated only by the operator-station page subtitle."
+  },
+  {
+   "pdf_file": "1685356775.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNST20"
+   ],
+   "db_status": "conflict",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav_catalogs.json",
+   "date_processed": "2026-08-10",
+   "note": "14 p. VNST20 Pallet Jack flyer, Copyright 2023, effectively image-only (56-394 extractable chars/page) - read via pdftoppm page rendering. Model identified from the p.1 title block. min_aisle_width conflict: DB 2250 vs p.9 'Right-angle stacking aisle width: 2100mm'. NOT the same machine as the catalog's VNT20(V)-07 despite both being 2 t / ~115 mm pallet jacks. Source of the 'charging efficiency 1C' charge_time trap and the sub-degree drop_accuracy_angle finding."
+  },
+  {
+   "pdf_file": "1728979799.pdf",
+   "company": "VisionNav Robotics",
+   "products": [
+    "VisionNav VNSL14(VL)-07",
+    "VisionNav VNST20(VL)-66",
+    "VisionNav VNP15(VL)-07",
+    "VisionNav VNP20(VL)-07",
+    "VisionNav VNP30(VL)-07",
+    "VisionNav VNR14(VL)-01",
+    "VisionNav VNR16(VL)-01",
+    "VisionNav VNR20(VL)-01",
+    "VisionNav VNE20(VL)-07",
+    "VisionNav VNE30(VL)-07",
+    "VisionNav VNE35(VL)-07",
+    "VisionNav VNE40(VL)-07",
+    "VisionNav VNQ50(VL)-01"
+   ],
+   "db_status": "11 conflict / 1 enrich / 1 new",
+   "findings_file": "docs/research_findings_opus_20260808_visionnav_es_catalog.json",
+   "date_processed": "2026-08-19",
+   "note": "16 p. Spanish full-line catalog, document version string 'Catalog-Spainish-2024V1.2' (p.1). Never extracted by any prior pass; an earlier spot-check wrongly wrote it off as 'confirmatory only, low value' - it is a full 30-row spec table per model across pp.8-16 (pp.1-7 are marketing only, which is what the spot-check saw). Covers 6 series: ST/SL/P/R/E (forklift) + Q (tugger). Key artefacts: (a) the DB's lifting_height for 8 products equals the footnote *1 REFERENCE MAST while the catalog states the MAX mast - one artefact, not eight errors; (b) the humidity row is MISLABELLED 'Separacion interior entre horquillas' on all 9 spec pages; (c) p.7 is a 6-series x 11-criterion load/application matrix that is invisible to text extraction and only readable as a render - it is the source for load_type, station_applications, trailer_loading/unloading, outdoor_capable and forks_free_floating here, and it supplies fresh evidence on the open forks_free_floating contradiction (CHEP closed pallet ticked for R series, not for SL); (d) p.16 restricts VNQ50 to the Americas, contradicting its stored service_coverage='EU'; (e) VNQ50 towing_capacity DB 19958 = exactly 44,000 lb, an imperial-source artefact, vs the catalog's 5000 kg; (f) VNP20 max_payload 1900 independently reproduces the same conflict found in 1657089341.pdf; (g) the -01/-07 model-code suffix is NOT a reliable generation marker (this 2024 catalog's VNSL14(VL)-07 differs from 1657089341.pdf's). New model-code suffix seen for the first time in the corpus: VNST20(VL)-66. Nine explicitly-labelled 'Radio Minimo de Giro' values stranded by the missing Forklift turning-radius field."
+  },
+  {
+   "pdf_file": "AGV_Brochure_(Full_Version)_ENG_2026Q2-V1_READ_updated_16_Jun_2026.pdf",
+   "company": "Hikrobot",
+   "products": [
+    "Hikrobot Q1P-50B",
+    "Hikrobot Q1M-80A",
+    "Hikrobot Q2-400D",
+    "Hikrobot Q3-600D",
+    "Hikrobot Q3S-600A",
+    "Hikrobot Q7-1000E",
+    "Hikrobot Q7-1500E",
+    "Hikrobot Q8-2000A",
+    "Hikrobot QF3-1000D-P1",
+    "Hikrobot QF3-1000D-P3",
+    "Hikrobot QF3-1000D-P5",
+    "Hikrobot QF3-1000D-P1 (CE)",
+    "Hikrobot QF3-600O-P1",
+    "Hikrobot QF3-1000O-P3",
+    "Hikrobot F4-1000",
+    "Hikrobot F4-1500",
+    "Hikrobot F4-2000",
+    "Hikrobot F4-3000",
+    "Hikrobot F4U-600",
+    "Hikrobot F4U-1000",
+    "Hikrobot F3-1000",
+    "Hikrobot F3-1500",
+    "Hikrobot F3G-1500",
+    "Hikrobot F3P-1500",
+    "Hikrobot F3P-2000",
+    "Hikrobot F3P-3000",
+    "Hikrobot F5-1600",
+    "Hikrobot F5-2500",
+    "Hikrobot F6-2000",
+    "Hikrobot F2-2000",
+    "Hikrobot F2-3000",
+    "Hikrobot TP1-50UM-B",
+    "Hikrobot TP1-50DC-A",
+    "Hikrobot TP1-50DM-B",
+    "Hikrobot TP5-50DC-C",
+    "Hikrobot TP5-50DCH",
+    "Hikrobot TP5-DCH(T)",
+    "Hikrobot TP5-50DGH(T)",
+    "Hikrobot TP5-50DTH",
+    "Hikrobot TP5-50DMH",
+    "Hikrobot TP6-50SCH",
+    "Hikrobot TP6-50SCP",
+    "Hikrobot TP6-50SCW",
+    "Hikrobot TP6-30SGH",
+    "Hikrobot TP6-30SGP",
+    "Hikrobot CU1-300",
+    "Hikrobot CU2-200",
+    "Hikrobot CU2-400",
+    "Hikrobot CU4-200",
+    "Hikrobot CU1-1200",
+    "Hikrobot CT5-1000",
+    "Hikrobot CT5-1500",
+    "Hikrobot CT7-1500",
+    "Hikrobot CT7L-1000",
+    "Hikrobot CHA-300",
+    "Hikrobot CHA-1200",
+    "Hikrobot CHA-1100",
+    "Hikrobot CHS-50",
+    "Hikrobot CHS-200",
+    "Hikrobot CHF-50",
+    "Hikrobot HL7-1500B",
+    "Hikrobot HL8-2000B",
+    "Hikrobot HL9-3000B",
+    "Hikrobot HL10-4000A",
+    "Hikrobot HL10-5000B",
+    "Hikrobot HL10-6000B",
+    "Hikrobot HL10-10000A",
+    "Hikrobot HR7-1500A",
+    "Hikrobot HR8-2000A",
+    "Hikrobot HC7-1000",
+    "Hikrobot HC8-2000",
+    "Hikrobot HC9-3000",
+    "Hikrobot HC7-1500"
+   ],
+   "db_status": "69 new / 3 conflict / 1 enrich",
+   "findings_file": "docs/research_findings_opus_20260808_hikrobot_full_catalog.json",
+   "date_processed": "2026-08-19",
+   "note": "69 p. full-line 'Mobile Robot Product Catalog', doc code R.101.EN.26Q2.1 (p.69), 2026 Q2 V1. Deferred by 4+ prior sessions on size grounds, never opened. LARGEST SINGLE YIELD OF THE CORPUS: 15 spec tables, 73 models, 11 families (Q LMR p18 / QF3 forklift-LMR p20 / F4 stacker p22 / F3 pallet truck p24 / F5 reach p26 / F6 counterbalance p28 / F2 tow tractor p31 / TP1 CTU p33 / TP5 CTU p35 / TP6 STU p37 / CU conveyor p39 / CT latent tractor p41 / CH lifting p43 / HL-HR heavy p45 / HC p47). Marketing only on pp.1-17 and pp.51-69; a page map located all 15 tables in one pass and NO page needed rendering. Key artefacts: (a) F5-1600 max_payload DB 1600 vs table 1350 - payload read off the model NAME, same error class as VisionNav VNP20 the same day; (b) F4-1000C vs catalog 'F4-1000' disagrees on SIX values = probably two different machines, a naming question not a data question; (c) 6 of 10 existing DB products absent from the catalog, 3 with different-suffix siblings present (superseded-model signature); (d) seven tables print a literal 'Chassis ground clearance' row (15-40mm) next to the dimension row - taking it would have poisoned min_ground_clearance, which holds ROBOT HEIGHT; (e) five tables print '360 degrees in-place rotation' - vehicle spin, NOT rotation_capable, declined on all 73; (f) every speed in mm/s and every charge time in hours - 141 unit conversions; (g) TP6 STU are 12m busbar-powered aisle-bound tote robots at the edge of AP0 scope, and busbar_compatible is Forklift-scope only; (h) F4-1500 carries MORE but lifts LESS than F4-1000 on an identical chassis - payload/lift derating shipped as two SKUs; (i) omnidirectional QF3 needs only a 1500mm aisle, below AP0's stated 1800mm VNA threshold, while correctly being vna_capable=false."
+  }
+ ]
+}

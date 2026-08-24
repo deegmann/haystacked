@@ -1,0 +1,175 @@
+{
+  "company": "Jungheinrich AG",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. EKS 215a already exists in DB (base_model_id d73b298f-7b66-4491-be81-4770114b1566) with most core KO fields already filled (max_payload=1500, lifting_height=6000, min_total_height=2730, min_aisle_width=3300 -- all confirmed to match this datasheet exactly, no conflict). This entry demonstrates FILE-GROUPING: 'eks-215a-2021-factsheet-de...pdf' (marketing factsheet, 5pp) and 'eks-215a-2021-specsheet-de...pdf' (VDI 2198 technical table, 6pp) both describe the same model EKS 215a and were combined into one extraction, citing whichever file/page had each value. A second, byte-identical copy of the specsheet ('...-2.pdf') was left in New/ untouched this run (duplicate, not moved, not reprocessed) -- flag for the full batch: dedupe by content hash before processing to avoid wasted extraction passes. DATA-QUALITY FLAG (not a DB conflict, since the field is null, but worth a reviewer's attention): the existing DB value drive_type='Straddle Stacker' sits oddly next to this datasheet's explicit claim of 'freitragende Gabeln' (free-floating/cantilever forks, i.e. nothing protrudes under the load) on p.2-3 of the factsheet -- per the industry README (Sec. 6) a straddle-under-load design is exactly the design that CANNOT handle closed-bottom pallets, which is the opposite of what free-floating forks imply. Also note existing DB value special_fork_option='Standard Fork' is not a valid AP0 allowed_value for that field (allowed=['Telescopic','Side-Shift','Clamp']) -- pre-existing data-quality issue, not introduced by this run, left untouched since it is non-null.",
+  "products": [
+    {
+      "product_name": "EKS 215a",
+      "product_type": "Forklift AGV",
+      "source_file": "eks-215a-2021-factsheet-de-2026-08-pdf-data.pdf + eks-215a-2021-specsheet-de-2026-08-pdf-data.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2492,
+        "vehicle_width": 900,
+        "vda5050_compatible": true,
+        "forks_free_floating": true,
+        "mast_type": "Duplex"
+      },
+      "field_sources": {
+        "vehicle_length": "specsheet p.4, VDI table row 4.19 'Gesamtlänge l1' = 2492 mm",
+        "vehicle_width": "specsheet p.4, VDI table row 4.21.1 'Gesamtbreite b1' = 900 mm",
+        "vda5050_compatible": "factsheet p.2, section header 'VDA 5050 Kompatibilität': 'Mobile Robots von Jungheinrich sind VDA 5050-kompatibel und verfügen über eine standardisierte Schnittstelle zur Kommunikation mit der Leitsteuerung.'",
+        "forks_free_floating": "factsheet p.2/p.3, repeated claim 'freitragende Gabeln' (free-floating forks) enabling handling of 'nicht unterfahrbare Stationen' (non-underrideable/closed stations) and 'geschlossenen Paletten' (closed-bottom pallets)",
+        "mast_type": "specsheet p.3, mast option table header 'Zweifach-Hubgerüst ZT' -- the VDI 2198 table on p.4-5 explicitly states its values are for 'Hubgerüst ZT3500 mm', i.e. the duplex (two-stage) mast variant"
+      },
+      "notes": "All values taken from the standard/default configuration (duplex mast ZT3500mm) per the specsheet's own footnote ('Die Werte in der Tabelle gelten für Hubgerüst ZT3500 mm'). The factsheet's summary line ('Hubhöhe: 2750-6000 mm') and the specsheet's mast table show that lift height is configurable from 2750-6000mm via different mast options (single-stage 'E' or duplex 'ZT') -- this is a configurable option on ONE base machine, not distinct product variants, so no new product rows were created for it. vda5050_compatible=true sits alongside the already-filled (non-null, untouched) fleet_management_system='Proprietary' -- worth a reviewer double-check since a VDA5050-compatible interface is not necessarily inconsistent with a proprietary native fleet manager (VDA5050 can be an additional standardised interface on top), but flagging the juxtaposition for manual confirmation rather than assuming."
+    },
+    {
+      "product_name": "EKX 514a",
+      "product_type": "Forklift AGV",
+      "source_file": "ekx-5a-20xx-factsheet-de-2026-08-pdf-data.pdf + ekx-5a-20xx-specsheet-de-2026-08-pdf-data.pdf",
+      "db_status": "enrich",
+      "variant_group": "EKX 5a VNA turret-truck family (EKX 514a/516ka/516a), shares chassis/mast architecture, differs by payload and lift-height range",
+      "fields": {
+        "vehicle_width": 1210
+      },
+      "field_sources": {
+        "vehicle_width": "specsheet p.8 VDI table row 4.21.1 'Gesamtbreite (b1)' = 1210 mm, single value applying to all three EKX 5a variants (not split by column)"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). EKX 514a/516ka/516a were ALREADY comprehensively filled in a prior general research batch (not this datasheet-ingestion agent's earlier runs) -- cross-checked this datasheet's VDI table against all three DB rows and every already-filled field matched exactly (max_payload 1400/1600/1600, max_speed 2.92/3.33/3.33 m/s [10.5 and 12 km/h converted], vehicle_length 3665/3775/4045, lifting_height 13000 [DB] -- consistent with this datasheet's separate 'EKX 516a' mast-config table reaching up to 14500mm hub / 17050mm h4, though the specific 13000mm figure isn't its own explicit table row, likely from a different/newer source document; not flagged as a conflict since it's plausible and not contradicted). Only 1 new field (vehicle_width) was safely addable across all 3 variants since it's a single non-config-dependent VDI row; min_total_height deliberately left null for all three because the VDI table's h1 'Höhe Hubgerüst eingefahren' row (2955mm) corresponds to the table's stated base config (Hub=3500mm), which doesn't match the much higher lifting_height already recorded in the DB (13000mm) -- mixing configs would risk a misleading number."
+    },
+    {
+      "product_name": "ERC 213a",
+      "product_type": "Forklift AGV",
+      "source_file": "erc-2a-2019-factsheet-de-2026-05-pdf-data.pdf + erc-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+      "db_status": "conflict",
+      "variant_group": "ERC 2a family (ERC 213a/217a), shares chassis, differs by payload/lift-height",
+      "fields": {
+        "vehicle_width": 965,
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "vehicle_width": "specsheet p.4 VDI table row 4.21.1 'Gesamtbreite (b1)' = 965mm",
+        "vda5050_compatible": "factsheet p.2, section header 'VDA 5050 Kompatibilität'"
+      },
+      "conflicts": {
+        "battery_type": {
+          "db_value": "Li-Ion",
+          "datasheet_value": "'B 3 PzS' (specsheet p.4, VDI row 6.3 'Batterie nach DIN 43531/35/36') -- PzS is the standard German traction-battery cell designation for flooded lead-acid, not Li-Ion",
+          "note": "Not overwritten. Possible explanation: DB value may reflect a newer/optional Li-Ion battery variant of the same model not shown in this (2019-dated) specsheet -- flagged for Tech Lead review rather than assumed wrong."
+        }
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Cross-checked already-filled fields: max_payload=1300 matches exactly, lifting_height=4400 matches the datasheet's own max hub value for ERC213a (3100-4400mm range) exactly, min_total_height=2150 does not exactly match either of this datasheet's two candidate readings (h1='Höhe Hubgerüst eingefahren'=2075mm, h15='Gesamthöhe'=2285mm) but is close to both (within ~135mm) -- not flagged as a hard conflict given the ambiguity over which quantity the DB's existing figure actually represents, but worth a reviewer's attention. max_gradient intentionally left null despite a printed value (4/4 with/without load) because ERC217a's own row for the same field prints '-/-' (not stated) -- filling only ERC213a's half of a shared variant_group risked an inconsistent-looking pair; deferred rather than guessed for ERC217a."
+    },
+    {
+      "product_name": "ERC 217a",
+      "product_type": "Forklift AGV",
+      "source_file": "erc-2a-2019-factsheet-de-2026-05-pdf-data.pdf + erc-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+      "db_status": "conflict",
+      "variant_group": "ERC 2a family (ERC 213a/217a), shares chassis, differs by payload/lift-height",
+      "fields": {
+        "vehicle_width": 965,
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "vehicle_width": "specsheet p.4 VDI table row 4.21.1 'Gesamtbreite (b1)' = 965mm, single value shared with ERC213a (not split by column in this row)",
+        "vda5050_compatible": "factsheet p.2, section header 'VDA 5050 Kompatibilität'"
+      },
+      "conflicts": {
+        "lifting_height": {
+          "db_value": 4400,
+          "datasheet_value": "3540 (specsheet p.3 mast table, 'ERC 217a' section, 'Zweifach-Hubgerüst ZT' max hub row: 2840mm / 3540mm -- only 2 mast options documented for ERC217a, both below the DB's 4400mm)",
+          "note": "Not overwritten. DB's ERC217a lifting_height is identical to ERC213a's (4400), which reads suspiciously like a copy-paste from the sibling row rather than an ERC217a-specific figure -- this datasheet's own ERC217a-specific mast table caps at 3540mm. Recommend Tech Lead re-verify against a newer/different ERC217a source."
+        },
+        "battery_type": {
+          "db_value": "Li-Ion",
+          "datasheet_value": "'B 3 PzS' (lead-acid) -- same conflict and same caveat as ERC213a above (shared specsheet, single battery row for both models)",
+          "note": "Not overwritten, see ERC213a's identical flag above."
+        }
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). max_payload=1700 matches this datasheet exactly, no conflict there."
+    },
+    {
+      "product_name": "Jungheinrich ERE 225a",
+      "product_type": "Forklift AGV",
+      "source_file": "ere-2a-2019-factsheet-de-2026-05-pdf-data.pdf + ere-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 3666,
+        "vehicle_width": 965,
+        "min_total_height": 2280,
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "vehicle_length": "specsheet p.3 VDI table row 4.19 'Gesamtlänge (l1)' = 3666mm",
+        "vehicle_width": "specsheet p.3 VDI table row 4.21.1 'Gesamtbreite (b1)' = 965mm",
+        "min_total_height": "specsheet p.3 VDI table row 4.2.1 'Gesamthöhe (h15)' = 2280mm (used over the alternative h1 'Höhe Hubgerüst eingefahren'=2230mm since 'Gesamthöhe'/overall height more literally matches the field's definition)",
+        "vda5050_compatible": "factsheet p.2, section header 'VDA 5050 Kompatibilität'"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Cross-checked already-filled DB fields: max_payload=2500 matches exactly, lifting_height=125 matches h3='Hub'=125mm exactly, max_speed=2.0 m/s matches the datasheet's 7,2 km/h (with/without load, same figure) converted (7.2/3.6=2.0) exactly -- three clean confirmations, no conflicts."
+    },
+    {
+      "product_name": "arculee M",
+      "product_type": "Mobile AMR",
+      "source_file": "download-factsheet-amr-arculee-m-data.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "max_speed": 1.6
+      },
+      "field_sources": {
+        "max_speed": "p.1 cover line 'Fahrgeschwindigkeit: 1,6 m/s (beladen)' -- explicitly the LOADED speed figure, no unloaded/empty figure given in this document"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db_value": 1200,
+          "datasheet_value": "1300 (p.1 cover line 'Tragfähigkeit: 1.300 kg'; also restated p.2 'Flexible Unterfahrtransportlösung für Lasten bis 1.300 kg bei 2,1 m Lasthöhe')",
+          "note": "Not overwritten. Consistent 1300kg figure appears twice in this document, so likely not a typo on the source side -- worth a Tech Lead re-check of the DB's original 1200kg source."
+        }
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). VDA5050 compatibility, fleet management, integration_capability, industries_served, etc. already comprehensively filled in DB from a prior batch and re-confirmed consistent with this document's own VDA5050/Jungheinrich Logistics Interface claims -- not restated. '2,1 m Lasthöhe' (load height at which the 1300kg capacity applies) has no matching AP0 field for an underride-type AMR (lift_height/shelf_height fields describe stroke/shelf mechanisms this product doesn't appear to have) -- deliberately not mapped rather than force-fit. 'Rotationsradius einer Europalette' (turning radius equal to a Euro-pallet footprint) is a qualitative claim with no explicit mm figure given -- not converted to min_turning_radius, consistent with the ongoing radius/diameter caution (see agent memory), though here the issue is simply no number at all rather than a radius-vs-diameter ambiguity."
+    },
+    {
+      "product_name": "EAE 212a",
+      "product_type": "Forklift AGV",
+      "source_file": "eae-2a-2024-factsheet-de-2026-08-pdf-data.pdf + eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf + eaea-flyer-de-pdf-data.pdf",
+      "db_status": "new",
+      "fields": {
+        "max_payload": 1200,
+        "lifting_height": 250,
+        "max_speed": 1.67,
+        "min_total_height": 2470,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true,
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "autonomous_charging": true,
+        "vda5050_compatible": true,
+        "integration_capability": [
+          "WMS",
+          "ERP"
+        ],
+        "vehicle_length": 1766,
+        "vehicle_width": 795
+      },
+      "field_sources": {
+        "max_payload": "factsheet p.1 cover line 'Tragfähigkeit: 1200 kg'; confirmed p.4 summary table 'EAE 212a ... 1200 kg'",
+        "lifting_height": "factsheet p.1 cover line 'Hubhöhe: 250 mm'; confirmed p.4 summary table 'Hubhöhe (max.) 250 mm'",
+        "max_speed": "factsheet p.4 summary table 'Fahrgeschwindigkeit ohne Last 6 km/h' -> 6/3.6 = 1.67 m/s (no-load figure; no loaded figure given separately)",
+        "min_total_height": "factsheet p.4 summary table 'Gesamthöhe 2470 mm'",
+        "navigation_type": "factsheet p.2 'navigiert... und navigiert ohne künstliche Landmarken' (navigates without artificial landmarks) -- natural-feature/markerless navigation",
+        "infrastructure_free": "same source as navigation_type -- explicitly markerless/no artificial landmarks required",
+        "battery_type": "factsheet p.2 'Lithium-Ionen-Batterie und automatisches Laden'",
+        "autonomous_charging": "factsheet p.2 'automatisches Laden stellen hohe Verfügbarkeit sicher'",
+        "vda5050_compatible": "eaea-flyer p.2 and factsheet's standard Jungheinrich VDA5050 boilerplate is NOT explicitly present in this file's extracted text -- actually sourced from factsheet p.3 'Als eigenständige Lösung oder mit Anbindung an vorhandenes WMS/ERP-System einsetzbar' plus the family-wide VDA5050 pattern confirmed independently on EKS/ERC/ERE/arculee siblings in this same batch; flagged as inferred-from-family-pattern rather than a literal per-document VDA5050 sentence for THIS specific file -- worth a reviewer double check of the EAE 212a's own document for the explicit VDA5050 sentence before treating as fully confirmed",
+        "integration_capability": "factsheet p.3 'Als eigenständige Lösung oder mit Anbindung an vorhandenes WMS/ERP-System einsetzbar'",
+        "vehicle_length": "specsheet p.3, VDI table row 4.19 'Gesamtlänge l1' = 1766mm",
+        "vehicle_width": "specsheet p.3, VDI table row 4.21.1 'Gesamtbreite b1' = 795mm"
+      },
+      "notes": "NEW PRODUCT, not previously in DB (no EAE-series product existed). Genuinely new Jungheinrich 'Niederhub' (low-lift) Mobile Robot model, distinct from the existing low-lift BT Levio LAE250 (lifting_height=120mm, drive_type='Pallet Mover') and from ERE 225a (lifting_height=125mm) -- EAE 212a has 250mm lift and only 1200kg payload, positioning it as a smaller/lighter unit than either. product_type set to Forklift AGV by analogy with LAE250/ERE225a (same low-lift pallet-truck category), though the source material calls it a 'Mobile Robot' throughout rather than 'FTF' (Fahrerloses Transportfahrzeug) like the ERC/ERE lines -- worth a second look if the Tech Lead wants a stricter distinction. drive_type intentionally left null: unlike EKS 215a's explicit 'freitragende Gabeln' (free-floating forks) claim, this document only says the vehicle can also pick up 'manuell bereitgestellte Ladehilfsmittel' (manually provided load carriers) without stating whether it is underride or cantilever-fork design -- genuinely ambiguous, not guessed. vehicle_length/vehicle_width not stated anywhere in either source file (only the summary table's 5 columns: payload/lift/speed/lift-speed/height) -- left null. vda5050_compatible flagged above as inferred from the family pattern rather than a literal sentence in this specific document -- the safer, more literal alternative would be to leave it null pending a direct re-check; kept as true per the very strong Jungheinrich Mobile-Robot-line pattern (5/5 other Jungheinrich Mobile Robot lines processed this batch state it explicitly and identically) but flagged for a fast confirmation pass. CORRECTION/ADDITION after initially processing only the factsheet: the specsheet file (eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf, 3 byte-identical copies moved together) contains a full VDI-2198 table confirming max_payload=1200, lifting_height=250, min_total_height=2470 (all exact matches to the factsheet's summary table) and adding vehicle_length=1766mm and vehicle_width=795mm. It also states row 6.3 'Batterie nach DIN 43531/35/36: nein' (i.e. NOT a DIN lead-acid traction battery), independently confirming the Li-Ion battery_type claim from the factsheet."
+    }
+  ]
+}

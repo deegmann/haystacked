@@ -1,0 +1,34 @@
+{
+  "company": "Magazino",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. FILE-GROUPING example #2 (different content-type pairing than the Jungheinrich EKS 215a factsheet+specsheet pair): 'download-product-advantages-amr-soto-data.pdf' (4pp marketing/feature-advantages sheet) and 'download-technical-data-amr-soto-data.pdf' (3pp VDI-style technical spec table) both describe the same model SOTO and were combined. GENUINE COMPANY-RELATIONSHIP AMBIGUITY FLAGGED PER WORKFLOW STEP 4 (explicitly not resolved silently): both source PDFs are printed/distributed under the JUNGHEINRICH brand -- footer 'Jungheinrich Vertrieb Deutschland AG & Co. KG', headline 'VDA 5050 Kompatibilität ... Mobile Robots von Jungheinrich sind VDA 5050-kompatibel' -- yet the product itself is explicitly still called 'SOTO' and the fleet software is explicitly named 'Magazino Fleet Manager' throughout both documents. This is real-world evidence of the Magazino↔Jungheinrich parent/subsidiary relationship already flagged in this project's history (Jungheinrich acquired Magazino) -- but it is genuinely ambiguous from the source documents alone whether this represents (a) Jungheinrich now selling this exact same base model under its own 'Mobile Robot' product line as a SEPARATE L2 Product row (same base_model_id as Magazino's SOTO, new company_id=Jungheinrich, per the Entity Model's OEM-rebadge pattern in Spec/haystacked_AP0_field_spec_v0_10.xlsx 'Entity Model' sheet), or (b) this is simply Jungheinrich-authored marketing collateral for its now-subsidiary Magazino brand with no distinct Jungheinrich-branded SKU actually sold separately. NOT resolved here -- flagged for the Tech Lead to decide; this run conservatively attached the extracted technical data to the EXISTING Magazino SOTO product row only (enrich), since the physical machine described (dimensions, payload, KLT handling) is unambiguously identical to the existing DB entry and every already-filled field cross-checked cleanly against it (no conflicts found except one, noted below).",
+  "products": [
+    {
+      "product_name": "SOTO",
+      "product_type": "Mobile AMR",
+      "source_file": "download-product-advantages-amr-soto-data.pdf + download-technical-data-amr-soto-data.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "autonomous_charging": true,
+        "safety_standard": ["ISO 3691-4"],
+        "min_total_height": 2160,
+        "cart_pickup_height_range": "400-1700mm"
+      },
+      "field_sources": {
+        "autonomous_charging": "product-advantages p.3, 'Effizientes Batteriemanagement' block: 'Platzsparende Energieversorgung durch das seitliche induktive Ladesystem' (side inductive charging system) -- inductive charging strongly implies automated/dock-based charging, though not phrased as an explicit 'autonomous charging' claim",
+        "safety_standard": "product-advantages p.3, 'Integrierte Sicherheitstechnik' block: 'Sichere Zusammenarbeit mit Menschen und Transportgut durch CE-, ISO-3691-4-, TÜV- und ESD-Zertifizierungen'",
+        "min_total_height": "technical-data p.2, 'Abmessungen (L × B × H) 2.230 × 1.060 × 2.160 mm' -- the 'H' component; the sheet notes 'Höhe in Betrieb zzgl. Laserscanner +80mm' (operating height including laser scanner adds 80mm, i.e. ~2240mm in active use), recorded here as the base/static figure",
+        "cart_pickup_height_range": "product-advantages p.1/p.2 headline 'Hubhöhe: 400-1.700 mm' and technical-data p.2 'Mind. Greifhöhe (frontal / seitlich) 500mm / 400mm' + 'Max. Greifhöhe 1.700mm' -- recorded as the overall documented range; already-filled lift_height=1700 (max) is consistent and untouched"
+      },
+      "conflicts": {
+        "min_turning_radius": {
+          "db_value": 1550,
+          "datasheet_value": "3100mm (technical-data p.2, 'Min. Wendekreis 3.100 mm')",
+          "note": "Not overwritten. The datasheet value is EXACTLY 2x the existing DB value (3100 / 2 = 1550) -- strongly suggestive of a radius-vs-diameter mixup somewhere (either in the original DB entry, or 'Wendekreis' in this sheet meaning turning CIRCLE diameter rather than radius, which is a common German terminology trap: 'Wendekreis' literally translates to 'turning circle', which in German technical usage is often the diameter of the circle the vehicle sweeps, not the radius). Flagged for manual resolution rather than guessed at."
+        }
+      },
+      "notes": "Every other already-filled field on this Base Model Extension record was cross-checked against both new source documents and matched exactly with no discrepancy: max_payload=240 ('Max. Nutzlast gesamt max. 240 kg'), max_speed=1.5 ('Höchstgeschwindigkeit 1,5 m/s'), vehicle_length/width=2230/1060, operating_temp_min/max=15/25, operating_humidity_max=95, ingress_protection_rating=IP20, battery_type=Li-Ion, battery_runtime=8.0, charge_time=96 (matches 'Ladezeit 1,6 Stunden' = 96 min exactly), fleet_management_system='VDA 5050 compatible', vda5050_compatible=true, integration_capability=WMS|REST API (matches 'Integration über VDA 5050 möglich ... Anbindung des Magazino Fleet Manager über standardisierte REST-Schnittstelle an das WMS'), rotation_capable=true, picking_mechanism='Conveyor-integrated' (matches 'Adaptive Förderbandgreifer für KLTs'), onboard_container_count=24, cleanroom_class already correctly bucketed against the more precise 'ISO-7-Zertifikat' stated here. No new field values were needed for any of these -- listed here only to document the thoroughness of the cross-check, not as new findings."
+    }
+  ]
+}

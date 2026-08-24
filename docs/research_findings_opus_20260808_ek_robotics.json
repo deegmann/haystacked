@@ -1,0 +1,291 @@
+{
+  "company": "ek robotics",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus redo pass, session 4. Ten ek robotics files: nine series brochures (NMR_ek_robotics_<SERIES>_Broschuere_de.pdf for BHL / COMPACT / CUSTOM / HEAVY / MEDI / OUT / VARIO / VNA / X MOVE) and one customer requirements form (NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf, 8 pp.).\n\nBRAND NOTE: the brochures state 'Bei ek robotics – a NEURA brand' (e.g. NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7), and every filename is prefixed 'NMR_' (NEURA Mobile Robots). The DB has an 'ek robotics' company and no NEURA company; that remains the right modelling here since the vehicles are still marketed under the ek robotics name. Flagged so the relationship is on record.\n\nSTRUCTURE OF THE SOURCE SET — read this before using the numbers. All nine brochures share an identical ~14-page back section (SERVICE / LIFECYCLE SERVICES / SERVICE MODELLE / SARA / SIMULATION & POINTCLOUD / VISUALISIERUNG / ACADEMY / EK ROBOTICS IM ÜBERBLICK). Only pages ~4-8 of each are product content, and that content is a FEATURES BULLET LIST, not a spec table. Every figure below is therefore a marketing bullet of the form 'Hohe Traglast von bis zu X kg' — a SERIES CEILING, not a per-variant rating. Where a brochure names variants but gives one ceiling, the ceiling is recorded once at series level and explicitly NOT distributed across the variants. This is a much weaker evidence class than the VDI Typenblätter elsewhere in this corpus and a reviewer should treat these as provisional.\n\nTHE HEADLINE FINDING IS COVERAGE, NOT VALUES. Each of the nine brochures prints the same 'WIR FINDEN FÜR SIE DIE INDIVIDUELLE FTS-LÖSUNG' portfolio page listing NINE series: VARIO MOVE, X MOVE, VNA MOVE, CUSTOM MOVE, OUT MOVE, BHL MOVE, HEAVY MOVE, COMPACT MOVE, MEDI MOVE. The DB holds products from only THREE of them (COMPACT MOVE, VARIO MOVE, X MOVE) plus a 'FAST MOVE' that appears on NONE of the nine portfolio pages. Six entire series are missing and one DB series may be discontinued.\n\ncharge_time: not stated anywhere in ten files, in any form. No ratio, no absolute. Left null throughout — the trap did not fire.\n\nPAYLOAD/LIFT DERATING: not published by ek robotics at all. Several brochures pair a max payload and a max lift height in the same bullet list (e.g. COMPACT MOVE '8 m' + '2.500 kg') with no statement about whether both hold simultaneously. Given the derating pattern found on Toyota, Balyo, Geek+ and Stäubli in this pass, assuming they are simultaneous would be unsafe — flagged, not assumed.",
+  "company_wide_context": {
+    "source_file": "NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf; NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7",
+    "fields": {
+      "operating_temp_min": 5,
+      "operating_temp_max": 40,
+      "operating_humidity_max": 90,
+      "industries_served": ["Automotive", "F&B", "Pharma", "General Manufacturing"],
+      "reference_count": 400,
+      "battery_type": ["Li-Ion"],
+      "cleanroom_class": "ISO 1–9"
+    },
+    "applies_to": "all base models of ek robotics",
+    "notes": "THE MOST VALUABLE FIND IN THIS GROUP, and it is not in a datasheet at all — it is in the customer requirements FORM. NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf p.2, section '2. UMGEBUNGSBEDINGUNGEN', asks the customer to tick 'Spezieller Temperaturbereich von __ bis __ °C' with the parenthetical **'(Standard: 5 °C … 40 °C)'** and 'Spezielle Luftfeuchtigkeit von __ bis __ %' with **'(Standard: 45 % … 90 %)'**. Those parentheticals are ek robotics' STANDARD VEHICLE ENVIRONMENTAL RATING, stated nowhere in any of the nine product brochures. operating_temp_min / operating_temp_max / operating_humidity_max are currently NULL on all seven ek robotics DB rows. Units are already °C and %, matching AP0; config/unit_semantics.json checked, both temperature bounds positive so no sign risk. CAVEAT: an RFQ form's 'standard' is a default configuration, not a certified rating — treat as a strong default rather than a spec.\ncleanroom_class: the same p.2 offers a tick-box 'Einsatz im Reinraum' (cleanroom deployment) alongside 'Einsatz im Ex-Schutz Bereich', i.e. cleanroom versions are available on request but NO ISO class is named. AP0's only non-None allowed value is the catch-all 'ISO 1–9'. Proposed with low confidence — a reviewer may reasonably prefer null, since the form asks the question rather than answering it. (The Ex-protection option has no AP0 field at all.)\nindustries_served: NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7 'KOMPETENZ IN JEDER BRANCHE' lists 21 verticals — Automobilzulieferer, Automobilindustrie, Lebensmittel, Maschinenbau, Verpackung, Gummi + Kunststoff, Druck + Papier, Weiße Ware, Eisen + Stahl, Pharma, Elektronische Komponenten, Chemie, Krankenhaus, Getränke, Keramik, Energie + Wasser, Textilien, Prozessanlage, Holzverarbeitung, Öffentliche Organisationen, Molkerei. Only four map onto AP0 allowed values. SEVENTEEN do not — see the AP0 gap note.\nreference_count: same page, '400 + AKTIVE ANLAGEN' (also '3.000 + AKTIVE FAHRZEUGE', '100 + VERTRÄGE'). 400 installations recorded as the reference count; the 3000-vehicle figure has no AP0 field. Also on that page: '55% D-A-CH / 45% WELTWEIT'.\nbattery_type: seven of the nine brochures carry the identical bullet 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz' (COMPACT / CUSTOM / HEAVY / MEDI / OUT / VARIO / VNA MOVE); X MOVE says 'LI-Ion Batteriesystem für 24/7 Einsatz'. Effectively a platform-wide standard.\nNOT PROPOSED but worth a reviewer's attention — fleet_management_system / modification_process: NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.12 describes the FTS-Leitsystem as a browser-based, platform-independent web UI where 'Transportaufträge manuell erstellt, laufende Transporte überwacht und vergangene Systemzustände detailliert analysiert werden' können, with a 'History Player' that replays the whole system up to 14 days back, plus a configurable OEE/KPI dashboard. p.10 describes SARA (Smart Analytics Reporting App) offered as SaaS. Customer job creation and monitoring is explicit; customer ROUTE/LAYOUT editing is not, so modification_process is left null rather than set to 'Client: All'. The DB's existing 'Proprietary (Transport Manager)' carries a non-conforming parenthetical suffix (recurring finding #5) and is not confirmed by these brochures, which never name the controller.\nAP0 stores operating_temp_*, operating_humidity_max, industries_served, battery_type and cleanroom_class at BASE-MODEL granularity — fan out per base model at import."
+  },
+  "products": [
+    {
+      "product_name": "ek robotics COMPACT MOVE (series)",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf",
+      "db_status": "conflict",
+      "variant_group": "p.4 shows THREE product images captioned 'COMPACT MOVE CLAMP', 'COMPACT MOVE CB 18/25' and 'COMPACT MOVE CB 10/12' — i.e. FIVE variants (CB 10, CB 12, CB 18, CB 25, CLAMP). The DB holds only CB 10 and CB 25.",
+      "fields": {
+        "product_type": "Forklift AGV",
+        "drive_type": "Counterbalanced",
+        "max_payload": 2500,
+        "lifting_height": 8000,
+        "max_speed": 2.0,
+        "battery_type": ["Li-Ion"],
+        "navigation_type": ["Contour", "Laser Reflector"],
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "product_type": "p.2 'Die Gegengewichtsstapler der Baureihe COMPACT MOVE sind für anspruchsvolle Transportaufgaben ausgelegt.'",
+        "drive_type": "same sentence — 'Gegengewichtsstapler' = counterbalance truck. CONFIRMS the DB's CB 25 value.",
+        "max_payload": "p.4 FEATURES bullet 'Hohe Traglast von bis zu 2.500 kg' — a SERIES CEILING. It corresponds to the CB 25 variant (2500 kg, matching the DB) and must NOT be applied to CB 10/12/18.",
+        "lifting_height": "p.4 FEATURES bullet 'Sichere Lastübergabe in bis zu 8 m Höhe' -> printed in metres, converted to 8000 mm (AP0 unit mm). Again a SERIES CEILING across all mast options.",
+        "max_speed": "p.4 FEATURES bullet 'Fahrgeschwindigkeit bis zu 2 m/s' (already AP0's unit)",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'. CONFIRMS the DB's CB 25 value.",
+        "navigation_type": "p.4 'Hybridnavigation, passend für alle Anwendungsbereiche'. 'Hybridnavigation' is ek robotics' term for combining contour and reflector localisation — spelled out on the sibling sheets: NMR_ek_robotics_X_MOVE_Broschuere_de.pdf p.4 'Hybridnavigation über Kontur und / oder Reflektoren' and NMR_ek_robotics_BHL_MOVE_Broschuere_de.pdf p.4 'Navigationsarten: Laser / Reflektor / Kontur / Hybrid'. Cross-document attribution, but from the same brochure family and unambiguous.",
+        "stacking_capability": "p.2 'Gegengewichtsstapler' + p.4 '8 m Höhe'. CONFIRMS the DB."
+      },
+      "notes": "MISSING VARIANTS — three of five COMPACT MOVE variants have no DB row: **CB 12**, **CB 18** and **CLAMP** (p.4 image captions). The CLAMP is the notable one: a clamp attachment rather than forks, which would need special_fork_option = 'Clamp' exactly as proposed for DS Automotion's AMADEUS Grip in this same batch. No specifications are published for any of the three, so they are flagged as candidates rather than staged as products.\nDIVERGENCE — lifting_height: the DB's COMPACT MOVE CB 25 holds 5500 mm; this brochure's series ceiling is 8000 mm. NOT flagged as a hard conflict: 8 m is the series maximum across all available masts ('Vielfältige Auswahl an Hubmasten'), so 5500 mm is entirely consistent as one specific CB 25 mast configuration. Worth a reviewer's glance only.\nDB gaps this brochure can fill on COMPACT MOVE CB 10 (which currently has almost nothing): drive_type 'Counterbalanced', max_speed 2.0, battery_type Li-Ion, plus the company-wide environmental values. Its max_payload of 1000 kg is untouched — the 2500 kg ceiling does not apply to it.\nWRONG-SCOPE values on both COMPACT MOVE DB rows (flag only): grid_required = 0 on CB 10 and CB 25; additionally route_type, route_programming (Tugger scope) and workflow_capability, grid_required, picking_mechanism (AMR scope) on CB 25 — five wrong-scope fields on a single Forklift AGV row."
+    },
+    {
+      "product_name": "ek robotics VARIO MOVE (series)",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_VARIO_MOVE_Broschuere_de.pdf",
+      "db_status": "conflict",
+      "variant_group": "p.4 shows FIVE variants: VARIO MOVE L, AS, CB, CT, CTO. The DB holds only 'VARIO MOVE CB'. p.5 documents a modular architecture (Antriebseinheit + Fahrwerk + Hubmast + Lastaufnahmemittel), which is presumably what the letter suffixes denote.",
+      "fields": {
+        "max_payload": 1600,
+        "lifting_height": 5250,
+        "max_speed": 2.0,
+        "battery_type": ["Li-Ion"],
+        "navigation_type": ["Contour", "Laser Reflector"],
+        "safety_coverage": "Single plane (2D)",
+        "multi_load_compatibility": true
+      },
+      "field_sources": {
+        "max_payload": "p.4 FEATURES bullet 'Hohe Traglast von bis zu 1.600 kg'. CONFIRMS the DB's VARIO MOVE CB value of 1600.",
+        "lifting_height": "p.4 FEATURES bullet 'Sichere Lastübergabe in bis zu 5,25 m Höhe' -> printed as 5,25 m, converted to 5250 mm (AP0 unit mm).",
+        "max_speed": "p.4 'Fahrgeschwindigkeit bis zu 2 m/s'. CONFIRMS the DB.",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'. CONFIRMS the DB.",
+        "navigation_type": "p.4 'Hybridnavigation, passend für alle Anwendungsbereiche' — see the COMPACT MOVE entry for how 'Hybridnavigation' is defined elsewhere in this brochure family. The DB's VARIO MOVE CB row currently has navigation_type NULL entirely, so this is an enrichment.",
+        "safety_coverage": "p.4 '360° Rundumsicht / Sicherheitsschutz'. 360° from laser scanners is a horizontal plane; no 3D sensing is claimed on this series. CONFIRMS the DB.",
+        "multi_load_compatibility": "p.5 'Dank seiner modularen Antriebseinheit lässt er sich flexibel mit verschiedenen Fahrwerken und Lastaufnahmemitteln konfigurieren' and 'Unterschiedliche Gabeln und aktive Förderer bieten ein breites Einsatzspektrum'. CAVEAT: this describes CONFIGURATION-time modularity (choosing a load handler when ordering), which is arguably the opposite of the AP0 hint's 'in ONE workflow without manual reconfiguration'. Proposed with that reservation; a reviewer could justifiably reject it."
+      },
+      "notes": "CONFLICT — lifting_height: DB 5000 mm vs brochure 'bis zu 5,25 m' = 5250 mm. Unlike the COMPACT MOVE divergence this one is tighter: 5250 IS the stated series ceiling and 5000 is not a round sub-configuration of anything named on the sheet. 250 mm on a hard K.O. field. Flagged.\nMISSING VARIANTS — four of five have no DB row: **VARIO MOVE L**, **AS**, **CT**, **CTO** (p.4 image captions; one image is watermarked '2023'). No per-variant specs are published, so these are flagged as candidates only. NOTE the same AS/CB/CT/CTO letter set recurs on HEAVY MOVE, which strongly suggests they are chassis types (AS = Anhänger/Schlepper? CB = Counterbalance, CT/CTO = ?) shared across series rather than arbitrary model names — worth asking ek robotics before creating rows.\nENRICH — navigation_type (currently NULL on VARIO MOVE CB).\nWRONG-SCOPE values on the VARIO MOVE CB DB row (flag only): route_type, route_programming (Tugger scope), workflow_capability, grid_required, picking_mechanism (AMR scope) — five, on a Forklift AGV row.\nAP0 GAP — p.5's modular breakdown (Antriebseinheit / Fahrwerk / Hubmast / Lastaufnahmemittel as separately selectable modules) is this series' entire value proposition and there is no field to express platform modularity for a forklift. top_module_type exists but is AMR-scope only."
+    },
+    {
+      "product_name": "ek robotics X MOVE 600 / X MOVE 1200",
+      "product_type": "Mobile AMR",
+      "source_file": "NMR_ek_robotics_X_MOVE_Broschuere_de.pdf",
+      "db_status": "enrich",
+      "variant_group": "p.4 gives per-variant spec bullets for X MOVE 600 and X MOVE 1200 — the only ek robotics brochure in the set that publishes real per-variant numbers rather than a series ceiling. Two further images are captioned 'X MOVE 1200 MIT HUBBALKEN' and 'X MOVE 1200 MIT ROLLENBAHN' (lift-beam and roller-conveyor top modules).",
+      "fields": {
+        "X MOVE 600": {
+          "max_payload": 600,
+          "max_speed": 1.7,
+          "vehicle_length": 1050,
+          "vehicle_width": 700,
+          "min_ground_clearance": 320,
+          "battery_type": ["Li-Ion"],
+          "navigation_type": ["Contour", "Laser Reflector"]
+        },
+        "X MOVE 1200": {
+          "max_payload": 1200,
+          "max_speed": 1.5,
+          "vehicle_length": 1350,
+          "vehicle_width": 910,
+          "min_ground_clearance": 320,
+          "battery_type": ["Li-Ion"],
+          "navigation_type": ["Contour", "Laser Reflector"],
+          "top_module_type": ["Lift", "Roller"]
+        }
+      },
+      "field_sources": {
+        "max_payload": "p.4 'X MOVE 600 • Nutzlastkapazität gesamt 600 kg' and 'X MOVE 1200 • Nutzlastkapazität gesamt 1.200 kg'. CONFIRMS both DB values exactly.",
+        "max_speed": "p.4 'X MOVE 600 • Max. Geschwindigkeit 1,7 m / s' and 'X MOVE 1200 • Max. Geschwindigkeit 1,5 m / s'. CONFIRMS both DB values exactly — and note the LARGER robot is the SLOWER one, so these are genuinely per-variant figures, not a copied ceiling.",
+        "vehicle_length": "p.4 'X MOVE 600 • (L x B x H) 1.050 x 700 x 320 mm' and 'X MOVE 1200 • (L x B x H) 1.350 x 910 x 320 mm'. CONFIRMS both DB values exactly.",
+        "vehicle_width": "same rows — 700 and 910 mm. CONFIRMS both DB values exactly.",
+        "min_ground_clearance": "same rows — the H figure, 320 mm for both. Per the AP0 hint this field holds the ROBOT'S HEIGHT (clearance needed to drive under the carrier), so the height is the correct source. CURRENTLY NULL on both DB rows.",
+        "battery_type": "p.4 'LI-Ion Batteriesystem für 24/7 Einsatz'. CONFIRMS the DB.",
+        "navigation_type": "p.4 'Hybridnavigation über Kontur und / oder Reflektoren' — the clearest statement of what 'Hybridnavigation' means anywhere in the nine brochures. CONFIRMS the DB's 'Natural Feature (SLAM)|Laser Reflector' in substance; note the DB uses 'Natural Feature (SLAM)' where 'Contour' would be the closer literal match for 'Kontur'. Both are defensible under the AP0 mapping rule ('contour-based' -> Natural Feature (SLAM)); no change proposed.",
+        "top_module_type": "p.4 image captions 'X MOVE 1200 MIT HUBBALKEN' (lift beam -> 'Lift') and 'X MOVE 1200 MIT ROLLENBAHN' (roller conveyor -> 'Roller'). The DB currently holds 'Custom' for X MOVE 1200; 'Lift' and 'Roller' are more specific and are named on the sheet."
+      },
+      "notes": "This is the strongest evidence in the ek robotics set: every single DB value for X MOVE 600 and X MOVE 1200 (payload, speed, length, width) is confirmed EXACTLY by p.4, including the counter-intuitive detail that the heavier variant is slower. High confidence.\nENRICH — min_ground_clearance = 320 mm on both (currently null); top_module_type 'Lift' + 'Roller' on X MOVE 1200 (currently the vaguer 'Custom').\nCOVERAGE PROBLEM — **ek robotics X MOVE 300** exists in the DB but appears NOWHERE on this 2025/2026 brochure, which shows only the 600 and 1200. Combined with the FAST MOVE issue below, this is a discontinued-model candidate. FLAG ONLY — this agent does not deactivate records.\nAP0 GAP — 'Gewicht ohne Last 250 kg / 340 kg' (p.4) has no field. Dead weight now has no home for the fourth supplier in this batch (Stäubli Sterimove 225 kg, ARNY 4200-5990 kg, Enabled Robotics 460 kg, ek robotics X MOVE).\nWRONG-SCOPE values on both X MOVE DB rows (flag only): route_type, route_programming (Tugger scope) on Mobile AMR rows."
+    },
+    {
+      "product_name": "ek robotics VNA MOVE 1350 / VNA MOVE 1500",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_VNA_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "variant_group": "Two variants published with individual spec bullets on p.4: VNA MOVE 1350 and VNA MOVE 1500. Entire series absent from the DB.",
+      "fields": {
+        "VNA MOVE 1350": {
+          "product_type": "Forklift AGV",
+          "drive_type": "VNA Turret",
+          "vna_capable": true,
+          "max_payload": 1350,
+          "lifting_height": 12000,
+          "mast_type": "Triplex",
+          "battery_type": ["Li-Ion"],
+          "navigation_type": ["Contour", "Laser Reflector", "Inductive Loop"],
+          "guidance": ["Rail", "Wire"],
+          "special_fork_option": ["Telescopic"],
+          "stacking_capability": true,
+          "load_detection": ["Camera/Vision"]
+        },
+        "VNA MOVE 1500": {
+          "product_type": "Forklift AGV",
+          "drive_type": "VNA Turret",
+          "vna_capable": true,
+          "max_payload": 1500,
+          "lifting_height": 12000,
+          "mast_type": "Triplex",
+          "battery_type": ["Li-Ion"],
+          "navigation_type": ["Contour", "Laser Reflector", "Inductive Loop"],
+          "guidance": ["Rail", "Wire"],
+          "special_fork_option": ["Telescopic"],
+          "stacking_capability": true,
+          "load_detection": ["Camera/Vision"]
+        }
+      },
+      "field_sources": {
+        "product_type": "p.2 'Auch im Einsatz im Schmalganglager sorgen unsere fahrerlosen Transportsysteme (FTS) für maximale Effizienz'; p.4 title 'MAXIMALE LEISTUNG AUF MINIMALEN RAUM — Optimiert für Hochregal- und Schmalganglager'",
+        "drive_type": "Schmalganglager (very narrow aisle) + 'Teleskopgabeln oder Schwenkschubgabeln' (telescopic or swing-reach forks) + in-aisle mechanical/inductive guidance = the AP0 drive_type hint's 'VNA Turret (Schmalgangstapler)' definition, including its 'Always wire- or rail-guided in the aisle' clause.",
+        "vna_capable": "p.2/p.4 'Schmalganglager' throughout; p.4 'Höchste Flexibilität und konfigurierbar für verschiedene Gangbreiten'",
+        "max_payload": "p.4 variant bullets 'VNA MOVE 1350 • Tragkraft bis 1.350 kg' and 'VNA MOVE 1500 • Tragkraft bis 1.500 kg' — the model numbers ARE the payloads",
+        "lifting_height": "p.4 FEATURES 'Sichere Lastübergabe in bis zu 12 m Höhe' and both variant bullets 'Hubhöhe bis 12 m' -> converted to 12000 mm (AP0 unit mm). Stated twice per variant.",
+        "mast_type": "p.4 both variant bullets '2fach- oder 3fach-Mast' -> Duplex or Triplex. 'Triplex' recorded as the configuration that reaches the stated 12 m; a reviewer should note Duplex is equally available and AP0's single-select cannot hold both.",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'. Both variant bullets add 'AC Technik, 80 Volt' (no AP0 field for system voltage).",
+        "navigation_type": "p.4 'Laser-, Reflektor-, Hybrid- oder Konturennavigation außerhalb des Ganges' (outside the aisle) and 'Induktive oder mechanische Führung innerhalb des Ganges' (inside the aisle). Inductive in-aisle guidance -> 'Inductive Loop' per the AP0 mapping rule; Reflektor -> Laser Reflector; Kontur -> Contour.",
+        "guidance": "p.4 'Induktive oder mechanische Führung innerhalb des Ganges'; p.2 'präziser Navigation – mechanisch über Bodenführungsschienen oder mittels induktiver Spurführung'. Bodenführungsschienen (floor guide rails) -> 'Rail'; induktive Spurführung -> 'Wire'. This is the AP0 guidance field working exactly as designed.",
+        "special_fork_option": "p.4 'Teleskopgabeln oder Schwenkschubgabeln' -> Teleskopgabeln maps to the allowed value 'Telescopic'. Schwenkschubgabeln (swing-reach forks) has no allowed value — see notes.",
+        "stacking_capability": "p.2 'Hochregallager', p.4 '12 m Höhe'",
+        "load_detection": "p.4 'Optionale 3D-Lasterkennung' (optional 3D load detection). OPTION, not standard."
+      },
+      "notes": "SIX NEW PRODUCTS ACROSS TWO NEW SERIES — this is the most consequential coverage gap in the group. **ek robotics has an entire VNA line and the DB has no VNA-capable ek robotics product at all.** Because vna_capable drives KO_BOOL_EXCLUSIVE in the matching engine, ek robotics is currently structurally excluded from every VNA tender despite selling two purpose-built VNA trucks reaching 12 m.\nEVIDENCE CLASS: unlike the other series brochures, this one publishes genuine per-variant bullets (payload, lift, mast, electrical system), so confidence is higher than for HEAVY/CUSTOM/OUT/BHL/MEDI MOVE below.\nAP0 GAP — 'Schwenkschubgabeln' (swing-reach forks) is a distinct VNA fork mechanism with no special_fork_option allowed value (the list is Telescopic / Side-Shift / Clamp). For a VNA buyer, telescopic vs swing-reach determines which side of the aisle can be served and is a real selection criterion.\nAP0 GAP — 'konfigurierbar für verschiedene Gangbreiten' (p.4): the brochure says aisle width is configurable but publishes NO figure, so min_aisle_width is left null. For a VNA product that is the single most important missing number; it should be requested from the supplier.\nAP0 GAP — 'AC Technik, 80 Volt' has no field, and 'Mit minimalem Abstand zum Regal' (p.2) has no field either."
+    },
+    {
+      "product_name": "ek robotics MEDI MOVE",
+      "product_type": "Mobile AMR",
+      "source_file": "NMR_ek_robotics_MEDI_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "variant_group": "Single series, no variants published.",
+      "fields": {
+        "product_type": "Mobile AMR",
+        "max_payload": 500,
+        "lift_height": 140,
+        "max_speed": 1.7,
+        "battery_type": ["Li-Ion"],
+        "navigation_type": ["Contour"],
+        "safety_coverage": "Single plane (2D)",
+        "top_module_type": ["Lift"],
+        "workflow_capability": ["Transport"],
+        "onboard_container_type": ["Bin"]
+      },
+      "field_sources": {
+        "product_type": "p.4 'Hubhöhe 140 mm für Unterfahr-FTF' — an underride transport robot, no mast",
+        "max_payload": "p.4 FEATURES bullet 'Tragfähigkeit von bis zu 500 kg'",
+        "lift_height": "p.4 'Hubhöhe 140 mm für Unterfahr-FTF' — an underride lift stroke, so AP0's AMR-scope lift_height (not the Forklift-scope lifting_height) is the right field",
+        "max_speed": "p.4 'Fahrgeschwindigkeit bis zu 1,7 m/s'",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'",
+        "navigation_type": "p.4 'Navigation über Laserscanner mit 360° Personenschutz'. CAUTION: that bullet describes a laser scanner used for 360° PERSONNEL PROTECTION; it does not name a localisation method. 'Contour' is inferred from the platform-wide Hybridnavigation described on the sibling brochures rather than stated here. Weak — a reviewer may prefer null.",
+        "safety_coverage": "p.4 'Laserscanner mit 360° Personenschutz'",
+        "top_module_type": "the 140 mm underride lift",
+        "workflow_capability": "p.2 'übernimmt der MEDI MOVE zuverlässig den automatisierten Warentransport (AWT)'",
+        "onboard_container_type": "p.4 'Hochpräzise Lastspiele mit unterschiedlichen Containern'; p.2 'Von Mahlzeiten und Medikamenten bis hin zu Wäsche oder Abfall'"
+      },
+      "notes": "NEW PRODUCT, new series.\nAP0 GAP — NO HEALTHCARE VERTICAL, second independent instance in this batch (after DS Automotion SALLY Kurier). This product exists solely for hospitals: p.2 'Speziell für die sensiblen Anforderungen in Kliniken entwickelt … navigiert durch unterirdische Versorgungsgänge und über mehrere Etagen, um Stationen, Pflegebereiche und Sterilzonen bedarfsgerecht zu beliefern.' industries_served has no value for it. **Three hospital/life-science machines in one session (SALLY Kurier, Stäubli Sterimove, MEDI MOVE) is a strong argument for adding the vertical.**\nAP0 GAP — MULTI-FLOOR / LIFT OPERATION. p.2 'navigiert durch unterirdische Versorgungsgänge und über mehrere Etagen'; DS Automotion's NAVIOS sheet says the same ('Die Routenplanung kann auch über mehrere Stockwerke erfolgen') and Enabled Robotics claims elevator integration. Three suppliers in one session advertise multi-storey operation via building lifts and AP0 cannot express it — for a hospital or multi-level plant this is a hard requirement, not a nice-to-have.\nAP0 GAP — hygiene/cleanability ('hygienisch', 'hygienekonforme Logistik', 'Sterilzonen'), the same gap logged for Stäubli Sterimove's EHEDG/VHP rows and DS Automotion SALLY Kurier's disinfectable cabinet. Three instances this session.\nNo dimensions, no aisle width and no charge data are published on this brochure."
+    },
+    {
+      "product_name": "ek robotics OUT MOVE",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_OUT_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "fields": {
+        "max_payload": 16000,
+        "outdoor_capable": true,
+        "battery_type": ["Li-Ion"],
+        "navigation_type": ["Contour", "Laser Reflector"],
+        "top_module_type": ["Roller", "Conveyor"],
+        "safety_coverage": "Single plane (2D)"
+      },
+      "field_sources": {
+        "max_payload": "p.4 FEATURES bullet 'Hohe Traglast von bis zu 16.000 kg'. Well above config/plausibility.json's typical heavy-duty band but inside its required_max_payload ceiling of 50000 kg — plausible for a yard/outdoor transporter.",
+        "outdoor_capable": "p.2 'wurde speziell für den wetterunabhängigen Materialtransport im Außenbereich entwickelt'; p.4 'Für Innen- und Außenbetrieb', 'Wetterfester Aufbau für alle Witterungen und Jahreszeiten', '365 TAGE IM EINSATZ'. As explicit as this field ever gets.",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'",
+        "navigation_type": "p.4 'Hybridnavigation und zusätzliche Hinderniserkennung durch Laserscanner'",
+        "top_module_type": "p.4 'Lastaufnahme über Rollen- oder Kettenförderer' — roller or chain conveyor. Rollen -> 'Roller'; Kettenförderer -> 'Conveyor'. NOTE top_module_type is AMR-scope and this is classified Forklift AGV; see notes.",
+        "safety_coverage": "p.4 'Maximale Sicherheit durch optische oder taktile Personenschutzsysteme' + 'zusätzliche Hinderniserkennung durch Laserscanner'"
+      },
+      "notes": "NEW PRODUCT, new series.\nCLASSIFICATION UNCERTAIN — product_type is genuinely ambiguous and is flagged rather than asserted confidently. The vehicle loads via roller/chain conveyor (not forks), has no stated lift height, and is an outdoor yard transporter. That reads more like a Mobile AMR or even a Tugger than a Forklift AGV, but nothing in the brochure names a drive category and 16 t is far outside AMR territory. 'Forklift AGV' is recorded as the least-bad fit; a reviewer should decide. Because the classification is unsettled, the type-specific block is deliberately thin — top_module_type is listed above even though it is AMR-scope, precisely so the reviewer can see which way the evidence points.\nNOTABLE REGULATORY CLAIM with no AP0 field: p.4 'Für Mischverkehr mit innerbetrieblichem Transport auf Werksgelände zugelassen' — type-approved for mixed traffic on company premises. For an outdoor deployment this is a gating legal requirement and there is nowhere to record it.\nAP0 GAP — outdoor_capable is a plain boolean, so 'wetterfester Aufbau für alle Witterungen und Jahreszeiten' cannot be distinguished from a machine that merely tolerates a covered loading dock. No IP rating is published to compensate.\nNo dimensions, speed, lift height or aisle width are published."
+    },
+    {
+      "product_name": "ek robotics BHL MOVE",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_BHL_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "fields": {
+        "lifting_height": 8000,
+        "navigation_type": ["Contour", "Laser Reflector"],
+        "stacking_capability": true,
+        "load_detection": ["Camera/Vision"],
+        "station_applications": ["Standard rack"],
+        "omnidirectional_movement": true
+      },
+      "field_sources": {
+        "lifting_height": "p.4 FEATURES bullet 'Übergabehöhe 8 m+' -> 8000 mm. The '+' means this is a FLOOR, not a ceiling — unusual, and recorded conservatively at 8000.",
+        "navigation_type": "p.4 'Navigationsarten: • Laser • Reflektor • Kontur • Hybrid' — the most explicit navigation list in the whole ek robotics set, printed as its own sub-block.",
+        "stacking_capability": "p.4 '4-Wege-Stapler für vollautomatische Lagersysteme', 'Geeignet für verschiedene Regalsysteme'",
+        "load_detection": "p.4 'Optional mit verstellbaren Gabelzinken und 3D-Objekterkennung' — OPTION",
+        "station_applications": "p.4 'Geeignet für verschiedene Regalsysteme'",
+        "omnidirectional_movement": "p.2 'Transportroboter der Fahrzeugserie BHL MOVE sind mit einem 4-Wege-Fahrwerk ausgestattet und ermöglichen damit maximale Bewegungsfreiheit selbst in engen Strukturen. Quer-, Diagonal- und Längsfahrten lassen sich präzise kombinieren'. Lateral + diagonal + longitudinal travel is the AP0 hint's 'sideways + spin on the spot' holonomic test. NOTE a classic 4-way truck switches wheel orientation rather than being truly holonomic, so a purist may object; the diagonal claim is what tips it."
+      },
+      "notes": "NEW PRODUCT, new series. BHL = 'Bulky, Heavy, Long' (p.2 subtitle).\nmax_payload deliberately LEFT NULL — p.4 says only 'Maßgeschneiderte Tragfähigkeit für Ihre Anwendung' (payload tailored to your application) and publishes no number at all. This is the correct null: the field is a hard K.O. and guessing from the series name would be indefensible.\nENRICH CANDIDATE not filled — fork_spread: p.4 'Optional mit verstellbaren Gabelzinken' (optionally with adjustable fork tines) establishes the capability but not whether adjustment is manual or automatic. AP0 offers only None / Manual / Auto with no 'available, mechanism unstated' value. Same situation as DS Automotion's ARNY 'Zinkenverstellung' in this batch — TWO independent instances now, which suggests AP0's fork_spread needs either a fourth value or a hint clarifying the default reading.\nAP0 GAP — 'Sicheres Handling von Langgut und Sonderlastgestellen in schmalen Gängen' (p.4): long-goods handling is this series' whole purpose and load_type's allowed values (pallets, totes, bins, roll containers, custom carrier) cannot express 'long stock'. It would land in 'Custom Carrier' alongside everything else.\nAP0 GAP — no aisle width is published despite 'schmale Gänge' being a headline claim.\nCLASSIFICATION: 'Forklift AGV' is well supported here (p.4 '4-Wege-Stapler', forks, 8 m+ transfer height, rack systems) — unlike OUT MOVE this one is not ambiguous."
+    },
+    {
+      "product_name": "ek robotics HEAVY MOVE (series)",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_HEAVY_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "variant_group": "p.4 shows FIVE variants: HEAVY MOVE AS, SG, CB, CT, CTO — the same AS/CB/CT/CTO letter set as VARIO MOVE plus SG. No per-variant specs are published.",
+      "fields": {
+        "max_payload": 12000,
+        "lifting_height": 10000,
+        "max_speed": 2.0,
+        "battery_type": ["Li-Ion"],
+        "navigation_type": ["Contour", "Laser Reflector"],
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "p.2 'Mit Tragfähigkeiten von bis zu 12.000 kg und flexibler Lasernavigation' and p.4 FEATURES bullet 'Hohe Traglast von bis zu 12.000 kg'. Stated twice. SERIES CEILING — the AS/SG/CB/CT/CTO variants will differ.",
+        "lifting_height": "p.4 FEATURES bullet 'Sichere Lastübergabe in bis zu 10 m Höhe' -> 10000 mm (converted from metres)",
+        "max_speed": "p.4 'Fahrgeschwindigkeit bis zu 2 m/s'",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'",
+        "navigation_type": "p.4 'Hybridnavigation, passend für alle Anwendungsbereiche'; p.2 'flexibler Lasernavigation'",
+        "stacking_capability": "p.4 '10 m Höhe'"
+      },
+      "notes": "NEW PRODUCT, new series. 12 t at 10 m is the heaviest forklift-class machine in the ek robotics range and there is no comparable entry in the DB from any supplier — a genuine capability gap in the supplier base, not just a data gap.\nSERIES-CEILING CAVEAT applies in full: 12000 kg and 10000 mm are 'bis zu' bullets for a five-variant series with no per-variant numbers. Do NOT create five rows all holding 12000 kg. If the importer wants variant rows, the specs must be requested from ek robotics first.\nPAYLOAD/LIFT INTERACTION UNVERIFIED: '12.000 kg' and '10 m' appear as two independent bullets in the same list with no statement that they hold simultaneously. Given that Toyota, Balyo, Geek+ and Stäubli all derate payload with lift height, assuming a 12 t load at 10 m would be unsafe.\nNo dimensions, aisle width, drive type or safety details are published."
+    },
+    {
+      "product_name": "ek robotics CUSTOM MOVE",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_CUSTOM_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "variant_group": "Not a product family — a bespoke-engineering offering. p.4 shows SIX example builds with individual dimensions, dead weights and payloads, presented as illustrations of what has been built, not as orderable models.",
+      "fields": {
+        "max_payload": 35000,
+        "max_speed": 2.0,
+        "battery_type": ["Li-Ion"],
+        "navigation_type": ["Contour", "Laser Reflector"],
+        "multi_load_compatibility": true
+      },
+      "field_sources": {
+        "max_payload": "p.4 FEATURES bullet 'Hohe Traglast von bis zu 35.000 kg'. The six example builds on the same page reach 32.000 kg, corroborating the order of magnitude. Inside config/plausibility.json's required_max_payload ceiling of 50000 kg.",
+        "max_speed": "p.4 'Fahrgeschwindigkeit bis zu 2 m/s'",
+        "battery_type": "p.4 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz'",
+        "navigation_type": "p.4 'Hybridnavigation, passend für alle Anwendungsbereiche'",
+        "multi_load_compatibility": "p.4 'Beliebige Lastaufnahmemittel' (any load handling attachment) + 'Hohe Flexibilität durch modulares Fahrzeugkonzept'"
+      },
+      "notes": "NEW ENTRY, but flagged as a MODELLING QUESTION rather than a straightforward product. CUSTOM MOVE is a bespoke-engineering service ('Wenn Standardlösungen an ihre Grenzen stoßen … maßgeschneiderte Transportlösung', p.2), so a single Product row carrying a 35 t ceiling would tell a matching engine that ek robotics has an off-the-shelf 35-tonne truck, which is not what the brochure says. A reviewer should decide whether to (a) skip it, (b) create it with a clear note, or (c) treat the six documented builds as reference installations rather than products. Recommendation: do not create it as a normal product row.\nTHE SIX DOCUMENTED BUILDS (p.4, each with L x B x H / Gewicht ohne Last / Nutzlastkapazität gesamt) are worth recording verbatim because they are the only real numbers ek robotics publishes for its heavy range:\n  1. 1.050 x 700 x 320 mm | 717 kg | 1.200 kg  — NOTE this is the X MOVE 600 footprint exactly (1050x700x320) but a 1200 kg payload and a 717 kg dead weight vs X MOVE 600's 250 kg. Either a heavily reinforced X MOVE derivative or a caption/layout mismatch on the page. Worth a second look.\n  2. 2.172 x 1.584 x 2.369 mm | 1.656 kg | 2.000 kg\n  3. 3.376 x 1.530 x 3.604 mm | 3.500 kg | 2 x 1.500 kg  — a DUAL-LOAD vehicle; AP0's max_payload cannot express '2 x 1500 kg' (total 3000 kg but in two separate load positions), another gap.\n  4. 4.326 x 3.082 x 2.398 mm | 10.000 kg | 16.000 kg\n  5. 6.724 x 2.724 x 2.047 mm | 9.450 kg | 32.000 kg\n  6. 4.740 x 3.312 x 480 mm | 3.500 kg | 3.000 kg\nAP0 GAP — 'Nutzlastkapazität gesamt: 2 x 1.500 kg' (build 3) has no representation; a two-station vehicle is a different proposition from a single 3 t one."
+    }
+  ]
+}

@@ -1,0 +1,337 @@
+{
+  "company": "Linde Material Handling",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "11 files (9 official VDI-2198-format datasheets in German/English + 1 16pp company-wide 'Linde-MATIC range' brochure not separately extracted this pass due to time budget, listed for a future run). VDI 2198 is a German industry-standard forklift datasheet layout (numbered rows 1.1-10.7) shared across Linde/STILL/Jungheinrich-style OEM sheets -- very information-dense and reliably structured once the row-number pattern is recognized. All 11 corresponding DB base models already existed with literally only base_model_id/name/product_type/last_updated populated (all real spec fields NULL) -- pure enrichment throughout, no new products. CONFIRMED CROSS-REFERENCE: P-MATIC and L-MATIC (BR133) datasheets both print 'Hersteller: LINDE/BALYO' and describe 'Geo-Navigation \"Driven by BALYO\"' -- this independently confirms the Linde<->Balyo OEM relationship already known from the Balyo-side datasheets processed earlier this run (Balyo TUGGY=Linde Tractor, LOWY=Linde Stacker, REACHY=Linde Reach, VEENY=Linde VNA base_model_names) -- not a new company-relationship finding, just a second-source confirmation, noted for completeness. Several multi-configuration tables (C-MATIC 10/15, L-MATIC AC 1.2t/1.6t, K-MATIC/R-MATIC mast-height variants) were collapsed to one DB row per the existing product naming (no separate DB rows exist per config) -- CONSERVATIVE (lowest-capability) values used for K.O. fields per the matrix policy, higher-capability configs noted in field_sources. 'Linde R-MATIC k (R-MATIC 17 k)' source file (DE_tb_r_matic_k_5190) only yielded a features/options list on the pages read (p.2-3), not a numeric VDI table -- likely present on a later page not captured this pass; flagged as PARTIALLY extracted, worth a follow-up re-read of pp.4-6 of that specific file. ADDENDUM (full-batch continuation run, same calendar day): the previously-deferred 16pp company brochure ('EN_p_robotics_en_a_0216.pdf') was now processed. It is a qualitative product-line overview (application-matrix style, e.g. 'Pick & drop at low levels' / 'Bar code scanning' mapped to which MATIC model handles which use case) with almost no additional numeric specs beyond what the 11 individual VDI-2198 datasheets already provided -- no new fields extracted for existing products. NEW PRODUCT NAME FLAG (insufficient data to create a row): the brochure's application matrix (p.15) lists 'T-MATIC' as a distinct model name alongside L-MATIC/L-MATIC AC, implying a Linde-MATIC tow-tractor/tugger model not currently in the DB and not covered by any of this batch's other 11 datasheet files -- but no numeric specs (payload, speed, towing capacity) are given anywhere in this brochure for it, so no product row was created; flagged for a future dedicated search for a T-MATIC-specific datasheet. The brochure also explicitly confirms (does not newly establish) the Linde↔BALYO relationship already documented from this batch's Balyo/Linde cross-references: 'Linde Material Handling and BALYO are merging their technologies and strengths to develop innovative robotic material handling solutions' (p.16).",
+  "products": [
+    {
+      "product_name": "Linde C-MATIC",
+      "product_type": "Mobile AMR",
+      "source_file": "DE_tb_c_matic_8925_dt_e_1025_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1180,
+        "vehicle_width": 832,
+        "lift_height": 60,
+        "max_payload": 1000,
+        "max_speed": 1.19,
+        "max_gradient": 5,
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "navigation_type": [
+          "QR/DM Code"
+        ],
+        "operating_temp_min": 0,
+        "operating_temp_max": 40,
+        "integration_capability": [
+          "WMS",
+          "ERP"
+        ],
+        "stop_accuracy": 5,
+        "min_turning_radius": 619,
+        "autonomous_charging": true,
+        "rotation_capable": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21 'Gesamtlänge l1=1180mm / Gesamtbreite b1=832mm'",
+        "lift_height": "VDI row 4.4 'Hub h3=60mm'",
+        "max_payload": "VDI row 1.5 'Nenntragfähigkeit Q=1.0/1.5t' -- CONSERVATIVE (lower) C-MATIC 10 config used, C-MATIC 15 (1500kg) noted",
+        "max_speed": "VDI row 5.1 'Fahrgeschwindigkeit mit/ohne Last 4.3/5.4 km/h' -- loaded 4.3km/h converted to m/s (÷3.6=1.19)",
+        "max_gradient": "VDI row 5.8 'Max. Steigfähigkeit <5.0%'",
+        "battery_type": "p.5 features list 'Li-ION-Batterie'",
+        "navigation_type": "p.5 features 'Navigation mit QR-Codes'; p.4 'LOKALISIERUNGSTECHNOLOGIE ... QR-Code Abstand (CUD)'",
+        "operating_temp": "p.5 'Umgebungstemperatur +0 – +40°C'",
+        "integration_capability": "p.5 'Standardschnittstellen mit bestehenden WMS, ERP etc.'",
+        "stop_accuracy": "p.5 'Genauigkeit beim Anhalten ±5mm'",
+        "min_turning_radius": "VDI row 4.35 'Wenderadius Wa=618.5mm'",
+        "autonomous_charging": "p.5 'Ladekontakt für automatisches Zwischenladen'",
+        "rotation_capable": "p.5 'Differentialantrieb mit zwei Rädern, Drehen auf der Stelle'; 'Drehen, Transportieren und Abstellen der Last mit 90°,180°,270°'"
+      },
+      "notes": "Also carries EPAL1/EPAL3/US-pallet-size handling via adapter plate (l3xb9=1200x887mm), not written to any single field."
+    },
+    {
+      "product_name": "Linde C-MATIC HP",
+      "product_type": "Mobile AMR",
+      "source_file": "DE_tb_c_matic_hp_10_8928_dt_a_0523_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1440,
+        "vehicle_width": 634,
+        "lift_height": 40,
+        "max_payload": 1000,
+        "max_speed": 2.2,
+        "min_turning_radius": 1592,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21 'Gesamtlänge l1=1440mm / Gesamtbreite b1=634mm'",
+        "lift_height": "VDI row 4.4 'Hub h3=40mm'",
+        "max_payload": "VDI row 1.5 'Nenntragfähigkeit Q=1.0t'",
+        "max_speed": "VDI row 5.1 'Fahrgeschwindigkeit mit/ohne Last 2.2 m/s' (already in m/s, no conversion needed)",
+        "min_turning_radius": "VDI row 4.35 'Wenderadius Wa=1592mm' (without adapter plate; with adapter plate + EPAL pallet: 1327mm, not used)",
+        "navigation_type": "p.1 marketing text 'Navigation mit natürlichen Merkmalen für optimale Orientierung ohne zusätzliche Infrastruktur'",
+        "infrastructure_free": "same source as navigation_type"
+      },
+      "notes": "Marketed for 'mittlere bis lange Entfernungen' (medium-to-long distances) at up to 8km/h max speed, distinguishing it from base C-MATIC's shorter-range use case. Battery chemistry not named (only '48V/120Ah' voltage/capacity given, no LiFePO4/Li-Ion/Lead-Acid word) -- battery_type left null rather than guessed."
+    },
+    {
+      "product_name": "Linde L-MATIC AC",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2900,
+        "vehicle_width": 790,
+        "lifting_height": 1844,
+        "max_payload": 1200,
+        "max_speed": 1.7,
+        "max_gradient": 3,
+        "min_aisle_width": 3340,
+        "navigation_type": [
+          "Contour"
+        ],
+        "infrastructure_free": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21, shorter-mast 1.6t config 'Gesamtlänge l1=2900mm / Gesamtbreite b1=790mm' (same length across 1.2t/1.6t short-mast columns)",
+        "lifting_height": "CONSERVATIVE (lowest) of 4 config columns used: VDI row 4.4 'Hub h3' = 1924/1844/4224/4144mm across (1.2t short, 1.6t short, 1.2t tall, 1.6t tall) mast options -- 1844mm (lowest) used, 4224mm tall-mast option noted",
+        "max_payload": "VDI row 1.5 'Nenntragfähigkeit Q=1.2/1.6t' -- CONSERVATIVE (lower) used",
+        "max_speed": "VDI row 5.1 'Max. Fahrgeschwindigkeit mit Last vorwärts 1.7 m/s' (already m/s)",
+        "max_gradient": "VDI row 5.8 'Max. Steigfähigkeit mit Last 3%'",
+        "min_aisle_width": "VDI row 4.34.2 'Arbeitsgangbreite bei Paletten 850x1250 längs' = 3340mm (smallest/conservative of the 4 config columns, up to 3710mm for 1.6t tall-mast)",
+        "navigation_type": "p.1 marketing text 'Intelligente Konturnavigation kommt ohne zusätzliche Infrastruktur aus'",
+        "infrastructure_free": "same source"
+      },
+      "notes": "Battery chemistry not named in the VDI table (blank DIN classification row) -- left null."
+    },
+    {
+      "product_name": "Linde L-MATIC AC k",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2768,
+        "lifting_height": 2844,
+        "max_payload": 1000
+      },
+      "field_sources": {
+        "vehicle_length": "VDI row 4.19, smaller config 'Gesamtlänge l1=2768mm' (larger config: 3133mm, not used)",
+        "lifting_height": "VDI row 4.4 'Hub h3=2844mm' (same across both configs)",
+        "max_payload": "VDI row 1.5 'Nenntragfähigkeit Q=1.0/1.4t' -- CONSERVATIVE (lower) used; note the model names themselves ('L-MATIC 12 AC k'/'L-MATIC 16 AC k') suggest a 1.2t/1.6t class naming that doesn't exactly match the table's own printed 1.0/1.4t Q values -- flagged as a minor source-internal inconsistency, table value used as ground truth"
+      },
+      "notes": "This sheet's page 2 has NO Ast (aisle width) or Fahrgeschwindigkeit (speed) rows at all -- narrower VDI subset than sibling L-MATIC AC sheet, several common fields genuinely absent from source rather than overlooked. Battery: '43535 B' DIN code present but no chemistry word -- left null."
+    },
+    {
+      "product_name": "Linde L-MATIC",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_br133_de_a_0516.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2285,
+        "vehicle_width": 804,
+        "lifting_height": 1924,
+        "max_payload": 1200,
+        "max_speed": 1.67,
+        "max_gradient": 5,
+        "min_aisle_width": 2739,
+        "navigation_type": [
+          "Contour"
+        ],
+        "infrastructure_free": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21 'Gesamtlänge l1=2285mm / Gesamtbreite b1=804mm'",
+        "lifting_height": "VDI row 4.4 'Hub h3=1924mm'",
+        "max_payload": "VDI row 1.5 'Tragfähigkeit Q=1.2/2.0t' -- footnote clarifies 2.0t is a SPLIT load (1000kg on forks + 1000kg on arms simultaneously, 2000kg combined max) -- 1200kg (single-load forks rating) used as the conservative base figure",
+        "max_speed": "VDI row 5.1 'Fahrgeschwindigkeit mit/ohne Last 6/6 km/h (max. autonomous 7.2/2.9km/h in parentheses)' -- base manual-mode figure (6km/h=1.67m/s) used as primary",
+        "max_gradient": "VDI row 5.8 'Max. Steigfähigkeit mit/ohne Last 5.0/5.0%'",
+        "min_aisle_width": "VDI row 4.34 'Arbeitsgangbreite bei Palette 800x1200 längs Ast=2739mm' (manual mode; autonomous-mode parenthetical value 2694mm not used)",
+        "navigation_type": "p.4 'Geo-Navigation: Innovative Technologie ohne Infrastruktur (keine Reflektoren), Orientiert sich an vorhandenen Strukturen (Wände, Säulen, Regale)' -- mapped to AP0's 'Contour'",
+        "infrastructure_free": "same source, 'ohne Infrastruktur (keine Reflektoren)'"
+      },
+      "notes": "Manufacturer field literally reads 'LINDE/BALYO' -- see researcher_notes cross-reference confirmation."
+    },
+    {
+      "product_name": "Linde L-MATIC core",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_core_1195_01_dt_b_0425_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1785,
+        "vehicle_width": 887,
+        "lifting_height": 1844,
+        "max_payload": 1200,
+        "max_speed": 1.67,
+        "min_aisle_width": 2750,
+        "battery_type": [
+          "Li-Ion"
+        ]
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21 'Gesamtlänge l1=1785mm / Gesamtbreite b1=887mm'",
+        "lifting_height": "VDI row 4.4 'Hub h3=1844mm'; matches p.1 marketing text 'maximale Hubhöhe bis zu 1.84 Metern'",
+        "max_payload": "VDI row 1.5 'Nenntragfähigkeit Q=1.2t'",
+        "max_speed": "VDI row 5.1 'Fahrgeschwindigkeit mit/ohne Last km/h 4/4 (Wartungsmodus) / 6.0/7.2 (Automatisierter Betrieb)' -- automated-mode loaded figure (6.0km/h=1.67m/s) used as more representative of AGV operation than the maintenance-mode figure",
+        "min_aisle_width": "VDI row 4.34.1 'Arbeitsgangbreite Palette 1000x1200 quer Ast=2148mm(Wartungsmodus)/2750mm(Automatisierter Betrieb)' -- automated-mode value (larger/conservative) used",
+        "battery_type": "VDI row 6.3 'Batterie: Li-ION: 1P8S 206'"
+      },
+      "notes": "p.1 marketing text: 'Arbeitsgangbreite unter 2.5 Metern' headline claim conflicts with the table's own automated-mode Ast=2750mm figure used here (only the maintenance-mode figure, 2148mm, is under 2.5m) -- flagged as a source-internal inconsistency between marketing copy and the technical table, not resolved."
+    },
+    {
+      "product_name": "Linde L-MATIC HD k",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2208,
+        "vehicle_width": 1000,
+        "lifting_height": 2844,
+        "max_payload": 1600,
+        "max_speed": 2.0,
+        "max_gradient": 3,
+        "min_aisle_width": 2925,
+        "battery_type": [
+          "Lead-Acid"
+        ]
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21, 'L-MATIC HD k' column 'Gesamtlänge l1=2208mm / Gesamtbreite b1=1000mm'",
+        "lifting_height": "VDI row 4.4, 'L-MATIC HD k' column 'Hub h3=2844mm'",
+        "max_payload": "VDI row 1.5 'Tragfähigkeit Q=1.6t' (same for both HD/HD k columns)",
+        "max_speed": "VDI row 5.1, 'L-MATIC HD k' column 'Fahrgeschwindigkeit mit/ohne Last 7.2/7.2 km/h' = 2.0m/s",
+        "max_gradient": "VDI row 5.8 'Max. Steigfähigkeit mit/ohne Last 3/3%'",
+        "min_aisle_width": "VDI row 4.34.2, 'L-MATIC HD k' column 'Arbeitsgangbreite Palette 800x1200 längs Ast=2925mm (2530mm in brackets = manual mode, not used)'",
+        "battery_type": "VDI row 6.3 '3 PzS SL' -- PzS is the standard DIN code prefix for a lead-acid traction battery, mapped to AP0's 'Lead-Acid'"
+      },
+      "notes": "Sibling 'L-MATIC HD' (non-k) column also present in the same table with slightly different dimensions (2137mm length, 800mm width, 2344mm lift) -- not extracted separately since the DB only has a combined 'Linde L-MATIC HD k' row; HD k column used since it matches the DB's exact product name."
+    },
+    {
+      "product_name": "Linde P-MATIC",
+      "product_type": "Tugger AGV",
+      "source_file": "DE_tb_p_matic_br1190_dt_a_0416.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1750,
+        "vehicle_width": 798,
+        "turning_radius": 1485,
+        "max_speed": 2.22,
+        "max_gradient": 5,
+        "navigation_type": [
+          "Contour"
+        ],
+        "infrastructure_free": true,
+        "integration_capability": [
+          "WMS",
+          "ERP"
+        ]
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21 'Gesamtlänge l1=1750mm / Gesamtbreite b1=798mm'",
+        "turning_radius": "VDI row 4.35 'Wenderadius Wa=1485mm'",
+        "max_speed": "VDI row 5.1 'Fahrgeschwindigkeit mit/ohne Last 8/8 km/h' = 2.22m/s",
+        "max_gradient": "VDI row 5.8 'Max. Steigfähigkeit mit Last 5.0%' (14.0% unloaded, not used)",
+        "navigation_type": "p.4 'Geo-Navigation: Innovative Technologie ohne Infrastruktur ... Orientiert sich an vorhandenen Strukturen'",
+        "infrastructure_free": "same source",
+        "integration_capability": "p.1 'Anbindung an Lagerverwaltungs- und ERP-Systeme' -- Lagerverwaltung(WMS) + ERP"
+      },
+      "notes": "towing_capacity deliberately left NULL: the datasheet only states drawbar/pull FORCE in Newtons (VDI row 1.7 'Nennzugkraft F=1800N', row 5.6 'Max. Zugkraft 4000N'), not a towed mass in kg -- converting N to kg would require assuming a rolling-resistance coefficient not stated in the source, which this agent will not do (that's a physics inference, not a unit conversion). Flagging this as a genuine data gap rather than guessing. 'LINDE/BALYO' manufacturer field, same cross-reference as L-MATIC BR133."
+    },
+    {
+      "product_name": "Linde R-MATIC k (R-MATIC 17 k)",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_r_matic_k_5190_dt_a_0425_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 1100,
+        "lifting_height": 10000,
+        "battery_type": [
+          "Lead-Acid",
+          "Li-Ion"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.1 headline 'Tragfähigkeit 1,1 t - 2,3 t' -- CONSERVATIVE (lower) bound used",
+        "lifting_height": "p.1 headline 'Präzises Ein- und Auslagern von Waren bis 2300kg in Höhen bis zu 10 m' -- approximate, rounded headline figure only",
+        "battery_type": "p.2 features list 'Wahl zwischen Blei-Säure- oder Li-ION-Batterien mit optionaler Schnellladelösung'"
+      },
+      "notes": "PARTIALLY EXTRACTED -- pp.2-3 of this file only yielded a features/options list and a dimension drawing (no numeric VDI 2198 table), unlike every other Linde file in this batch. A fuller numeric table likely exists on pp.4-6, not read this pass due to time budget -- flagged as a good target for a follow-up re-read of this specific file before considering this product's enrichment complete. vehicle dimensions, speed, aisle width all left null pending that re-read."
+    },
+    {
+      "product_name": "Linde K-MATIC",
+      "product_type": "Forklift AGV",
+      "source_file": "EN_ds_k_matic_5231_en_a_0224_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 3843,
+        "vehicle_width": 1450,
+        "lifting_height": 7200,
+        "max_payload": 1450,
+        "max_speed": 2.0,
+        "min_aisle_width": 1850,
+        "battery_type": [
+          "Lead-Acid"
+        ],
+        "navigation_type": [
+          "Contour"
+        ],
+        "infrastructure_free": true,
+        "integration_capability": [
+          "WMS",
+          "ERP"
+        ],
+        "vna_capable": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21, smallest (5231) config 'Overall length l1=3843mm / Overall width b1=1450mm'",
+        "lifting_height": "CONSERVATIVE (lowest) of 3 config columns: VDI row 4.4 'Lift h3' = 7200/11550/14350mm -- lowest used, up to 14350mm (16m on request per p.1) noted",
+        "max_payload": "VDI row 1.5 'Rated capacity Q=1.45t' (same across all 3 configs)",
+        "max_speed": "VDI row 5.1 'Travel speed, laden/unladen 2/2 m/s' (already m/s, identical across configs)",
+        "min_aisle_width": "VDI row 4.34, smallest config 'Aisle width (800x1200) Ast=1850mm'",
+        "battery_type": "VDI row 6.3/6.4 'IEC 254-2; A' / 'PzS, 80V/700Ah' -- PzS prefix mapped to Lead-Acid",
+        "navigation_type": "p.1 headline 'Control via intelligent contour navigation without additional infrastructure'",
+        "infrastructure_free": "same source",
+        "integration_capability": "p.1 headline 'Straightforward integration into common WMS and ERP systems'",
+        "vna_capable": "p.1 headline 'Reliable logistics in narrow aisle warehouses' + product is explicitly a K-MATIC narrow-aisle stacker (1850mm aisle at smallest config)"
+      },
+      "notes": "This is Linde's VNA-class automated truck (narrow-aisle, high-bay storage) -- vna_capable=true flag based on the product's own explicit positioning, not the AP0 aisle-width threshold heuristic alone."
+    },
+    {
+      "product_name": "Linde R-MATIC",
+      "product_type": "Forklift AGV",
+      "source_file": "EN_ds_r_matic_1120_en_b_0623_view.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2515,
+        "vehicle_width": 1290,
+        "lifting_height": 6844,
+        "max_payload": 1600,
+        "max_speed": 1.95,
+        "max_gradient": 3,
+        "min_aisle_width": 2990,
+        "stop_accuracy": 20,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "infrastructure_free": true,
+        "vna_capable": true
+      },
+      "field_sources": {
+        "vehicle_length/width": "VDI row 4.19/4.21, config 1 'Overall length l1=2515mm / Overall width b1=1290mm'",
+        "lifting_height": "CONSERVATIVE (lowest) of 4 config columns: VDI row 4.4 'Lift h3' = 6844/8444/9644/11344mm -- lowest used, up to 11344mm (matches p.1 '11 meters') noted",
+        "max_payload": "VDI row 1.5 'Load capacity Q=1.6t' (same across all 4 configs)",
+        "max_speed": "VDI row 5.1 'Travel speed forward 1.95 m/s' (already m/s)",
+        "max_gradient": "VDI row 5.8 'Maximum climbing ability 3%'",
+        "min_aisle_width": "VDI row 4.34.2, config 1-3 'Aisle width (800x1200 along forks, AUTOMATIC) Ast=2990mm' (config 4: 3160mm, not used)",
+        "stop_accuracy": "p.3 supplementary table 'Truck longitudinal positioning precision at standstill ± 20mm'",
+        "navigation_type": "p.1 headline 'Natural feature navigation without additional infrastructure'",
+        "infrastructure_free": "same source",
+        "vna_capable": "based on R16 HD reach truck platform, p.1 headline 'Precise and reliable automation solution for high-bay warehouses ... Narrow working aisle width for higher density storage'"
+      },
+      "notes": "Extremely detailed p.3 supplementary sensor-position table (3D camera offsets, barcode reader positions, Bluespot projection distance etc.) -- none of it maps to any AP0 field, not extracted further. Battery chemistry not named in the VDI table -- left null."
+    }
+  ]
+}

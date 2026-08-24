@@ -1,0 +1,115 @@
+{
+  "company": "Stäubli",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "OPUS REDO PASS. Blind independent re-extraction of the 2 Stäubli datasheets in Datasheets/AGV_AMR/Analysed/. No sonnet-era findings consulted. Both products exist in the DB. FL1500 = enrich, PF3 = conflict. Scope discipline: FL1500 extracted against '*' + 'Logistics:AGV' + 'Logistics:AGV:Forklift'; PF3 against '*' + 'Logistics:AGV' + 'Logistics:AGV:AMR'. TOOLING LIMITATION AFFECTING THIS GROUP: both datasheets place key dimensions on an unlabelled CAD drawing rather than in the spec table, and PDF page rendering is unavailable in this environment (the Read tool reports 'pdftoppm is not installed'), so drawing callouts could only be recovered as positioned text via pdfplumber, not read visually. This materially limited FL1500 — see its notes.",
+  "company_wide_context": {
+    "source_file": "FL1500-data-sheet-EN.pdf / PF3-data-sheet-EN.pdf",
+    "fields": {
+      "certifications_generic": ["CE"]
+    },
+    "field_sources": {
+      "certifications_generic": "FL1500-data-sheet-EN.pdf p.2, 'Installation environment' block, row 'Compliance  CE'; identical row in PF3-data-sheet-EN.pdf p.2"
+    },
+    "applies_to": "Company record (certifications_generic is scope '*', entity Company). Both datasheets state it independently.",
+    "notes": "COMPANY COUNTRY IS UNRESOLVED AND FLAGGED, NOT FILLED. The DB currently stores country='??' for Stäubli. The only country evidence in this corpus is weak and contradictory: (a) both sheets, p.3 footer: 'Staubli is a trademark of Stäubli International AG, registered in Switzerland and other countries' — this is a trademark-registration statement, not an HQ statement; (b) FL1500-data-sheet-EN.pdf p.2, CAD drawing title block: 'Stäubli WFT GmbH' with German-language drawing notes and standards references (DIN, 'Maßstab', 'Gewicht', 'Bearb./Geprüft'), indicating the FL1500 is engineered by a German Stäubli entity. Neither states an HQ country, so per the no-inference rule country was left unfilled. A Tech Lead ruling or a non-datasheet source is needed to clear the '??'."
+  },
+  "products": [
+    {
+      "product_name": "Stäubli FL1500",
+      "product_type": "Forklift AGV",
+      "source_file": "FL1500-data-sheet-EN.pdf",
+      "db_status": "enrich",
+      "variant_group": "Single product, but the p.2 CAD drawing shows TWO mast configurations side by side, labelled 'MONO MAST' and 'DUPLEX MAST'. These may warrant separate variants once the drawing can be read visually — see notes.",
+      "fields": {
+        "max_payload": 1500,
+        "max_speed": 1.5,
+        "stop_accuracy": 10,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "battery_type": ["Li-Ion"],
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "ingress_protection_rating": "IP54",
+        "max_gradient": 3.0,
+        "outdoor_capable": false,
+        "safety_coverage": "Single plane (2D)",
+        "safety_standard": ["ISO 3691-4"],
+        "load_detection": ["Laser/LiDAR profiling"]
+      },
+      "field_sources": {
+        "max_payload": "p.2, Performance block, row 'Payload (kg)  Up to 1 500' — printed unit kg = AP0 unit, no conversion",
+        "max_speed": "p.2, Performance block, row 'Max. speed (m/s)  Up to 1.5' — printed unit m/s = AP0 unit, no conversion",
+        "stop_accuracy": "p.2, Performance block, row 'Position accuracy (mm)  Up to ± 10'",
+        "navigation_type": "p.2, Performance block, row 'Navigation  Laser natural feature' — AP0 navigation_type hint maps 'natural feature' → 'Natural Feature (SLAM)'",
+        "battery_type": "p.2, Energy block, row 'Battery technology  Li-ion 48V'",
+        "autonomous_charging": "p.2, Energy block, row 'Inductive charging  Floor' (standard column), 'Side, Top' (option column) — contactless inductive charging from a floor pad, i.e. no operator action required",
+        "operating_temp_min": "p.2, Installation environment block, row 'Working temperature  +5°C to 40°C (DIN EN ISO 3691-4)' — lower bound. Signed unit °C checked against config/unit_semantics.json; both bounds positive, no sign risk.",
+        "operating_temp_max": "p.2, same row — upper bound 40",
+        "ingress_protection_rating": "p.2, Installation environment block, row 'Protection class  IP54'",
+        "max_gradient": "p.2, Installation environment block, row 'Slope (%)  Up to 3' — printed unit % = AP0 unit",
+        "outdoor_capable": "p.2, Installation environment block, row 'Indoor' with a filled standard-column marker and no corresponding outdoor row — the sheet positively designates the machine as indoor, so false rather than null",
+        "safety_coverage": "p.2, Safety block, row 'Human safety  Laser scanner' (standard) — the only personnel-safety sensing named; no 3D camera or volumetric sensing anywhere in the document",
+        "safety_standard": "p.2, Installation environment block: the working-temperature row cites '(DIN EN ISO 3691-4)' as the governing standard. FLAG: this citation sits in the environment row rather than in a compliance/certification list, so it is weaker evidence than a dedicated 'complies with ISO 3691-4' statement — recorded, but worth a reviewer's eye.",
+        "load_detection": "p.2, Safety block, row 'Load monitoring  Laser scanner' → 'Laser/LiDAR profiling'. FLAG: the printed wording is 'load monitoring' (during handling/travel) whereas the AP0 hint defines load_detection as identifying/verifying the pallet and slot BEFORE handling. The sensing technology is unambiguous; the exact function is a slight semantic stretch."
+      },
+      "notes": "KO FIELD NOT RECOVERABLE — lifting_height LEFT NULL, FLAGGED. The p.2 spec table does NOT state a lift height anywhere (Performance block covers payload, drive type, turning radius, ground clearance, speed, lifting SPEED 250 mm/s, position accuracy, navigation, dead weight — no lift height). The lift height exists only as callouts on the p.2 CAD drawing, which is headed 'MONO MAST' and 'DUPLEX MAST' with the note 'mono lift fully extended' appearing twice. Positioned-text extraction recovers the drawing callouts '2604', '2479', '1000' (horizontal) and '5381' plus a garbled overlapping '5,4062' (rotated/vertical dimension lines), but PDF page rendering is unavailable in this environment (pdftoppm/poppler not installed), so these could not be matched to their dimension lines visually and no lift height can be responsibly assigned. NOTE FOR THE REVIEWER: the existing DB value lifting_height=3205 does NOT appear anywhere in this document's extracted text or in any recovered drawing callout — it is neither confirmed nor contradicted here, and should be re-verified against a rendered page. NOT MAPPED — AP0 SCOPE GAP (second occurrence in this session, after Grenzebach FF1200S): p.2 prints 'Turning radius (m) 1.5' with an explicit, unambiguous 'Turning radius' label (safe to map under the established radius-vs-diameter rule), but there is NO turning-radius field in 'Logistics:AGV:Forklift' scope — turning_radius is Tugger-only and min_turning_radius is AMR-only. The value 1500 mm (converted from the printed 1.5 m) is recorded here in prose only and could not be written to any field. NOT MAPPED — WRONG-SCOPE TRAP AVOIDED: p.2 prints 'Ground clearance min. (mm) 30'. min_ground_clearance is AMR-scope only and, per its AP0 hint, holds the ROBOT HEIGHT for under-ride workflows, not the gap beneath the chassis — so this 30 mm figure is doubly unmappable here (wrong scope AND wrong semantics). NOT MAPPED — other: 'Drive type Tricycle' (a wheel arrangement; AP0 drive_type allowed_values are Counterbalanced / Reach Truck / Straddle Stacker / Pallet Mover / VNA Turret, none of which is stated); mast_type (the drawing offers BOTH a mono mast (≈Simplex) and a duplex mast, but mast_type is a single-value Dropdown and the sheet does not say which is standard); 'Lifting speed (mm/s) 250', 'Dead weight (kg) 3 500', 'Charging power (kW) 3 / 6', 'Battery usable capacity [85% SoC] 11.75 kWh', 'Visual safety LED strip', 'Emergency stop button', 'Floor spot Front / Side', 'Key panel', '10\" touch display', 'Wifi' — no AP0 field for any of these (note: onboard_ui, which would fit the key panel + 10\" display, is AMR-scope only and therefore invalid on this Forklift AGV). 'Collision avoidance  Coming soon' explicitly marks the feature as NOT YET AVAILABLE, so autonomous_obstacle_bypass was left null rather than true. 'Floor conditions  Can withstand floor irregularity' names no flatness standard or value, so floor_flatness_req was left null per its AP0 NULL RULE. SCOPE BUG IN EXISTING DB ROW (pre-existing): this product is product_type='Forklift AGV' but carries grid_required=0, which is scope 'Logistics:AGV:AMR' — not valid on a Forklift AGV. Flagged, not corrected."
+    },
+    {
+      "product_name": "Stäubli PF3",
+      "product_type": "Mobile AMR",
+      "source_file": "PF3-data-sheet-EN.pdf",
+      "db_status": "conflict",
+      "variant_group": "PF3 is one member of Stäubli's PF platform family (DB also holds PF6, PF30, PF280). Only PF3 has a datasheet in this corpus — see coverage report for the partial-coverage note.",
+      "fields": {
+        "max_payload": 3000,
+        "max_speed": 1.5,
+        "min_turning_radius": 1700,
+        "stop_accuracy": 10,
+        "navigation_type": ["Natural Feature (SLAM)", "QR/DM Code"],
+        "battery_type": ["Li-Ion"],
+        "autonomous_charging": true,
+        "battery_runtime": 8.0,
+        "charge_time": 90,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "ingress_protection_rating": "IP54",
+        "max_gradient": 3.0,
+        "outdoor_capable": false,
+        "safety_coverage": "Single plane (2D)",
+        "safety_standard": ["ISO 3691-4"],
+        "onboard_ui": true,
+        "vehicle_length": 1750,
+        "vehicle_width": 996,
+        "min_ground_clearance": 350,
+        "top_module_type": ["Lift"],
+        "lift_height": 100
+      },
+      "field_sources": {
+        "max_payload": "p.2, Performance block, row 'Payload (tons)  Up to 3' — printed unit is TONS, AP0 unit is kg → converted 3 t → 3000 kg",
+        "max_speed": "p.2, Performance block, row 'Max. speed (m/s)  Up to 1.5' — printed unit m/s = AP0 unit",
+        "min_turning_radius": "p.2, Performance block, row 'Turning radius (m)  1.7' — explicit English 'Turning radius' label (not Wendekreis/Drehkreis/diameter), so mapping is safe under the established rule. Printed unit m, AP0 unit mm → converted 1.7 m → 1700 mm.",
+        "stop_accuracy": "p.2, Performance block, row 'Position accuracy (mm)  Up to ± 10' (Standard column). The Option column shows 'Up to ± 5' — the conservative standard-configuration value (10) was taken.",
+        "navigation_type": "p.2, Performance block, row 'Navigation  Laser natural feature' (Standard) → 'Natural Feature (SLAM)'; Option column reads 'Hybrid navigation: +2D code camera (floor)' → adds 'QR/DM Code' per the AP0 hint's 'data matrix' mapping. NOTE: the QR/DM Code entry is an OPTION, not standard.",
+        "battery_type": "p.2, Energy block, row 'Battery technology  Li-ion 48V'",
+        "autonomous_charging": "p.2, Energy block, row 'Inductive charging  Floor' — contactless floor-pad charging, no operator action",
+        "battery_runtime": "p.2, Battery block, row 'Runtime (h)  min. 8' — printed unit h = AP0 unit hours",
+        "charge_time": "p.2, Battery block, row 'Charge time [15% to 90%] (min)  90' — printed unit min = AP0 unit min",
+        "operating_temp_min": "p.2, Installation environment block, row 'Working temperature  +5°C to 40°C (DIN EN ISO 3691-4)' — lower bound",
+        "operating_temp_max": "p.2, same row — upper bound",
+        "ingress_protection_rating": "p.2, Installation environment block, row 'Protection class  Up to IP54'",
+        "max_gradient": "p.2, Installation environment block, row 'Slope (%)  Up to 3'",
+        "outdoor_capable": "p.2, Installation environment block, row 'Indoor' marked, with no outdoor row",
+        "safety_coverage": "p.2, Safety block, row 'Human safety  Laser scanner' (Standard) — only 2D laser scanning named",
+        "safety_standard": "p.2, working-temperature row cites '(DIN EN ISO 3691-4)'. Same FLAG as FL1500: the citation is in an environment row, not a compliance list.",
+        "onboard_ui": "p.2, Communication / Software block, Standard column: 'Key panel' and '10\" touch display'",
+        "vehicle_length": "p.2, unlabelled CAD dimension callout '1750' (drawing at top of page). SEE NOTES — callout recovered from positioned text, not read visually; axis assignment inferred from magnitude.",
+        "vehicle_width": "p.2, unlabelled CAD dimension callout '996'. SEE NOTES — same caveat.",
+        "min_ground_clearance": "p.2, unlabelled CAD dimension callout '350' (smallest of the three, and the only one consistent with a flat transport platform). Per the AP0 hint this field holds the ROBOT HEIGHT for under-ride workflows. SEE NOTES — same caveat.",
+        "top_module_type": "p.2, Add-ons column: 'Lift unit (stroke +100 mm)'",
+        "lift_height": "p.2, Add-ons column: 'Lift unit (stroke +100 mm)' — printed unit mm = AP0 unit. SEE NOTES: this is an ADD-ON, not standard equipment."
+      },
+      "notes": "CONFLICTS (existing DB values NOT overwritten): (1) max_payload DB=2721 kg vs datasheet 3000 kg (p.2, 'Payload (tons) Up to 3'). Unit forensics per the standing check: 2721 kg is EXACTLY 6000 lb (6000 × 0.45359237 = 2721.55), so the DB value is almost certainly a US-market spec converted from pounds, not an independent measurement or a transcription error — i.e. this looks like a genuine market/variant difference (a 6000 lb US rating vs a 3 t EU rating), not a data-entry mistake. Needs a Tech Lead decision on which rating the DB should carry; do not silently overwrite. (2) max_speed DB=1.1 m/s vs datasheet 1.5 m/s (p.2, 'Max. speed (m/s) Up to 1.5'). Note the DB also carries 1.1 for PF6 and 1.3 for PF280, so 1.1 is not obviously a copy artifact. (3) omnidirectional_movement DB=true vs datasheet-implied FALSE — p.2 states 'Drive type  Tricycle' AND 'Turning radius (m) 1.7'. A tricycle-drive vehicle with a 1.7 m turning radius is by definition not holonomic; both facts independently contradict omnidirectional operation. (4) rotation_capable DB=true vs datasheet-implied FALSE — same two rows; a vehicle needing 1.7 m of turning radius cannot rotate on the spot. Conflicts (3) and (4) apply identically to the DB's PF6, PF30 and PF280 rows, which all carry omnidirectional_movement=1 and rotation_capable=1 — worth checking those too even though only PF3 has a datasheet here. WRONG-SCOPE TRAP AVOIDED (important): p.2 prints 'Ground clearance min. (mm)  30'. This was deliberately NOT written to min_ground_clearance. The AP0 hint defines min_ground_clearance as the ROBOT HEIGHT / clearance needed to drive UNDER the carrier ('Source: vehicle height spec'), i.e. it holds the vehicle's own height, not the gap beneath its chassis. Writing 30 here would have understated the field by a factor of ~12 on a KO_IF_LT field. The 350 mm drawing callout was used instead. DRAWING-CALLOUT CAVEAT (applies to vehicle_length, vehicle_width, min_ground_clearance): p.2 carries three unlabelled dimension callouts — 350, 996 and 1750 mm — on the product drawing. PDF page rendering is unavailable in this environment (pdftoppm/poppler not installed), so these were recovered as positioned text via pdfplumber rather than read visually against their dimension lines. Axis assignment is therefore an inference from magnitude and vehicle type (a 3-tonne flat transport platform with 30 mm ground clearance and a 615 kg dead weight): 350 = height, 996 = width, 1750 = length. min_ground_clearance is a KO field, so this one in particular should be visually re-verified before import. ADD-ON CAVEAT (lift_height): the recorded 100 mm comes from the 'Add-ons' column ('Lift unit (stroke +100 mm)'), NOT from the base configuration. The base PF3 is a flat transport platform, which under the AP0 lift_height hint ('0 for non-lifting transport tops') would be 0. Recorded as 100 because the capability is offered, but a reviewer should decide whether an add-on capability belongs in a KO_IF_LT field on the base model. Related and ambiguous: an isolated 'Height: 400 mm' appears in the same Add-ons region of p.2, adjacent to 'Lift unit (stroke +100 mm)' and 'Remote control' — the two-column layout makes it impossible to tell whether 400 mm is the add-on lift unit's own height, the raised deck height, or an unrelated Installation-environment value. Left unmapped. NOT MAPPED — other: 'Drive type Tricycle' (not an AP0 drive_type allowed value, and drive_type is Forklift-scope anyway so invalid here); 'Dead weight (kg) 615'; 'Charging power (kW) 3'; 'Battery usable capacity [85% SoC] 3.7 kWh'; 'Emergency stop button'; 'Visual safety LED strip'; 'Add-ons interface'; 'Wireless communication Wifi (standard) / 5G (option)'; 'Remote control' — no AP0 field for any of these. 'Collision avoidance  On request' is both optional and non-committal, so autonomous_obstacle_bypass left null. 'Floor conditions  Can withstand floor irregularity' names no standard, so floor_flatness_req left null per its NULL RULE. SCOPE BUG IN EXISTING DB ROW (pre-existing): this product is product_type='Mobile AMR' but carries vna_capable=0 and stacking_capability=0, both of which exist only in scope 'Logistics:AGV:Forklift'. The same two out-of-scope fields appear on the PF6, PF30 and PF280 rows. Flagged, not corrected."
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "company": "ek robotics",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "FULL-BATCH CONTINUATION RUN. COMPANY-RELATIONSHIP FLAG (new pair, not the previously-resolved Magazino/Jungheinrich pattern -- per agent memory, only NEW pairs need re-flagging): every one of these 8 product-family brochures and the checklist explicitly states 'ek robotics – a NEURA brand' and prints the legal entity as 'NEURA Mobile Robots GmbH, 20539 Hamburg' in the footer/imprint. ek robotics already exists in the DB as its own company ('ek robotics', 7 products). This run attached all extracted data to the EXISTING 'ek robotics' company (not a new company, not renamed) since that's the DB's current identity -- but flags for Tech Lead decision whether the DB's company record should be renamed to 'NEURA Mobile Robots' (with 'ek robotics' as a legacy/product-brand name) or left as-is with the relationship merely noted, per the same open question pattern as Magazino/Jungheinrich (extra-brand vs rename). Source files are general product-family catalogs/brochures (8-15pp each), NOT VDI-2198 style datasheets -- numeric data is sparser and sometimes only given as family-wide 'up to X' headline figures rather than per-SKU precision; flagged per-product below where this distinction matters. The 9th file (NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf) is a blank customer-intake requirements form, not a product datasheet -- but it does state the company's STANDARD environmental operating envelope as a checkbox default, captured as company_wide_context below.",
+  "company_wide_context": {
+    "source_file": "NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf",
+    "fields": {
+      "operating_temp_min": 5,
+      "operating_temp_max": 40,
+      "operating_humidity_max": 90
+    },
+    "field_sources": {
+      "operating_temp_min": "p.2, checklist default option 'Normale Bedingungen nach Technischen Bedingungen FTS' with printed default range 'Standard: 5 °C … 40 °C'",
+      "operating_temp_max": "same row",
+      "operating_humidity_max": "p.2, same block, 'Spezielle Luftfeuchtigkeit von bis % (Standard: 45 % … 90 %)' -- upper bound used for operating_humidity_max"
+    },
+    "applies_to": "all ek robotics base models currently missing operating_temp_min/max/operating_humidity_max (this is presented in the source document as the company's STANDARD vehicle environmental spec, not a per-product claim -- a customer would only need to fill in the checklist fields if their site deviates from this default)",
+    "notes": "This is an unusual source for company-wide environmental defaults (a blank sales-intake form rather than a marketing datasheet), but the printed default values are an explicit, quotable company statement ('Technische Bedingungen FTS' standard), not an inference -- kept, but flagged as a slightly different kind of source than the usual fleet-software company-wide context examples in this project."
+  },
+  "products": [
+    {
+      "product_name": "ek robotics X MOVE 600",
+      "product_type": "Mobile AMR",
+      "source_file": "NMR_ek_robotics_X_MOVE_Broschuere_de.pdf",
+      "db_status": "enrich",
+      "fields": {},
+      "field_sources": {},
+      "notes": "Full cross-validation, no new fields addable: vehicle_length=1050/vehicle_width=700 (p.4, '(L x B x H) 1.050 x 700 x 320 mm'), max_payload=600 ('Nutzlastkapazität gesamt 600 kg'), max_speed=1.7 ('Max. Geschwindigkeit 1,7 m/s') -- every already-filled DB value matches this brochure exactly."
+    },
+    {
+      "product_name": "ek robotics X MOVE 1200",
+      "product_type": "Mobile AMR",
+      "source_file": "NMR_ek_robotics_X_MOVE_Broschuere_de.pdf",
+      "db_status": "enrich",
+      "fields": {},
+      "field_sources": {},
+      "notes": "Full cross-validation, no new fields addable: vehicle_length=1350/vehicle_width=910 (p.4, '1.350 x 910 x 320 mm'), max_payload=1200, max_speed=1.5 -- every already-filled DB value matches this brochure exactly."
+    },
+    {
+      "product_name": "ek robotics COMPACT MOVE CB 10",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 2.0
+      },
+      "field_sources": {
+        "max_speed": "p.4 'FEATURES' block, 'Fahrgeschwindigkeit bis zu 2 m/s' -- a COMPACT MOVE family-wide headline figure covering CLAMP/CB18/25/CB10/12 sub-variants, not stated per-SKU; applied here since the family's other already-filled sibling (VARIO MOVE CB, same 'CB' counterbalance platform) independently has the identical max_speed=2.0 value, supporting this as a shared platform speed rather than a risky family-max guess"
+      },
+      "notes": "max_payload=1000 already filled, matches this family's headline 'Hohe Traglast von bis zu 2.500 kg' as a plausible ≤2500kg family ceiling (CB10 itself at 1000kg). lifting_height deliberately left null: family headline 'Sichere Lastübergabe in bis zu 8 m Höhe' is a family MAX across CLAMP/CB18/25/CB10/12, and CB10 (the smallest/lightest variant) is very unlikely to reach the family's top figure -- not applied to avoid a misleading number."
+    },
+    {
+      "product_name": "ek robotics COMPACT MOVE CB 25",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 2.0
+      },
+      "field_sources": {
+        "max_speed": "p.4 'FEATURES' block, 'Fahrgeschwindigkeit bis zu 2 m/s' -- same family-wide figure and same cross-validation reasoning as COMPACT MOVE CB 10 above"
+      },
+      "notes": "max_payload=2500 and lifting_height=5500 already filled, both plausible/consistent with this brochure's family headlines ('bis zu 2.500 kg', 'bis zu 8 m Höhe' as an upper family bound) -- no conflict, not restated since already non-null."
+    },
+    {
+      "product_name": "ek robotics VNA MOVE 1350",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_VNA_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "variant_group": "VNA MOVE narrow-aisle turret-truck family (1350/1500), shares chassis, differs by payload",
+      "fields": {
+        "max_payload": 1350,
+        "lifting_height": 12000,
+        "vna_capable": true,
+        "mast_type": [
+          "Duplex",
+          "Triplex"
+        ],
+        "guidance": [
+          "Wire",
+          "Rail"
+        ],
+        "navigation_type": [
+          "Laser Reflector",
+          "Contour",
+          "Inductive Loop"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.4, 'VNA MOVE 1350' spec bullets, 'Tragkraft bis 1.350 kg'",
+        "lifting_height": "p.4, same block, 'Hubhöhe bis 12 m'",
+        "vna_capable": "product family name 'VNA MOVE' plus p.4 header 'Optimiert für Hochregal- und Schmalganglager' (optimized for high-bay/narrow-aisle warehousing)",
+        "mast_type": "p.4, '2fach- oder 3fach-Mast' (2-stage or 3-stage mast, i.e. duplex or triplex, configurable)",
+        "guidance": "p.4 features list, 'Induktive oder mechanische Führung innerhalb des Ganges' (inductive or mechanical/rail guidance inside the aisle) -- 'mechanische Führung' mapped to 'Rail' as the closest AP0 allowed_value for a physical in-aisle guide rail, flagged as an interpretive mapping",
+        "navigation_type": "p.4 features list, 'Laser-, Reflektor-, Hybrid- oder Konturennavigation außerhalb des Ganges' (laser/reflector/hybrid/contour navigation outside the aisle) plus the inductive in-aisle guidance above"
+      },
+      "notes": "NEW PRODUCT, not previously in DB (ek robotics had no VNA-type product before this run). Sibling 'VNA MOVE 1500' processed as a separate new product below, sharing this same source file and feature list, differing only in payload. 'AC Technik, 80 Volt' (drivetrain voltage) has no matching AP0 field -- omitted. drive_type left null: 'VNA Turret' would be the natural AP0 value by analogy with Jungheinrich's EKX 5a family in this same batch, but this document never uses a term equivalent to 'turret' or describes the fork rotation mechanism explicitly -- not guessed."
+    },
+    {
+      "product_name": "ek robotics VNA MOVE 1500",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_VNA_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "variant_group": "VNA MOVE narrow-aisle turret-truck family (1350/1500), shares chassis, differs by payload",
+      "fields": {
+        "max_payload": 1500,
+        "lifting_height": 12000,
+        "vna_capable": true,
+        "mast_type": [
+          "Duplex",
+          "Triplex"
+        ],
+        "guidance": [
+          "Wire",
+          "Rail"
+        ],
+        "navigation_type": [
+          "Laser Reflector",
+          "Contour",
+          "Inductive Loop"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.4, 'VNA MOVE 1500' spec bullets, 'Tragkraft bis 1.500 kg'",
+        "lifting_height": "p.4, same block, 'Hubhöhe bis 12 m'",
+        "vna_capable": "same as VNA MOVE 1350 sibling",
+        "mast_type": "same as VNA MOVE 1350 sibling, '2fach- oder 3fach-Mast'",
+        "guidance": "same as VNA MOVE 1350 sibling",
+        "navigation_type": "same as VNA MOVE 1350 sibling"
+      },
+      "notes": "NEW PRODUCT, see VNA MOVE 1350 sibling entry for shared feature-list sourcing and the same drive_type caveat."
+    },
+    {
+      "product_name": "ek robotics MEDI MOVE",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_MEDI_MOVE_Broschuere_de.pdf",
+      "db_status": "new",
+      "fields": {
+        "max_payload": 500,
+        "lifting_height": 140,
+        "max_speed": 1.7,
+        "safety_coverage": "Single plane (2D)"
+      },
+      "field_sources": {
+        "max_payload": "p.4 'FEATURES' block, 'Tragfähigkeit von bis zu 500 kg'",
+        "lifting_height": "p.4, 'Hubhöhe 140 mm für Unterfahr-FTF' (underride AGV lift stroke)",
+        "max_speed": "p.4, 'Fahrgeschwindigkeit bis zu 1,7 m/s'",
+        "safety_coverage": "p.4, 'Navigation über Laserscanner mit 360° Personenschutz' -- 360° laser personal-protection scanning maps to single-plane (2D) coverage, consistent with how this same value was used for other ek robotics products in the DB"
+      },
+      "notes": "NEW PRODUCT (underride/low-lift AGV explicitly marketed for hospital/clinic transport, 'Höchste Sicherheit im Klinikbetrieb'). drive_type='Pallet Mover' or similar was considered by analogy with other underride low-lift products in this batch (Jungheinrich EAE 212a, Toyota LAE250) but not set since this document doesn't explicitly describe the load-handling mechanism (forks vs. underride hook/tow) beyond 'Unterfahr-FTF' (underride AGV) and 'Hochpräzise Lastspiele mit unterschiedlichen Containern' (precision handling of various containers) -- ambiguous enough to leave null rather than guess between Forklift-AGV-scope drive_type values."
+    },
+    {
+      "product_name": "ek robotics VARIO MOVE CB",
+      "product_type": "Forklift AGV",
+      "source_file": "NMR_ek_robotics_VARIO_MOVE_Broschuere_de.pdf",
+      "db_status": "enrich",
+      "fields": {},
+      "field_sources": {},
+      "notes": "Cross-checked already-filled DB fields: max_payload=1600 matches family headline 'Hohe Traglast von bis zu 1.600 kg' exactly, max_speed=2.0 matches 'Fahrgeschwindigkeit bis zu 2 m/s' exactly. lifting_height=5000 (DB) vs this brochure's family headline 'Sichere Lastübergabe in bis zu 5,25 m Höhe' (5250mm) -- a minor ~5% difference, not flagged as a hard conflict since the 5.25m figure is a VARIO MOVE family maximum across 5 sub-variants (L/AS/CB/CT/CTO) and CB specifically may sit slightly below the family ceiling; noted for reviewer awareness rather than entered as a conflict."
+    }
+  ]
+}

@@ -1,0 +1,389 @@
+{
+  "task": "Reconciliation of company_wide_context blocks: sonnet (2026-08-06) vs opus (2026-08-08/10)",
+  "date": "2026-08-19",
+  "adjudicator": "agv-datasheet-ingestor (opus), challenge round",
+  "dossier": "docs/sonnet_opus_cwc_challenge_dossier.json",
+  "method": "Every disputed field re-derived from the physical PDF in Datasheets/AGV_AMR/Done with Opus/ using pdfplumber text extraction. No web research. AP0 field definitions (entity / level / data_type / allowed_values / hint) re-read fresh from config/fields.json. Read-only DB queries used only to size the fan-out blast radius, not to decide any verdict.",
+  "tally": {
+    "CONFIRM": 18,
+    "CONCEDE": 2,
+    "REVISED": 2,
+    "total": 22,
+    "concession_rate": "18% (4 of 22 items where the opus value did not survive)"
+  },
+  "product_counts_for_fanout": {
+    "KNAPP AG": 5,
+    "Omron Mobile Robotics": 7,
+    "DS Automotion GmbH": 24,
+    "ek robotics": 7
+  },
+  "results": [
+    {
+      "company": "KNAPP AG",
+      "field": "certifications_generic",
+      "sonnet_value": null,
+      "opus_value": ["CE"],
+      "verdict": "CONFIRM",
+      "correct_value": ["CE"],
+      "reasoning": "'CE-zertifiziert' is printed as a standard-feature token on every one of the five vehicle feature pages (KNAPP-Folder Open Shuttle Productinfo de-2.pdf pp.7, 11, 15, 19, 23 — e.g. p.7 'Omnidirektionaler Antrieb  CE-zertifiziert  LiFePo4  Elektrisch  ESD-tauglich') and once more in the p.5 '8 GUTE GRÜNDE' safety tile. 'CE' is an explicit allowed_value of certifications_generic in AP0. Six independent occurrences; not an inference.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf pp.5, 7, 11, 15, 19, 23",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Company entity — written once on the KNAPP AG company record, NOT fanned out per base model",
+        "note": "AP0 level = SCORING. No K.O. consequence. Value is correct anyway."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "country",
+      "sonnet_value": null,
+      "opus_value": "AT",
+      "verdict": "CONFIRM",
+      "correct_value": "AT",
+      "reasoning": "p.33 IMPRESSUM: 'KNAPP Industry Solutions GmbH, Gewerbeparkstraße 17, 8143 Dobl | Österreich'. Österreich → ISO 3166-1 alpha-2 'AT', matching AP0's required uppercase 2-letter form. The AP0 hint's NULL RULE ('output null unless the tender explicitly requires a domestic supplier') is tender-side normalisation and does not apply supplier-side — same precedent as the 'Contour' ruling in the product-field round. Unlike hq_city below, the legal-entity ambiguity is harmless here: both KNAPP Industry Solutions GmbH and the group are Austrian, and the DB already independently holds country='AT' on the KNAPP AG record.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf p.33 (imprint)",
+      "fanout_impact": {
+        "severity": "NONE",
+        "granularity": "Company entity — single write",
+        "note": "Value already present in the DB; this is a confirmation, not a fill. COND_KO level, so a wrong country WOULD be K.O.-relevant — but it is not wrong."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "fleet_management_system",
+      "sonnet_value": null,
+      "opus_value": "Proprietary",
+      "verdict": "CONFIRM",
+      "correct_value": "Proprietary",
+      "reasoning": "Chapter 5 (pp.26-28) documents KiSoft FCS as KNAPP's own fleet-control system for the Open Shuttles ('KiSoft FCS ist ein Flottenkontroll-System für manuell und automatisiert betriebene Flurförderzeuge', p.26; 'Stand-alone-Lösung für Open Shuttles möglich', p.27). I grepped all 34 pages for VDA / API / Schnittstelle / SAP / ERP / WMS / MES / OPC: the ONLY hit is p.28's generic 'Daten über die Schnittstellen und die Umgebung'. No open API, no VDA 5050, no third-party-WMS-native claim anywhere. Among the four allowed values that leaves 'Proprietary'. HONEST CAVEAT: this is elimination-based inference from a closed value set, and the AP0 hint explicitly warns 'Do NOT infer from the mere presence of a WMS, fleet software...'. I still confirm because (a) the positive half is stated — a named vendor-own controller that drives these vehicles — and (b) 'Proprietary' is the supplier-unfavourable option, so an error here can only understate KNAPP, never falsely qualify it.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf pp.26-28; negative evidence: full-document keyword sweep, no VDA/API/standard-interface mention",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — must be written to all 5 KNAPP base models individually",
+        "note": "AP0 level = CONTEXT, not K.O. A wrong value would be visible on 5 rows but cannot disqualify or falsely qualify KNAPP in matching."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "hq_city",
+      "sonnet_value": null,
+      "opus_value": "Dobl",
+      "verdict": "REVISED",
+      "correct_value": null,
+      "reasoning": "The value 'Dobl' is correctly READ but incorrectly ATTRIBUTED. The only address in the document is the p.33 imprint of 'KNAPP Industry Solutions GmbH' (8143 Dobl). I grepped all 34 pages: the string 'KNAPP AG' never appears. The DB company record is 'KNAPP AG' — a different legal entity, which opus itself flagged in its own notes and then wrote hq_city into anyway. Under the no-external-research rule I have no document evidence for KNAPP AG's own headquarters city, so the correct value for the KNAPP AG record is null. 'Dobl' becomes correct only if the Tech Lead re-scopes the record to KNAPP Industry Solutions GmbH or adds it as a subsidiary. Note the inconsistency this exposes in opus's own block: it accepted the entity mismatch as blocking for nothing, yet filled a geography field that is entity-specific by definition.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf p.33 (imprint, KNAPP Industry Solutions GmbH); absence of 'KNAPP AG' verified by full-document grep",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Company entity — single write, no per-product multiplication",
+        "note": "AP0 level = CONTEXT ('helps buyer assess geographic proximity'). Practically low-harm (both entities are in the Graz area), but it is an unsourced attribution and the entity question is exactly what the Tech Lead was asked to decide."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "infrastructure_free",
+      "sonnet_value": null,
+      "opus_value": true,
+      "verdict": "CONFIRM",
+      "correct_value": true,
+      "reasoning": "AP0's NULL RULE requires the document to explicitly address whether permanent site modification is needed. p.5 does exactly that: 'Einsatz in bestehende Systeme ohne bauliche Maßnahmen, einfache und rasche Inbetriebnahme', alongside 'Autonome, robuste, deterministische Navigation'. The reflector caveat opus recorded is real and I verified it (pp.30-31: 'Reflektoren unterstützen die Open Shuttles bei der relativen Positionierung an Übergabestellen' / 'Reflektoren zur exakten Positionierung'), but reflectors appear only in the ACCESSORIES chapter as an optional positioning aid at transfer points — never as the localisation method. The standard vehicle is stated to need no structural work. TRUE stands.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf p.5 (primary); pp.30-31 accessories chapter (caveat)",
+      "fanout_impact": {
+        "severity": "HIGH",
+        "granularity": "Base Model — fans out to all 5 KNAPP base models",
+        "note": "COND_KO field. A wrong TRUE here would let all 5 KNAPP products pass a tender that explicitly forbids infrastructure modification. The reflector accessory makes this the single most review-worthy of the KNAPP confirmations — the value is right for the standard configuration, but a reviewer should see the pp.30-31 caveat before import."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "installation_process",
+      "sonnet_value": "Client",
+      "opus_value": ["Client"],
+      "verdict": "CONFIRM",
+      "correct_value": ["Client"],
+      "reasoning": "NOT A VALUE DISAGREEMENT — both passes read the same evidence identically (p.5 headline 'NEHMEN SIE SELBSTSTÄNDIG INSTALLATIONEN, WARTUNGEN UND ÄNDERUNGEN AM SYSTEM VOR'). The difference is serialisation only: config/fields.json gives installation_process data_type = 'Multi-Select', so the list form is the AP0-conformant one and sonnet's bare string is a type error. Confirming the list form on formal grounds, not on evidence grounds.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf p.5; AP0 data_type from config/fields.json",
+      "fanout_impact": {
+        "severity": "NONE",
+        "granularity": "Base Model — 5 rows",
+        "note": "Semantically identical values. An import script must coerce scalars to lists for Multi-Select fields regardless."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "modification_process",
+      "sonnet_value": "Client: All",
+      "opus_value": ["Client: All"],
+      "verdict": "CONFIRM",
+      "correct_value": ["Client: All"],
+      "reasoning": "Same as installation_process: identical value, Multi-Select serialisation difference only. Evidence is solid on both sides — p.27 'Einfache Konfigurierbarkeit — Selbstständige Änderungen der Prozesse, Stationen und Fahrwege möglich' maps directly onto the AP0 hint's 'who may change routes/stations/layout AFTER go-live', and 'Client: All' = full operational autonomy.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf p.27 (+ p.5 headline)",
+      "fanout_impact": {
+        "severity": "NONE",
+        "granularity": "Base Model — 5 rows",
+        "note": "SCORING level. No substantive disagreement to resolve."
+      }
+    },
+    {
+      "company": "KNAPP AG",
+      "field": "reference_count",
+      "sonnet_value": null,
+      "opus_value": 150,
+      "verdict": "CONFIRM",
+      "correct_value": 150,
+      "reasoning": "p.5 carries '+150 erfolgreich realisierte Kundenprojekte' as one of the eight tiles in the '8 GUTE GRÜNDE FÜR OPEN SHUTTLES' spread. Verbatim confirmed. Two caveats that do not change the value: (a) '+150' is a floor, so 150 is the conservative integer, which matches AP0's 'Completed reference installs' semantics; (b) the tile sits adjacent to the 'Partner / KNAPP als zuverlässiger Partner mit globalem Kundenservice' tile, so whether the 150 counts Open Shuttle projects or all KNAPP projects is not fully resolvable from the layout — but 150 is the printed figure either way.",
+      "source_citation": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf p.5",
+      "fanout_impact": {
+        "severity": "MEDIUM",
+        "granularity": "Product entity — the same 150 gets written to all 5 KNAPP product rows",
+        "note": "STRUCTURAL AP0 ISSUE, not an extraction error: reference_count lives on Product but the only available datum is company-wide, so each of the 5 products will individually claim 150 references. SCORING level, so it inflates KNAPP's maturity score fivefold in aggregate views. Same structural issue as ek robotics reference_count = 400 below."
+      }
+    },
+    {
+      "company": "Omron Mobile Robotics",
+      "field": "fleet_control_architecture",
+      "sonnet_value": null,
+      "opus_value": "Centralized",
+      "verdict": "CONFIRM",
+      "correct_value": "Centralized",
+      "reasoning": "Better evidence exists than opus cited. 72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf p.39 states it structurally: 'The OMRON AMR fleet uses a star network topology. Each AMR communicates with the Fleet Manager, and the Fleet Manager shares information with each AMR in the fleet, as well as with other servers and clients.' A star topology around a Fleet Manager is the textbook Centralized architecture. Corroborated by i828_ld-series_mobile_robot_datasheet_en.pdf p.1 'Fleet management: Supervises and coordinates the entire fleet of up to 100 vehicles'. No swarm/on-board-arbitration claim anywhere in the Omron corpus.",
+      "source_citation": "72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf p.39; i828_ld-series_mobile_robot_datasheet_en.pdf p.1",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — 7 Omron base models",
+        "note": "SCORING level. Value well-grounded; the star-topology sentence should replace opus's original citation as the primary source."
+      }
+    },
+    {
+      "company": "Omron Mobile Robotics",
+      "field": "fleet_management_system",
+      "sonnet_value": null,
+      "opus_value": "Proprietary",
+      "verdict": "CONFIRM",
+      "correct_value": "Proprietary",
+      "reasoning": "Omron's fleet controller is its own Fleet Operations Workspace (FLOW) Core; the release notes' compatibility matrix lists only Omron hardware (Lynx, LD-60/90/CT, LD-250, HD-1500, EM2100), and the command interface is Omron's own ARCL (Advanced Robotics Command Language) — see wireless guide pp.41-42 'ARCL Server' / 'Outgoing ARCL Connection' and release-notes pp.3-4 ARCL command list. No VDA 5050 anywhere in the corpus (verified by grep across all 7 Omron PDFs: zero hits). The Integration Toolkit's REST/MQTT APIs are northbound IT interfaces, which AP0 captures separately in integration_capability — they do not make the fleet CONTROLLER open. Note the tension with the multi_fleet_capable verdict below: Omron sells a Unified Fleet License for multi-vendor AMRs, but that is still Omron's proprietary controller managing foreign robots, not an open/standard controller.",
+      "source_citation": "OMRON FLOW Core 3.1.1 Release Notes.pdf pp.1-4; 72503-100 wireless guide pp.41-42 (ARCL); grep: no 'VDA' hit in any Omron file",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — 7 rows",
+        "note": "CONTEXT level. Also corroborated by prior DB state, which already carried 'Proprietary (FLOW Core)' on several Omron products from an earlier research batch."
+      }
+    },
+    {
+      "company": "Omron Mobile Robotics",
+      "field": "integration_capability",
+      "sonnet_value": ["WMS", "MES", "MQTT"],
+      "opus_value": null,
+      "verdict": "REVISED",
+      "correct_value": ["WMS", "MES", "MQTT", "REST API"],
+      "reasoning": "Opus's null is plainly wrong and sonnet was substantially right — but incomplete. The wireless guide documents the integrations explicitly: p.39 'any other equipment or servers that communicate with the Fleet Manager will need access to ports listing here. This includes WMS/MES and MP clients'; p.41 port 7171 'Job Monitoring and Submission (ARCL Interface) — Used for managing jobs on the Fleet Manager, typically submitted from a Warehouse Management System (WMS) or Manufacturing Execution System (MES)', with the initiator column reading 'WMS/MES to Fleet Manager'; p.42 an outgoing 'Fleet Manager to WMS/MES' connection. That is WMS + MES, stated as a supported interface, not inferred. MQTT: i828 p.11 and i885 p.8 both list published manual 'M107 Fleet Operation Workspace Core Integration Toolkit - MQTT API User's Manual', and the wireless guide p.40 opens broker ports 1884 TCP and RabbitMQ/AMQP 5672. REST API is the piece BOTH passes missed: wireless guide p.40, 'Integration Toolkit TCP Ports … 8443 TCP … ITK REST', corroborated independently by OMRON FLOW Core 3.1.1 Release Notes.pdf p.7 'Integration Toolkit 2.1.1 * Fix logic with robot table, view, and REST endpoints.'",
+      "source_citation": "72503-100 wireless guide pp.39, 40, 41, 42; i828 p.11 / i885 p.8 (MQTT API manual M107); OMRON FLOW Core 3.1.1 Release Notes.pdf p.7 (REST endpoints)",
+      "fanout_impact": {
+        "severity": "HIGH",
+        "granularity": "Base Model — up to 7 Omron base models",
+        "note": "COND_KO field. Opus's null would have been the damaging direction here in the opposite way to the DS case: under the Blank≠Zero / LL-06 null rule a null does not K.O., but it costs the -15pt null penalty and hides a genuine, well-documented capability. Sonnet's per-run note is also worth honouring: LD-60/90/250 and HD-1500 already hold an equal-or-broader set in the DB and must NOT be overwritten — fill only the currently-null rows."
+      }
+    },
+    {
+      "company": "Omron Mobile Robotics",
+      "field": "max_fleet_size",
+      "sonnet_value": null,
+      "opus_value": 100,
+      "verdict": "CONFIRM",
+      "correct_value": 100,
+      "reasoning": "Value correct, but two things need saying. (1) THE DISAGREEMENT IS AN ARTEFACT: sonnet did extract max_fleet_size = 100 — it just staged it on the product rows (Omron HD-1500, MD-650, MD-900) instead of in company_wide_context, so a CWC-only diff reports a false disagreement. Both passes agree. (2) CITATION DEFECT IN OPUS'S BLOCK: the field_source quotes a footnote \"*1: Contact your local OMRON representative for fleets larger than 100\" — that footnote does not exist. i828 p.3's actual *1 footnote is about FLOW Core licence expiration, and the neighbouring Note is about software upgrades. The value itself is solidly printed twice: i828 p.1 'Supervises and coordinates the entire fleet of up to 100 vehicles' and i885 p.1 'Operates in coordination with a fleet of up to 100 AMRs'. The bogus footnote should be struck from the record before import so a reviewer spot-checking it does not reject a correct value.",
+      "source_citation": "i828_ld-series_mobile_robot_datasheet_en.pdf p.1; i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf p.1",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — 7 rows",
+        "note": "CONTEXT level. Value agreed by both passes; only the citation needs correcting."
+      }
+    },
+    {
+      "company": "Omron Mobile Robotics",
+      "field": "multi_fleet_capable",
+      "sonnet_value": null,
+      "opus_value": true,
+      "verdict": "CONFIRM",
+      "correct_value": true,
+      "reasoning": "RIGHT ANSWER, WRONG REASON — and I nearly conceded this one. Opus's stated evidence (the FLOW Core release-notes compatibility matrix spanning Lynx / LD-60/90/CT / LD-250 / HD-1500 / EM2100) proves only that Omron's controller runs Omron's own models, which is NOT what AP0 asks: the hint reads 'Interoperates with OTHER VENDORS' robots (open / VDA 5050 fleet)'. On that evidence alone the verdict would be CONCEDE. The value survives because of a source neither pass cited: i828_ld-series_mobile_robot_datasheet_en.pdf p.3, Software Licenses table, 'Unified Fleet License' (ordering code 30271-601): 'Provides interoperability within complex and diverse fleets. Includes Traffic Light Sector to allow for secure, reliable intersection and area exclusion management among MULTI-VENDOR AMRs.' That is an explicit multi-vendor interoperability claim. CAVEAT: it is a separately-orderable perpetual licence, not a standard capability, and it appears only in the LD datasheet (grep found no 'Unified Fleet' / 'multi-vendor' string in i855 HD or i885 MD). It is a Fleet-Manager licence and FLOW Core is the shared controller for the whole range, so fanning it company-wide is defensible — but the licence caveat must travel with the value.",
+      "source_citation": "i828_ld-series_mobile_robot_datasheet_en.pdf p.3 (Unified Fleet License, 30271-601). Opus's original citation (FLOW Core release notes p.2 compatibility matrix) is invalid reasoning and should be replaced.",
+      "fanout_impact": {
+        "severity": "MEDIUM",
+        "granularity": "Base Model — 7 rows",
+        "note": "SCORING level, so no K.O. risk, but this is a lock-in-avoidance selling point that scores. The optional-licence caveat should be in notes on all 7 rows; and the citation swap is essential — a reviewer checking opus's original source would have found nothing supporting the claim and rejected a value that is actually true."
+      }
+    },
+    {
+      "company": "DS Automotion GmbH",
+      "field": "country",
+      "sonnet_value": null,
+      "opus_value": "AT",
+      "verdict": "CONFIRM",
+      "correct_value": "AT",
+      "reasoning": "Every page of both company-wide documents carries the footer 'DS Automotion GmbH | Lunzerstraße 60 | 4030 Linz | Österreich' (Navios-OnePager-2025-DE.pdf pp.1-2, Amy-FourPager-2025-DE.pdf pp.1-3), and Planbare_Autonomie_Broschuere_DE.pdf p.12 gives the full legal imprint including 'FN 230030f | LG Linz' and 'UID-Nr. ATU 56224534' — the ATU VAT prefix is itself an Austrian identifier. No entity ambiguity here, unlike KNAPP: the imprint entity IS the DB company. Matches the value already in the DB.",
+      "source_citation": "Navios-OnePager-2025-DE.pdf pp.1-2 footer; Planbare_Autonomie_Broschuere_DE.pdf p.12 imprint",
+      "fanout_impact": {
+        "severity": "NONE",
+        "granularity": "Company entity — single write",
+        "note": "COND_KO level but already correct and already present in the DB."
+      }
+    },
+    {
+      "company": "DS Automotion GmbH",
+      "field": "distribution_model",
+      "sonnet_value": null,
+      "opus_value": "Direct",
+      "verdict": "CONFIRM",
+      "correct_value": "Direct",
+      "reasoning": "Both quotes verified verbatim. Amy-FourPager-2025-DE.pdf p.2, 'Komplettlösung aus einer Hand': 'Wir sind OEM-Hersteller der Fahrzeuge und Übergabestationen sowie der gesamten Software und offerieren Komplettlösungen aus einer Hand. Eine Lösung von einem Ansprechpartner für Ihre Planungs- und Erweiterungssicherheit.' Navios-OnePager-2025-DE.pdf p.1, 'Ein Ansprechpartner': 'Bei uns bekommen Sie alles aus einem Haus: Das bedeutet, dass Sie sich sowohl für Anfragen rund um die Software als auch die Fahrzeuge immer direkt an uns wenden können… Wir stehen für Ihre Anlage gerade.' The AP0 hint asks who the buyer actually contracts with; 'immer direkt an uns' plus OEM-manufacturer-of-everything is a direct-supply claim, and no dealer, partner network or integrator channel is mentioned in any of the ten DS files. HONEST CAVEAT: this is read from marketing prose about scope of supply rather than from a 'where to buy' section, and it would not exclude regional dealers in export markets.",
+      "source_citation": "Amy-FourPager-2025-DE.pdf p.2; Navios-OnePager-2025-DE.pdf p.1",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Product entity — 24 DS Automotion product rows (AP0 hint explicitly notes this lives on Product layer L2, not the base model)",
+        "note": "CONTEXT level, no K.O. consequence, but it is the widest fan-out in this dossier at 24 rows — worth the reviewer's eye precisely because a soft inference gets multiplied 24x."
+      }
+    },
+    {
+      "company": "DS Automotion GmbH",
+      "field": "hq_city",
+      "sonnet_value": null,
+      "opus_value": "Linz",
+      "verdict": "CONFIRM",
+      "correct_value": "Linz",
+      "reasoning": "'4030 Linz' in the page footer of every document, and 'DS Automotion GmbH, Lunzerstraße 60, 4030 Linz | Austria' in the full imprint on Planbare_Autonomie_Broschuere_DE.pdf p.12. Matches the DB.",
+      "source_citation": "Planbare_Autonomie_Broschuere_DE.pdf p.12; footers of Navios-OnePager-2025-DE.pdf and Amy-FourPager-2025-DE.pdf",
+      "fanout_impact": {
+        "severity": "NONE",
+        "granularity": "Company entity — single write",
+        "note": "CONTEXT level, already present in the DB."
+      }
+    },
+    {
+      "company": "DS Automotion GmbH",
+      "field": "integration_capability",
+      "sonnet_value": ["ERP"],
+      "opus_value": ["ERP", "WMS"],
+      "verdict": "CONCEDE",
+      "correct_value": ["ERP"],
+      "reasoning": "Opus's 'WMS' rests on Navios-OnePager-2025-DE.pdf p.2: 'Lager- und Stellplatzverwaltung — Zusätzlich zur Materialfluss- und Flottensteuerung kann mit NAVIOS auch eine Lager- oder Stellplatzverwaltung umgesetzt werden.' Read in full, that paragraph says the OPPOSITE of what opus concluded. Its own justification is 'profitieren Sie davon, dass alles innerhalb einer Software abgebildet ist und so keine Kommunikationsschwierigkeiten entstehen können' — the selling point is that NAVIOS REPLACES a separate warehouse-management system so that no inter-system communication is needed. Capability to substitute for a WMS is not capability to integrate with the buyer's WMS; if anything the AP0 field for that idea is the separate wms_integration_native, and even that requires a named product (SAP EWM / Oracle WMS / …) which is absent. ERP stands on its own explicit statement in the same column: 'Aufträge können … über die Anbindung eines ERP-Systems' ('Anbindung' = connection/integration). Navios p.1 also claims 'in unserer Software [sind] bereits viele Standardschnittstellen dargestellt und an andere Produkte eingebunden' but names none, so nothing else is addable. Sonnet's ['ERP'] is the correct value.",
+      "source_citation": "Navios-OnePager-2025-DE.pdf p.2 ('Materialflusssteuerung' block = ERP; 'Lager- und Stellplatzverwaltung' block = NOT a WMS integration); Navios p.1 (unnamed 'Standardschnittstellen')",
+      "fanout_impact": {
+        "severity": "HIGH",
+        "granularity": "Base Model — would have been fanned to all 24 DS Automotion base models",
+        "note": "THE MOST CONSEQUENTIAL ERROR IN THIS DOSSIER. integration_capability is COND_KO. A spurious 'WMS' on 24 base models would have let the entire DS Automotion range pass any tender that requires WMS integration as a K.O. criterion, on the strength of a sentence that actually says no external WMS is involved. One misread sentence, 24 wrongly-qualified products."
+      }
+    },
+    {
+      "company": "DS Automotion GmbH",
+      "field": "modification_process",
+      "sonnet_value": null,
+      "opus_value": ["Client: All"],
+      "verdict": "CONFIRM",
+      "correct_value": ["Client: All"],
+      "reasoning": "Value correct, but opus cited the wrong page and then hedged unnecessarily. Its citation (Planbare_Autonomie_Broschuere_DE.pdf p.7, 'Systemparameter während der Laufzeit aktualisiert') really is too weak — runtime parameters are not routes/stations/layout, and on that basis 'Supplier limited' or null would be the safer call, which is why opus flagged reviewer doubt. The decisive sentence is on p.10, in the FAQ 'Welche Autonomiezonen gibt es und wie werden diese definiert?': 'Die Definition der Zonen erfolgt in der webbasierten Umgebung des Flottenmanagers NAVIOS. Das Anlagenlayout und die Zonendefinition kann vom ANLAGENBETREIBER auch NACHTRÄGLICH benutzerfreundlich verändert werden.' Plant layout + zone definition, changeable by the plant OPERATOR, AFTER the fact — that is a one-to-one match with the AP0 hint ('Who may change routes/stations/layout AFTER go-live') and it names the client as the actor. Supporting: Navios-OnePager-2025-DE.pdf p.2 'Bei kurzfristigen Änderungen der Stationen können diese sogar im laufenden Betrieb angepasst werden'. Opus's hedge should be withdrawn.",
+      "source_citation": "Planbare_Autonomie_Broschuere_DE.pdf p.10 (FAQ, decisive); p.7 (weak, supporting only); Navios-OnePager-2025-DE.pdf p.2",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — 24 rows",
+        "note": "SCORING level. Value survives on better evidence than was originally cited; swap the citation to p.10 before import so the reviewer can verify it in one look."
+      }
+    },
+    {
+      "company": "ek robotics",
+      "field": "battery_type",
+      "sonnet_value": null,
+      "opus_value": ["Li-Ion"],
+      "verdict": "CONFIRM",
+      "correct_value": ["Li-Ion"],
+      "reasoning": "Verified across the whole brochure set rather than by trusting opus's count: eight of the nine NMR_ek_robotics_*_MOVE brochures carry the bullet on p.4 — COMPACT / CUSTOM / HEAVY / MEDI / OUT / VARIO 'Wartungsfreies LI-Ion Batteriesystem', VNA 'Wartungsfreies LI-Ion Batteriesystem für 24/7 Einsatz', X MOVE 'LI-Ion Batteriesystem für 24/7 Einsatz'. Only BHL MOVE contains no battery statement at all (silence, not contradiction). Also independently corroborated by prior DB state: Li-Ion is already stored on 4 of the 7 ek robotics rows with no conflicting value anywhere. Effectively a platform standard.",
+      "source_citation": "NMR_ek_robotics_{COMPACT,CUSTOM,HEAVY,MEDI,OUT,VARIO,VNA,X}_MOVE_Broschuere_de.pdf, each p.4",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — 7 rows",
+        "note": "CONTEXT level. Safe for the 8 documented series; if a DB row maps to BHL MOVE it is an extrapolation, since that brochure states nothing about energy storage."
+      }
+    },
+    {
+      "company": "ek robotics",
+      "field": "cleanroom_class",
+      "sonnet_value": null,
+      "opus_value": "ISO 1–9",
+      "verdict": "CONCEDE",
+      "correct_value": null,
+      "reasoning": "The source is a blank customer intake form, and the tick-box is a QUESTION TO THE CUSTOMER, not a claim by the manufacturer. NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf p.2, section '2. UMGEBUNGSBEDINGUNGEN', is headed 'UMWELTEINFLÜSSE: SIND BESONDERE UMWELTEINFLÜSSE ZU BEACHTEN?' and lists un-ticked options 'Aggressive Stoffe (Gase, Flüssigkeiten etc.)', 'Einsatz im Ex-Schutz Bereich', 'Einsatz im Reinraum'. ek robotics is asking whether the buyer's SITE is a cleanroom — the form nowhere states that a cleanroom-rated vehicle exists, and names no ISO class. AP0's NULL RULE is explicit: 'output None or null unless the document explicitly states a cleanroom ISO class (e.g. ISO 7, cleanroom version)'. A question is not a statement. Note the asymmetry that makes this decisive: the identical logic would let the neighbouring 'Einsatz im Ex-Schutz Bereich' box create an ATEX rating out of nothing. Opus itself proposed this 'with low confidence' and said a reviewer may prefer null — the reviewer is right.",
+      "source_citation": "NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf p.2, section 2 UMGEBUNGSBEDINGUNGEN",
+      "fanout_impact": {
+        "severity": "HIGH",
+        "granularity": "Base Model — would have been fanned to all 7 ek robotics base models (cleanroom_class is currently NULL on every one, so this would have been a clean 7-row fill with nothing to contradict it)",
+        "note": "COND_KO field that binds specifically for pharma / semiconductor / sterile F&B tenders. A spurious 'ISO 1–9' would have qualified the entire ek robotics range for cleanroom tenders on the basis of a blank checkbox. Second-worst blast radius in this dossier after DS integration_capability."
+      }
+    },
+    {
+      "company": "ek robotics",
+      "field": "industries_served",
+      "sonnet_value": null,
+      "opus_value": ["Automotive", "F&B", "Pharma", "General Manufacturing"],
+      "verdict": "CONFIRM",
+      "correct_value": ["Automotive", "F&B", "Pharma", "General Manufacturing"],
+      "reasoning": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7, 'KOMPETENZ IN JEDER BRANCHE', lists 21 verticals on the same page as '400 + AKTIVE ANLAGEN' and '55% D-A-CH / 45% WELTWEIT', i.e. it is presented as the installed-base profile — which matches the AP0 hint 'Verticals with live references'. The mapping is right and, importantly, conservative in the correct direction: Automobilzulieferer + Automobilindustrie → Automotive; Lebensmittel + Getränke + Molkerei → F&B; Pharma → Pharma; Maschinenbau, Verpackung, Gummi + Kunststoff, Druck + Papier, Weiße Ware, Eisen + Stahl, Elektronische Komponenten, Chemie, Keramik, Textilien, Prozessanlage, Holzverarbeitung → General Manufacturing. Nothing on the page supports E-Commerce, 3PL or Retail and opus correctly did not add them. Krankenhaus, Öffentliche Organisationen and Energie + Wasser have no AP0 home (an AP0 coverage gap, not an extraction error). This back section is identical in all nine brochures, so it is genuinely company-wide.",
+      "source_citation": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7 (identical section present in all nine brochures)",
+      "fanout_impact": {
+        "severity": "LOW",
+        "granularity": "Base Model — 7 rows",
+        "note": "CONTEXT level. The company-level list is applied per base model, which slightly overstates any individual vehicle's vertical coverage — inherent to AP0's granularity, not to this extraction."
+      }
+    },
+    {
+      "company": "ek robotics",
+      "field": "reference_count",
+      "sonnet_value": null,
+      "opus_value": 400,
+      "verdict": "CONFIRM",
+      "correct_value": 400,
+      "reasoning": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7 prints the KPI block '400 + AKTIVE ANLAGEN' alongside '3.000 + AKTIVE FAHRZEUGE', '100 + VERTRÄGE' and service-response figures. 'Aktive Anlagen' (active installations) is the right datum for AP0's 'Completed reference installs' — opus correctly did NOT take the larger 3.000 vehicle figure, which would have inflated the field by 7.5x. '+' makes 400 a floor, so the integer is conservative in the direction AP0 expects.",
+      "source_citation": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf p.7 (identical section in all nine brochures)",
+      "fanout_impact": {
+        "severity": "MEDIUM",
+        "granularity": "Product entity — the same 400 written to all 7 ek robotics product rows",
+        "note": "Same structural AP0 issue as KNAPP reference_count: a company-level installed-base figure lands on a Product-level field, so each product individually claims 400 references. SCORING level. Worth a Tech Lead decision on whether reference_count should be company-scoped, since this pattern will recur on every supplier."
+      }
+    }
+  ],
+  "systematic_patterns": [
+    {
+      "id": "P1",
+      "title": "This dossier is mostly a coverage gap, not a value conflict — and the diff over-counts it",
+      "detail": "18 of 22 items are 'sonnet null vs opus value' (opus simply extracted company-level fields that sonnet never attempted), 2 are pure serialisation differences, and only 2 are genuine head-to-head value conflicts. Worse, at least one 'disagreement' is a placement artefact: Omron max_fleet_size = 100 WAS extracted by sonnet, just staged on three product rows instead of in company_wide_context. A CWC-block-only diff cannot see per-product placement and will keep manufacturing phantom disagreements. Recommendation: future diffs for company-wide fields should union the CWC block with the per-product fields before comparing."
+    },
+    {
+      "id": "P2",
+      "title": "Both concessions have the same root cause: a document that is not making a product claim",
+      "detail": "ek robotics cleanroom_class came from a tick-box in a blank RFQ intake form — ek robotics asking the CUSTOMER whether their site is a cleanroom. DS Automotion 'WMS' came from a paragraph whose actual point is that NAVIOS REPLACES a separate warehouse-management system ('alles innerhalb einer Software'). Neither is the vendor asserting a capability. Proposed rule for company_wide_context: a value may only be staged if it is an assertion the vendor makes about its own product. Questions posed to the buyer, and functions described as substituting for the buyer's system, are not assertions of capability."
+    },
+    {
+      "id": "P3",
+      "title": "The two concessions are both COND_KO fields — errors clustered exactly where they cost most",
+      "detail": "Of 22 items, only 4 are COND_KO-level (infrastructure_free, cleanroom_class, both integration_capability entries). Both concessions and one of the two revisions sit in that group of 4. The confirmations cluster in CONTEXT/SCORING fields. Company-wide extraction is therefore accurate where it does not matter and unreliable where it does — argues for mandatory human review of COND_KO fields in any CWC block, and for treating CONTEXT-level CWC fills as low-risk bulk."
+    },
+    {
+      "id": "P4",
+      "title": "New failure mode versus the product-field round: correct values carried by broken citations",
+      "detail": "Three items are right for the wrong reason, which a naive spot-check would misjudge. (a) Omron max_fleet_size: opus quoted a footnote 'Contact your local OMRON representative for fleets larger than 100' that does not exist in i828 or i885 — the real *1 footnote is about licence expiration; the value is nonetheless printed on p.1 of both datasheets. (b) Omron multi_fleet_capable: opus argued from a compatibility matrix listing only Omron's own models, which proves nothing about other vendors; the value survives solely on the i828 p.3 'Unified Fleet License … among multi-vendor AMRs' row that neither pass cited. (c) DS modification_process: opus cited a weak p.7 line about runtime parameters and hedged, while the decisive sentence naming the Anlagenbetreiber as the actor sits in the p.10 FAQ. In all three cases a reviewer following the stated citation would have rejected a true value. Citation quality needs to be audited separately from value correctness."
+    },
+    {
+      "id": "P5",
+      "title": "Company-wide blocks inherit an entity-identity problem that per-product extraction never hits",
+      "detail": "KNAPP's only address belongs to 'KNAPP Industry Solutions GmbH'; the string 'KNAPP AG' appears nowhere in the 34-page folder. Opus flagged the mismatch and then wrote hq_city into the KNAPP AG record anyway. Geography and certification fields are entity-specific by definition, so an unresolved company-identity flag should HARD-BLOCK company-level fills, not merely annotate them. (ek robotics has the same open question — 'a NEURA brand', legal entity NEURA Mobile Robots GmbH — but the disputed ek fields are all product-capability fields, so the identity question does not bind there.)"
+    },
+    {
+      "id": "P6",
+      "title": "AP0 structural finding: reference_count lives on Product but the only available data is company-level",
+      "detail": "Both KNAPP (150) and ek robotics (400) hit this. The figure is a company installed-base claim, but AP0 stores reference_count on the Product entity, so it is written identically to 5 and 7 product rows respectively and inflates aggregate maturity scoring. This is not an extraction error and will recur on every supplier — worth a Tech Lead ruling on whether reference_count should be company-scoped or explicitly documented as 'company figure repeated per product'."
+    },
+    {
+      "id": "P7",
+      "title": "Serialisation: sonnet emits scalars for AP0 Multi-Select fields",
+      "detail": "installation_process and modification_process are data_type 'Multi-Select' in config/fields.json; sonnet wrote bare strings ('Client', 'Client: All'), opus wrote lists. 2 of the 22 'disagreements' are nothing but this. Any import script must coerce scalar → single-element list for Multi-Select fields, and the diff tool should normalise before comparing so these stop consuming review attention."
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "company": "Toyota Material Handling Europe",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "OPUS REDO PASS — PARTIAL TOYOTA GROUP (part 1 of 2). Blind independent re-extraction of TWO of the Toyota files in Datasheets/AGV_AMR/Analysed/: 'lae250-technicky-list.pdf' and 'sae160-technicky-list.pdf'. No sonnet-era findings consulted. The remaining Toyota files ('tae500-technicky-list-003.pdf', 'tmha_sai125cb_brochure.pdf') were deliberately LEFT IN Analysed/ and are NOT covered here — this session stopped at a clean product boundary rather than start a group it could not finish. A later session should write 'docs/research_findings_opus_20260808_toyota_part2.json' (or equivalent) for those; the filename is suffixed 'part1' precisely so the two do not collide. Both files are VDI 2198 'Typenblatt'-style technical spec sheets with battery/fork-length/mast configuration matrices — the multi-dimensional-matrix case; every collapse decision is documented per product. Scope: '*' + 'Logistics:AGV' + 'Logistics:AGV:Forklift' for all three products. Result: 2 enrich + 1 new variant, ZERO conflicts.",
+  "company_wide_context": {
+    "source_file": "lae250-technicky-list.pdf / sae160-technicky-list.pdf",
+    "fields": {
+      "country": "SE"
+    },
+    "field_sources": {
+      "country": "Both files, p.2 footer disclaimer: 'Toyota Material Handling Manufacturing Sweden AB products and specifications are subject to change without notice'; both p.4 colophons: 'TP-Technical Publications, Sweden'"
+    },
+    "applies_to": "Company record. DB already holds SE — confirmed, not a change.",
+    "notes": "Both p.4 colophons read 'TOYOTA MATERIAL HANDLING IN EUROPE, MANAGING THE TOYOTA AND BT MATERIALS HANDLING BRANDS IN EUROPE' — which is why one product is DB-named 'BT Levio LAE250 Autopilot' (BT brand) and the other 'Toyota Staxio SAE160 Autopilot' (Toyota brand) under the same company. That existing naming is consistent with the documents and needs no change. DOCUMENT AGE — worth noting before import: both sheets are from 2019 ('746906-040, version 12, 2019-03-12' for the LAE250; '746908-040, version 13, 2019-03-05' for the SAE160). They are the manufacturer's own data and remain ground truth for what they state, but they are seven years old and several rows are marked 'n) = New value / text since previous version of the data sheet', so a currency check against the live range would be reasonable. Both sheets carry the standard VDI-style caveat 'All data are based on table configuration. Other configurations may give other values' and 'Truck performance and dimensions are nominal and subject to tolerances' (p.2) — i.e. the headline column is the STANDARD configuration only and does not constrain options, which is the same reasoning that makes a VDI row a poor basis for a conflict flag."
+  },
+  "products": [
+    {
+      "product_name": "BT Levio LAE250 Autopilot",
+      "product_type": "Forklift AGV",
+      "source_file": "lae250-technicky-list.pdf",
+      "db_status": "enrich",
+      "variant_group": "Single model, but the sheet documents a 2-axis configuration matrix on p.3: battery compartment (Small / Large) × fork length (FL 1200 / FL 1600 / FL 2400). These are options on one truck, not separate models — no distinct model designations are given — so they were NOT split into variants. All matrix collapses are documented in notes.",
+      "fields": {
+        "max_payload": 2500,
+        "lifting_height": 120,
+        "max_speed": 2.22,
+        "max_gradient": 6.0,
+        "vehicle_length": 2227,
+        "vehicle_width": 930,
+        "min_total_height": 2381,
+        "min_aisle_width": 2660,
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "battery_swap_capable": true,
+        "autonomous_charging": true,
+        "manual_usage": true,
+        "safety_coverage": "Single plane (2D)",
+        "drive_type": "Pallet Mover",
+        "stacking_capability": false
+      },
+      "field_sources": {
+        "max_payload": "p.2, VDI row '1.5 Load capacity/rated load Q kg 2500'",
+        "lifting_height": "p.2, VDI row '4.4 Lift h3 mm 120' — h3 is the fork STROKE, which matches AP0's definition ('the height the forks travel'). SEE NOTES: the same page also prints 'Lift height h23 mm 207,5', a different VDI quantity.",
+        "max_speed": "p.2, VDI row '5.1.1 Travel speed, drive wheel/fork direction, automatic mode km/h 8,0/1,1' — AUTOMATIC-mode figure used (this is an AGV), drive-wheel direction. Printed unit km/h, AP0 unit m/s → converted 8,0 km/h ÷ 3.6 = 2.22 m/s. SEE NOTES for the fork-direction figure.",
+        "max_gradient": "p.2, VDI row '5.8 Max. gradeability, with/without load 1) % 6/10' — CONSERVATIVE loaded figure (6) taken; footnote 1) 'Measured according to company standard'. Printed unit % = AP0 unit.",
+        "vehicle_length": "p.3, matrix row '4.19 Overall lenght l1 — FL 1200 mm 2130 (Small) / 2227 (Large)'. The 2227 cell was taken because p.2's headline column IS the FL 1200 + Large-battery configuration (its wheelbase row '1.9 Wheelbase, lowered/raised forks y mm 1536/1486' matches the p.3 FL 1200/Large cell exactly, not the Small cell's 1439/1389).",
+        "vehicle_width": "p.2, VDI row '4.21 Overall width b1 mm 930'",
+        "min_total_height": "p.2, row 'Total height with scanner h20 mm 2381/2969' — the LOWER of the two figures, per AP0's definition ('lowest overall vehicle height'). SEE NOTES: the sheet does not say what the two figures correspond to.",
+        "min_aisle_width": "p.3, 'Aisle width Auto mode' table, Large battery compartment, 800×1200 load, 'PPS in fork direction: No' → 2660 mm. AUTO-mode table used rather than the manual-mode table, because this is an AGV. Full matrix and the alternatives in notes.",
+        "battery_type": "p.2, VDI row '6.4 Battery voltage/nominal capacity K5 V/Ah 24/500' with '6.5 Battery weight kg 368' (a 500 Ah / 368 kg pack at 24 V is a traction lead-acid battery), PLUS p.4 truck-features bullet 'Auto charging Lithium Ion battery (optional)' → both chemistries offered",
+        "battery_swap_capable": "p.4, truck-features bullet 'Sideway battery change'; corroborated by p.2 row 'Height from floor to upside battery rollers mm 140' (a roller-bed battery compartment for lateral exchange)",
+        "autonomous_charging": "p.4, truck-features bullet 'Auto charging Lithium Ion battery (optional)'. NOTE: explicitly OPTIONAL and tied to the Li-Ion battery choice.",
+        "manual_usage": "p.2, VDI row '1.4 Operator type  Automatic/Pedestrian' + p.4 bullet 'Manual handling' + the p.2 speed rows giving separate manual-mode speeds ('Travel speed ... manual mode with platform km/h 6,0/6,0', '... manual mode km/h 2,0/4,0')",
+        "safety_coverage": "p.4, truck-features bullets 'Personal safety protection drive direction', '... along sides', '... fork direction (optional)', 'Obstacle detection, top (optional)', 'Obstacle detection, front (optional)' — the STANDARD personnel protection is 2D scanning; the additional obstacle detection is optional. Corroborated by p.2 'Safety of laser products Class 1 (EC 60825-1)'.",
+        "drive_type": "p.2, title 'Autopilot lowlifter truck' + the 120 mm fork stroke and 87,5 mm lowered fork height — a low-lift pallet mover",
+        "stacking_capability": "p.4, truck-features list — the automatic functions are 'loading and unloading', 'horizontal transport' and 'horizontal deep stacking'. 'Horizontal deep stacking' is deep-lane FLOOR placement, not vertical stacking; with a 120 mm total lift this truck cannot stack pallets on top of each other."
+      },
+      "notes": "ENRICH — no conflict. Every DB value the sheet covers is confirmed exactly: max_payload=2500, lifting_height=120, max_speed=2.22 (the DB already carries the correct 8,0 km/h → 2.22 m/s conversion), max_gradient=6.0, vehicle_length=2227, vehicle_width=930, min_aisle_width=2660, battery_type, battery_swap_capable, autonomous_charging, manual_usage, safety_coverage, drive_type, stacking_capability=false. The only genuinely new field is min_total_height. PLAUSIBILITY FLAG (verbatim, not a read error): lifting_height=120 mm is far below config/plausibility.json's required_lifting_height floor of 500 mm — but this is a LOWLIFTER ('Autopilot lowlifter truck', p.1) whose entire job is 120 mm of ground clearance under a pallet. The floor is tuned for stackers. AMBIGUITY IN lifting_height (recorded choice, flagged): p.2 gives BOTH '4.4 Lift h3 mm 120' and 'Lift height h23 mm 207,5'. In VDI 2198, h3 is the lift stroke and h23 is the total fork height above ground (87,5 mm lowered fork height + 120 mm stroke = 207,5 ✓, which confirms the reading). AP0's hint says 'the height the forks travel', i.e. the stroke — so 120 was kept, matching the DB. A reviewer preferring top-of-fork height would use 207,5. min_total_height CAVEAT: p.2 prints 'Total height with scanner h20 mm 2381/2969' and 'Laser scanner beamer height h21 mm 2362/2950' as PAIRS, without saying what the two figures correspond to (they do not track the tiller height row '4.9 ... min./max. h14 mm 1150/1485' — the h20 delta is 588 mm vs the tiller's 335 mm). The lower figure (2381) was recorded per AP0's 'lowest overall vehicle height' definition; note that min_total_height is KO_IF_GT, so if 2969 is a real standard configuration this understates the truck. Flagged for a reviewer with access to the drawing. MIN_AISLE_WIDTH — CONFIGURATION MATRIX COLLAPSED (documented per the matrix rule). p.3 gives TWO aisle tables. (a) Manual mode, 800×1200 short-side handling: FL1200 2544 (Small) / 2639 (Large); FL1600 2903/2998; FL2400 3667/3763. (b) Auto mode, 'Ast Rotate on point. PPS muted': Large battery 2660 (800×1200) / 3030 (800×1600) / 3800 (800×2400); Small battery 2566 / 2935 / 3705. Choice made: the AUTO-mode table was used (this is an AGV), the standard 800×1200 EUR-pallet column was used, and the Large-battery row was used to stay consistent with p.2's headline configuration → 2660 mm, which is exactly what the DB already holds. Discarded cells a reviewer might prefer: 2566 mm (Small battery, i.e. the narrowest aisle achievable) and 3800 mm (the conservative worst case, but that is for a 2400 mm-long load, not a pallet). Footnote: '*) Add 41mm with mechanical fork bumper.' SPEED CAVEAT worth recording: the automatic-mode speed is heavily direction-dependent — 8,0 km/h in the drive-wheel direction but only 1,1 km/h (0,31 m/s) in the fork direction (p.2, row 5.1.1). AP0 has one max_speed field, so the higher figure is stored; real cycle times will be dominated by the fork-direction speed during load handling. NOT MAPPED — AP0 SCOPE GAP (recurring): p.3 gives '4.35 Turning radius Wa' for every configuration (FL1200 1755/1707 Small, 1850/1801 Large; FL1600 2023/1974, 2118/2069; FL2400 2648/2599, 2744/2694) with an explicit, unambiguous 'Turning radius' label — but there is no turning-radius field in Forklift scope (turning_radius is Tugger-only, min_turning_radius is AMR-only). Third independent occurrence of this gap this session. NOT MAPPED — no AP0 field: service weight 1061 kg and all axle-load rows; wheel materials/sizes/counts; track widths; '4.9 Height of tiller in drive position 1150/1485'; '4.15 Height, fork lowered 87,5'; '4.22 Fork dimensions s/e/l 70/180/1200'; '4.25 Width over forks 520/550/675'; '4.32 Ground clearance, centre of wheelbase 17 mm' (and note Forklift scope has no ground-clearance field anyway); lift/lowering speeds; '5.10 Service brake Electromagnetic'; motor ratings; '8.1 Type of drive control Variable AC'; '8.4 Sound level <70 dB(A)'; 'Height from floor to upside battery rollers 140 mm'; features 'Electronic regenerative braking system', 'Information display', 'Mechanical fork bumper (optional)'. LEFT NULL DELIBERATELY: navigation_type — p.4 says only 'Laser precision navigation', which does not distinguish reflector-based from natural-feature laser navigation; the DB's 'Laser Reflector' is therefore neither confirmed nor contradicted. load_detection — p.4 says 'Load detection & fork tip sensors' without naming a sensing technology; the DB's 'Mechanical/Tactile' is unsupported here (fork-tip sensors are as often optical). operating temperatures, IP rating, humidity — not stated anywhere. SCOPE BUG IN EXISTING DB ROW (pre-existing): this product is product_type='Forklift AGV' but carries onboard_ui (scope 'Logistics:AGV:AMR'), route_type and route_programming (scope 'Logistics:AGV:Tugger'), and workflow_capability and grid_required (scope 'Logistics:AGV:AMR'). The p.4 feature 'Information display' would justify onboard_ui if the field existed for forklifts — it does not. Also fleet_management_system is stored as 'Proprietary (T-ONE)', which is not an AP0 allowed value."
+    },
+    {
+      "product_name": "Toyota Staxio SAE160 Autopilot (Triplex Hi-Lo)",
+      "product_type": "Forklift AGV",
+      "source_file": "sae160-technicky-list.pdf",
+      "db_status": "enrich",
+      "variant_group": "SAE160 family. The spec sheet's p.2 has TWO parallel model columns — 'SAE160 (Duplex Tele)' and 'SAE160 (Triplex Hi-Lo)' — with genuinely different masts, lift heights, service weights and axle loads. This entry is the Triplex Hi-Lo; the Duplex Tele is staged as a separate variant below. The existing DB row is mapped to THIS variant because its lifting_height=4700 matches the Triplex column exactly.",
+      "fields": {
+        "max_payload": 1600,
+        "lifting_height": 4700,
+        "mast_type": "Triplex",
+        "max_speed": 2.22,
+        "max_gradient": 6.0,
+        "vehicle_length": 2258,
+        "vehicle_width": 930,
+        "min_total_height": 2381,
+        "min_aisle_width": 2686,
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "battery_swap_capable": true,
+        "autonomous_charging": true,
+        "manual_usage": true,
+        "safety_coverage": "Single plane (2D)",
+        "drive_type": "Straddle Stacker",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "p.2, VDI row '1.5 Load capacity/rated load Q kg 1600' (shared by both mast columns)",
+        "lifting_height": "p.2, Triplex Hi-Lo column, row 'Lift height h23 mm 4700 3)'. SEE NOTES — footnote 3) materially qualifies this figure for automatic operation.",
+        "mast_type": "p.2, column header 'SAE160 (Triplex Hi-Lo)'; corroborated by p.3 mast column 'TX Hi-Lo mast' and by the presence of a free-lift row ('4.3 Free lift h2 mm 1592') which the Duplex column lacks",
+        "max_speed": "p.2, VDI row '5.1.1 Travel speed, drive wheel/fork direction, automatic mode km/h 8,0/1,1 2)' — automatic mode, drive-wheel direction; converted 8,0 km/h → 2.22 m/s. SEE NOTES for footnote 2).",
+        "max_gradient": "p.2, VDI row '5.8 Max. gradeability, with/without load 1) % 6/10' — conservative loaded figure",
+        "vehicle_length": "p.3, matrix row '4.19 Overall length l1 — TX Hi-Lo mast, fork length 1200 mm: 2258'",
+        "vehicle_width": "p.2, VDI row '4.21 Overall width b1 mm 930'",
+        "min_total_height": "p.2, row 'Height with scanner h20 mm 2381/2969' — lower figure. NOTE this exceeds the Triplex's own mast-lowered height ('4.2 Height, mast lowered h1 mm 2162'), i.e. the laser-scanner mast, not the fork mast, sets the vehicle's overall height.",
+        "min_aisle_width": "p.3, 'Aisle width Auto mode' table, Large battery compartment, 800×1200 load, TX Hi-Lo row, 'PPS in fork direction: No' → 2686 mm. Full matrix in notes.",
+        "battery_type": "p.2, VDI row '6.4 Battery voltage/nominal capacity K5 V/Ah 24/500' with '6.5 Battery weight kg 345-403', PLUS p.4 bullet 'Auto charging Lithium Ion battery (optional)'",
+        "battery_swap_capable": "p.4, bullet 'Sideway battery change'; corroborated by p.2 'Height from floor to upside battery rollers mm 140'",
+        "autonomous_charging": "p.4, bullet 'Auto charging Lithium Ion battery (optional)' — optional and tied to Li-Ion",
+        "manual_usage": "p.2, VDI row '1.4 Operator type Automatic/Pedestrian' + p.4 bullet 'Manual handling' + the separate manual-mode speed rows on p.2",
+        "safety_coverage": "p.4, bullets 'Personal safety protection drive direction / along sides / fork direction (optional)', 'Obstacle detection, top (optional)', 'Obstacle detection, front (optional)' + p.2 'Safety of laser products Class 1 (EC 60825-1)'",
+        "drive_type": "p.2, title 'Autopilot stacker truck' + VDI row '4.26 Distance between support arms b4 mm 212/226' — straddle support arms",
+        "stacking_capability": "p.2, a 4700 mm lift height with a 1592 mm free lift on a stacker truck; p.4 automatic functions include 'loading and unloading'"
+      },
+      "notes": "ENRICH — no conflict. DB values confirmed: max_payload=1600, lifting_height=4700, max_speed=2.22, max_gradient=6.0, vehicle_length=2261 (DB) vs 2258 (this Triplex column) — see the note below before treating that as a discrepancy, vehicle_width=930, min_aisle_width=2686, battery_type, battery_swap_capable, autonomous_charging, manual_usage, safety_coverage, drive_type, stacking_capability. NOT FLAGGED AS A CONFLICT — vehicle_length: the DB holds 2261, which is the DUPLEX TELE / FL1200 cell on p.3; the Triplex/FL1200 cell is 2258. A 3 mm difference between the two mast columns is a real spec difference, not an error — this is precisely why the two masts are staged as separate variants. The DB row's other values (lifting_height 4700) identify it as the Triplex, so its length should become 2258 if the variant split is accepted. Recorded as 2258 here. IMPORTANT QUALIFIER ON THE KO FIELD lifting_height — footnote 3) on p.2 reads 'Max height of load station in automode is h23 - 200mm'. In AUTOMATIC operation the truck can therefore only serve a load station at 4500 mm, not 4700 mm. Since AP0 describes an automated vehicle and lifting_height is KO_IF_LT, a case can be made that 4500 is the correct value and 4700 overstates the truck by 200 mm on a K.O. field. Recorded 4700 (matching both the printed 'Lift height' row and the existing DB value) but FLAGGED — this needs a Tech Lead ruling, and it applies to the Duplex variant too (2350 → 2150). SPEED QUALIFIER — footnote 2) on p.2: the 8,0 km/h automatic-mode speed drops to '4,3 km/h with optional safety scanner in fork direction', i.e. 1.19 m/s. Trucks fitted with the optional fork-direction personnel protection are roughly half as fast. AP0 has one max_speed field; the standard-configuration figure is stored. MIN_AISLE_WIDTH — CONFIGURATION MATRIX COLLAPSED. p.3's 'Aisle width Auto mode' table (Large battery compartment only) has axes mast (DX Tele / TX Hi-Lo) × load length (800×1200 / 800×1600) × PPS-in-fork-direction (Yes / No): DX Tele 2734/2686 (1200) and 3115/3065 (1600); TX Hi-Lo 2774/2686 (1200) and 3125/3065 (1600). Choice made: TX Hi-Lo row, 800×1200 EUR-pallet column, PPS=No → 2686, matching the DB. NOTE the conservative alternative is 2774 mm — fitting the optional fork-direction safety scanner costs 88 mm of aisle on this variant. Footnote: '*) Add 50mm with Tx 4,7m mast. Add 41mm with mechanical fork bumper.' The p.3 MANUAL-mode aisle figures (2646 mm for 800×1200, 3023 mm for 800×1600) were not used. NOT MAPPED — AP0 SCOPE GAP: p.3 row '4.35 Turning radius Wa' gives 1767 mm (FL1200) / 2080 mm (FL1600), rising to 1825/2140 with the rear safety scanner — explicit 'Turning radius' labels with no Forklift-scope field to hold them. NOT MAPPED — no AP0 field: service weight 1723 kg and axle loads; '4.2 Height, mast lowered 2162'; '4.3 Free lift 1592'; '4.4 Lift movement 4658'; '4.5 Height, mast extended 5228'; wheels, track widths, tiller height, fork dimensions, width over forks, distance between support arms, ground clearances (17 / 24,5 mm), lift/lowering speeds, service brake, motor ratings, drive control, sound level. LEFT NULL DELIBERATELY: navigation_type (p.4 'Laser precision navigation' does not distinguish reflector from natural-feature; DB has 'Laser Reflector|Natural Feature (SLAM)', i.e. both, which this sheet cannot confirm); load_detection (p.4 'Load detection & fork tip sensors' names no technology; DB has 'Mechanical/Tactile'); operating temperatures (DB has 0/40 — not stated anywhere in this sheet); functional_safety_level (DB has 'PLd' — no Performance Level appears in this document). NON-CONFORMING VALUE ALREADY IN THE DB: mast_type is stored as 'Duplex|Triplex', but mast_type is a single-value Dropdown in AP0 — a pipe-separated pair is not a valid value. This is the DB visibly straining against the missing variant split; accepting the split resolves it (Triplex here, Duplex on the variant row). Also fleet_management_system='Proprietary (T-ONE)' is not an allowed value. SCOPE BUG IN EXISTING DB ROW (pre-existing): route_type and route_programming (Tugger scope) and workflow_capability, grid_required (AMR scope) on a Forklift AGV row."
+    },
+    {
+      "product_name": "Toyota Staxio SAE160 Autopilot (Duplex Tele)",
+      "product_type": "Forklift AGV",
+      "source_file": "sae160-technicky-list.pdf",
+      "db_status": "new",
+      "variant_group": "SAE160 family — the second of the two model columns on p.2. Shares the chassis, payload (1600 kg), width, speeds, gradeability, battery and safety package with the Triplex Hi-Lo variant; differs in mast (telescopic duplex vs triplex hi-lo), lift height (2350 vs 4700 mm), mast-lowered height (1737 vs 2162 mm), free lift (none vs 1592 mm), service weight (1513 vs 1723 kg) and overall length (2261 vs 2258 mm at FL1200). Clear candidate for one shared base model with two Product rows.",
+      "fields": {
+        "max_payload": 1600,
+        "lifting_height": 2350,
+        "mast_type": "Duplex",
+        "max_speed": 2.22,
+        "max_gradient": 6.0,
+        "vehicle_length": 2261,
+        "vehicle_width": 930,
+        "min_total_height": 2381,
+        "min_aisle_width": 2686,
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "battery_swap_capable": true,
+        "autonomous_charging": true,
+        "manual_usage": true,
+        "safety_coverage": "Single plane (2D)",
+        "drive_type": "Straddle Stacker",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "p.2, VDI row '1.5 Load capacity/rated load Q kg 1600' (shared across both mast columns)",
+        "lifting_height": "p.2, Duplex Tele column, row 'Lift height h23 mm 2350 3)'. Same footnote-3 qualifier as the Triplex — see notes.",
+        "mast_type": "p.2, column header 'SAE160 (Duplex Tele)'; corroborated by p.3 mast column 'DX Tele mast' and by the ABSENCE of a free-lift value in this column ('4.3 Free lift h2 mm  -')",
+        "max_speed": "p.2, VDI row '5.1.1 ... automatic mode km/h 8,0/1,1 2)' → 2.22 m/s",
+        "max_gradient": "p.2, VDI row '5.8 ... % 6/10' — conservative loaded figure",
+        "vehicle_length": "p.3, matrix row '4.19 Overall length l1 — DX Tele mast, fork length 1200 mm: 2261'",
+        "vehicle_width": "p.2, VDI row '4.21 Overall width b1 mm 930'",
+        "min_total_height": "p.2, row 'Height with scanner h20 mm 2381/2969' — lower figure. Note this is well above this variant's own mast-lowered height ('4.2 Height, mast lowered h1 mm 1737'): the scanner mast, not the fork mast, sets overall height on the Duplex.",
+        "min_aisle_width": "p.3, 'Aisle width Auto mode' table, Large battery compartment, 800×1200 load, DX Tele row, 'PPS in fork direction: No' → 2686 mm",
+        "battery_type": "p.2, VDI rows 6.4/6.5 + p.4 bullet 'Auto charging Lithium Ion battery (optional)'",
+        "battery_swap_capable": "p.4, bullet 'Sideway battery change'",
+        "autonomous_charging": "p.4, bullet 'Auto charging Lithium Ion battery (optional)'",
+        "manual_usage": "p.2, VDI row '1.4 Operator type Automatic/Pedestrian' + p.4 bullet 'Manual handling'",
+        "safety_coverage": "p.4 personnel-protection bullets + p.2 'Safety of laser products Class 1 (EC 60825-1)'",
+        "drive_type": "p.2, title 'Autopilot stacker truck' + '4.26 Distance between support arms b4 mm 212/226'",
+        "stacking_capability": "p.2, a 2350 mm lift height on a stacker truck"
+      },
+      "notes": "NEW VARIANT — staged per the variant-completion rule. The DB currently holds ONE 'Toyota Staxio SAE160 Autopilot' row carrying lifting_height=4700 (the Triplex) and mast_type='Duplex|Triplex' (an invalid pipe-separated value in a single-value Dropdown). The spec sheet documents two genuinely different trucks side by side, so the clean resolution is: keep the existing row as the Triplex Hi-Lo and add this Duplex Tele row. That also fixes the invalid mast_type. If the Tech Lead prefers a single row, the conservative KO values would be the Duplex figures (lifting_height 2350, the lower of the two). SAME footnote-3 QUALIFIER as the Triplex: p.2 footnote '3) Max height of load station in automode is h23 - 200mm' means this variant can only serve a load station at 2150 mm in automatic operation, not 2350 mm. Recorded 2350 (the printed 'Lift height') but flagged for the same ruling. SAME footnote-2 SPEED QUALIFIER: 8,0 km/h drops to 4,3 km/h (1.19 m/s) with the optional fork-direction safety scanner. MIN_AISLE_WIDTH matrix: the DX Tele row of p.3's auto-mode table gives 2734 mm (PPS yes) / 2686 mm (PPS no) for an 800×1200 load, and 3115 / 3065 mm for 800×1600. The PPS=No, 800×1200 cell (2686) was taken, consistent with the sibling variant. NOT MAPPED — AP0 SCOPE GAP: p.3 '4.35 Turning radius Wa' 1767 mm (FL1200) / 2080 mm (FL1600), or 1815/2130 with the rear safety scanner — no Forklift-scope field exists to hold it. All other unmapped rows and deliberately-null fields are identical to the Triplex Hi-Lo entry; see its notes."
+    }
+  ]
+}

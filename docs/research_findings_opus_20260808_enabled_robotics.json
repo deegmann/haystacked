@@ -1,0 +1,109 @@
+{
+  "company": "Enabled Robotics ApS",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus redo pass, session 4. NEW SUPPLIER — 'Enabled Robotics ApS' does not exist in the DB (38 companies, checked against a fresh live Airtable sync). Two files, both Enabled Robotics, both previously mis-attributed to Vecna Robotics on filename appearance alone ('er-flex-*'):\n  1. 'er-flex-brochure-2024_digital.pdf' (5 pp., 2024) — ER-FLEX 250 series brochure with a SPECIFICATIONS panel on p.4.\n  2. 'er-flex-max-specifications-sheet-with-cable.pdf' (1 p.) — ER-FLEX-MAX spec sheet.\nCompany identity is on 'er-flex-brochure-2024_digital.pdf' p.5: 'Headquarter: Enabled Robotics ApS, Agerhatten 27A, Entrance 4, DK-5220 Odense SØ, Denmark, www.enabled-robotics.com'. The MAX sheet carries no company name at all — it was only attributable via the shared 'ER-FLEX' / 'ER-ABILITY' branding.\n\nPRODUCT CATEGORY NOTE: both machines are MOBILE MANIPULATORS — an AMR base carrying a Universal Robots cobot arm. product_type 'Mobile AMR' is the only AP0 category that fits, but be aware that a large share of each datasheet describes the ARM (payload, reach, force-sensing protective stop), which AP0 has no vocabulary for beyond picking_mechanism = 'Autonomous arm' and top_module_type = 'Cobot arm'. The arm payload (5 / 12.5 / 16 / 20 / 30 kg) must NOT be confused with the vehicle's transport payload (186 / 380 kg) — they are different rows on the same sheet and only the latter belongs in max_payload.\n\nVEHICLE DIMENSIONS: recorded for ER-FLEX-MAX (its sheet prints an explicit 'Foot print 1350 x 910 mm' row) but NOT for the ER-FLEX 250 series, whose p.4 gives only unlabelled CAD callouts (357 / 840 / 517 / 364 / 800 / 580 mm) with no way to tell length from width from height. Left null rather than guessed; both fields are CONTEXT-level so no image render was spent on it.\n\nCHARGE_TIME — the trap did NOT fire here, but read the caveat. Neither sheet states a charge-to-runtime RATIO (the trap that has hit ~13 times in this pass). The 250 series does publish 'Charge time 40 minutes - 20% to 80%', which is a genuine absolute duration and is recorded — but it is a PARTIAL 20->80% fast charge, not a time to full. A reviewer treating 40 min as time-to-full would understate the real dwell.",
+  "company_wide_context": {
+    "source_file": "er-flex-brochure-2024_digital.pdf",
+    "fields": {
+      "country": "DK",
+      "hq_city": "Odense SØ",
+      "installation_process": ["Supplier only", "Client"],
+      "modification_process": ["Client: All"],
+      "integration_capability": ["ERP", "MES", "WMS", "REST API", "OPC-UA"],
+      "distribution_model": "Direct"
+    },
+    "applies_to": "all base models of Enabled Robotics ApS",
+    "notes": "country/hq_city from p.5 'Enabled Robotics ApS, Agerhatten 27A, Entrance 4, DK-5220 Odense SØ, Denmark'. modification_process 'Client: All' from p.2 'It can set up a site map of the location in a few minutes, is easily programmable ... If the environment or tasks change, it's easy to add new tasks and routes' and p.4 'The ER-FLEX is easy to set up ... The intuitive drag-and-drop programming ... With a little training, you can utilize all the smart features' — i.e. route and task editing is explicitly a customer activity. installation_process keeps both values because p.4 also markets ER-ACADEMY training courses ('we always recommend our ER-ACADEMY training courses') and p.5 offers supplier-run feasibility studies and proofs of concept. integration_capability from p.3 'The ER-FLEX can communicate with machines, electrical doors, elevators and other systems through OPC UA or REST. It also exposes a REST API for communication with your in-house ERP, WES, MES or WMS systems' — note 'WES' (Warehouse Execution System) has no AP0 allowed value and is dropped. distribution_model 'Direct' from p.5 'Headquarter: … Your regional sales office:' plus the direct sales@enabled-robotics.com contact — WEAK evidence, a reviewer may prefer null. AP0 stores installation_process / modification_process / integration_capability at Base-Model granularity, so these must be fanned out per base model at import, not written once at company level."
+  },
+  "products": [
+    {
+      "product_name": "ER-FLEX 250",
+      "product_type": "Mobile AMR",
+      "source_file": "er-flex-brochure-2024_digital.pdf",
+      "db_status": "new",
+      "variant_group": "The brochure calls this the 'ER-FLEX 250 series' and offers three arm options (UR5e / UR10e / UR16e) on ONE mobile base. The arm choice changes only the arm payload (5 / 12.5 / 16 kg), not any vehicle-level field, so this is recorded as ONE product, not three. The '250 series' naming implies sibling series exist that are not in this folder.",
+      "fields": {
+        "product_type": "Mobile AMR",
+        "max_payload": 186,
+        "max_speed": 2.0,
+        "battery_runtime": 4.5,
+        "charge_time": 40,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "ingress_protection_rating": "IP20",
+        "navigation_type": ["Natural Feature (SLAM)", "Vision"],
+        "picking_mechanism": "Autonomous arm",
+        "top_module_type": ["Cobot arm", "Shelf Carrier"],
+        "safety_coverage": "Limited 3D (e.g. waterfall)",
+        "integration_capability": ["ERP", "MES", "WMS", "REST API", "OPC-UA"],
+        "workflow_capability": ["Transport"],
+        "industries_served": ["General Manufacturing"]
+      },
+      "field_sources": {
+        "product_type": "p.2 'This is a robot, designed to navigate in an industrial environment and to collaborate with human co-workers'; p.4 SPECIFICATIONS panel — an autonomous mobile base with an interchangeable cobot arm",
+        "max_payload": "p.4 SPECIFICATIONS row 'Payload — Up to 186 kg'. DISTINCT from the row directly above it, 'Arm payload — UR5e: 5 kg / UR10e: 12.5 kg / UR16e: 16 kg', which is the manipulator's rating and must not be used here.",
+        "max_speed": "p.4 SPECIFICATIONS row 'Max speed — 2.0 m/s' (already AP0's unit)",
+        "battery_runtime": "p.4 row 'Operating time — 4.5 hours - 100% to 10%'. The 100->10% basis is stated, which is unusually honest; recorded at face value.",
+        "charge_time": "p.4 row 'Charge time — 40 minutes - 20% to 80%'. CAVEAT: a partial 20->80% fast charge, NOT a time to full. Unit already minutes, matching AP0.",
+        "operating_temp_min": "p.4 row 'Environment — 5-40˚C IP20 (humidity 10-95% non-condensing)' — lower bound. Unit °C matches AP0; checked config/unit_semantics.json, both bounds positive so no sign risk.",
+        "operating_temp_max": "same row, upper bound 40°C",
+        "operating_humidity_max": "same row, '(humidity 10-95% non-condensing)' — upper bound 95%",
+        "ingress_protection_rating": "same row, 'IP20'",
+        "navigation_type": "p.2 'It can set up a site map of the location in a few minutes'; p.3 SITE LAYOUT MANAGER 'Adds 3D coordinates to the automatically scanned 2D site map' -> Natural Feature (SLAM). p.3 PRECISION 'the ER-FLEX has an ultra-precise camera and uses markers to calibrate the position before performing a task' -> Vision. NOTE the marker-based calibration is arguably 'QR/DM Code' as well, but the markers are used for local pre-task calibration rather than as the navigation reference, so QR/DM Code is deliberately not proposed.",
+        "picking_mechanism": "p.4 row 'Arm options — UR5e / UR10e / UR16e'; p.2 MACHINE TENDING 'Make the robot pick an item from a rack, go to the machine, place the item in the machine, take it out and repeat'",
+        "top_module_type": "'Cobot arm' from p.4 'Arm options'; 'Shelf Carrier' from p.3 CARGO MANAGER 'lets you control onboard racks and shelves automatically. All you have to do is define pick and place routines for your racks'",
+        "safety_coverage": "p.4 ROBOT SAFETY / FULL STOP MEASURES: 'Proximity sensors scan the floor surrounding the robot', 'Laser sensors detect objects from afar', 'Cameras detect objects higher than 40 cm IN FRONT OF the robot', 'Virtual 3D safety planes can be defined'. JUDGEMENT CALL: 360° coverage is 2D laser only and the height-detecting cameras are explicitly front-facing, which is the AP0 hint's 'partial 3D (waterfall front field)' picture rather than Full 3D. A reviewer who reads 'Virtual 3D safety planes' as volumetric may prefer Full 3D.",
+        "integration_capability": "p.2 'it allows for communication with your ERP, WES, MES or WMS systems, production machines, doors and elevators'; p.3 COMMUNICATION 'through OPC UA or REST. It also exposes a REST API'. Canonicalised to AP0 forms — 'OPC UA' written with a space in the source is stored as 'OPC-UA'. 'WES' has no AP0 allowed value and is dropped.",
+        "workflow_capability": "p.2 use-case tiles PICK N' PLACE and LINESIDE DELIVERY ('continuous replenishment of parts and items'). Only 'Transport' is proposed: 'Picking support' in AP0 means supporting a HUMAN picker, which is not what this robot does, and 'Goods-to-Person' is not claimed anywhere.",
+        "industries_served": "p.2 'By introducing the ER-FLEX to your production or lab'; p.4 'have a stabile workflow running in your production, lab or warehouse'. Only 'General Manufacturing' is proposed — 'lab' has no AP0 allowed value and mapping it to 'Pharma' would be an inference."
+      },
+      "notes": "NEW PRODUCT under a NEW COMPANY.\nNOT RECORDED, deliberately — autonomous_charging: p.2 says 'With a smart production layout and smart charging, you can even make it run 24/7' and p.4 'Daily utilization Up to 20 hours (24 hours with smart layout)'. 'Smart charging' plus 24/7 operation strongly implies unattended docking, but neither sheet says so outright. Strong enrichment candidate; left null under Blank != Zero.\nNOT RECORDED, deliberately — infrastructure_free: the robot SLAM-maps autonomously (which points to true) but the 1 mm precision claim explicitly depends on physical markers placed in the environment (p.3), which points to false. Genuinely contradictory from this document alone; left null and flagged rather than guessed.\nNOT RECORDED, deliberately — the '1 mm precision' figure (p.3, p.4). It is ARM/task precision after marker calibration, not carrier placement. AP0's drop_accuracy_lat means 'placement accuracy when the robot sets a CARRIER down', which is a different quantity. Left null.\nNOT RECORDED — vehicle_length / vehicle_width: p.4 has six unlabelled CAD callouts (357 / 840 / 517 / 364 / 800 / 580 mm) with no legend. 800 x 580 mm is the most plausible footprint pair but that is a guess, so both fields are null.\nAP0 GAP — nothing holds: arm payload and arm reach (the primary buying criterion for a mobile manipulator); 'Daily utilization Up to 20 hours (24 hours with smart layout)'; weight 161-174 kg; the force-sensing 'Force sensors stop the arm if it senses counterpressure' protective stop; the LED status-light communication channel; or 'Reading of QR and bar-code' (the Forklift-scope barcode_readers field has no AMR counterpart — this is a NEW instance of the same scope asymmetry already logged for onboard_ui and min_aisle_width).\nAP0 GAP — no aisle/corridor width field exists in AMR scope, so nothing on this sheet's manoeuvring claims is storable (11th+ instance in this redo pass).\nNOTE FOR THE IMPORTER: per the project's standing rule, do not create the Enabled Robotics company record unless these product rows are created with it."
+    },
+    {
+      "product_name": "ER-FLEX-MAX",
+      "product_type": "Mobile AMR",
+      "source_file": "er-flex-max-specifications-sheet-with-cable.pdf",
+      "db_status": "new",
+      "variant_group": "Larger sibling of the ER-FLEX 250 series — roughly double the transport payload (380 vs 186 kg), a bigger footprint, larger arm options (UR20 / UR30 vs UR5e/UR10e/UR16e) and a much better IP rating (IP52/IP54 vs IP20). Distinct chassis, not a configuration of the 250.",
+      "fields": {
+        "product_type": "Mobile AMR",
+        "max_payload": 380,
+        "max_speed": 2.0,
+        "battery_runtime": 4,
+        "vehicle_length": 1350,
+        "vehicle_width": 910,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "ingress_protection_rating": "IP52",
+        "navigation_type": ["Natural Feature (SLAM)", "Vision"],
+        "picking_mechanism": "Autonomous arm",
+        "top_module_type": ["Cobot arm"],
+        "safety_coverage": "Limited 3D (e.g. waterfall)",
+        "integration_capability": ["REST API", "OPC-UA"],
+        "workflow_capability": ["Transport"]
+      },
+      "field_sources": {
+        "product_type": "p.1 'ER-FLEX-MAX ... SPECIFICATION' with Arm Options and a Physical/Power/Environment/Safety spec block",
+        "max_payload": "p.1 Physical panel, row 'Transport Payload — 380 kg'. DISTINCT from 'Arm Payload — UR20: 20 kg / UR30: 30 kg' at the top of the same sheet.",
+        "max_speed": "p.1 Physical panel, row 'Max Driving Speed — 2 m/s' (already AP0's unit)",
+        "battery_runtime": "p.1 Power panel, row 'Operation* — 4 hours (100% - 10%)'. Footnote on the same sheet: '*Operation and utilization are estimates' — so this is an estimate, not a measured spec.",
+        "vehicle_length": "p.1 Physical panel, row 'Foot print — 1350 x 910 mm' — length taken as the larger figure, corroborated by the p.1 drawing callouts 1350 mm and 910 mm",
+        "vehicle_width": "same row, 910 mm",
+        "operating_temp_min": "p.1 Environment panel, row 'Ambient temperature — 5 - 40°C' — lower bound",
+        "operating_temp_max": "same row, upper bound 40°C. CAVEAT: the row carries the footnote 'Max ambient temp for 1 h', i.e. 40°C is a ONE-HOUR PEAK, not a continuous rating. The continuous figure is not published. This is the recurring operating_temp_max continuous-vs-peak ambiguity; 40 recorded because it is the only number given, but it is NOT a continuous rating and a K.O. match against it would be optimistic.",
+        "operating_humidity_max": "p.1 Environment panel, row 'Humidity — 10–95% non-condensing' — upper bound",
+        "ingress_protection_rating": "p.1 Environment panel, row 'IP rating — IP52' with the qualifier 'Arm and Tower - IP54'. The CONSERVATIVE (lower) figure is recorded, since IP52 is what the chassis as a whole achieves.",
+        "navigation_type": "p.1 ER-ABILITY feature list 'Vision system for precise localization to marker'; p.1 Other panel 'Vision precision — 1 mm relative to markers'. SLAM inherited from the shared ER-FLEX platform description in er-flex-brochure-2024_digital.pdf p.2-3 — the MAX sheet alone does not state map-building, so SLAM here is a cross-document attribution, weaker than the 250's.",
+        "picking_mechanism": "p.1 'Arm Options — UR20 / UR30', 'Arm Payload 20 kg / 30 kg', 'Arm Reach 1750 mm / 1300 mm'",
+        "top_module_type": "p.1 Arm Options block. 'Shelf Carrier' NOT proposed for the MAX — its sheet gives a 'Load space 1030 x 864 mm' but never mentions onboard racks or shelves.",
+        "safety_coverage": "p.1 Safety panel: 'Laser Scanners — Detects objects from afar, 360°', '3D Cameras — Detects objects taler [sic] than 40 cm', 'Proximity sensors — Scans the floor surrounding the robot', 'Protective Stop — Arm enters protective stop in case of unexpected forces'. Same judgement as the 250: 360° is 2D laser, 3D cameras are a partial field.",
+        "integration_capability": "p.1 ER-ABILITY feature list 'Communication with external IT systems through REST or OPC-UA' — the MAX sheet names only these two; the ERP/WES/MES/WMS list is from the 250's brochure and is NOT attributed to the MAX here.",
+        "workflow_capability": "p.1 'Transport Payload' row and 'Load space' row — a transport function is explicit"
+      },
+      "notes": "NEW PRODUCT under a NEW COMPANY.\nSOURCE TYPO recorded, not propagated: p.1 Safety panel reads '3D Cameras — Detects objects taler than 40 cm' ('taler' for 'taller'). Cosmetic only.\nNOT RECORDED — the 'Battery 34.2 Ah / 1.63 kWh' row (p.1 Power panel): AP0 has no battery-capacity field, and no chemistry is stated anywhere on either sheet, so battery_type stays null for both products.\nNOT RECORDED — 'Utilization* 18½ hours per day' (p.1): no AP0 field, and it is footnoted as an estimate.\nNOT RECORDED — 'Vision precision 1 mm relative to markers' (p.1 Other panel): same reasoning as the 250 — arm/task precision relative to fiducials, not carrier drop accuracy.\nNOT RECORDED — 'Weight 460 kg' and 'Load space 1030 x 864 mm': no AP0 fields. The load space in particular is exactly the kind of figure a buyer sizing totes would want.\nno charge_time is published on this sheet at all (contrast the 250's 40 min) — left null rather than carried across from the sibling.\nAP0 GAP — 'WiFi Dual-Band Wireless b/a/g/n/ac' (p.1 Other panel) has nowhere to go; wireless infrastructure requirements are a real deployment constraint (cf. the Omron AMR wireless technical guide also in this batch)."
+    }
+  ]
+}

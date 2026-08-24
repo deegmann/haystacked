@@ -1,0 +1,1438 @@
+{
+  "AGILOX Services GmbH": [
+    {
+      "sonnet_product": "AGILOX OCF",
+      "opus_product": "AGILOX OCF",
+      "field": "vehicle_length",
+      "sonnet_value": 2784,
+      "sonnet_source": "'TECHNISCHE DETAILS' table, 'ABMASSE (L x B x H) 2.784 x 1.200 x 2.566 MM'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_agilox.json",
+      "opus_value": 2795,
+      "opus_source": "brochure p.17, row ABMESSUNGEN (L X B X H), column OCF: '2.795 x 1.200 x 2.566 mm'",
+      "opus_file": "docs/research_findings_opus_20260808_agilox.json"
+    }
+  ],
+  "Balyo": [
+    {
+      "sonnet_product": "VEENY",
+      "opus_product": "VEENY",
+      "field": "lifting_height",
+      "sonnet_value": 14710,
+      "sonnet_source": "visible page-image table, 'Maximum picking height mm/in 14710 / 579.1'; body text 'can pick pallets up to a height of 14710mm / 579.1 in' (drop height 14510mm also stated, not used -- picking height is the taller/governing figure)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "opus_value": 14510,
+      "opus_source": "p.1, FOCUS paragraph: 'can pick pallets up to a height of 14710mm / 579.1 in, and drop pallets up to 14510mm / 571.2 in'. Took the DROP (stacking) height 14510 mm as the usable stacking height. The spec table's 'Maximum picking height mm / in — 14710 / 579,1' gives the pick figure. Printed in mm, AP0 unit mm",
+      "opus_file": "docs/research_findings_opus_20260808_balyo_addendum.json"
+    },
+    {
+      "sonnet_product": "LOWY / LOWY HD",
+      "opus_product": "LOWY",
+      "field": "min_aisle_width",
+      "sonnet_value": 2950,
+      "sonnet_source": "CONSERVATIVE (larger/worse-case) value used: base LOWY sheet 'FROM 2.9m/10ft Aisle width'; LOWY HD sheet 'FROM 2950mm/9'8\" Aisle width' -- 2950mm (the larger figure) used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "opus_value": 2900,
+      "opus_source": "headline stat block, 'FROM 2.9m / 10ft — Aisle width'. Printed in m → converted to 2900 mm",
+      "opus_file": "docs/research_findings_opus_20260808_balyo_addendum.json"
+    }
+  ],
+  "Enabled Robotics ApS": [
+    {
+      "sonnet_product": "ER-FLEX-MAX",
+      "opus_product": "ER-FLEX-MAX",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Vision"
+      ],
+      "sonnet_source": "spec sheet feature list 'Vision system for precise localization to marker'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_enabled_robotics.json",
+      "opus_value": [
+        "Natural Feature (SLAM)",
+        "Vision"
+      ],
+      "opus_source": "p.1 ER-ABILITY feature list 'Vision system for precise localization to marker'; p.1 Other panel 'Vision precision — 1 mm relative to markers'. SLAM inherited from the shared ER-FLEX platform description in er-flex-brochure-2024_digital.pdf p.2-3 — the MAX sheet alone does not state map-building, so SLAM here is a cross-document attribution, weaker than the 250's.",
+      "opus_file": "docs/research_findings_opus_20260808_enabled_robotics.json"
+    },
+    {
+      "sonnet_product": "ER-FLEX",
+      "opus_product": "ER-FLEX 250",
+      "field": "top_module_type",
+      "sonnet_value": [
+        "Cobot arm"
+      ],
+      "sonnet_source": "p.2 'The ER-FLEX combines mobility and handling in one robot' -- mobile base with an onboard collaborative robot arm (arm options confirmed p.4)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_enabled_robotics.json",
+      "opus_value": [
+        "Cobot arm",
+        "Shelf Carrier"
+      ],
+      "opus_source": "'Cobot arm' from p.4 'Arm options'; 'Shelf Carrier' from p.3 CARGO MANAGER 'lets you control onboard racks and shelves automatically. All you have to do is define pick and place routines for your racks'",
+      "opus_file": "docs/research_findings_opus_20260808_enabled_robotics.json"
+    },
+    {
+      "sonnet_product": "ER-FLEX",
+      "opus_product": "ER-FLEX 250",
+      "field": "integration_capability",
+      "sonnet_value": [
+        "ERP",
+        "WMS",
+        "MES",
+        "REST API",
+        "OPC-UA"
+      ],
+      "sonnet_source": "p.2 'it allows for communication with your ERP, WES, MES or WMS systems, production machines, doors and elevators'; p.3 'The ER-FLEX can communicate with machines, electrical doors, elevators and other systems through OPC UA or REST. It also exposes a REST API for communication with your in-house ERP, WES, MES or WMS systems' -- WES has no matching AP0 allowed value and was not mapped to anything",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_enabled_robotics.json",
+      "opus_value": [
+        "ERP",
+        "MES",
+        "WMS",
+        "REST API",
+        "OPC-UA"
+      ],
+      "opus_source": "p.2 'it allows for communication with your ERP, WES, MES or WMS systems, production machines, doors and elevators'; p.3 COMMUNICATION 'through OPC UA or REST. It also exposes a REST API'. Canonicalised to AP0 forms — 'OPC UA' written with a space in the source is stored as 'OPC-UA'. 'WES' has no AP0 allowed value and is dropped.",
+      "opus_file": "docs/research_findings_opus_20260808_enabled_robotics.json"
+    },
+    {
+      "sonnet_product": "ER-FLEX",
+      "opus_product": "ER-FLEX 250",
+      "field": "workflow_capability",
+      "sonnet_value": [
+        "Transport",
+        "Picking support"
+      ],
+      "sonnet_source": "p.2 use-case list: 'PICK N' PLACE', 'MACHINE TENDING', 'LINESIDE DELIVERY' (Transport + item handling) and 'INSPECTION & DOCUMENTATION' (Picking support-adjacent quality/documentation task)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_enabled_robotics.json",
+      "opus_value": [
+        "Transport"
+      ],
+      "opus_source": "p.2 use-case tiles PICK N' PLACE and LINESIDE DELIVERY ('continuous replenishment of parts and items'). Only 'Transport' is proposed: 'Picking support' in AP0 means supporting a HUMAN picker, which is not what this robot does, and 'Goods-to-Person' is not claimed anywhere.",
+      "opus_file": "docs/research_findings_opus_20260808_enabled_robotics.json"
+    }
+  ],
+  "Geek+ (Geekplus Technology Co.)": [
+    {
+      "sonnet_product": "Geek+ P500R",
+      "opus_product": "Geek+ P500R",
+      "field": "max_speed",
+      "sonnet_value": 1.5,
+      "sonnet_source": "'BaseTravel Speed No-load 2m/s, full-load 1.5m/s' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 2.0,
+      "opus_source": "p.1, 'BaseTravel Speed — No-load 2m/s, full-load 1.5m/s'. Printed in m/s, AP0 unit m/s",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ P500R",
+      "opus_product": "Geek+ P500R",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.1, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ P800R",
+      "opus_product": "Geek+ P800R",
+      "field": "max_speed",
+      "sonnet_value": 2.0,
+      "sonnet_source": "'No-load 2.3m/s, full-load 2m/s' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 2.3,
+      "opus_source": "p.2, 'BaseTravel Speed — No-load 2.3m/s, full-load 2m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ P800R",
+      "opus_product": "Geek+ P800R",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.2, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ P1200R",
+      "opus_product": "Geek+ P1200R",
+      "field": "max_speed",
+      "sonnet_value": 2.2,
+      "sonnet_source": "'No-load 2.6m/s, full-load 2.2m/s' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 2.6,
+      "opus_source": "p.3, 'BaseTravel Speed — No-load 2.6m/s, full-load 2.2m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ P1200R",
+      "opus_product": "Geek+ P1200R",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.3, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle P40",
+      "opus_product": "Geek+ RoboShuttle P40",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.6, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ X1200Z",
+      "opus_product": "Geek+ X1200Z",
+      "field": "operating_temp_min",
+      "sonnet_value": -10,
+      "sonnet_source": null,
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": -25,
+      "opus_source": "p.1, 'Temperature: Room Temperature: -10~45 C / Cold Storage: 0~-25 C' — the Cold Storage build's -25 C is the lowest published figure",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ X1200Z",
+      "opus_product": "Geek+ X1200Z",
+      "field": "max_speed",
+      "sonnet_value": 1.5,
+      "sonnet_source": "'No-load 1.6m/s, full-load 1.5m/s' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1.6,
+      "opus_source": "p.1, 'BaseTravel Speed — No-load 1.6m/s, full-load 1.5m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS5-D",
+      "opus_product": "Geek+ RoboShuttle RS5-D",
+      "field": "max_speed",
+      "sonnet_value": 1.5,
+      "sonnet_source": "'No-load 1.8m/s, full-load 1.5m/s' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1.8,
+      "opus_source": "p.1, 'BaseTravel Speed — No-load 1.8m/s, full-load 1.5m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS5-D",
+      "opus_product": "Geek+ RoboShuttle RS5-D",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.1, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS8-DA",
+      "opus_product": "Geek+ RoboShuttle RS8-DA",
+      "field": "max_speed",
+      "sonnet_value": 1.5,
+      "sonnet_source": "'No-load 1.8m/s, full-load 1.5m/s'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1.8,
+      "opus_source": "p.2, 'BaseTravel Speed — No-load 1.8m/s, full-load 1.5m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS8-DA",
+      "opus_product": "Geek+ RoboShuttle RS8-DA",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.2, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS8-DX",
+      "opus_product": "Geek+ RoboShuttle RS8-DX",
+      "field": "max_speed",
+      "sonnet_value": 1.5,
+      "sonnet_source": "'No-load 1.8m/s, full-load 1.5m/s'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1.8,
+      "opus_source": "p.3, 'BaseTravel Speed — No-load 1.8m/s, full-load 1.5m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS8-DX",
+      "opus_product": "Geek+ RoboShuttle RS8-DX",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.3, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS11-DA",
+      "opus_product": "Geek+ RoboShuttle RS11-DA",
+      "field": "max_speed",
+      "sonnet_value": 1.2,
+      "sonnet_source": "'No-load 1.8m/s, full-load 1.2m/s' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1.8,
+      "opus_source": "p.4, 'BaseTravel Speed — No-load 1.8 m/s, full-load 1.2 m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS11-DA",
+      "opus_product": "Geek+ RoboShuttle RS11-DA",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.4, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS11-DX",
+      "opus_product": "Geek+ RoboShuttle RS11-DX",
+      "field": "max_speed",
+      "sonnet_value": 1.2,
+      "sonnet_source": "'No-load 1.8m/s, full-load 1.2m/s'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1.8,
+      "opus_source": "p.5, 'BaseTravel Speed — No-load 1.8 m/s, full-load 1.2 m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ RoboShuttle RS11-DX",
+      "opus_product": "Geek+ RoboShuttle RS11-DX",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "QR/DM Code"
+      ],
+      "sonnet_source": "'Inertia + QR code visual navigation'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": [
+        "QR/DM Code",
+        "Vision"
+      ],
+      "opus_source": "p.5, 'Navigation System — Inertia + QR code visual navigation'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ F12ML",
+      "opus_product": "Geek+ F12ML",
+      "field": "max_payload",
+      "sonnet_value": 1000,
+      "sonnet_source": "'0-2m: 1500kg / 2-2.5m: 1200kg / 2.5-3m: 1000kg' -- CONSERVATIVE (lowest, worst-case) figure at max lift height used per K.O.-field matrix policy; full derating curve noted here",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 1500,
+      "opus_source": "p.1, 'Payload Capacity — 0-2 m: 1500 kg / 2-2.5 m: 1200 kg / 2.5-3 m: 1000 kg'. Recorded the rated 1500 kg (the 0-2 m figure); see notes on the derating",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ S20T",
+      "opus_product": "Geek+ S20T V2.0",
+      "field": "max_speed",
+      "sonnet_value": 2.0,
+      "sonnet_source": "'Fully Loaded Speed: 2.0m/s' (Robot Max Speed unloaded: 2.5m/s, not used)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 2.5,
+      "opus_source": "p.1, 'Robot Max Speed: 2.5m/s' (BaseTravel Speed block); 'Fully Loaded Speed: 2.0m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ S20C",
+      "opus_product": "Geek+ S20C V2.0",
+      "field": "max_speed",
+      "sonnet_value": 2.0,
+      "sonnet_source": "'Fully Loaded Speed: 2.0m/s'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 2.5,
+      "opus_source": "p.2, 'Robot Max Speed: 2.5m/s'; 'Fully Loaded Speed: 2.0m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    },
+    {
+      "sonnet_product": "Geek+ S20C-A",
+      "opus_product": "Geek+ S20C-A V2.0",
+      "field": "max_speed",
+      "sonnet_value": 2.0,
+      "sonnet_source": "'Fully Loaded Speed: 2.0m/s'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "opus_value": 2.5,
+      "opus_source": "p.4, 'Robot Max Speed: 2.5m/s'; 'Fully Loaded Speed: 2.0m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_geekplus.json"
+    }
+  ],
+  "Grenzebach Maschinenbau GmbH": [
+    {
+      "sonnet_product": "Grenzebach FF1200S",
+      "opus_product": "Grenzebach FF1200S",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Contour"
+      ],
+      "sonnet_source": "p.2 table 'Navigation Contour navigation (Safety scanner scans the environment and compares with previously charted map)' -- exact AP0 allowed_value match",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_grenzebach.json",
+      "opus_value": [
+        "Natural Feature (SLAM)"
+      ],
+      "opus_source": "p.2, spec row 'Navigation Contour navigation (Safety scanner scans the environment and compares with previously charted map)' + p.2 prose 'The free contour navigation enables an easy integration'. AP0 hint maps 'contour-based' → 'Natural Feature (SLAM)'.",
+      "opus_file": "docs/research_findings_opus_20260808_grenzebach_addendum.json"
+    },
+    {
+      "sonnet_product": "Grenzebach OL1200S",
+      "opus_product": "Grenzebach OL1200S",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Contour",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "p.4 table 'Navigation Contour navigation (safety scanner detects surrounding and compares with internal map)' AND p.2 body text 'With smart sensors and SLAM navigation, the OL1200S reduces static peripheral requirements' -- both terms explicitly used in this document for the same product, recorded as two values",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_grenzebach.json",
+      "opus_value": [
+        "Natural Feature (SLAM)"
+      ],
+      "opus_source": "p.4, spec row 'Navigation Contour navigation (safety scanner detects surrounding and compares with internal map)' AND p.2 prose 'With smart sensors and SLAM navigation, the OL1200S reduces static peripheral requirements to a minimum' — the brochure names SLAM literally, so this mapping needs no interpretation",
+      "opus_file": "docs/research_findings_opus_20260808_grenzebach_addendum.json"
+    }
+  ],
+  "Hikrobot": [
+    {
+      "sonnet_product": "Hikrobot QF-1000D",
+      "opus_product": "Hikrobot Q7-1000D",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Natural Feature (SLAM)",
+        "QR/DM Code"
+      ],
+      "sonnet_source": "p.1 body bullet, shared with QF-600D (same flyer, one product family)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "opus_value": [
+        "Natural Feature (SLAM)",
+        "Vision",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.2, bullet 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes'",
+      "opus_file": "docs/research_findings_opus_20260808_hikrobot.json"
+    },
+    {
+      "sonnet_product": "Hikrobot QF-600D",
+      "opus_product": "Hikrobot Q7-600D",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Natural Feature (SLAM)",
+        "QR/DM Code"
+      ],
+      "sonnet_source": "p.1 body bullet 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes' -- V-SLAM/L-SLAM mapped to 'Natural Feature (SLAM)', 2D barcode mapped to 'QR/DM Code'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "opus_value": [
+        "Natural Feature (SLAM)",
+        "Vision",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.2, bullet 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes' → V-SLAM (visual SLAM) → 'Vision' + 'Natural Feature (SLAM)'; L-SLAM (laser SLAM) → 'Natural Feature (SLAM)'; '2D barcode' → 'QR/DM Code' per the AP0 hint's 'barcode' / 'data matrix' mapping",
+      "opus_file": "docs/research_findings_opus_20260808_hikrobot.json"
+    },
+    {
+      "sonnet_product": "Hikrobot QF-600D",
+      "opus_product": "Hikrobot Q7-600D",
+      "field": "max_speed",
+      "sonnet_value": 2.0,
+      "sonnet_source": "p.1 body bullet 'Max. running speed for differential AMR type is 2 m/s' + p.2 table 'Rated Running Speed (Empty/Rated Load)(mm/s)' = '1800/2000' -- converted 2000 mm/s (rated-load, conservative/worst-case figure, and matches the p.1 headline of 2 m/s exactly) to 2.0 m/s; printed empty-run figure was 1800 mm/s = 1.8 m/s, not used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "opus_value": 1.8,
+      "opus_source": "p.2, spec table row 'Rated Running Speed (Empty/Rated Load) (mm/s)  1800/2000' — printed unit is mm/s, AP0 unit is m/s → converted 1800 mm/s → 1.8 m/s. CONSERVATIVE value taken (see notes: the row's two figures are internally odd). Cross-check: p.2 bullet 'Max. running speed for differential AMR type is 2 m/s'.",
+      "opus_file": "docs/research_findings_opus_20260808_hikrobot.json"
+    },
+    {
+      "sonnet_product": "Hikrobot STU Series",
+      "opus_product": "Hikrobot STU MR-TP6-30SCH",
+      "field": "max_payload",
+      "sonnet_value": 50,
+      "sonnet_source": "p.2 spec table, 'Basic Parameters', 'Rated Load(kg) 30/50' -- dual rating for two adaptor variants (MR-TP6-30SCH / MR-TP6-30SCW), higher figure used as max_payload",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "opus_value": 30,
+      "opus_source": "p.2, 'Basic Parameters' block, row 'Execution Structure Rated Load(kg)  30/50' — CONSERVATIVE value (30) taken for this KO field; the flyer offers 30 or 50 kg execution structures without naming which is standard. SEE NOTES for a plausibility flag.",
+      "opus_file": "docs/research_findings_opus_20260808_hikrobot.json"
+    }
+  ],
+  "Jungheinrich AG": [
+    {
+      "sonnet_product": "EKX 514a",
+      "opus_product": "EKX 514a",
+      "field": "vehicle_width",
+      "sonnet_value": 1210,
+      "sonnet_source": "specsheet p.8 VDI table row 4.21.1 'Gesamtbreite (b1)' = 1210 mm, single value applying to all three EKX 5a variants (not split by column)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "opus_value": 1450,
+      "opus_source": "p.8, VDI row '4.21.2 Gesamtbreite b2 mm 1450' (over the load; row 4.21.1 gives b1 1210 over the chassis)",
+      "opus_file": "docs/research_findings_opus_20260808_jungheinrich.json"
+    },
+    {
+      "sonnet_product": "EAE 212a",
+      "opus_product": "EAE 212a",
+      "field": "min_total_height",
+      "sonnet_value": 2470,
+      "sonnet_source": "factsheet p.4 summary table 'Gesamthöhe 2470 mm'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "opus_value": 1891,
+      "opus_source": "p.4 footnote, 'VDI-Nr. 4.2.1: Gesamthöhe mit Optionsbügel **eingeklappt: 1891 mm**; ausgeklappt: 2470 mm' — took the folded height as the minimum, which is what the field name asks for; the VDI row 4.2.1 itself prints the deployed 2470 mm",
+      "opus_file": "docs/research_findings_opus_20260808_jungheinrich.json"
+    }
+  ],
+  "KIVNON Logística S.L.": [
+    {
+      "sonnet_product": "KIVNON K07",
+      "opus_product": "KIVNON K07",
+      "field": "max_speed",
+      "sonnet_value": 2.1,
+      "sonnet_source": "p.8, 'MAX. SPEED 2,1 – 2,5 m/s no load' -- lower/conservative end of the stated empty-load range used (no full-load figure is given on this page)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_kivnon.json",
+      "opus_value": 2.5,
+      "opus_source": "p.9, headline 'MAX. SPEED. 2,5 m/s' (spec row: '2,1 – 2,5 m/s no load')",
+      "opus_file": "docs/research_findings_opus_20260808_kivnon.json"
+    }
+  ],
+  "KNAPP AG": [
+    {
+      "sonnet_product": "KNAPP Open Shuttle 100",
+      "opus_product": "KNAPP Open Shuttle 100",
+      "field": "top_module_type",
+      "sonnet_value": [
+        "Roller"
+      ],
+      "sonnet_source": "p.15 STANDARD FEATURES badge 'Rollenfördertechnik' -> 'Roller'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Roller",
+        "Conveyor"
+      ],
+      "opus_source": "p.15, STANDARD FEATURES, 'Rollenfördertechnik — Lastaufnahmemittel'",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "KNAPP Open Shuttle 100",
+      "opus_product": "KNAPP Open Shuttle 100",
+      "field": "onboard_container_type",
+      "sonnet_value": [
+        "Bin"
+      ],
+      "sonnet_source": "p.14 'Ladungsträger: Behälter, Kartons, Trays' -> 'Bin'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Tote"
+      ],
+      "opus_source": "p.14, same row",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "KNAPP Open Shuttle Boxgrip",
+      "opus_product": "KNAPP Open Shuttle Boxgrip",
+      "field": "onboard_container_type",
+      "sonnet_value": [
+        "Bin"
+      ],
+      "sonnet_source": "p.18 'Behälter mit seitlichen Öffnungen zum Greifen' (bins with side openings for gripping) -> 'Bin'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Tote"
+      ],
+      "opus_source": "p.18, same row",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "KNAPP Open Shuttle 50 ASG",
+      "opus_product": "KNAPP Open Shuttle 50 ASG",
+      "field": "top_module_type",
+      "sonnet_value": [
+        "Roller"
+      ],
+      "sonnet_source": "p.23 STANDARD FEATURES badge 'Rollenfördertechnik' -> 'Roller'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Roller",
+        "Conveyor"
+      ],
+      "opus_source": "p.23, STANDARD FEATURES, 'Rollenfördertechnik — Lastaufnahmemittel'",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "KNAPP Open Shuttle 50 ASG",
+      "opus_product": "KNAPP Open Shuttle 50 ASG",
+      "field": "onboard_container_type",
+      "sonnet_value": [
+        "Bin"
+      ],
+      "sonnet_source": "p.22 'Ladungsträger: Leiterplatten-Magazine, Trays, Behälter, Kartons' -- 'Behälter' mapped to 'Bin'; circuit-board magazines have no closer AP0 allowed_value",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Tote"
+      ],
+      "opus_source": "p.22, same row",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "Open Shuttle Fork",
+      "opus_product": "KNAPP Open Shuttle Fork",
+      "field": "load_type",
+      "sonnet_value": [
+        "Pallet EUR",
+        "Half-Euro",
+        "Custom Carrier"
+      ],
+      "sonnet_source": "p.6 body text 'Paletten (Euro-, Industrie-, Halb- und Chep-Paletten), Gestelle, Regale, Sonderladungsträger' -- Euro-Paletten->Pallet EUR, Halb-Paletten->Half-Euro; Industrie-/Chep-Paletten and racks/shelves have no closer AP0 match than Custom Carrier",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Pallet EUR",
+        "Pallet ISO",
+        "Half-Euro",
+        "Custom Carrier"
+      ],
+      "opus_source": "p.6, 'Ladungsträger: Paletten (Euro-, Industrie-, Halb- und Chep-Paletten), Gestelle, Regale, Sonderladungsträger' → Euro-Palette = 'Pallet EUR'; Industriepalette (1200×1000) = 'Pallet ISO'; Halbpalette = 'Half-Euro'; Gestelle/Regale/Sonderladungsträger = 'Custom Carrier'. Chep pallets are additionally supported via the 'Chep-Paletten-Adapter' (p.7 add-on, repeated p.30).",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "Open Shuttle Fork",
+      "opus_product": "KNAPP Open Shuttle Fork",
+      "field": "min_aisle_width",
+      "sonnet_value": 1400,
+      "sonnet_source": "p.9 'OPEN SHUTTLE FORK: Einbahn (vmin) 1.400 mm' -- the narrowest one-way/minimum-speed corridor figure used as the vehicle's own minimum requirement; wider figures also printed for opposing traffic and max speed (Gegenverkehr vmin 2.700mm, Einbahn vmax 1.950mm, Gegenverkehr vmax 3.500mm, Drehkreis 2.700mm) but not used since min_aisle_width should reflect the narrowest condition the vehicle can actually operate in",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": 1950,
+      "opus_source": "p.9, aisle-geometry page: 'Einbahn (vmax) 1.950 mm'. SEE NOTES — this collapses a 2×2 configuration matrix (Einbahn/Gegenverkehr × vmin/vmax); the axis choice and the discarded cells are documented there.",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "Open Shuttle",
+      "opus_product": "KNAPP Open Shuttle 50",
+      "field": "top_module_type",
+      "sonnet_value": [
+        "Roller"
+      ],
+      "sonnet_source": "p.11 STANDARD FEATURES badge 'Rollenfördertechnik' (roller conveyor) mapped to AP0's 'Roller'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Roller",
+        "Conveyor"
+      ],
+      "opus_source": "p.11, STANDARD FEATURES, 'Rollenfördertechnik — Lastaufnahmemittel' → a powered roller deck",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    },
+    {
+      "sonnet_product": "Open Shuttle",
+      "opus_product": "KNAPP Open Shuttle 50",
+      "field": "onboard_container_type",
+      "sonnet_value": [
+        "Bin"
+      ],
+      "sonnet_source": "p.10 'Ladungsträger: Behälter (-Stapel), Kartons, Trays' -- 'Behälter' mapped to AP0's 'Bin'; cartons/trays have no closer AP0 allowed_value",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "opus_value": [
+        "Tote"
+      ],
+      "opus_source": "p.10, same row — containers/boxes/trays carried on the deck",
+      "opus_file": "docs/research_findings_opus_20260808_knapp.json"
+    }
+  ],
+  "Linde Material Handling": [
+    {
+      "sonnet_product": "Linde L-MATIC AC",
+      "opus_product": "Linde L-MATIC AC",
+      "field": "vehicle_length",
+      "sonnet_value": 2900,
+      "sonnet_source": null,
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 3270,
+      "opus_source": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) … 3270' (1.6 t columns)",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    },
+    {
+      "sonnet_product": "Linde L-MATIC AC",
+      "opus_product": "Linde L-MATIC AC",
+      "field": "vehicle_width",
+      "sonnet_value": 790,
+      "sonnet_source": null,
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 890,
+      "opus_source": "p.2, VDI row '4.21 Gesamtbreite b1/b2 (mm) 790/890' — took b2 (over the load arms) as the wider",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    },
+    {
+      "sonnet_product": "Linde L-MATIC AC k",
+      "opus_product": "Linde L-MATIC AC k",
+      "field": "vehicle_length",
+      "sonnet_value": 2768,
+      "sonnet_source": "VDI row 4.19, smaller config 'Gesamtlänge l1=2768mm' (larger config: 3133mm, not used)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 3133,
+      "opus_source": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 2768 | 3133' — 16 AC k column",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    },
+    {
+      "sonnet_product": "Linde L-MATIC",
+      "opus_product": "Linde L-MATIC",
+      "field": "min_aisle_width",
+      "sonnet_value": 2739,
+      "sonnet_source": "VDI row 4.34 'Arbeitsgangbreite bei Palette 800x1200 längs Ast=2739mm' (manual mode; autonomous-mode parenthetical value 2694mm not used)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 2868,
+      "opus_source": "p.2, VDI row '4.33 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast (mm) 2868 (2774)' — took the larger, unbracketed value (row 4.34, 800×1200 längs, gives 2739)",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    },
+    {
+      "sonnet_product": "Linde K-MATIC",
+      "opus_product": "Linde K-MATIC",
+      "field": "vehicle_length",
+      "sonnet_value": 3843,
+      "sonnet_source": null,
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 4258,
+      "opus_source": "p.2, VDI row '4.19 Overall length l1 (mm) 3843 | 4158 | 4258' — took the largest (the 14 m configuration, matching the DB's 14000 lift)",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    },
+    {
+      "sonnet_product": "Linde K-MATIC",
+      "opus_product": "Linde K-MATIC",
+      "field": "vehicle_width",
+      "sonnet_value": 1450,
+      "sonnet_source": null,
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 1750,
+      "opus_source": "p.2, VDI row '4.21 Overall width b1/b2 (mm) 1450/1600 | 1450/1650 | 1450/1750' — took b2 of the 14 m configuration",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    },
+    {
+      "sonnet_product": "Linde R-MATIC",
+      "opus_product": "Linde R-MATIC",
+      "field": "vehicle_width",
+      "sonnet_value": 1290,
+      "sonnet_source": null,
+      "sonnet_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "opus_value": 1570,
+      "opus_source": "p.2, VDI row '4.21 Overal width front b1/b2 (mm) 1290/1570' — took b2",
+      "opus_file": "docs/research_findings_opus_20260808_linde.json"
+    }
+  ],
+  "Mobile Industrial Robots A/S (MiR)": [
+    {
+      "sonnet_product": "MiR1200 Pallet Jack",
+      "opus_product": "MiR1200 Pallet Jack",
+      "field": "operating_temp_max",
+      "sonnet_value": 40,
+      "sonnet_source": "same table row -- the 1-hour-limited peak is 40°C",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 25,
+      "opus_source": "same row — continuous-use bound (25) taken conservatively, not the 1-hour peak (40)",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR250",
+      "opus_product": "MiR250",
+      "field": "min_ground_clearance",
+      "sonnet_value": 25,
+      "sonnet_source": "p.1 'Ground clearance 25-28mm' -- lower/conservative bound (25mm) used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 300,
+      "opus_source": "p.1, 'Dimensions' block, row 'Height  300 mm' — per the AP0 hint this field holds the ROBOT HEIGHT for under-ride workflows, NOT the chassis gap (see notes)",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR250",
+      "opus_product": "MiR250",
+      "field": "safety_standard",
+      "sonnet_value": [
+        "ISO 3691-4"
+      ],
+      "sonnet_source": "p.11 'Design based on principles in safety standards for industrial vehicles: ISO3691-4 (Except Clause 4.4, 4.9.4, 5.1, 6, and Annex A), ISO13849-1, ISO13850, ISO12100, ITSDF B56-5, RIA R15.08-1' -- ISO3691-4 mapped to AP0 exact allowed_value; note the source explicitly says compliance is PARTIAL (several clauses excepted), recorded as-is without that nuance since AP0 has no partial-compliance option",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": [
+        "ISO 3691-4",
+        "ANSI/ITSDF B56.5"
+      ],
+      "opus_source": "p.11, row 'Design based on principles in safety standards for industrial vehicles  ISO 3691-4 (Except Clause 4.4, 4.9.4, 5.1, 6, and Annex A), ISO 13849-1, ISO 13850, ISO 12100, ITSDF B56-5, RIA R15.08-1' → 'ISO 3691-4' + 'ANSI/ITSDF B56.5'. CAVEAT in notes.",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR250",
+      "opus_product": "MiR250",
+      "field": "operating_temp_max",
+      "sonnet_value": 40,
+      "sonnet_source": "same row, peak figure",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 25,
+      "opus_source": "p.11, same row — CONTINUOUS-USE upper bound (25) taken as the conservative value, not the 1-hour peak (40). See company_wide_context.",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR1350",
+      "opus_product": "MiR1350",
+      "field": "min_ground_clearance",
+      "sonnet_value": 25,
+      "sonnet_source": "p.1 'Ground clearance 25-27mm' -- lower/conservative bound used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 322,
+      "opus_source": "p.1, row 'Height  322 mm' — robot height per the AP0 hint, NOT the 'Ground clearance 25–27 mm' row",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR1350",
+      "opus_product": "MiR1350",
+      "field": "safety_standard",
+      "sonnet_value": [
+        "ISO 3691-4"
+      ],
+      "sonnet_source": "p.9 'ISO3691-4 (except Clause 4.4, 4.9.4, 5.1, 5.2, 6, and ...)' -- same partial-compliance caveat as MiR250",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": [
+        "ISO 3691-4",
+        "ANSI/ITSDF B56.5"
+      ],
+      "opus_source": "p.9–10, 'Compliance': 'Compliant with ... ISO 3691-4 (except Clause 4.4, 4.9.4, 5.1, 5.2, 6, and Annex A)' + 'Design based on principles in safety standards for industrial vehicles  ITSDF B56-5 and RIA R15.08-1'",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR1350",
+      "opus_product": "MiR1350",
+      "field": "operating_temp_max",
+      "sonnet_value": 40,
+      "sonnet_source": "same row, peak figure",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 25,
+      "opus_source": "p.9, same row — continuous-use bound taken conservatively",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR600",
+      "opus_product": "MiR600",
+      "field": "min_ground_clearance",
+      "sonnet_value": 25,
+      "sonnet_source": "p.1 'Ground clearance 25-27mm' -- lower/conservative bound used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 322,
+      "opus_source": "p.1, row 'Height  322 mm' — robot height per the AP0 hint, NOT the 'Ground clearance 25–27 mm' row (see notes)",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR600",
+      "opus_product": "MiR600",
+      "field": "safety_standard",
+      "sonnet_value": [
+        "ISO 3691-4"
+      ],
+      "sonnet_source": "p.9 'ISO3691-4 (except Clause 4.4, 4.9.4, 5.1, 5.2, 6, and ...)' -- same partial-compliance caveat as MiR250/MiR1350",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": [
+        "ISO 3691-4",
+        "ANSI/ITSDF B56.5"
+      ],
+      "opus_source": "p.9, 'Compliance' block: 'Compliant with ... ISO 3691-4 (except Clause 4.4, 4.9.4, 5.1, 5.2, 6, and Annex A)' and 'Design based on principles in safety standards for industrial vehicles  ITSDF B56-5 and RIA R15.08-1'. NOTE this sheet says 'Compliant with' for ISO 3691-4 — stronger wording than the MiR250 sheet's 'design based on principles in'.",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    },
+    {
+      "sonnet_product": "MiR600",
+      "opus_product": "MiR600",
+      "field": "operating_temp_max",
+      "sonnet_value": 40,
+      "sonnet_source": "same row, peak figure",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "opus_value": 25,
+      "opus_source": "p.9, same row — continuous-use bound (25) taken conservatively, not the 1-hour peak",
+      "opus_file": "docs/research_findings_opus_20260808_mir.json"
+    }
+  ],
+  "Omron Mobile Robotics": [
+    {
+      "sonnet_product": "Omron MD-650",
+      "opus_product": "Omron MD-650",
+      "field": "charge_time",
+      "sonnet_value": 20,
+      "sonnet_source": "p.6 Battery block, 'Recharge Time 19.6 minutes (from 20% to 80%)' -- rounded to nearest integer minute (field is Integer type)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "opus_value": 30,
+      "opus_source": "md-series_leaflet_en.pdf p.2, 'Charge Time < 30 minutes (5%-95%)'; the datasheet's battery block (i885_md_series…pdf p.6) gives 'Recharge Time 19.6 minutes (from 20% to 80%)*1'",
+      "opus_file": "docs/research_findings_opus_20260808_omron.json"
+    },
+    {
+      "sonnet_product": "Omron MD-900",
+      "opus_product": "Omron MD-900",
+      "field": "charge_time",
+      "sonnet_value": 20,
+      "sonnet_source": "p.6 Battery block, 'Recharge Time 19.6 minutes (from 20% to 80%)' (shared row)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "opus_value": 30,
+      "opus_source": "md-series_leaflet_en.pdf p.2, 'Charge Time < 30 minutes (5%-95%)'",
+      "opus_file": "docs/research_findings_opus_20260808_omron.json"
+    }
+  ],
+  "SAFELOG GmbH": [
+    {
+      "sonnet_product": "SAFELOG AGV L2 lift",
+      "opus_product": "SAFELOG L2 lift",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' -- loaded used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV L2 lift",
+      "opus_product": "SAFELOG L2 lift",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "same Standard localization list as sibling L2-core",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), inductive sensor' (Standard) / 'grid codes (only with LLS)' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, 'grid codes'->QR/DM Code. 'LiDAR (LLS)' left unmapped (reflector vs. natural-feature not stated).",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV M4 core",
+      "opus_product": "SAFELOG M4 core",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' -- loaded used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV M4 core",
+      "opus_product": "SAFELOG M4 core",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "'Localization: Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard column)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Vision"
+      ],
+      "opus_source": "p.3, PERFORMANCE, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, '2D camera'->Vision. NOT mapped: RFID and odometry (no AP0 allowed value), 'LiDAR (LLS)' (the document never says whether LLS is reflector-based or natural-contour, so it could be Laser Reflector OR Natural Feature (SLAM) - deliberately left unmapped).",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV M4 lift",
+      "opus_product": "SAFELOG M4 lift",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'; 1.6 m/s is the printed top speed (unloaded), 1.0 m/s is the loaded figure - see notes",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV M4 lift",
+      "opus_product": "SAFELOG M4 lift",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "same Standard localization list as M4-core",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Vision"
+      ],
+      "opus_source": "p.3, PERFORMANCE, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, '2D camera'->Vision. NOT mapped: RFID and odometry (no AP0 allowed value), 'LiDAR (LLS)' (the document never says whether LLS is reflector-based or natural-contour, so it could be Laser Reflector OR Natural Feature (SLAM) - deliberately left unmapped).",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV S3 tow",
+      "opus_product": "SAFELOG S3 tow",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV X1 lift 1200",
+      "opus_product": "SAFELOG X1 lift 1200",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'; p.2 prose 'driving speeds from 0.02 to 1.6 m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV X1 lift 1200",
+      "opus_product": "SAFELOG X1 lift 1200",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "same Standard localization list as X1-core",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Vision",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera, grid codes' (Optional). 'LiDAR (LLS)' left unmapped.",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV X1 spin",
+      "opus_product": "SAFELOG X1 spin",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV X1 spin",
+      "opus_product": "SAFELOG X1 spin",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "same Standard localization list as X1-core",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Vision",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera, grid codes' (Optional). 'LiDAR (LLS)' left unmapped.",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV GT1 spin",
+      "opus_product": "SAFELOG GT1 spin",
+      "field": "max_speed",
+      "sonnet_value": 2.0,
+      "sonnet_source": "body text 'Under full load, the robot can reach a top speed of up to 2.0m/s' (3.0m/s unloaded, not used)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 3.0,
+      "opus_source": "p.3, row 'Speed ([non]safe) (m/s)' = '0.02 - 2.0 [3.0]'; p.2 prose 'Under full load, the robot can reach a top speed of up to 2.0 m/s, while speeds of up to 3 m/s are possible without a payload' -> 3.0 recorded as top speed, 2.0 is the loaded/safety-rated figure",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV L2",
+      "opus_product": "SAFELOG L2 core",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'Speed 0.02-1/1.6 (w/o load)' -- loaded value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV L2",
+      "opus_product": "SAFELOG L2 core",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "'Localization: Magnetic track, RFID, LiDAR (LLS), inductive sensor' (Standard column; 'grid codes' listed as Optional-only, not included)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), inductive sensor' (Standard) / 'grid codes (only with LLS)' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, 'grid codes'->QR/DM Code. 'LiDAR (LLS)' left unmapped (reflector vs. natural-feature not stated).",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV M4",
+      "opus_product": "SAFELOG M4 tow",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV S3",
+      "opus_product": "SAFELOG S3 core",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV S3",
+      "opus_product": "SAFELOG S3 core",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "'Localization: Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard column)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Vision"
+      ],
+      "opus_source": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). 'LiDAR (LLS)' left unmapped.",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV X1",
+      "opus_product": "SAFELOG X1 core",
+      "field": "max_speed",
+      "sonnet_value": 1.0,
+      "sonnet_source": "'0.02-1/1.6 (w/o load)' loaded",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": 1.6,
+      "opus_source": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'; p.2 prose 'driving speeds from 0.02 to 1.6 m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV X1",
+      "opus_product": "SAFELOG X1 core",
+      "field": "navigation_type",
+      "sonnet_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Natural Feature (SLAM)"
+      ],
+      "sonnet_source": "'Localization: Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard); 'grid codes'/2D camera listed Optional-only",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Magnetic Tape",
+        "Inductive Loop",
+        "Vision",
+        "QR/DM Code"
+      ],
+      "opus_source": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera, grid codes' (Optional). 'LiDAR (LLS)' left unmapped.",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    },
+    {
+      "sonnet_product": "SAFELOG AGV XS1",
+      "opus_product": "SAFELOG XS1 IntelliCart",
+      "field": "onboard_container_type",
+      "sonnet_value": [
+        "Bin"
+      ],
+      "sonnet_source": "body text 'designed to accommodate standard KLTs and boxes' -- KLT (small-parts container) mapped to AP0's 'Bin'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "opus_value": [
+        "Tote",
+        "Bin"
+      ],
+      "opus_source": "p.2 prose 'standard KLTs and boxes'",
+      "opus_file": "docs/research_findings_opus_20260808_safelog.json"
+    }
+  ],
+  "STILL GmbH": [
+    {
+      "sonnet_product": "EXV iGo",
+      "opus_product": "EXV iGo",
+      "field": "min_aisle_width",
+      "sonnet_value": 2925,
+      "sonnet_source": "p.6, VDI table row 4.34.2 'Arbeitsgangbreite bei Palette 800x1200 längs Ast' = 2925mm -- used the smaller of the two documented aisle-width figures (vs. 4.34.1's 3075mm for 1000x1200 quer), consistent with this project's established 'tightest documented Ast' convention",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 3075,
+      "opus_source": "iGo_systems_DE_TD.pdf p.6, VDI row '4.34.1 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast mm 3075'",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "EXV iGo",
+      "opus_product": "EXV iGo",
+      "field": "min_total_height",
+      "sonnet_value": 2443,
+      "sonnet_source": "p.6, VDI table row 4.7 'Höhe Schutzdach h6' = 2443mm (overhead guard height, mast collapsed)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 1915,
+      "opus_source": "iGo_systems_DE_TD.pdf p.6, VDI row '4.2 Höhe Hubgerüst eingefahren h1 mm 1915' (also the lowest 'Bauhöhe h1' in the mast table on the same page)",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "FM-X 12 iGo",
+      "opus_product": "FM-X 12 iGo",
+      "field": "min_aisle_width",
+      "sonnet_value": 2975,
+      "sonnet_source": "p.10, VDI table, FM-X 12 iGo column, row 4.34.1 'Arbeitsgangbreite bei Palette 1000x1200 quer Ast' = 2975mm (smaller of the two documented Ast figures for this column)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 3000,
+      "opus_source": "iGo_systems_DE_TD.pdf p.10, VDI row '4.34.2 Arbeitsgangbreite bei Palette 800 x 1200 längs Ast mm 3000' (row 4.34.1, 1000×1200 quer, gives 2975 — took the larger)",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "FM-X 12 iGo",
+      "opus_product": "FM-X 12 iGo",
+      "field": "lifting_height",
+      "sonnet_value": 5532,
+      "sonnet_source": "p.10, VDI table, FM-X 12 iGo column, row 4.4 'Hub h3' = 5532mm (base config)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 9450,
+      "opus_source": "iGo_systems_DE_TD.pdf p.11, 'FM-X 12 iGo – FM-X 14 iGo / Dreifach-Hubgerüst' mast table, highest column: 'Einlagerhöhe mm ... 9450' (with 'Hub h3 mm ... 9582')",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "FM-X 14 iGo",
+      "opus_product": "FM-X 14 iGo",
+      "field": "min_aisle_width",
+      "sonnet_value": 3000,
+      "sonnet_source": "p.10, VDI table, FM-X 14 iGo column, row 4.34.1",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 3025,
+      "opus_source": "iGo_systems_DE_TD.pdf p.10, row 4.34.2 (800×1200 längs) = 3025; row 4.34.1 (1000×1200 quer) = 3000 — larger taken",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "FM-X 14 iGo",
+      "opus_product": "FM-X 14 iGo",
+      "field": "lifting_height",
+      "sonnet_value": 5532,
+      "sonnet_source": "p.10, VDI table, FM-X 14 iGo column, row 4.4 'Hub h3' = 5532mm",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 9450,
+      "opus_source": "iGo_systems_DE_TD.pdf p.11, 'FM-X 12 iGo – FM-X 14 iGo' mast table, max 'Einlagerhöhe mm 9450'",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "FM-X 17 iGo",
+      "opus_product": "FM-X 17 iGo",
+      "field": "lifting_height",
+      "sonnet_value": 5532,
+      "sonnet_source": "p.10, VDI table, FM-X 17 iGo column, row 4.4 'Hub h3' = 5532mm",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 9450,
+      "opus_source": "iGo_systems_DE_TD.pdf p.11 — NOTE: the mast tables on p.11 are headed 'FM-X 12 iGo – FM-X 14 iGo', 'FM-X 20 iGo' and 'FM-X 25 iGo'; there is NO explicit FM-X 17 mast table. 9450 mm is carried over on the basis that all three printed tables end at the same 9450 mm Einlagerhöhe. Weaker evidence than the other four variants — flagged.",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "FM-X 20 iGo",
+      "opus_product": "FM-X 20 iGo",
+      "field": "lifting_height",
+      "sonnet_value": 5362,
+      "sonnet_source": "p.10, VDI table, FM-X 20 iGo column, row 4.4 'Hub h3' = 5362mm",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 9450,
+      "opus_source": "iGo_systems_DE_TD.pdf p.11, 'FM-X 20 iGo / Dreifach-Hubgerüst' mast table, max 'Einlagerhöhe mm 9450' (Hub h3 9582)",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    },
+    {
+      "sonnet_product": "MX-X iGo",
+      "opus_product": "MX-X iGo",
+      "field": "max_speed",
+      "sonnet_value": 3.0,
+      "sonnet_source": "p.12, VDI table, row 5.1 'Fahrgeschwindigkeit (abhängig vom Sicherheitskonzept)' = '1,2/2,0/3,0 m/s' (3 safety-configuration-dependent speed tiers) -- the TOP tier (3.0 m/s) was used, matching the same figure independently given in AGV-Overview_DE_Flyer.pdf's summary table for MX-X iGo ('3,0 m/s')",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_still.json",
+      "opus_value": 1.2,
+      "opus_source": "iGo_systems_DE_TD.pdf p.12, VDI row '5.1 Fahrgeschwindigkeit m/s 1,2/2,0/3,0 (abhängig vom Sicherheitskonzept)'",
+      "opus_file": "docs/research_findings_opus_20260808_still.json"
+    }
+  ],
+  "Toyota Material Handling Europe": [
+    {
+      "sonnet_product": "Toyota RAE160 Autopilot",
+      "opus_product": "Toyota RAE160 Autopilot",
+      "field": "load_detection",
+      "sonnet_value": [
+        "Mechanical/Tactile",
+        "Camera/Vision"
+      ],
+      "sonnet_source": "p.5 feature list 'Load presence and push detection' (Mechanical/Tactile) + 'Advanced vision aided load handling (optional)' (Camera/Vision)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "opus_value": [
+        "Camera/Vision",
+        "Barcode/DataMatrix"
+      ],
+      "opus_source": "p.5 'Advanced vision aided load handling (optional)', 'Multi load detection (optional)', 'Barcode scanner (optional)'",
+      "opus_file": "docs/research_findings_opus_20260808_toyota_part1.json"
+    },
+    {
+      "sonnet_product": "Toyota RAE160 Autopilot",
+      "opus_product": "Toyota RAE160 Autopilot",
+      "field": "min_aisle_width",
+      "sonnet_value": 2694,
+      "sonnet_source": "p.4 'Aisle width Auto mode' table, RAE160 row, 'Rotate on point' mode, 275mm battery compartment, load 800(length)x1200(width)mm = 2694mm (smallest documented figure for this model)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "opus_value": 3096,
+      "opus_source": "p.4 'Aisle width Auto mode', RAE160 / Triplex hilo-B / 491 mm battery compartment / load 1200x800 / 'Ast Rotate on point, PPS Muted' = 3096. Range across the 275/347/419/491 mm battery compartments for that same load: 2888-3096 mm; across ALL load footprints and both manoeuvre modes: 2683-3238 mm.",
+      "opus_file": "docs/research_findings_opus_20260808_toyota_part1.json"
+    },
+    {
+      "sonnet_product": "Toyota RAE200 Autopilot",
+      "opus_product": "Toyota RAE200 Autopilot",
+      "field": "lifting_height",
+      "sonnet_value": 9500,
+      "sonnet_source": "p.3 footnote 'Max lift height 9500mm' (applies to the 347/419/491mm battery compartments used by RAE200); the printed Mast Dimensions table itself extends to 10000mm, an inconsistency with the footnote, flagged in researcher_notes",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "opus_value": 10000,
+      "opus_source": "p.3 'Mast dimensions', RAE200 row 'Lift height h23 mm ... 10000' (Triplex Hi-Lo B and C)",
+      "opus_file": "docs/research_findings_opus_20260808_toyota_part1.json"
+    },
+    {
+      "sonnet_product": "Toyota RAE200 Autopilot",
+      "opus_product": "Toyota RAE200 Autopilot",
+      "field": "load_detection",
+      "sonnet_value": [
+        "Mechanical/Tactile",
+        "Camera/Vision"
+      ],
+      "sonnet_source": "p.5 feature list 'Load presence and push detection' + 'Advanced vision aided load handling (optional)'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "opus_value": [
+        "Camera/Vision",
+        "Barcode/DataMatrix"
+      ],
+      "opus_source": "p.5 'Advanced vision aided load handling (optional)' / 'Multi load detection (optional)' / 'Barcode scanner (optional)'",
+      "opus_file": "docs/research_findings_opus_20260808_toyota_part1.json"
+    },
+    {
+      "sonnet_product": "Toyota RAE200 Autopilot",
+      "opus_product": "Toyota RAE200 Autopilot",
+      "field": "min_aisle_width",
+      "sonnet_value": 2801,
+      "sonnet_source": "p.4 aisle-width table, RAE200 row, 'Rotate on point' mode, smallest available (347mm) battery compartment, load 800x1200mm = 2801mm",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "opus_value": 3145,
+      "opus_source": "p.4, RAE200 / Triplex hilo-C / 491 mm battery / load 1200x800 / rotate on point = 3145. Range for that load across B and C masts and 347/419/491 mm batteries: 2983-3145 mm; across all loads and both modes: 2781-3283 mm.",
+      "opus_file": "docs/research_findings_opus_20260808_toyota_part1.json"
+    },
+    {
+      "sonnet_product": "Toyota Autopilot SAI125CB",
+      "opus_product": "Toyota Autopilot SAI125CB",
+      "field": "load_detection",
+      "sonnet_value": "Mechanical/Tactile",
+      "sonnet_source": "p.4 feature list 'Load detection & fork tip sensors'",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "opus_value": [
+        "Barcode/DataMatrix",
+        "RFID",
+        "Mechanical/Tactile"
+      ],
+      "opus_source": "p.4, features 'Barcode scanner (optional)', 'RFID scanner (optional)', 'Load detection & fork tip sensors'",
+      "opus_file": "docs/research_findings_opus_20260808_toyota_part1.json"
+    }
+  ],
+  "VisionNav Robotics": [
+    {
+      "sonnet_product": "VisionNav VNP15",
+      "opus_product": "VisionNav VNP15",
+      "field": "min_aisle_width",
+      "sonnet_value": 3200,
+      "sonnet_source": "CONSERVATIVE (worst-case/largest) value used per K.O.-field variant-matrix policy: p.2 table shows 'Min. Stacking Aisle Width ... 3150mm' for the first configuration (turning radius 1423mm), p.4 table shows 3200mm for the second configuration (turning radius 1529mm, stand-up-manual operation mode) -- 3200mm recorded since a KO_IF_LT-style disqualification check must not understate the aisle width the vehicle actually needs",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "opus_value": 3150,
+      "opus_source": "p.1 headline stat block, '3150mm Min. Stacking Aisle Width'",
+      "opus_file": "docs/research_findings_opus_20260808_visionnav_catalogs.json"
+    },
+    {
+      "sonnet_product": "VisionNav VNP15",
+      "opus_product": "VisionNav VNP15",
+      "field": "max_speed",
+      "sonnet_value": 1.3,
+      "sonnet_source": "p.2/p.4 'MOTION PERFORMANCE' tables, straight forward speed (Full-Load/Empty-Load) '1.3m/s, 1.5m/s' (both configs identical) -- loaded (conservative) value used",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "opus_value": 1.5,
+      "opus_source": "p.1 headline stat block, '1.5m/s Max. Safety Driving Speed'",
+      "opus_file": "docs/research_findings_opus_20260808_visionnav_catalogs.json"
+    },
+    {
+      "sonnet_product": "VisionNav VNQ40-07",
+      "opus_product": "VisionNav VNQ40(VM)-07",
+      "field": "max_speed",
+      "sonnet_value": 1.3,
+      "sonnet_source": "p.17, 'Straight Forward (Head Direction) Full-Load/Empty-Load 1.3m/s, 1.5m/s' -- conservative (loaded) figure used, per this batch's established convention",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "opus_value": 1.5,
+      "opus_source": "p.17, 'Maximum Driving Speed / Straight Forward (Head Direction) Full-Load/Empty-Load: 1.3m/s, 1.5m/s (2.90mph , 3.36mph)'",
+      "opus_file": "docs/research_findings_opus_20260808_visionnav_catalogs.json"
+    },
+    {
+      "sonnet_product": "VisionNav VNQ60-07",
+      "opus_product": "VisionNav VNQ60(VM)-07",
+      "field": "max_speed",
+      "sonnet_value": 1.3,
+      "sonnet_source": "p.17, shared row (conservative loaded figure 1.3 m/s)",
+      "sonnet_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "opus_value": 1.5,
+      "opus_source": "p.17, 'Straight Forward (Head Direction) Full-Load/Empty-Load: 1.3m/s, 1.5m/s'",
+      "opus_file": "docs/research_findings_opus_20260808_visionnav_catalogs.json"
+    }
+  ]
+}

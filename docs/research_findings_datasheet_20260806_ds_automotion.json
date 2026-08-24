@@ -1,0 +1,161 @@
+{
+  "company": "DS Automotion GmbH",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. This is the COMPANY-WIDE INFRASTRUCTURE/SOFTWARE example for this run: two documents describe DS Automotion's software stack (NAVIOS fleet manager + ARCOS onboard vehicle software), not any single vehicle -- 'Navios-OnePager-2025-DE.pdf' (2pp) and 'Planbare_Autonomie_Broschuere_DE.pdf' (12pp, 'ARCOS verbindet AGV und AMR'). Both explicitly and repeatedly state VDA 5050 compatibility as a headline feature ('Zentrale Intelligenz, VDA 5050 inklusive' / 'integrierte VDA 5050 Schnittstelle' / cover page badge 'VDA 5050 & LIF kompatibel'). No individual product datasheets were processed in this run for DS Automotion -- see coverage report for the many AMADEUS/AMY/ARNY/LUCY/OSCAR/SALLY one-pagers still sitting in New/ for a future batch. IMPORTANT FOR IMPORT: per the agent workflow, these company-wide fields are stored at Base-Model granularity in the schema, not at Company granularity -- they must be fanned out to EVERY DS Automotion base model (AMADEUS Classic/Counter/Grip/Low/Rack/Tugger/Wide, AMY Deck/Lift, ARNY Duplex/HD Triplex/Mono/Triplex, FLEXIHAULER, LUCY, OSCAR Omni/Omni XL/Spin 180/Spin 360, ROLLGANG Doppel/Mono, SALLY/Kurier/Rollgang) at import time, respecting the 'never overwrite non-null' rule per base model individually (some DS Automotion base models may already have these fields filled from a prior research batch and should not be blindly overwritten). ADDENDUM (continuation run, same calendar day): processed 8 one-pager files covering AMADEUS/AMY/ARNY/LUCY/OSCAR/SALLY. Almost all core KO fields (max_payload, lifting_height, max_speed) for these products were ALREADY comprehensively filled in a prior general research batch (not this agent's own earlier runs) and cross-checked cleanly against these one-pagers with no conflicts except where noted below.",
+  "company_wide_context": {
+    "source_file": "Navios-OnePager-2025-DE.pdf + Planbare_Autonomie_Broschuere_DE.pdf",
+    "fields": {
+      "vda5050_compatible": true,
+      "fleet_management_system": "VDA 5050 compatible",
+      "fleet_control_architecture": "Hybrid",
+      "multi_fleet_capable": true,
+      "autonomous_obstacle_bypass": true,
+      "integration_capability": [
+        "ERP"
+      ]
+    },
+    "field_sources": {
+      "vda5050_compatible": "NAVIOS onepager p.1 headline 'Zentrale Intelligenz, VDA 5050 inklusive' and body text 'Eine zuverlässige Einbindung von Fremdfahrzeugen ist durch die VDA 5050 problemlos möglich'; ARCOS brochure p.5 'integrierte VDA 5050 Schnittstelle' and back cover badge 'VDA 5050 & LIF kompatibel'",
+      "fleet_management_system": "same sources as above -- both NAVIOS (control tower) and ARCOS (onboard) are built around a standardised VDA5050 interface, explicitly stated to also communicate with THIRD-PARTY VDA5050 control towers, not only DS Automotion's own",
+      "fleet_control_architecture": "ARCOS brochure p.8 'kooperative Navigation ... ohne dabei auf ein zentrales Verkehrssteuerungssystem vertrauen zu müssen' (decentralized/cooperative intersection negotiation) combined with p.4/p.8 'in Verbindung mit dem Flottenmanager NAVIOS werden zudem auch gegenseitige Blockierungen verhindert' (central fleet manager still coordinates) -- read as Hybrid (decentralized reactive/cooperative navigation + centralized order/fleet management), not a fully centralized or fully decentralized architecture",
+      "multi_fleet_capable": "NAVIOS onepager p.1 'Eine zuverlässige Einbindung von Fremdfahrzeugen ist durch die VDA 5050 problemlos möglich' (reliable integration of third-party vehicles via VDA5050)",
+      "autonomous_obstacle_bypass": "ARCOS brochure p.5/p.6 'Hindernisse können effizient umfahren werden' and p.4 'Autonome Funktionen wie die freie Bahnplanung zum Umfahren von Hindernissen erhöhen die Flexibilität'",
+      "integration_capability": "NAVIOS onepager p.2 'Aufträge können ... über die Anbindung eines ERP-Systems' erzeugt werden -- only ERP is explicitly named; no SAP/MES/REST API/MQTT/OPC-UA/Modbus term appears anywhere in either document, so nothing else was added"
+    },
+    "applies_to": "all base models of this company (DS Automotion GmbH)",
+    "notes": "navigation_type was deliberately NOT included as a company-wide field despite ARCOS brochure p.9 listing 'Virtuell Spurgeführt / Teilautonom / Autonom' (Navigation) and 'Konturbasiert / Laser / Magnetgrid' (Lokalisierung) -- these terms don't map cleanly 1:1 onto the AP0 allowed_values list (['Laser Reflector','Natural Feature (SLAM)','Magnetic Tape','QR/DM Code','Contour','Inductive Loop','Vision']); 'Magnetgrid' in particular is a magnetic-grid/marker technology distinct from 'Magnetic Tape' and 'Laser' alone is ambiguous between reflector-based and SLAM-based use, and DS Automotion's whole positioning (ARCOS combining AGV+AMR modes per vehicle/zone) suggests navigation_type genuinely VARIES per base model/zone configuration rather than being a fixed company-wide constant -- left for per-product extraction instead of forcing a guess here."
+  },
+  "products": [
+    {
+      "product_name": "ARNY Mono / ARNY Duplex / ARNY Triplex / ARNY HD Triplex",
+      "product_type": "Forklift AGV",
+      "source_file": "Arny-OnePager-2026-DE.pdf",
+      "db_status": "enrich",
+      "variant_group": "ARNY counterbalance-truck family, shares chassis, differs by mast type/lift height",
+      "fields": {
+        "min_aisle_width": 3700
+      },
+      "field_sources": {
+        "min_aisle_width": "p.2, body text 'kompakte Bauweise für das effiziente Navigieren in engen Gassen ab 3,7 m Breite' -- a single family-wide claim, applied identically to all 4 ARNY variants since the datasheet does not differentiate it by mast type"
+      },
+      "notes": "Cross-checked the p.2 comparison table (mono/duplex/triplex/triplex HD columns) against all 4 DB rows: max_payload (1500/1200/1000/1000), lifting_height (1500/4500/7400/10800mm from 'Hub' row in meters), max_speed (1.5 m/s all four) -- every single value matches the DB exactly, a clean full cross-validation with zero conflicts. min_aisle_width is a genuinely new KO field for all 4 variants."
+    },
+    {
+      "product_name": "LUCY",
+      "product_type": "Forklift AGV",
+      "source_file": "Lucy-OnePager-2026-DE.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 1.6
+      },
+      "field_sources": {
+        "max_speed": "p.2, 'Technische Details' block, 'Geschwindigkeit: max. 1,6 m/s'"
+      },
+      "notes": "max_payload=500 and lifting_height=600 already filled in DB, both match this datasheet exactly ('Transportgewicht: max. 500 kg', 'Hub: 600 mm'), no conflict."
+    },
+    {
+      "product_name": "OSCAR Spin 180",
+      "product_type": "Mobile AMR",
+      "source_file": "OSCAR-OnePager-2025-DE.pdf",
+      "db_status": "enrich",
+      "variant_group": "OSCAR underride-transport family (spin 180/spin 360/omni), shares chassis, differs by rotation capability and lift height",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "min_ground_clearance": {
+          "db_value": 260,
+          "datasheet_value": "25 (p.2, body text 'bietet die OSCAR-Baureihe eine mit 25 mm ausreichend große Bodenfreiheit' -- stated once, applying to the whole OSCAR line, not per-model)",
+          "note": "Not overwritten. DB's existing per-model values (260/295/320mm for spin180/spin360/omni respectively) suspiciously match this SAME document's own vehicle-dimension table's third/height figures (1620x560x260, 1620x712x295, 1520x720x320mm L x W x H) rather than a literal ground-clearance measurement -- strongly suggests the DB's min_ground_clearance field was originally populated from a vehicle-HEIGHT figure, not true ground clearance. Flagged as a likely field-semantics mix-up from an earlier research batch, not resolved here since the field is non-null (Blank≠Zero rule -- never silently overwrite)."
+        }
+      },
+      "notes": "lift_height=80 already matches this datasheet's 'Hub: 80mm / 130mm / 160mm' first (spin180) value, vehicle_length=1620/vehicle_width=560 match the dimension table's first triplet exactly -- confirms this positional mapping (spin180=1st column, spin360=2nd, omni=3rd) used for the ground-clearance flag above. No new fields addable for spin180 itself beyond what's already filled; the min_ground_clearance flag is the main finding."
+    },
+    {
+      "product_name": "OSCAR Spin 360",
+      "product_type": "Mobile AMR",
+      "source_file": "OSCAR-OnePager-2025-DE.pdf",
+      "db_status": "enrich",
+      "variant_group": "OSCAR underride-transport family (spin 180/spin 360/omni), shares chassis, differs by rotation capability and lift height",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "min_ground_clearance": {
+          "db_value": 295,
+          "datasheet_value": "25 (same shared OSCAR-line claim as spin180, see that entry's conflict note for the full explanation)",
+          "note": "Not overwritten. Same likely height-vs-clearance field mix-up as OSCAR Spin 180."
+        }
+      },
+      "notes": "lift_height=130 matches this datasheet's second 'Hub' value exactly. vehicle_length=1670/vehicle_width=700 (DB) vs this datasheet's second dimension-table triplet 1620x712 -- a minor (~3%) mismatch, not flagged as a hard conflict given it's close and could be a rounding/revision difference, but noted for a reviewer's awareness."
+    },
+    {
+      "product_name": "OSCAR Omni",
+      "product_type": "Mobile AMR",
+      "source_file": "OSCAR-OnePager-2025-DE.pdf",
+      "db_status": "conflict",
+      "variant_group": "OSCAR underride-transport family (spin 180/spin 360/omni), shares chassis, differs by rotation capability and lift height",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "lift_height": {
+          "db_value": 200,
+          "datasheet_value": "160 (p.2, 'Hub: 80 mm / 130 mm / 160 mm' -- third value, positionally corresponding to 'omni' per the spin180/spin360/omni column order used consistently elsewhere on the same page)",
+          "note": "Not overwritten. Positional mapping is inferred from consistent column ordering elsewhere in the document (dimension table, underride-clearance table), not from an explicit 'omni: 160mm' label -- flagged with that caveat, but the same ordering held correctly for spin180 (80mm, matches DB) and spin360 (130mm, matches DB), which supports the mapping."
+        },
+        "min_ground_clearance": {
+          "db_value": 320,
+          "datasheet_value": "25 (same shared OSCAR-line claim, see OSCAR Spin 180's conflict note)",
+          "note": "Not overwritten. Same likely height-vs-clearance field mix-up as its siblings."
+        }
+      },
+      "notes": "vehicle_length=1520/vehicle_width=720 (DB) match this datasheet's third dimension-table triplet (1520x720) exactly, which is why the positional inference for the lift_height conflict above is considered reasonably reliable despite not being an explicit per-model label."
+    },
+    {
+      "product_name": "SALLY",
+      "product_type": "Mobile AMR",
+      "source_file": "SALLY-OnePager-2024-DE.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "ingress_protection_rating": "IP44"
+      },
+      "field_sources": {
+        "ingress_protection_rating": "p.2, body text 'kommt mit einer IP-Schutzklasse von IP44'"
+      },
+      "notes": "max_payload=100 and max_speed=1.6 already filled in DB, both match this datasheet exactly ('Transportgewicht max. 100 kg', 'Geschwindigkeit max. 1,6 m/s' / 'bis 1,6 m/s'), no conflict."
+    },
+    {
+      "product_name": "SALLY Kurier",
+      "product_type": "Mobile AMR",
+      "source_file": "SALLY_Kurier-OnePager-2024-DE.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 1.0
+      },
+      "field_sources": {
+        "max_speed": "p.2, 'Technische Details' block, 'Geschwindigkeit max. 1,0 m/s'"
+      },
+      "notes": "max_payload=50 already filled in DB, matches this datasheet exactly ('Transportgewicht max. 50 kg'). This datasheet explicitly states 'SLAM' (Simultaneous Localization and Mapping) navigation technology, while the DB's existing navigation_type field only has 'Contour' (not also 'Natural Feature (SLAM)') -- not added here since the field is already non-null and appending to an existing multi-select wasn't judged safe to do unilaterally; flagged for reviewer consideration."
+    },
+    {
+      "product_name": "AMADEUS Grip",
+      "product_type": "Forklift AGV",
+      "source_file": "AMADEUS_Grip_Onepager_2022_DE.pdf",
+      "db_status": "conflict",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "max_payload": {
+          "db_value": 2000,
+          "datasheet_value": "800 (p.2, 'Mit einer Nutzlast von max. 800 kg schafft es der AMADEUS 2 Blöcke...' and technical-data block 'Nutzlast: bis 800 kg')",
+          "note": "Not overwritten. This document is a customer-application case study specifically for insulation-material ('Dämmstoffe') handling, describing an AMADEUS Grip configured for a specific clamping/block-transport task -- may represent a reduced-capacity/specialized configuration rather than the general product's rated max payload. Flagged for Tech Lead judgment rather than assumed to be either right or wrong."
+        },
+        "lifting_height": {
+          "db_value": 2880,
+          "datasheet_value": "600 (p.2 technical-data block 'Hubhöhe: 85-600 mm')",
+          "note": "Not overwritten. Same case-study-vs-general-spec caveat as max_payload above -- this figure is dramatically lower than the DB's 2880mm and than the general 'AMADEUS' one-pager's own 2800mm duplex-mast range, suggesting this specific Dämmstoff application uses a shorter-stroke Grip variant."
+        }
+      },
+      "notes": "The general 'AMADEUS' family one-pager (AMADEUS-OnePager-2025-DE.pdf, also processed this run) gives max_payload 'bis max. 2.000 kg' and Grip-specific 'Hubhöhe bis max. 2.800 mm' -- both close to the DB's existing AMADEUS Grip values (2000kg / 2880mm respectively), i.e. the GENERAL one-pager corroborates the DB and does NOT conflict; only the separate customer-application Dämmstoff-specific one-pager conflicts, supporting the 'specialized configuration' explanation above rather than a DB data error. No new fields added for AMADEUS Grip from the general one-pager since every value it states is already non-null in the DB and matches."
+    }
+  ]
+}

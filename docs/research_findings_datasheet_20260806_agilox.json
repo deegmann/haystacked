@@ -1,0 +1,85 @@
+{
+  "company": "AGILOX Services GmbH",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "FULL-BATCH CONTINUATION RUN. Source files are a mix of PDF product sheets (Agilox ODM.pdf, Agilox OFL.pdf, Agilox One.pdf) and one saved HTML product page ('AGILOX  OCF.html', double space is part of the actual filename) -- the HTML file required stripping tags with a small regex script (no PDF text extraction tool applicable) since it is a full saved webpage including tracking-script boilerplate; the actual product spec content was found deep in the page body after ~140K characters of JS/cookie-consent noise. All 4 products already exist in DB (company AGILOX Services GmbH already has 6 products: NFK, OCF, ODM 600/800, OFL, ONE, OPS) -- all db_status=enrich except where noted. RECURRING RADIUS/DIAMETER FLAG (see agent memory, still unresolved by Tech Lead): every single AGILOX sheet processed this run prints a 'Drehkreis' or 'minimaler Drehkreis' (turning CIRCLE, not radius) figure -- consistently NOT written to min_turning_radius, per the established convention, even where the DB already has min_turning_radius=0 pre-filled (that pre-existing 0 describes a different claim -- in-place rotation capability -- not contradicted by a distinct 'sweep envelope while cornering' Drehkreis figure, so not flagged as a conflict either). agilox-corporate-folder-o-de_02_2026_web.pdf (48pp company brochure) was skimmed only for company-level facts (confirms Austria HQ, already correctly set as country='AT' in DB) -- not used for per-product technical fields since all 4 individual product sheets already provided richer, more precise data; not deeply mined for AGILOX NFK or AGILOX OPS (which have no individual datasheet in this batch) due to time budget, flagged as a good target for a future session.",
+  "products": [
+    {
+      "product_name": "AGILOX OCF",
+      "product_type": "Forklift AGV",
+      "source_file": "AGILOX  OCF.html",
+      "db_status": "conflict",
+      "fields": {
+        "max_speed": 1.4,
+        "vehicle_length": 2784,
+        "vehicle_width": 1200,
+        "min_total_height": 2560
+      },
+      "field_sources": {
+        "max_speed": "'1,4 m/s ... maximale Geschwindigkeit' (hero stat block)",
+        "vehicle_length": "'TECHNISCHE DETAILS' table, 'ABMASSE (L x B x H) 2.784 x 1.200 x 2.566 MM'",
+        "vehicle_width": "same table row",
+        "min_total_height": "body text, 'Standardversion des AGILOX OCF hat eine Fahrzeughöhe von 2,56 m (101 in) und bietet eine maximale Hubhöhe von 1,6 m' -- explicitly the STANDARD configuration (1.6m lift height), which matches the DB's already-filled lifting_height=1600, so this vehicle-height figure corresponds to the same configuration and was not mixed with the alternate low-height variant (2.34m body / 1.2m lift, see notes)"
+      },
+      "conflicts": {
+        "min_aisle_width": {
+          "db_value": 1300,
+          "datasheet_value": "2100 ('TECHNISCHE DETAILS' table, 'MIN. GANGBREITE 2.100 MM')",
+          "note": "Not overwritten. Large discrepancy (1300 vs 2100mm) on a K.O. field -- worth Tech Lead re-verification; possibly the DB value came from a different/narrower-fork configuration."
+        }
+      },
+      "notes": "max_payload=1500 and lifting_height=1600 already filled in DB, both match this page exactly ('MAX. LAST 1.500 KG', 'MAX. HUBHÖHE 1.600 MM'), no conflict. Page also documents 2 payload variants (1500kg or 750kg) and 2 lift-height variants (1.6m or 1.2m, tied to 2 different vehicle body heights 2.56m/2.34m) and 2 fork lengths (1200/1400mm) as CONFIGURATION OPTIONS on one product (page literally labelled 'AGILOX OCF KONFIGURATIONEN'), not separately named SKUs -- treated as one product per this document's own presentation, matching the DB's existing single OCF row (already using the higher-spec 1500kg/1.6m configuration); the smaller-config numbers are not entered as a separate variant this run, flagged as a possible future variant-completion candidate if the Tech Lead judges these config options warrant separate product rows (cf. the Toyota SAI125CB/SAE160 mast-option precedent in this same batch, where similar in-document config choices were NOT split). 'Drehkreis 3.500mm' / 'WENDEKREIS 3.500 MM' printed twice -- not mapped to min_turning_radius (currently null for OCF), per the ongoing radius/diameter caution."
+    },
+    {
+      "product_name": "AGILOX ODM 600/800",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox ODM.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 1.4,
+        "min_aisle_width": 1000,
+        "vehicle_length": 1095,
+        "vehicle_width": 400,
+        "charge_time": 11
+      },
+      "field_sources": {
+        "max_speed": "hero stat block, '1,4 m/s ... maximale Geschwindigkeit'",
+        "min_aisle_width": "'TECHNISCHE DETAILS' table, 'MIN. GANGBREITE 1.000 MM'",
+        "vehicle_length": "'TECHNISCHE DETAILS' table, 'ABMASSE (L x B x H) 1.095 x 400 x 1.235 MM'",
+        "vehicle_width": "same table row",
+        "charge_time": "'TECHNISCHE DETAILS' table, 'LADEZEIT 20 – 100 % in ca. 11 Min.'"
+      },
+      "notes": "max_payload=300 and lift_height=250 already filled in DB, both match exactly ('MAX. LAST 300 KG', 'MAX. HUBHÖHE 250 MM'). 'DREHKREIS 1.700 MM' printed -- min_turning_radius already 0 in DB (pre-existing, not this document's figure, different concept per the radius/diameter caution) -- not touched. Document header lists 'ODM 600 / ODM 800' as two named variants but the technical-details table shows only ONE shared spec set (differing only by the compatible dolly footprint 600x400mm, not by numeric capacity) -- consistent with the DB's existing single combined 'AGILOX ODM 600/800' product row, no split needed."
+    },
+    {
+      "product_name": "AGILOX OFL",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox OFL.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "min_aisle_width": 1600
+      },
+      "field_sources": {
+        "min_aisle_width": "'TECHNISCHE DETAILS' table, 'MIN. GANGBREITE 1.600 MM'"
+      },
+      "notes": "max_payload=800, vehicle_length=1655/vehicle_width=800 already filled in DB and all match this datasheet exactly ('MAX. LAST 800 KG / 1.200 KG' -- 800kg is the DB's already-recorded base config, 1200kg is a documented heavier option not separately entered, same config-vs-variant reasoning as OCF above). lift_height=1390 and lifting_height=1200 are BOTH already filled in DB under two different AP0 field names on the same row -- cross-checked against this datasheet: 'MAX. HUBHÖHE 1390 MM' matches lift_height=1390 exactly, and 'MAX. STATIONSHÖHE (EPAL) 1.200 MM' matches the pre-existing lifting_height=1200 value exactly -- clarifies (does not conflict with) the pre-existing dual-field state, worth noting for the Tech Lead that lifting_height on this AMR-classified product appears to have been populated from a 'max station height' figure rather than 'max lift stroke'. 'MIN. DREHKREIS 2.200 MM' printed -- min_turning_radius already 0 in DB (pre-existing, different concept), not touched."
+    },
+    {
+      "product_name": "AGILOX ONE",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox One.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "min_aisle_width": 1600,
+        "vehicle_length": 1511,
+        "vehicle_width": 810
+      },
+      "field_sources": {
+        "min_aisle_width": "'TECHNISCHE DETAILS' table, 'MIN. GANGBREITE 1.600 MM'",
+        "vehicle_length": "'TECHNISCHE DETAILS' table, 'ABMASSE (L x B x H) 1.511 x 810 x 1.862 MM' (identical for both documented payload configs)",
+        "vehicle_width": "same table row"
+      },
+      "notes": "max_payload=1000 and lift_height=620 already filled in DB, both match this datasheet's 'Einfachscherenhub' (single-scissor-lift) configuration column exactly ('MAX. LAST 1.000 KG', 'MAX. HUBHÖHE 620 MM'). A second documented configuration ('Doppelscherenhub'/double-scissor-lift: 750kg payload, 1100mm lift height) is NOT entered as a separate variant, same config-vs-SKU reasoning as OCF/OFL above -- flagged as a possible future variant-completion candidate. charge_time deliberately left null: this document's only charging figure is 'LADEZEIT 3 Minuten laden = 1 Stunde Betrieb' (fast-charge ratio: 3 min charge per 1h runtime), not a simple 'minutes to full charge' figure compatible with the Integer-minutes charge_time field -- left unmapped rather than force-converted. 'DREHKREIS 2.100 MM' printed -- min_turning_radius already 0 in DB (pre-existing, different concept), not touched."
+    }
+  ]
+}

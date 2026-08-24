@@ -1,0 +1,1169 @@
+{
+ "company": "VisionNav Robotics",
+ "date": "2026-08-19",
+ "source_method": "local_datasheet",
+ "source_files": [
+  "1728979799.pdf"
+ ],
+ "document_title": "VisionNav Robotics full-line catalog, Spanish edition — 'Catalog-Spainish-2024V1.2' (document version string printed on p.1). 16 pages.",
+ "researcher_notes": "SCOPE: this file covers the ONE remaining never-extracted VisionNav document, 1728979799.pdf. It had been spot-checked in an earlier session and written off as 'confirmatory only, low value'. THAT ASSESSMENT IS WRONG and should be discarded: the catalog carries a full 30-row technical parameter table for every model, and the DB rows it maps onto currently hold only ~12 populated fields each. It yields 13 product entries (1 genuinely new model, VNR14) and roughly 25 fields per product, most of them previously NULL.\n\nDOCUMENT GENERATION: this is the OLDER VisionNav generation — model codes carry the -01/-07 suffixes and the (V)/(VL)/(VM) navigation-package markers, and the layout is metric-first with a parenthesised imperial column. Per the VisionNav model-code convention, (VL) decodes as 'Vision-based Navigation + 3D Laser Navigation'. Every model in this catalog is (VL), i.e. there is no magnetic-guided (VM) machine here, so infrastructure_free=true is safe throughout.\n\n*** SYSTEMATIC FINDING #1 — the lifting_height 'conflicts' are one single reference-mast artefact, not eight independent errors. ***\nEight products (VNSL14, VNP15, VNP20, VNP30, VNE20, VNE30, VNE35, VNE40) show DB lifting_height that disagrees with this catalog. In every case the DB holds the value from footnote *1 — the REFERENCE MAST the rest of the spec table is measured with — while the catalog's 'Altura de elevación' row states the MAXIMUM available mast. The proof is VNSL14: its footnote reads 'un mástil dúplex de 1600 mm (63 pulg.)' and the DB holds exactly 1600. Every P- and E-series footnote reads 'mástil dúplex de 118 pulgadas (3000 mm)' and the DB holds exactly 3000 for all seven of them. This is a configuration axis, not a data error on either side.\nI have NOT proposed overwriting any of them. AP0's lifting_height hint states no direction (unlike max_payload's 'heaviest' or min_aisle_width's 'minimum'), so per the no-blanket-conservatism rule I fall back to conservative — and the conservative value is the one already stored. What the Tech Lead actually needs to decide is whether AP0 should store the reference-mast height or the max-mast height, because footnote *4 on every single page says the maximum mast DERATES the payload ('mayores alturas de elevación pueden dar lugar a una disminución de la capacidad'), so storing max lift together with max payload overstates the machine on two K.O. fields at once. This is the payload-derating problem again, now with an eight-product worked example in one document.\n\n*** SYSTEMATIC FINDING #2 — a mislabelled row in the Spanish edition. ***\nOn EVERY spec page (8,9,10,11,12,13,14,15,16) the humidity row is printed with the WRONG LABEL: it reads 'Separación interior entre horquillas' (inner fork spread) but carries the value '20% ~ 95%'. The correct inner-fork-spread row, in millimetres, already appears earlier on the same page. The row sits between 'Temperatura de Trabajo' and 'Planicidad del suelo', which is exactly where the working-humidity row sits in VisionNav's English sheets, and the English sheets independently give 20%~95% there. I have therefore mapped it to operating_humidity_max=95 for all 13 products, but I am flagging it loudly because it is a defect in the source document itself, not an extraction artefact — anyone re-reading this PDF will see the wrong label.\n\n*** SYSTEMATIC FINDING #3 — the p.7 series matrix is the most useful page in the document and it is invisible to text extraction. ***\np.7 is a 6-series x 11-criterion capability matrix (load types x application types). pdfplumber linearises it into a meaningless column of isolated tick marks; it only becomes readable as a 160 dpi render. It is the ONLY place in the entire VisionNav corpus that states, per series, which load carriers and which applications each machine is qualified for. It is the source for load_type, station_applications, trailer_loading/unloading, outdoor_capable and forks_free_floating throughout this file. Two things it settles:\n  (a) forks_free_floating — 'Pallet CHEP cerrado' (closed-bottom pallet) is ticked for ST, P, E and R series but explicitly NOT for the SL (slim stacker) series. That is direct manufacturer evidence for the industry README's straddle-under-load rule, and it is also a real data point for the OPEN forks_free_floating contradiction (config/fields.json vs the README disagree on reach trucks): VisionNav says its reach trucks DO handle closed-bottom pallets. I have left forks_free_floating NULL for the R series pending the ruling rather than picking a side.\n  (b) stacking_capability — the matrix cleanly separates 'Apilado de mercancías' (goods stacking) from 'Almacén de gran altura' (high-bay warehousing), which is precisely the distinction industry README §6a draws. It ticks stacking ONLY for the P and E series. Read literally that makes stacking_capability=false for the SL and R series, yet the DB holds 1 for VNSL14, VNR16 and VNR20 and the SL machine is literally called an 'apilador' (stacker). I judged that too aggressive to propose as a value, so I have left stacking_capability out of the fields block for those three products and flagged it instead. It needs a Tech Lead call.\n\n*** THE RECURRING no-Forklift-turning-radius GAP, again, with nine more instances. ***\nEvery forklift page prints 'Radio Mínimo de Giro' — explicitly a RADIUS in Spanish, so unambiguous and safe to map — and there is still no turning-radius field in Forklift scope (turning_radius is Tugger-only, min_turning_radius is AMR-only). Nine values are stranded here: VNSL14 1137, VNST20 1431, VNP15 1490, VNP20 1900, VNP30 2020, VNR14 1695, VNR16 1800, VNR20 1915, VNE20 1835, VNE30/35/40 2240. The one model that DOES have a home for it (VNQ50, a tugger) is mapped. This document is now the best single artefact for that AP0 gap after 1657089341.pdf.\n\nOTHER FIELDS THAT HAD NOWHERE TO GO: 'Planicidad del suelo' is printed for all 13 models and spans ±3, ±5 and ±10 mm/m² within this one catalog — a 3x spread that floor_flatness_req's four categorical values cannot hold, so all 13 are left NULL. Body weight (500–6200 kg) is printed for every model and has no AP0 field. Battery voltage/capacity architecture (24V/48V/83.2V) likewise. 'Materiales sin soporte' (unsupported/pallet-less material) is a load type with no AP0 allowed value.\n\nMAPPING DECISIONS WORTH CHALLENGING: 'Pallet CHEP cerrado' -> Pallet ISO (the catalog's own reference load is 1200x1000 mm, which is ISO; there is no closed-bottom-pallet concept in AP0's load_type list). 'Jaula de almacenaje/estantería multicapa' (mesh storage cage / multi-layer stillage) -> Bulk Bin as the nearest allowed value. Both are noted per product.\n\nNOTHING WAS WRITTEN TO AIRTABLE. All values below are staged for review. No existing non-null DB value is proposed for overwrite anywhere in this file.",
+ "company_wide_context": {
+  "source_file": "1728979799.pdf",
+  "source_pages": "1-7",
+  "fields": {
+   "hq_city": "Shenzhen",
+   "certifications_generic": [
+    "CE"
+   ],
+   "max_fleet_size": 150,
+   "fleet_control_architecture": "Centralized",
+   "integration_capability": [
+    "WMS",
+    "ERP",
+    "MES",
+    "SAP",
+    "REST API"
+   ],
+   "industries_served": [
+    "Automotive",
+    "F&B",
+    "Pharma",
+    "E-Commerce",
+    "General Manufacturing",
+    "3PL",
+    "Retail"
+   ],
+   "modification_process": [
+    "Supplier limited"
+   ]
+  },
+  "field_sources": {
+   "hq_city": "p.4 service-network world map, 'Shenzhen' labelled as a Branch Company. CAUTION: this is read off a map graphic, not an address block — p.1's address list gives only the Rotterdam/Atlanta/Tokyo/Seoul/Singapore/Hong Kong branches and no Shenzhen street address. Treat as a strong hint, not a printed HQ statement.",
+   "certifications_generic": "p.7, a CE mark is printed inline in the 'Series de productos' heading, applying to the whole vehicle range (verified on a 160 dpi render — the mark does not survive text extraction)",
+   "max_fleet_size": "p.6, RCS 2.0 description: 'un sistema inteligente de gestión visual para la comunicación y administración de tareas de hasta 150 AGVs'",
+   "fleet_control_architecture": "p.6, RCS 2.0: 'Mediante la programación desde la nube' (cloud-based scheduling) + p.5 architecture diagram placing RCS as a single central layer between the WMS/MES and the vehicles",
+   "integration_capability": "p.5 solution-architecture diagram: 'Sistema-MES/WMS + SAP/Ignition' at the top layer and 'Protocolo API Restful Web' as the interface between it and the RCS; p.6 repeats 'Al integrarse con sistemas MES/WMS/ERP'. Canonical AP0 forms used ('REST API', 'WMS').",
+   "industries_served": "p.5 'APLICACIONES' list: Fabricación, Alimentación y bebidas (F&B), FMCG, Productos eléctricos, Industria farmacéutica (Pharma), Productos químicos, Industria del embalaje, Productos metálicos, Maquinaria, Ropa y calzado, Productos textiles, Vehículos (Automotive), Muebles, Construcción, Logística, 3PL, Mayoristas y minoristas (Retail); p.2 adds 'comercio electrónico' (E-Commerce). Mapped to the AP0 allowed values only.",
+   "modification_process": "p.5 RCS integrates with 'Equipos Automatizados: Ascensor, Puerta Automática, Transportador de Rodillos, Botón/Tablet' and p.6 lists 'Programación de robots y tareas' as an operator-facing RCS function, but the catalog never says the CLIENT may re-map or re-route after go-live. 'Supplier limited' is the conservative read; challenge it if a commissioning document says otherwise."
+  },
+  "applies_to": "all base models of VisionNav Robotics — note that the schema stores fleet/integration fields at Base-Model granularity, so these must be fanned out per base model at import time, not written once centrally",
+  "notes": "NOT MAPPED, deliberately:\n- outdoor_capable: p.6 claims the positioning module has 'Alta adaptabilidad al entorno: Operaciones en interiores y exteriores'. That is a claim about the NAVIGATION MODULE, not about any vehicle's environmental rating, and the p.7 matrix ticks 'Transporte interior y exterior' for the Q series ONLY. I have set outdoor_capable=true on VNQ50 alone and left it NULL everywhere else rather than fanning the p.6 sentence out.\n- languages_spoken: the mere existence of a Spanish-language catalog is real but indirect evidence of ES sales support. The DB currently holds the non-conforming string 'unknown' in this field (allowed values are DE|EN|FR|ES|ZH), which is worth cleaning up regardless. Not proposed as a value.\n- service_coverage: p.4 states 'Ventas, Operaciones y Servicios en más de 30 países y regiones' with branches in Rotterdam (Europe), Atlanta, Tokyo, Seoul, Singapore and Hong Kong. This supports a broad footprint but names no individual countries, so no ISO codes can be derived. IMPORTANT related finding: p.16 restricts the VNQ50 to the Americas only, which contradicts that product's stored service_coverage of 'EU' — see the VNQ50 entry.\n- vda5050_compatible: 'VDA 5050' does not appear anywhere in this document. Left NULL per the field's NULL RULE.\n- fleet_management_system: RCS 2.0 is a named proprietary controller that also exposes a REST API. The single-select cannot express 'proprietary product with an open API', which is a known AP0 limitation. Not mapped.\n- reference_count: p.2 claims 'cientos de instalaciones' (hundreds of installations) and 'más de 11 millones de almacenamientos de pallets' and 'decenas de empresas de la lista Fortune 500'. These are marketing magnitudes, not a countable reference figure. Not mapped.\n- The perception module's stated capability (p.6: '±10 mm y ±0.5°' 6-DoF pose detection) matches the per-model 'Precisión de Ubicación' rows exactly, which is a useful cross-check that the per-product stop_accuracy values are consistent with the platform-level claim."
+ },
+ "products": [
+  {
+   "product_name": "VisionNav VNSL14(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 8,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Straddle Stacker",
+    "mast_type": "Duplex",
+    "max_payload": 1400,
+    "lifting_height": 3000,
+    "min_aisle_width": 2200,
+    "vehicle_length": 1650,
+    "vehicle_width": 1000,
+    "min_total_height": 2150,
+    "max_speed": 1.3,
+    "max_gradient": 5,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation",
+     "Standard rack"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "forks_free_floating": false,
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.8, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.8, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.8, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.8, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.8, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.8, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.8, row 'Tipo de Operación' = 'Automático / Manual con Control Portátil'",
+    "vna_capable": "p.8, row 'Ancho Mínimo del pasillo de carga' = 2200 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.8, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.8, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.8, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.8, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.8, product-type header 'APILADOR SLIM AGV' + body text 'horquillas y patas de soporte personalizables' (support legs under the load) → Straddle Stacker",
+    "mast_type": "p.8, footnote *1: 'el modelo equipado con un mástil dúplex de 1600 mm (63 pulg.)'",
+    "max_payload": "p.8, row 'Capacidad de Carga Nominal' = '1400kg(3000 lb)' (also printed as headline stat '1400kg')",
+    "lifting_height": "p.8, row 'Altura de elevación' = 'hasta 3000mm (177in)' (headline stat repeats '1400kg hasta 3000mm'). NOTE: the printed inch value 177in = 4496mm, NOT 3000mm — the imperial figure is wrong/copy-pasted from the 4500mm P/E-series pages; the metric 3000mm is stated twice so it is the reliable figure.",
+    "min_aisle_width": "p.8, row 'Ancho Mínimo del pasillo de carga' = '2200mm (87in)' (also headline stat). NOT the 1800mm 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.8, row 'Dimensiones del Vehículo' = '1650x1000x2150mm' → L",
+    "vehicle_width": "p.8, row 'Dimensiones del Vehículo' = '1650x1000x2150mm' → W",
+    "min_total_height": "p.8, row 'Dimensiones del Vehículo' = '1650x1000x2150mm' → H",
+    "max_speed": "p.8, row 'Velocidad en avance (Cargado/Vacío)' = '1.0m/s, 1.3m/s' → unloaded/top figure 1.3 per AP0 hint 'capture rated/unloaded'",
+    "max_gradient": "p.8, row 'Pendiente máxima de subida (Cargado/Vacío)' = '5%, 5% (3°, 3°)' → loaded 5%. Already in %, no conversion needed (tan(3°)·100 = 5.2%, internally consistent).",
+    "stop_accuracy": "p.8, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'SL series': 'Pallet EU abierto' ✓ and 'Jaula de almacenaje/estantería multicapa' ✓ (verified on a 160 dpi pdftoppm render of p.7)",
+    "station_applications": "p.7 series matrix, column 'SL series': 'Transporte de suelo a suelo' ✓, 'Traslado a línea de producción' ✓, 'Almacén de gran altura' ✓",
+    "load_detection": "p.8, row 'Método de percepción' = 'Lidar 3D'",
+    "forks_free_floating": "p.7 series matrix, column 'SL series': 'Pallet CHEP cerrado' is NOT ticked (while ST/P/E/R series are) — direct positive evidence that the straddle support legs collide with closed-bottom pallets, matching industry README § on straddle-under-load designs",
+    "safety_coverage": "p.8, rows 'Protección de Seguridad Frontal/Trasera/Lateral' = 2D laser scanners + bumpers, 'Protección de Seguridad Superior' = 'Sensor Fotoeléctrico + Escáner Ultrasónico' (overhead detection present but not a 3D scanner) → Limited 3D",
+    "product_type": "p.8 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=1600 vs catalog 3000; DB min_aisle_width=2250 vs catalog 2200. The 1600 is exactly the footnote *1 REFERENCE MAST ('mástil dúplex de 1600 mm') — see researcher_notes for the systematic reference-mast-vs-max-lift pattern across this whole catalog. DB max_speed=1.3 CONFIRMED. UNMAPPED (no Forklift-scope AP0 field): 'Radio Mínimo de Giro 1137mm(47in)' — explicitly a RADIUS, safe to map if AP0 ever gains a Forklift turning-radius field. UNMAPPED (categorical field cannot hold the printed value): 'Planicidad del suelo ±5mm/㎡'. UNMAPPED (no AP0 field): body weight 1000kg; battery 24V/180Ah; fork dims 1150x180x60mm; optional fork lengths 1250/1350/1450mm; outer fork spread 560/680mm; inner fork spread 200/320mm; load centre 600mm; safety-laser scan height 100mm; max joint/groove width 30mm; max obstacle height 10mm; lift speed 115/175 mm/s, lower speed 160/125 mm/s. AMBIGUITY (flagged, no value proposed): p.7 matrix ticks 'Almacén de gran altura' for SL series but NOT 'Apilado de mercancías' — under industry README §6a (block stacking ≠ rack placement) that would read as stacking_capability=false, yet DB holds 1 and the machine is literally an 'apilador'. Needs a Tech Lead call."
+  },
+  {
+   "product_name": "VisionNav VNST20(VL)-66",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 9,
+   "db_status": "enrich",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Pallet Mover",
+    "max_payload": 2000,
+    "lifting_height": 115,
+    "min_aisle_width": 2250,
+    "vehicle_length": 1620,
+    "vehicle_width": 800,
+    "min_total_height": 1830,
+    "max_speed": 1.8,
+    "max_gradient": 5,
+    "stop_accuracy": 8,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation",
+     "Dock"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "stacking_capability": false,
+    "trailer_loading": true,
+    "trailer_unloading": true,
+    "safety_coverage": "Single plane (2D)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.9, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.9, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.9, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.9, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.9, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.9, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.9, row 'Tipo de Operación' = 'Automático / Manual con Control Portátil'",
+    "vna_capable": "p.9, row 'Ancho Mínimo del pasillo de carga' = 2250 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.9, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.9, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.9, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.9, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.9, product-type header 'TRANSPALETA SLIM AGV' (pallet truck) + 115mm lift → Pallet Mover",
+    "max_payload": "p.9, row 'Capacidad de Carga Nominal' = '2000kg (4400lb)' (also headline stat)",
+    "lifting_height": "p.9, row 'Altura de elevación' = '115mm(4.5in)'",
+    "min_aisle_width": "p.9, row 'Ancho Mínimo del pasillo de carga' = '2250mm(89in)'. NOT the 1900mm 'Pasillo de Giro' row.",
+    "vehicle_length": "p.9, row 'Dimensiones del Vehículo' = '1620x800x1830mm' → L (also headline stat)",
+    "vehicle_width": "p.9, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.9, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.9, row 'Velocidad en avance (Cargado/Vacío)' = '1.4m/s, 1.8m/s' → unloaded/top 1.8 per AP0 hint",
+    "max_gradient": "p.9, row 'Pendiente máxima de subida' = '5%, 5% (3°, 3°)' → loaded 5%",
+    "stop_accuracy": "p.9, row 'Precisión de Ubicación' = '±8mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'ST series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓",
+    "station_applications": "p.7 series matrix, column 'ST series': floor-to-floor ✓, production-line transfer ✓, 'Carga y descarga de remolques' ✓",
+    "load_detection": "p.9, row 'Método de percepción' = 'Lidar 3D'",
+    "stacking_capability": "p.7 series matrix, column 'ST series': 'Apilado de mercancías' NOT ticked; 115mm lift stroke is transport-only",
+    "trailer_loading": "p.7 series matrix, column 'ST series': 'Carga y descarga de remolques' ✓",
+    "trailer_unloading": "p.7 series matrix, column 'ST series': 'Carga y descarga de remolques' ✓",
+    "safety_coverage": "p.9, 'Protección de Seguridad Superior' = 'Protección con Escáner Láser' (2D laser only, no 3D scanner, no photoelectric/ultrasonic overhead unlike the SL/P pages)",
+    "product_type": "p.9 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "CLEAN CONFIRMATION of every KO value the DB already holds for 'VisionNav VNST20': max_payload 2000 ✓, lifting_height 115 ✓, min_aisle_width 2250 ✓, max_speed 1.8 ✓, stacking_capability 0 ✓. Therefore db_status=enrich, no conflict. NEW MODEL-CODE SUFFIX: '-66'. Every other VisionNav model code in the whole corpus ends in -01 or -07; '(VL)-66' has not appeared in any previously processed VisionNav document. Recorded as-is; may indicate a newer hardware revision of the same machine. NOTE the DB also holds a separate 'VisionNav VNST20-SINGLE' (1000 kg / 100 mm / 2090 mm) which this catalog does NOT cover — not contradicted, just absent. UNMAPPED: 'Radio Mínimo de Giro 1431mm(57in)' (explicit RADIUS, no Forklift-scope field); 'Planicidad del suelo ±5mm/㎡'. UNMAPPED (no AP0 field): body weight 500kg; battery 48V/40Ah; fork dims 1150x175x55mm; optional fork lengths 950/1150/1350/1450/1550mm; outer/inner fork spread 560/210mm; load centre 600mm; safety-laser scan height 110mm; max joint width 30mm; max obstacle height 10mm; lifting up/down times 3.2s/1.8s and 1.9s/2.7s."
+  },
+  {
+   "product_name": "VisionNav VNP15(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 10,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 1500,
+    "lifting_height": 4500,
+    "min_aisle_width": 3350,
+    "vehicle_length": 2693,
+    "vehicle_width": 1344,
+    "min_total_height": 2085,
+    "max_speed": 1.5,
+    "max_gradient": 5,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.10, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.10, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.10, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.10, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.10, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.10, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.10, row 'Tipo de Operación' = 'Automático / Manual con Control Portátil'",
+    "vna_capable": "p.10, row 'Ancho Mínimo del pasillo de carga' = 3350 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.10, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.10, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.10, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.10, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.10, product-type header 'APILADOR CONTRAPESADO AGV' (counterbalanced stacker)",
+    "mast_type": "p.10, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.10, row 'Capacidad de Carga Nominal' = '1500kg' (also printed as the headline stat)",
+    "lifting_height": "p.10, row 'Altura de elevación' = 'Hasta 4500mm(177in)' (headline stat repeats 'hasta 4500mm'). Imperial cross-check 177in = 4496mm ✓ internally consistent.",
+    "min_aisle_width": "p.10, row 'Ancho Mínimo del pasillo de carga' = '3350mm' (also headline stat). NOT the '2180mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.10, row 'Dimensiones del Vehículo' = '2693x1344x2085mm' → L",
+    "vehicle_width": "p.10, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.10, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.10, row 'Velocidad en avance (Cargado/Vacío)' = '1.3m/s, 1.5m/s' → unloaded/top 1.5 per AP0 hint",
+    "max_gradient": "p.10, row 'Pendiente máxima de subida (Cargado/Vacío)' = '5%, 5% (3°, 3°)' → loaded 5%",
+    "stop_accuracy": "p.10, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'P series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓ (last one has no AP0 allowed value)",
+    "station_applications": "p.7 series matrix, column 'P series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.10, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.10, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.10 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the P series",
+    "stacking_capability": "p.7 series matrix, column 'P series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.10, 'Protección de Seguridad Superior' = 'Sensor Fotoeléctrico + Escáner Ultrasónico' over 2D laser planes front/rear/side",
+    "product_type": "p.10 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=3000 vs catalog 'Hasta 4500mm'. DB max_payload=1500 CONFIRMED. DB min_aisle_width was NULL → 3350 is a new fill. P-series shared: mast_type Duplex per footnote *1 ('mástil dúplex de 118 pulgadas (3000 mm)'); special_fork_option Side-Shift per footnote *2 ('Desplazador lateral y posicionador de horquillas opcionales'); forks_free_floating true — counterbalanced build with no legs under the load, corroborated by p.7 matrix ticking 'Pallet CHEP cerrado' (closed-bottom) for the P series. Footnote *4 states explicitly that optional masts, attachments, larger load dimensions or greater lift heights REDUCE capacity — the payload/lift pair below is therefore NOT simultaneously achievable at both extremes (AP0 cannot express this derating). SOURCE TYPO on p.10: 'Radio Mínimo de Giro 1490mm (20in)' — 20in = 508mm, not 1490mm. The '(20in)' is copy-pasted from the 'Distancia del centro de gravedad 500mm (20in)' row directly above. The metric 1490mm agrees with the headline stat, so the metric figure is the reliable one. UNMAPPED: 'Radio Mínimo de Giro 1490mm' (explicit RADIUS — no Forklift-scope AP0 field exists); 'Planicidad del suelo ±5mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 24V/270Ah; load centre 500mm; safety-laser scan height; max joint width 30mm; max obstacle height 10mm; lift/lower speeds."
+  },
+  {
+   "product_name": "VisionNav VNP20(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 11,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 1900,
+    "lifting_height": 4500,
+    "min_aisle_width": 3850,
+    "vehicle_length": 3201,
+    "vehicle_width": 1344,
+    "min_total_height": 2085,
+    "max_speed": 1.5,
+    "max_gradient": 5,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.11, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.11, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.11, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.11, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.11, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.11, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.11, row 'Tipo de Operación' = 'Automático / Manual con Control Portátil'",
+    "vna_capable": "p.11, row 'Ancho Mínimo del pasillo de carga' = 3850 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.11, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.11, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.11, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.11, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.11, product-type header 'APILADOR CONTRAPESADO AGV' (counterbalanced stacker)",
+    "mast_type": "p.11, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.11, row 'Capacidad de Carga Nominal' = '1900kg' (also printed as the headline stat)",
+    "lifting_height": "p.11, row 'Altura de elevación' = 'Hasta 4500mm(177in)' (headline stat repeats 'hasta 4500mm'). Imperial cross-check 177in = 4496mm ✓ internally consistent.",
+    "min_aisle_width": "p.11, row 'Ancho Mínimo del pasillo de carga' = '3850mm' (also headline stat). NOT the '2430mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.11, row 'Dimensiones del Vehículo' = '3201x1344x2085mm' → L",
+    "vehicle_width": "p.11, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.11, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.11, row 'Velocidad en avance (Cargado/Vacío)' = '1.3m/s, 1.5m/s' → unloaded/top 1.5 per AP0 hint",
+    "max_gradient": "p.11, row 'Pendiente máxima de subida (Cargado/Vacío)' = '5%, 5% (3°, 3°)' → loaded 5%",
+    "stop_accuracy": "p.11, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'P series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓ (last one has no AP0 allowed value)",
+    "station_applications": "p.7 series matrix, column 'P series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.11, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.11, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.11 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the P series",
+    "stacking_capability": "p.7 series matrix, column 'P series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.11, 'Protección de Seguridad Superior' = 'Sensor Fotoeléctrico + Escáner Ultrasónico' over 2D laser planes front/rear/side",
+    "product_type": "p.11 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT ×2 (do not overwrite): (a) DB max_payload=2000 vs catalog 1900 — the catalog states 1900 kg TWICE independently (headline stat '1900kg' and table row 'Capacidad de Carga Nominal 1900kg (4100lb)'), and the imperial 4100lb = 1860kg corroborates the ~1900 magnitude rather than 2000 (2000kg would print as 4400lb, which is exactly what the VNE20 page on p.14 prints). This is strong evidence against a source-side typo; the model NAME 'VNP20' evidently does not encode a 2000 kg rating. (b) DB lifting_height=3000 vs catalog 'Hasta 4500mm'. DB min_aisle_width was NULL → 3850 new fill. P-series shared: mast_type Duplex per footnote *1 ('mástil dúplex de 118 pulgadas (3000 mm)'); special_fork_option Side-Shift per footnote *2 ('Desplazador lateral y posicionador de horquillas opcionales'); forks_free_floating true — counterbalanced build with no legs under the load, corroborated by p.7 matrix ticking 'Pallet CHEP cerrado' (closed-bottom) for the P series. Footnote *4 states explicitly that optional masts, attachments, larger load dimensions or greater lift heights REDUCE capacity — the payload/lift pair below is therefore NOT simultaneously achievable at both extremes (AP0 cannot express this derating).  UNMAPPED: 'Radio Mínimo de Giro 1900mm' (explicit RADIUS — no Forklift-scope AP0 field exists); 'Planicidad del suelo ±5mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 24V/270Ah; load centre 500mm; safety-laser scan height; max joint width 30mm; max obstacle height 10mm; lift/lower speeds."
+  },
+  {
+   "product_name": "VisionNav VNP30(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 12,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 3000,
+    "lifting_height": 4500,
+    "min_aisle_width": 4050,
+    "vehicle_length": 3400,
+    "vehicle_width": 1420,
+    "min_total_height": 2170,
+    "max_speed": 1.5,
+    "max_gradient": 5,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.12, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.12, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.12, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.12, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.12, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.12, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.12, row 'Tipo de Operación' = 'Automático / Manual con Control Portátil'",
+    "vna_capable": "p.12, row 'Ancho Mínimo del pasillo de carga' = 4050 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.12, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.12, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.12, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.12, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.12, product-type header 'APILADOR CONTRAPESADO AGV' (counterbalanced stacker)",
+    "mast_type": "p.12, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.12, row 'Capacidad de Carga Nominal' = '3000kg' (also printed as the headline stat)",
+    "lifting_height": "p.12, row 'Altura de elevación' = 'Hasta 4500mm(177in)' (headline stat repeats 'hasta 4500mm'). Imperial cross-check 177in = 4496mm ✓ internally consistent.",
+    "min_aisle_width": "p.12, row 'Ancho Mínimo del pasillo de carga' = '4050mm' (also headline stat). NOT the '2620mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.12, row 'Dimensiones del Vehículo' = '3400x1420x2170mm' → L",
+    "vehicle_width": "p.12, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.12, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.12, row 'Velocidad en avance (Cargado/Vacío)' = '1.3m/s, 1.5m/s' → unloaded/top 1.5 per AP0 hint",
+    "max_gradient": "p.12, row 'Pendiente máxima de subida (Cargado/Vacío)' = '5%, 5% (3°, 3°)' → loaded 5%",
+    "stop_accuracy": "p.12, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'P series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓ (last one has no AP0 allowed value)",
+    "station_applications": "p.7 series matrix, column 'P series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.12, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.12, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.12 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the P series",
+    "stacking_capability": "p.7 series matrix, column 'P series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.12, 'Protección de Seguridad Superior' = 'Sensor Fotoeléctrico + Escáner Ultrasónico' over 2D laser planes front/rear/side",
+    "product_type": "p.12 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT ×2 (do not overwrite): DB lifting_height=3000 vs catalog 'Hasta 4500mm'; DB min_aisle_width=3992 vs catalog 4050. The DB's 3992 is oddly precise — I tested it for an imperial artefact (157in = 3988mm, 13.1ft = 3993mm) and neither is clean, so it is more likely a value from a different VisionNav generation than a conversion error. DB max_payload=3000 and max_speed=1.5 both CONFIRMED. P-series shared: mast_type Duplex per footnote *1 ('mástil dúplex de 118 pulgadas (3000 mm)'); special_fork_option Side-Shift per footnote *2 ('Desplazador lateral y posicionador de horquillas opcionales'); forks_free_floating true — counterbalanced build with no legs under the load, corroborated by p.7 matrix ticking 'Pallet CHEP cerrado' (closed-bottom) for the P series. Footnote *4 states explicitly that optional masts, attachments, larger load dimensions or greater lift heights REDUCE capacity — the payload/lift pair below is therefore NOT simultaneously achievable at both extremes (AP0 cannot express this derating).  UNMAPPED: 'Radio Mínimo de Giro 2020mm' (explicit RADIUS — no Forklift-scope AP0 field exists); 'Planicidad del suelo ±5mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 48V/400Ah; load centre 500mm; safety-laser scan height; max joint width 30mm; max obstacle height 10mm; lift/lower speeds."
+  },
+  {
+   "product_name": "VisionNav VNR14(VL)-01",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 13,
+   "db_status": "new",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Vision"
+    ],
+    "drive_type": "Reach Truck",
+    "mast_type": "Triplex",
+    "max_payload": 1400,
+    "lifting_height": 8500,
+    "min_aisle_width": 3250,
+    "vehicle_length": 2650,
+    "vehicle_width": 1640,
+    "min_total_height": 2480,
+    "max_speed": 2.0,
+    "max_gradient": 10,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation",
+     "Standard rack"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.13, row 'Método de Posicionamiento' = Vision-based (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.13, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.13, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.13, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.13, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.13, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.13, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.13, row 'Ancho Mínimo del pasillo de carga' = 3250 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.13, row 'Método de Posicionamiento' = 'Vision-based' (spans all three models)",
+    "drive_type": "p.13, product-type header 'CARRETILLA RETRÁCTIL SERIE VNR AGV' (reach truck); p.7 matrix column 'R series' = 'CARRETILLA RETRÁCTIL'",
+    "mast_type": "p.13, footnote *1: 'mástil triple telescópico de 5755 mm (225 pulg.)'",
+    "max_payload": "p.13, row 'Capacidad de Carga Nominal', column 'VNR14(VL)-01' = '1400kg'",
+    "lifting_height": "p.13, row 'Altura de elevación' = 'Hasta 8500mm' — MERGED-CELL resolution verified on a 150 dpi render: 'Hasta 8500mm(335in)' occupies the VNR14 column only, 'Hasta 11400mm(450in)' spans the VNR16+VNR20 columns",
+    "min_aisle_width": "p.13, row 'Ancho Mínimo del pasillo de carga (Schubmast-Eingefahrene)' [mast RETRACTED] = 3250mm. The companion '(Schubmast-Ausgefahrene)' [mast EXTENDED] row gives 3700mm for this model. Merge boundaries verified on a 150 dpi render. NOT the '2500mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.13, row 'Dimensiones con el mástil retraído' = '2650x1640x2480mm' → L (mast RETRACTED; the 'mástil extendido' row gives 3080mm length)",
+    "vehicle_width": "p.13, row 'Dimensiones con el mástil retraído' → W",
+    "min_total_height": "p.13, row 'Dimensiones con el mástil retraído' → H",
+    "max_speed": "p.13, row 'Velocidad en avance (Cargado/Vacío)' = '2.0m/s, 2.0m/s' (spans all three models); loaded and unloaded are equal here so the AP0 'top/unloaded' rule is not load-bearing",
+    "max_gradient": "p.13, row 'Pendiente máxima de subida (Cargado/Vacío)' = '10%, 10% (6°, 6°)' → loaded 10%. Already in %; tan(6°)·100 = 10.5%, internally consistent.",
+    "stop_accuracy": "p.13, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'R series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓",
+    "station_applications": "p.7 series matrix, column 'R series': floor-to-floor ✓, production-line transfer ✓, 'Almacén de gran altura' ✓",
+    "load_detection": "p.13, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.13, row 'Rango de desplazamiento lateral' = '±80mm(±3.15in)' — an explicit lateral (side-shift) travel range, verified on a 150 dpi render",
+    "safety_coverage": "p.13, 'Protección de Seguridad Superior' and 'Lateral' both = 'Sensor Fotoeléctrico + Escáner Ultrasónico' over 2D laser front/rear",
+    "product_type": "p.13 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "NEW PRODUCT — no 'VisionNav VNR14' row exists in the DB (the DB has VNR16 and VNR20 only). NOTE: VNR14 has already been staged twice before from other VisionNav documents with DIFFERENT specs (a standalone sheet gave aisle 3150 / lift 8555; the older T/L/Q catalog gave VNR14(V)-01 with aisle 3316 / lift 7255). This catalog's VNR14(VL)-01 is a third documented configuration. Whoever writes the import script must decide whether these are one product with a config matrix or genuinely separate variants — do not merge them silently. R-series shared (p.13, single 3-model configuration table verified against a 150 dpi pdftoppm render because several cells are MERGED across models and pdfplumber's linearisation cannot show the merge boundaries): reference mast per footnote *1 = 'mástil triple telescópico de 5755 mm (225 pulg.)' → mast_type Triplex (note: 225 in = 5715 mm, so the printed 5755 mm is itself ~40 mm off — a source rounding/typo, cited as printed). Footnote *2 states optional masts / attachments / larger loads / greater lift heights reduce capacity. navigation_type = Vision, NOT SLAM: the 'Método de Posicionamiento' row reads 'Vision-based' for the whole R series, whereas every other series in this catalog reads '3D SLAM'. ('Lidar 3D' on the next row is the PERCEPTION method for load handling, not positioning.) The (VL) code suffix decodes as 'Vision + 3D Laser' per the VisionNav model-code convention, so a case could be made for ['Vision','Natural Feature (SLAM)'] — but only 'Vision-based' is printed, and one vendor compound term maps to one AP0 value. AISLE-WIDTH CONVENTION (read this before importing): p.13 prints TWO stacking-aisle figures per model — 'Ancho Mínimo del pasillo de carga (Schubmast-Eingefahrene)' = mast RETRACTED, and '(Schubmast-Ausgefahrene)' = mast EXTENDED (the Spanish edition leaves these two qualifiers in German — a translation artefact). I have mapped the RETRACTED figure, because AP0's min_aisle_width means the narrowest aisle the vehicle can work in and the reach stroke goes into the RACK, not into the aisle. This also matches what the DB already holds for VNR16 (3250) and VNR20 (3300) exactly. NOTE FOR THE TECH LEAD: an earlier pass over the English VisionNav reach-truck sheets adopted the OPPOSITE convention (extended). One of the two conventions is wrong across the corpus; this needs a ruling. Extended figures are recorded per model below. UNMAPPED: 'Radio Mínimo de Giro 1695mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±3mm/㎡' (the tightest floor requirement in the whole catalog — R series only). UNMAPPED (no AP0 field): battery 48V/400Ah; support-leg height 310mm; fork dims 1115x100x45mm; optional fork lengths 1260/1360/1460/1560mm; outer/inner fork spread 710/486mm; load centre 600mm; max joint width 30mm; max obstacle height 10mm; mast forward reach distance. AMBIGUITY (flagged, no value proposed): p.7 matrix ticks 'Almacén de gran altura' for the R series but NOT 'Apilado de mercancías'; under industry README §6a that reads as stacking_capability=false, yet the DB holds 1 for VNR16/VNR20. Needs a Tech Lead call — I have deliberately left stacking_capability out of the fields block. EVIDENCE FOR THE OPEN forks_free_floating QUESTION: the p.7 matrix ticks 'Pallet CHEP cerrado' (closed-bottom pallet) for the R series. That is direct manufacturer evidence on the exact point where config/fields.json and the industry README contradict each other for reach trucks. I have left forks_free_floating NULL pending the ruling, but this data point should feed it."
+  },
+  {
+   "product_name": "VisionNav VNR16(VL)-01",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 13,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Vision"
+    ],
+    "drive_type": "Reach Truck",
+    "mast_type": "Triplex",
+    "max_payload": 1600,
+    "lifting_height": 11400,
+    "min_aisle_width": 3250,
+    "vehicle_length": 2650,
+    "vehicle_width": 1640,
+    "min_total_height": 2480,
+    "max_speed": 2.0,
+    "max_gradient": 10,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation",
+     "Standard rack"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.13, row 'Método de Posicionamiento' = Vision-based (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.13, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.13, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.13, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.13, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.13, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.13, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.13, row 'Ancho Mínimo del pasillo de carga' = 3250 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.13, row 'Método de Posicionamiento' = 'Vision-based' (spans all three models)",
+    "drive_type": "p.13, product-type header 'CARRETILLA RETRÁCTIL SERIE VNR AGV' (reach truck); p.7 matrix column 'R series' = 'CARRETILLA RETRÁCTIL'",
+    "mast_type": "p.13, footnote *1: 'mástil triple telescópico de 5755 mm (225 pulg.)'",
+    "max_payload": "p.13, row 'Capacidad de Carga Nominal', column 'VNR16(VL)-01' = '1600kg'",
+    "lifting_height": "p.13, row 'Altura de elevación' = 'Hasta 11400mm' — MERGED-CELL resolution verified on a 150 dpi render: 'Hasta 8500mm(335in)' occupies the VNR14 column only, 'Hasta 11400mm(450in)' spans the VNR16+VNR20 columns",
+    "min_aisle_width": "p.13, row 'Ancho Mínimo del pasillo de carga (Schubmast-Eingefahrene)' [mast RETRACTED] = 3250mm. The companion '(Schubmast-Ausgefahrene)' [mast EXTENDED] row gives 3800mm for this model. Merge boundaries verified on a 150 dpi render. NOT the '2500mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.13, row 'Dimensiones con el mástil retraído' = '2650x1640x2480mm' → L (mast RETRACTED; the 'mástil extendido' row gives 3185mm length)",
+    "vehicle_width": "p.13, row 'Dimensiones con el mástil retraído' → W",
+    "min_total_height": "p.13, row 'Dimensiones con el mástil retraído' → H",
+    "max_speed": "p.13, row 'Velocidad en avance (Cargado/Vacío)' = '2.0m/s, 2.0m/s' (spans all three models); loaded and unloaded are equal here so the AP0 'top/unloaded' rule is not load-bearing",
+    "max_gradient": "p.13, row 'Pendiente máxima de subida (Cargado/Vacío)' = '10%, 10% (6°, 6°)' → loaded 10%. Already in %; tan(6°)·100 = 10.5%, internally consistent.",
+    "stop_accuracy": "p.13, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'R series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓",
+    "station_applications": "p.7 series matrix, column 'R series': floor-to-floor ✓, production-line transfer ✓, 'Almacén de gran altura' ✓",
+    "load_detection": "p.13, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.13, row 'Rango de desplazamiento lateral' = '±80mm(±3.15in)' — an explicit lateral (side-shift) travel range, verified on a 150 dpi render",
+    "safety_coverage": "p.13, 'Protección de Seguridad Superior' and 'Lateral' both = 'Sensor Fotoeléctrico + Escáner Ultrasónico' over 2D laser front/rear",
+    "product_type": "p.13 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=5500 vs catalog 11400. The footnote *1 reference mast is 5755mm, which is close to but not equal to the DB's 5500 — so the DB is probably documenting yet another mast configuration rather than the footnote reference. DB max_payload=1600 CONFIRMED, DB max_speed=2.0 CONFIRMED, DB min_aisle_width=3250 CONFIRMED (matches the mast-retracted column exactly). R-series shared (p.13, single 3-model configuration table verified against a 150 dpi pdftoppm render because several cells are MERGED across models and pdfplumber's linearisation cannot show the merge boundaries): reference mast per footnote *1 = 'mástil triple telescópico de 5755 mm (225 pulg.)' → mast_type Triplex (note: 225 in = 5715 mm, so the printed 5755 mm is itself ~40 mm off — a source rounding/typo, cited as printed). Footnote *2 states optional masts / attachments / larger loads / greater lift heights reduce capacity. navigation_type = Vision, NOT SLAM: the 'Método de Posicionamiento' row reads 'Vision-based' for the whole R series, whereas every other series in this catalog reads '3D SLAM'. ('Lidar 3D' on the next row is the PERCEPTION method for load handling, not positioning.) The (VL) code suffix decodes as 'Vision + 3D Laser' per the VisionNav model-code convention, so a case could be made for ['Vision','Natural Feature (SLAM)'] — but only 'Vision-based' is printed, and one vendor compound term maps to one AP0 value. AISLE-WIDTH CONVENTION (read this before importing): p.13 prints TWO stacking-aisle figures per model — 'Ancho Mínimo del pasillo de carga (Schubmast-Eingefahrene)' = mast RETRACTED, and '(Schubmast-Ausgefahrene)' = mast EXTENDED (the Spanish edition leaves these two qualifiers in German — a translation artefact). I have mapped the RETRACTED figure, because AP0's min_aisle_width means the narrowest aisle the vehicle can work in and the reach stroke goes into the RACK, not into the aisle. This also matches what the DB already holds for VNR16 (3250) and VNR20 (3300) exactly. NOTE FOR THE TECH LEAD: an earlier pass over the English VisionNav reach-truck sheets adopted the OPPOSITE convention (extended). One of the two conventions is wrong across the corpus; this needs a ruling. Extended figures are recorded per model below. UNMAPPED: 'Radio Mínimo de Giro 1800mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±3mm/㎡' (the tightest floor requirement in the whole catalog — R series only). UNMAPPED (no AP0 field): battery 48V/400Ah; support-leg height 310mm; fork dims 1115x100x45mm; optional fork lengths 1260/1360/1460/1560mm; outer/inner fork spread 710/486mm; load centre 600mm; max joint width 30mm; max obstacle height 10mm; mast forward reach distance. AMBIGUITY (flagged, no value proposed): p.7 matrix ticks 'Almacén de gran altura' for the R series but NOT 'Apilado de mercancías'; under industry README §6a that reads as stacking_capability=false, yet the DB holds 1 for VNR16/VNR20. Needs a Tech Lead call — I have deliberately left stacking_capability out of the fields block. EVIDENCE FOR THE OPEN forks_free_floating QUESTION: the p.7 matrix ticks 'Pallet CHEP cerrado' (closed-bottom pallet) for the R series. That is direct manufacturer evidence on the exact point where config/fields.json and the industry README contradict each other for reach trucks. I have left forks_free_floating NULL pending the ruling, but this data point should feed it."
+  },
+  {
+   "product_name": "VisionNav VNR20(VL)-01",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 13,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Vision"
+    ],
+    "drive_type": "Reach Truck",
+    "mast_type": "Triplex",
+    "max_payload": 2000,
+    "lifting_height": 11400,
+    "min_aisle_width": 3300,
+    "vehicle_length": 2670,
+    "vehicle_width": 1640,
+    "min_total_height": 3430,
+    "max_speed": 2.0,
+    "max_gradient": 10,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation",
+     "Standard rack"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.13, row 'Método de Posicionamiento' = Vision-based (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.13, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.13, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.13, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.13, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.13, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.13, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.13, row 'Ancho Mínimo del pasillo de carga' = 3300 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.13, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.13, row 'Método de Posicionamiento' = 'Vision-based' (spans all three models)",
+    "drive_type": "p.13, product-type header 'CARRETILLA RETRÁCTIL SERIE VNR AGV' (reach truck); p.7 matrix column 'R series' = 'CARRETILLA RETRÁCTIL'",
+    "mast_type": "p.13, footnote *1: 'mástil triple telescópico de 5755 mm (225 pulg.)'",
+    "max_payload": "p.13, row 'Capacidad de Carga Nominal', column 'VNR20(VL)-01' = '2000kg'",
+    "lifting_height": "p.13, row 'Altura de elevación' = 'Hasta 11400mm' — MERGED-CELL resolution verified on a 150 dpi render: 'Hasta 8500mm(335in)' occupies the VNR14 column only, 'Hasta 11400mm(450in)' spans the VNR16+VNR20 columns",
+    "min_aisle_width": "p.13, row 'Ancho Mínimo del pasillo de carga (Schubmast-Eingefahrene)' [mast RETRACTED] = 3300mm. The companion '(Schubmast-Ausgefahrene)' [mast EXTENDED] row gives 3900mm for this model. Merge boundaries verified on a 150 dpi render. NOT the '2600mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.13, row 'Dimensiones con el mástil retraído' = '2670x1640x3430mm' → L (mast RETRACTED; the 'mástil extendido' row gives 3295mm length)",
+    "vehicle_width": "p.13, row 'Dimensiones con el mástil retraído' → W",
+    "min_total_height": "p.13, row 'Dimensiones con el mástil retraído' → H",
+    "max_speed": "p.13, row 'Velocidad en avance (Cargado/Vacío)' = '2.0m/s, 2.0m/s' (spans all three models); loaded and unloaded are equal here so the AP0 'top/unloaded' rule is not load-bearing",
+    "max_gradient": "p.13, row 'Pendiente máxima de subida (Cargado/Vacío)' = '10%, 10% (6°, 6°)' → loaded 10%. Already in %; tan(6°)·100 = 10.5%, internally consistent.",
+    "stop_accuracy": "p.13, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'R series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓",
+    "station_applications": "p.7 series matrix, column 'R series': floor-to-floor ✓, production-line transfer ✓, 'Almacén de gran altura' ✓",
+    "load_detection": "p.13, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.13, row 'Rango de desplazamiento lateral' = '±80mm(±3.15in)' — an explicit lateral (side-shift) travel range, verified on a 150 dpi render",
+    "safety_coverage": "p.13, 'Protección de Seguridad Superior' and 'Lateral' both = 'Sensor Fotoeléctrico + Escáner Ultrasónico' over 2D laser front/rear",
+    "product_type": "p.13 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=7000 vs catalog 11400. DB max_payload=2000 CONFIRMED, DB max_speed=2.0 CONFIRMED, DB min_aisle_width=3300 CONFIRMED (matches the mast-retracted column exactly). Note VNR20's collapsed height is 3430mm vs 2480mm for VNR14/VNR16 — it is a physically taller chassis, consistent with the 11400mm mast. R-series shared (p.13, single 3-model configuration table verified against a 150 dpi pdftoppm render because several cells are MERGED across models and pdfplumber's linearisation cannot show the merge boundaries): reference mast per footnote *1 = 'mástil triple telescópico de 5755 mm (225 pulg.)' → mast_type Triplex (note: 225 in = 5715 mm, so the printed 5755 mm is itself ~40 mm off — a source rounding/typo, cited as printed). Footnote *2 states optional masts / attachments / larger loads / greater lift heights reduce capacity. navigation_type = Vision, NOT SLAM: the 'Método de Posicionamiento' row reads 'Vision-based' for the whole R series, whereas every other series in this catalog reads '3D SLAM'. ('Lidar 3D' on the next row is the PERCEPTION method for load handling, not positioning.) The (VL) code suffix decodes as 'Vision + 3D Laser' per the VisionNav model-code convention, so a case could be made for ['Vision','Natural Feature (SLAM)'] — but only 'Vision-based' is printed, and one vendor compound term maps to one AP0 value. AISLE-WIDTH CONVENTION (read this before importing): p.13 prints TWO stacking-aisle figures per model — 'Ancho Mínimo del pasillo de carga (Schubmast-Eingefahrene)' = mast RETRACTED, and '(Schubmast-Ausgefahrene)' = mast EXTENDED (the Spanish edition leaves these two qualifiers in German — a translation artefact). I have mapped the RETRACTED figure, because AP0's min_aisle_width means the narrowest aisle the vehicle can work in and the reach stroke goes into the RACK, not into the aisle. This also matches what the DB already holds for VNR16 (3250) and VNR20 (3300) exactly. NOTE FOR THE TECH LEAD: an earlier pass over the English VisionNav reach-truck sheets adopted the OPPOSITE convention (extended). One of the two conventions is wrong across the corpus; this needs a ruling. Extended figures are recorded per model below. UNMAPPED: 'Radio Mínimo de Giro 1915mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±3mm/㎡' (the tightest floor requirement in the whole catalog — R series only). UNMAPPED (no AP0 field): battery 48V/400Ah; support-leg height 373mm; fork dims 1115x100x45mm; optional fork lengths 1260/1360/1460/1560mm; outer/inner fork spread 710/486mm; load centre 600mm; max joint width 30mm; max obstacle height 10mm; mast forward reach distance. AMBIGUITY (flagged, no value proposed): p.7 matrix ticks 'Almacén de gran altura' for the R series but NOT 'Apilado de mercancías'; under industry README §6a that reads as stacking_capability=false, yet the DB holds 1 for VNR16/VNR20. Needs a Tech Lead call — I have deliberately left stacking_capability out of the fields block. EVIDENCE FOR THE OPEN forks_free_floating QUESTION: the p.7 matrix ticks 'Pallet CHEP cerrado' (closed-bottom pallet) for the R series. That is direct manufacturer evidence on the exact point where config/fields.json and the industry README contradict each other for reach trucks. I have left forks_free_floating NULL pending the ruling, but this data point should feed it."
+  },
+  {
+   "product_name": "VisionNav VNE20(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 14,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 2000,
+    "lifting_height": 4500,
+    "min_aisle_width": 3760,
+    "vehicle_length": 3460,
+    "vehicle_width": 1250,
+    "min_total_height": 2040,
+    "max_speed": 2.7,
+    "max_gradient": 13,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Full 3D"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.14, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.14, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.14, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.14, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.14, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.14, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.14, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.14, row 'Ancho Mínimo del pasillo de carga' = 3760 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.14, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.14, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.14, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.14, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.14, product-type header 'TORO CONTRAPESADO AGV' (counterbalanced forklift); p.7 matrix column 'E series' = 'TORO CONTRAPESADO'",
+    "mast_type": "p.14, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.14, row 'Capacidad de Carga Nominal' = '2000kg'",
+    "lifting_height": "p.14, row 'Altura de elevación' = 'Hasta 4500mm(177in)'",
+    "min_aisle_width": "p.14, row 'Ancho Mínimo del pasillo de carga' = '3760mm'. NOT the '2470mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.14, row 'Dimensiones del Vehículo' = '3460x1250x2040mm' → L",
+    "vehicle_width": "p.14, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.14, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.14, row 'Velocidad en avance (Cargado/Vacío)' → unloaded/top figure 2.7 per AP0 hint",
+    "max_gradient": "p.14, row 'Pendiente máxima de subida (Cargado/Vacío)' → LOADED figure 13% (AP0 hint: 'gradient the LOADED unit handles')",
+    "stop_accuracy": "p.14, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'E series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓",
+    "station_applications": "p.7 series matrix, column 'E series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.14, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.14, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.14 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the E series",
+    "stacking_capability": "p.7 series matrix, column 'E series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.14, row 'Protección de Seguridad Superior' = 'Protección con Escáner Láser 3D' — an explicitly 3D safety scanner, which only the E series in this catalog has",
+    "product_type": "p.14 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=3000 vs catalog 'Hasta 4500mm'. DB max_payload=2000 CONFIRMED and DB min_aisle_width=3760 CONFIRMED exactly. DB max_speed was NULL → 2.7 is a new fill. PLAUSIBILITY FLAG: max_speed 2.7 m/s exceeds this project's fallback sanity bound for automated zones (2.5 m/s) — but config/plausibility.json has no max_speed entry, and the source prints '2.7m/s (6.04mph)' where 6.04 mph = 2.70 m/s, an internally consistent imperial cross-check. So the figure is real, not an OCR slip. It is also the fastest vehicle in this catalog by a wide margin, consistent with the page's own claim that this model 'es capaz de desplazarse a mayor velocidad'. STRAY GLYPHS: p.14 contains an untranslated Chinese string ('滚滚长江东逝水') left in the layout next to the safety rows — a source production error, no data impact. UNMAPPED: 'Radio Mínimo de Giro 1835mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±5mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 48V/400Ah; load centre 500mm; max joint width 50mm; max obstacle height 30mm; lift/lower speeds. Footnote *4 states optional masts, attachments, larger load dimensions or greater lift heights reduce capacity — payload and max lift are not simultaneously achievable."
+  },
+  {
+   "product_name": "VisionNav VNE30(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 15,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 3000,
+    "lifting_height": 4500,
+    "min_aisle_width": 4430,
+    "vehicle_length": 3790,
+    "vehicle_width": 1430,
+    "min_total_height": 2190,
+    "max_speed": 2.2,
+    "max_gradient": 13,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Full 3D"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.15, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.15, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.15, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.15, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.15, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.15, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.15, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.15, row 'Ancho Mínimo del pasillo de carga' = 4430 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.15, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.15, product-type header 'TORO CONTRAPESADO AGV' (counterbalanced forklift); p.7 matrix column 'E series' = 'TORO CONTRAPESADO'",
+    "mast_type": "p.15, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.15, row 'Capacidad de Carga Nominal' = '3000kg'",
+    "lifting_height": "p.15, row 'Altura de elevación' = 'Hasta 4500mm(177in)'",
+    "min_aisle_width": "p.15, row 'Ancho Mínimo del pasillo de carga' = '4430mm'. NOT the '2690mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.15, row 'Dimensiones del Vehículo' = '3790x1430x2190mm' → L",
+    "vehicle_width": "p.15, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.15, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.15, row 'Velocidad en avance (Cargado/Vacío)' → unloaded/top figure 2.2 per AP0 hint",
+    "max_gradient": "p.15, row 'Pendiente máxima de subida (Cargado/Vacío)' → LOADED figure 13% (AP0 hint: 'gradient the LOADED unit handles')",
+    "stop_accuracy": "p.15, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'E series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓",
+    "station_applications": "p.7 series matrix, column 'E series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.15, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.15, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.15 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the E series",
+    "stacking_capability": "p.7 series matrix, column 'E series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.15, row 'Protección de Seguridad Superior' = 'Protección con Escáner Láser 3D' — an explicitly 3D safety scanner, which only the E series in this catalog has",
+    "product_type": "p.15 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=3000 vs catalog 'Hasta 4500mm'. DB max_payload=3000 CONFIRMED, DB max_speed=2.2 CONFIRMED, DB min_aisle_width=4430 CONFIRMED exactly. p.15 is a 3-model configuration table; merge boundaries verified on a 150 dpi pdftoppm render. VNE30/VNE35/VNE40 share one chassis: vehicle dimensions, aisle widths, lift height, speed, battery (83.2V/500Ah — the only 83.2 V system in the catalog) and floor-flatness requirement are all single merged cells spanning all three columns. Only body weight (5450/5600/6200 kg), rated capacity (3000/3500/4000 kg) and gradeability (13%,15% for VNE30+VNE35 vs 12%,15% for VNE40) differ. variant_group: these three should almost certainly share one base model. UNMAPPED: 'Radio Mínimo de Giro 2240mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±10mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 83.2V/500Ah; load centre 500mm; max joint width 50mm; max obstacle height 30mm; lift/lower speeds. Footnote *4 states optional masts, attachments, larger load dimensions or greater lift heights reduce capacity — payload and max lift are not simultaneously achievable.",
+   "variant_group": "VisionNav VNE30/VNE35/VNE40 (p.15) — one shared chassis, differing only in rated capacity, body weight and gradeability"
+  },
+  {
+   "product_name": "VisionNav VNE35(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 15,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 3500,
+    "lifting_height": 4500,
+    "min_aisle_width": 4430,
+    "vehicle_length": 3790,
+    "vehicle_width": 1430,
+    "min_total_height": 2190,
+    "max_speed": 2.2,
+    "max_gradient": 13,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Full 3D"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.15, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.15, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.15, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.15, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.15, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.15, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.15, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.15, row 'Ancho Mínimo del pasillo de carga' = 4430 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.15, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.15, product-type header 'TORO CONTRAPESADO AGV' (counterbalanced forklift); p.7 matrix column 'E series' = 'TORO CONTRAPESADO'",
+    "mast_type": "p.15, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.15, row 'Capacidad de Carga Nominal' = '3500kg'",
+    "lifting_height": "p.15, row 'Altura de elevación' = 'Hasta 4500mm(177in)'",
+    "min_aisle_width": "p.15, row 'Ancho Mínimo del pasillo de carga' = '4430mm'. NOT the '2690mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.15, row 'Dimensiones del Vehículo' = '3790x1430x2190mm' → L",
+    "vehicle_width": "p.15, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.15, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.15, row 'Velocidad en avance (Cargado/Vacío)' → unloaded/top figure 2.2 per AP0 hint",
+    "max_gradient": "p.15, row 'Pendiente máxima de subida (Cargado/Vacío)' → LOADED figure 13% (AP0 hint: 'gradient the LOADED unit handles')",
+    "stop_accuracy": "p.15, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'E series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓",
+    "station_applications": "p.7 series matrix, column 'E series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.15, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.15, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.15 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the E series",
+    "stacking_capability": "p.7 series matrix, column 'E series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.15, row 'Protección de Seguridad Superior' = 'Protección con Escáner Láser 3D' — an explicitly 3D safety scanner, which only the E series in this catalog has",
+    "product_type": "p.15 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=3000 vs catalog 'Hasta 4500mm'. DB max_payload=3500 CONFIRMED, DB max_speed=2.2 CONFIRMED, DB min_aisle_width=4430 CONFIRMED exactly. p.15 is a 3-model configuration table; merge boundaries verified on a 150 dpi pdftoppm render. VNE30/VNE35/VNE40 share one chassis: vehicle dimensions, aisle widths, lift height, speed, battery (83.2V/500Ah — the only 83.2 V system in the catalog) and floor-flatness requirement are all single merged cells spanning all three columns. Only body weight (5450/5600/6200 kg), rated capacity (3000/3500/4000 kg) and gradeability (13%,15% for VNE30+VNE35 vs 12%,15% for VNE40) differ. variant_group: these three should almost certainly share one base model. UNMAPPED: 'Radio Mínimo de Giro 2240mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±10mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 83.2V/500Ah; load centre 500mm; max joint width 50mm; max obstacle height 30mm; lift/lower speeds. Footnote *4 states optional masts, attachments, larger load dimensions or greater lift heights reduce capacity — payload and max lift are not simultaneously achievable.",
+   "variant_group": "VisionNav VNE30/VNE35/VNE40 (p.15) — one shared chassis, differing only in rated capacity, body weight and gradeability"
+  },
+  {
+   "product_name": "VisionNav VNE40(VL)-07",
+   "product_type": "Forklift AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 15,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "vna_capable": false,
+    "pick_req_accuracy_lat": 100,
+    "pick_req_accuracy_dep": 100,
+    "pick_req_accuracy_angle": 10,
+    "product_type": "Forklift AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "drive_type": "Counterbalanced",
+    "mast_type": "Duplex",
+    "max_payload": 4000,
+    "lifting_height": 4500,
+    "min_aisle_width": 4430,
+    "vehicle_length": 3790,
+    "vehicle_width": 1430,
+    "min_total_height": 2190,
+    "max_speed": 2.2,
+    "max_gradient": 12,
+    "stop_accuracy": 10,
+    "load_type": [
+     "Pallet EUR",
+     "Pallet ISO",
+     "Bulk Bin"
+    ],
+    "station_applications": [
+     "Floor",
+     "Workstation"
+    ],
+    "load_detection": [
+     "Laser/LiDAR profiling"
+    ],
+    "special_fork_option": [
+     "Side-Shift"
+    ],
+    "forks_free_floating": true,
+    "stacking_capability": true,
+    "safety_coverage": "Full 3D"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.15, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.15, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.15, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.15, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.15, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.15, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.15, row 'Tipo de Operación' = 'Automatic / Manual Seated'",
+    "vna_capable": "p.15, row 'Ancho Mínimo del pasillo de carga' = 4430 mm — well above the 1800 mm VNA threshold; no turret/side-loader wording anywhere in the catalog",
+    "pick_req_accuracy_lat": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_dep": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°' (single combined figure, not split by axis)",
+    "pick_req_accuracy_angle": "p.15, row 'Auto-adaptabilidad de recogida' = '±100mm/±10°'",
+    "navigation_type": "p.15, row 'Método de Posicionamiento' = '3D SLAM'",
+    "drive_type": "p.15, product-type header 'TORO CONTRAPESADO AGV' (counterbalanced forklift); p.7 matrix column 'E series' = 'TORO CONTRAPESADO'",
+    "mast_type": "p.15, footnote *1: 'mástil dúplex de 118 pulgadas (3000 mm)'",
+    "max_payload": "p.15, row 'Capacidad de Carga Nominal' = '4000kg'",
+    "lifting_height": "p.15, row 'Altura de elevación' = 'Hasta 4500mm(177in)'",
+    "min_aisle_width": "p.15, row 'Ancho Mínimo del pasillo de carga' = '4430mm'. NOT the '2690mm' 'Ancho Mínimo del Pasillo de Giro' row.",
+    "vehicle_length": "p.15, row 'Dimensiones del Vehículo' = '3790x1430x2190mm' → L",
+    "vehicle_width": "p.15, row 'Dimensiones del Vehículo' → W",
+    "min_total_height": "p.15, row 'Dimensiones del Vehículo' → H",
+    "max_speed": "p.15, row 'Velocidad en avance (Cargado/Vacío)' → unloaded/top figure 2.2 per AP0 hint",
+    "max_gradient": "p.15, row 'Pendiente máxima de subida (Cargado/Vacío)' → LOADED figure 12% (AP0 hint: 'gradient the LOADED unit handles')",
+    "stop_accuracy": "p.15, row 'Precisión de Ubicación' = '±10mm/±0.5°'",
+    "load_type": "p.7 series matrix, column 'E series': 'Pallet EU abierto' ✓, 'Pallet CHEP cerrado' ✓, 'Jaula de almacenaje/estantería multicapa' ✓, 'Materiales sin soporte' ✓",
+    "station_applications": "p.7 series matrix, column 'E series': floor-to-floor ✓, production-line transfer ✓",
+    "load_detection": "p.15, row 'Método de percepción' = 'Lidar 3D'",
+    "special_fork_option": "p.15, footnote *2: 'Desplazador lateral y posicionador de horquillas opcionales'",
+    "forks_free_floating": "p.15 drive_type=Counterbalanced + p.7 series matrix 'Pallet CHEP cerrado' ✓ for the E series",
+    "stacking_capability": "p.7 series matrix, column 'E series': 'Apilado de mercancías' ✓",
+    "safety_coverage": "p.15, row 'Protección de Seguridad Superior' = 'Protección con Escáner Láser 3D' — an explicitly 3D safety scanner, which only the E series in this catalog has",
+    "product_type": "p.15 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT (do not overwrite): DB lifting_height=3000 vs catalog 'Hasta 4500mm'. DB max_payload=4000 CONFIRMED, DB max_speed=2.2 CONFIRMED, DB min_aisle_width=4430 CONFIRMED exactly. p.15 is a 3-model configuration table; merge boundaries verified on a 150 dpi pdftoppm render. VNE30/VNE35/VNE40 share one chassis: vehicle dimensions, aisle widths, lift height, speed, battery (83.2V/500Ah — the only 83.2 V system in the catalog) and floor-flatness requirement are all single merged cells spanning all three columns. Only body weight (5450/5600/6200 kg), rated capacity (3000/3500/4000 kg) and gradeability (13%,15% for VNE30+VNE35 vs 12%,15% for VNE40) differ. variant_group: these three should almost certainly share one base model. UNMAPPED: 'Radio Mínimo de Giro 2240mm' (explicit RADIUS — no Forklift-scope AP0 field); 'Planicidad del suelo ±10mm/㎡' (categorical AP0 field cannot hold mm/m²). UNMAPPED (no AP0 field): battery 83.2V/500Ah; load centre 500mm; max joint width 50mm; max obstacle height 30mm; lift/lower speeds. Footnote *4 states optional masts, attachments, larger load dimensions or greater lift heights reduce capacity — payload and max lift are not simultaneously achievable.",
+   "variant_group": "VisionNav VNE30/VNE35/VNE40 (p.15) — one shared chassis, differing only in rated capacity, body weight and gradeability"
+  },
+  {
+   "product_name": "VisionNav VNQ50(VL)-01",
+   "product_type": "Tugger AGV",
+   "source_file": "1728979799.pdf",
+   "source_page": 16,
+   "db_status": "conflict",
+   "fields": {
+    "infrastructure_free": true,
+    "operating_temp_min": -5,
+    "operating_temp_max": 40,
+    "operating_humidity_max": 95,
+    "battery_type": [
+     "LiFePO4"
+    ],
+    "autonomous_charging": true,
+    "manual_usage": true,
+    "product_type": "Tugger AGV",
+    "navigation_type": [
+     "Natural Feature (SLAM)"
+    ],
+    "towing_capacity": 5000,
+    "turning_radius": 1300,
+    "vehicle_length": 1650,
+    "vehicle_width": 860,
+    "max_speed": 2.0,
+    "max_gradient": 5,
+    "stop_accuracy": 50,
+    "outdoor_capable": true,
+    "load_type": [
+     "Roll Container"
+    ],
+    "trailer_steering_technology": [
+     "Quad-steer (all-wheel)"
+    ],
+    "route_type": "Fully Dynamic",
+    "safety_coverage": "Limited 3D (e.g. waterfall)"
+   },
+   "field_sources": {
+    "infrastructure_free": "p.16, row 'Método de Posicionamiento' = 3D SLAM (no reflectors/tape/wire named anywhere in the catalog)",
+    "operating_temp_min": "p.16, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → lower bound",
+    "operating_temp_max": "p.16, row 'Temperatura de Trabajo' = '-5℃ ~ 40℃' → upper bound",
+    "operating_humidity_max": "p.16, humidity row printed '20% ~ 95%' → upper bound (see notes: this row is MISLABELLED 'Separación interior entre horquillas' in the Spanish edition)",
+    "battery_type": "p.16, row 'Tipo de Batería' = 'Fosfato de hierro y litio (LiFePO4)'",
+    "autonomous_charging": "p.16, row 'Modo de Carga' = 'Carga Manual / Automática'",
+    "manual_usage": "p.16, row 'Tipo de Operación' = 'Asiento automático / manual'",
+    "navigation_type": "p.16, row 'Método de Posicionamiento' = '3D SLAM'",
+    "towing_capacity": "p.16, row 'Capacidad de Carga Nominal' = '5000kg(11000lb)' (also headline stat). Mapped to towing_capacity, NOT max_payload — see notes.",
+    "turning_radius": "p.16, headline stat 'Radio Mínimo de Giro 1300mm (52in)'. Explicitly a RADIUS (Spanish 'radio'), so safe to map directly per the established radius-vs-diameter rule. Distinct from the 'Min. Pasillo de giro (sin carrito) 1700mm' row.",
+    "vehicle_length": "p.16, row 'Dimensiones del vehículo' = '1650x860x2000mm(65x34x79in)' → L",
+    "vehicle_width": "p.16, row 'Dimensiones del vehículo' → W",
+    "max_speed": "p.16, row 'Velocidad en avance (Cargado/Vacío)' = '2.0m/s, 2.0m/s'",
+    "max_gradient": "p.16, row 'Max. Capacidad de escalada (Cargado/Vacío)' = '5%, 24% (3°, 13°)' → LOADED figure 5% per the AP0 hint ('gradient the LOADED unit handles'). The 24% unloaded figure is deliberately NOT used.",
+    "stop_accuracy": "p.16, row 'Precisión de posición' = '±50mm/±1°' — an order of magnitude looser than every forklift in this catalog (±8–10mm), consistent with a tow tractor",
+    "outdoor_capable": "p.7 series matrix, column 'Q series': 'Transporte interior y exterior' ✓ (only series with this tick); corroborated on p.16 by row 'Tipo de neumático' = 'Caucho (exterior)/Poliuretano (interior)' — a dedicated outdoor tyre option",
+    "load_type": "p.7 series matrix, column 'Q series': 'Carros rodantes' ✓ (only load type ticked for Q series)",
+    "trailer_steering_technology": "p.16, row 'Tipo de carro' = 'Dirección Quad' (quad steering)",
+    "route_type": "p.16 body text: 3D SLAM positioning with no fixed guidance; p.6 RCS 2.0 does 'planificación de rutas' dynamically for up to 150 AGVs",
+    "safety_coverage": "p.16, front/rear/top/side rows all = laser scanner + anti-collision bumper; body text 'Su sistema láser 3D puede detectar obstáculos de alto nivel'",
+    "product_type": "p.16 product-type header, corroborated by the p.7 series matrix row 'TIPO DE PRODUCTO'"
+   },
+   "notes": "DB CONFLICT ×3 (do not overwrite, all flagged for manual resolution): (1) DB towing_capacity=19958 vs catalog 5000. UNIT FORENSICS: 19958 kg is EXACTLY 44,000 lb (44000 × 0.45359237 = 19958.06), so the DB value came from a US-market imperial spec sheet, not from a metric source — it is not a random error. This catalog prints 5000kg (11000lb), i.e. exactly one QUARTER of 44,000 lb. A plausible reconciliation is that 5000 kg is the tractor's rated drawbar/tow rating and 44,000 lb is a total train weight, but the catalog does not say so. Needs a Tech Lead call. (2) DB max_payload=5000. Per the established VisionNav tow-tractor rule, a tow tractor's 'Rated Load Capacity' is a TRACTION rating and max_payload should be NULL — this page corroborates that rule: it has no fork, mast or lift row at all, and instead gives 'Altura central del bulón de tracción' (traction-pin centre height) and 'Tracción nominal en la barra de tracción 1000N' (rated drawbar pull). I have deliberately NOT proposed a max_payload value. (3) DB service_coverage='EU', but p.16 states in a boxed note: 'Este producto solo está disponible en América. Contacta a tu representante de ventas... para conocer la disponibilidad más reciente.' (This product is only available in the Americas.) That directly contradicts an EU service-coverage claim for this specific model. This is the single most commercially significant finding in the file. DB max_speed=2.0 CONFIRMED (metric). SOURCE INCONSISTENCY: the imperial column prints '2.90mph' for 2.0 m/s, but 2.0 m/s = 4.47 mph; 2.90 mph would be 1.30 m/s. Every other page in this catalog converts 2.0 m/s correctly to 4.47 mph, so this is a p.16-local typo in the imperial column; the metric figure is reliable. DB min_aisle_width=1700 appears to have been populated from 'Min. Pasillo de giro (sin carrito) 1700mm' — that is a min TURNING-aisle figure measured WITHOUT a cart, not a working aisle width, and the established VisionNav convention is not to map turning-aisle rows to min_aisle_width. Flagged, not changed. coupling_type left NULL: the page names a traction pin ('bulón de tracción') but never states whether coupling is automatic or manual, so 'Pintle Hook' would be a guess. max_trailers left NULL: not stated anywhere. UNMAPPED (no AP0 field): body weight 1000kg; battery 24V/270Ah LiFePO4; wheelbase 1050mm; rated drawbar pull 1000N; motor power 3kW (60-min rating); electromagnetic service brake; noise at operator's ear <70dB; traction-pin centre height options 290/345/400mm; max joint width 30mm; max obstacle height 20mm; floor flatness ±5mm/㎡."
+  }
+ ]
+}

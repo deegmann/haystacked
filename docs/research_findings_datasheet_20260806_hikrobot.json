@@ -1,0 +1,118 @@
+{
+  "company": "Hikrobot",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. Single 2-page flyer for an existing DB product (Hikrobot F3-1500, forklift/pallet-mover class AGV). Kept deliberately small/simple as the 8th and final unit of this calibration batch. Two conflicts found against already-filled DB fields, neither overwritten. ADDENDUM (full-batch continuation run, same calendar day): STU_flyer_eng_cemat_v2.pdf processed, revealing a genuinely NEW Hikrobot product line (STU Series, tote-shuttle/CTU-class mobile robot for high-density storage, similar in category to Geek+'s RoboShuttle line already in the DB under a different company) not previously covered. 'QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf' (+1 byte-identical duplicate) was attempted but its extracted text is a garbled custom-font-encoding cipher (every character substituted, not a language/OCR issue -- e.g. 'Nutzlast' concepts appear as unreadable symbol strings) that neither plain text nor table extraction could resolve; unlike the Balyo Veeny/REACHY font-garbling cases earlier in this batch (which were readable via image fallback), this one was NOT visually re-read this run due to remaining time budget -- deferred alongside the other large deferred catalogs (Hikrobot full-version brochure, Kivnon catalog, VisionNav catalogs), flagged as a good target for a dedicated future session using image-based extraction from the start. ADDENDUM 2 (final-8-files run, same calendar day): QF flyer read via image-based Read tool per plan (garbled-font file, text extraction skipped entirely this time). Two genuinely new products found: QF-600D and QF-1000D, an underride-style 'latent mobile robot chassis + forklift forks' pallet handler -- classified Mobile AMR by analogy with Hikrobot's own Q-series (underride) naming/classification convention rather than F-series (Forklift AGV), since 'QF' explicitly combines LMR (latent/underride) chassis with FMR forks and the flyer's own text frames it as an LMR-class robot gaining pallet capability, not a forklift gaining AMR features.",
+  "products": [
+    {
+      "product_name": "Hikrobot F3-1500",
+      "product_type": "Forklift AGV",
+      "source_file": "F3-1500_flyer_eng_cemat_v2.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "min_total_height": 1986
+      },
+      "field_sources": {
+        "min_total_height": "p.2 'Specification' table, 'Dimension (Length*Width*Height) 1632*863*1986mm' -- Height component"
+      },
+      "conflicts": {
+        "max_speed": {
+          "db_value": 2.1,
+          "datasheet_value": "1.5 m/s (p.1 'Key Feature: Efficient Transferring: max. running speed 1.5m/s' and p.2 table 'Running Speed 1.5/1.2m/s')",
+          "note": "Not overwritten. DB value 2.1 m/s does not match either the loaded or unloaded speed printed on this flyer (1.5/1.2 m/s) -- flagged for manual reconciliation, possibly sourced from a different revision or a different Hikrobot model originally."
+        },
+        "vehicle_width": {
+          "db_value": 870,
+          "datasheet_value": "863mm (p.2 table 'Dimension (Length*Width*Height) 1632*863*1986mm')",
+          "note": "Not overwritten. Minor 7mm discrepancy, plausibly rounding/tolerance rather than a real spec difference -- flagged for completeness but low-priority for manual review."
+        }
+      },
+      "notes": "vehicle_length=1632 and stop_accuracy=10 already match this flyer exactly ('Positioning Accuracy ±10mm') -- confirmed, not restated as new fills. load_detection=Camera/Vision already matches the flyer's 'Pallet Recognition: autonomous fork picking according to the location of the pallet, and can identify the black, stainless steel and other special pallets' (implies vision-based recognition) -- confirmed, no change. drive_type='Pallet Mover' already set and left untouched; the flyer's adaptive-carrier icons (Plastic Pallet / Wooden Pallet / Rack) and 'autonomous fork picking' language are consistent with a fork-based pallet handler but do not by themselves confirm or contradict the specific 'Pallet Mover' (straddle-under-load) sub-classification versus e.g. a reach-truck-style design -- not re-verified in this run. omnidirectional_movement intentionally left null despite 'Flexible movement: forward/backward/arc moving, rotate in place' -- rotate-in-place and arc movement do not by themselves confirm lateral/omnidirectional travel (could be a standard differential/steer drive), so not set to avoid a wrong true."
+    },
+    {
+      "product_name": "Hikrobot STU Series",
+      "product_type": "Mobile AMR",
+      "source_file": "STU_flyer_eng_cemat_v2.pdf",
+      "db_status": "new",
+      "fields": {
+        "max_payload": 50,
+        "max_speed": 3,
+        "operating_temp_min": -10,
+        "operating_temp_max": 45,
+        "navigation_type": [
+          "Vision"
+        ],
+        "top_module_type": "Lift"
+      },
+      "field_sources": {
+        "max_payload": "p.2 spec table, 'Basic Parameters', 'Rated Load(kg) 30/50' -- dual rating for two adaptor variants (MR-TP6-30SCH / MR-TP6-30SCW), higher figure used as max_payload",
+        "max_speed": "p.2 spec table, 'Motion Performance', 'Max. Running Speed(m/s) 3'",
+        "operating_temp_min": "p.2 spec table, 'Environment', 'Temperature -10~45℃'",
+        "operating_temp_max": "p.2 spec table, same row",
+        "navigation_type": "p.2 spec table, 'Navigation Mode Visual' for both sub-models",
+        "top_module_type": "p.1 body text, actuator/clamping mechanism for tote handling ('Proven and reliable CTU clamping, grab components') plus p.2 'Max. Lifting Speed (m/s) 2' -- a lift-type top module"
+      },
+      "notes": "NEW PRODUCT (genuinely new product line, not a variant of any existing Hikrobot F/Q-series product -- STU is described as 'the new generation of CTU mobile robots' for tote/shuttle warehousing, structurally different from the F/Q-series pallet-handling forklifts already in the DB). Two sub-model codes (MR-TP6-30SCH / MR-TP6-30SCW) share identical numeric specs except tote-dimension compatibility (different adaptor orientations: 600x400x300mm & 800x600x450mm vs 650x450x300mm) -- treated as ONE product entry rather than two, since the difference is a tote-adaptor configuration, not a distinct capability class (consistent with this batch's AGILOX OCF config-vs-variant reasoning). 'Picking Height(m) 12' (max shelf/rack height the STU system operates within, not a single-vehicle lift stroke) has no clean single-field AP0 mapping and was NOT mapped to lift_height, since lift_height's AP0 definition is a per-vehicle stroke not an installation's overall storage height -- left null rather than force-mapped; noted here for a reviewer's awareness since it's a materially informative figure (max 12m warehouse height) even though it doesn't fit lift_height cleanly. fleet_management_system/integration_capability not stated in this flyer -- left null."
+    },
+    {
+      "product_name": "Hikrobot QF-600D",
+      "product_type": "Mobile AMR",
+      "source_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf (read via image/visual rendering -- text and table extraction both failed on this file, garbled custom-font encoding, per prior-session notes)",
+      "db_status": "new",
+      "variant_group": "Hikrobot QF Series (QF-600D and QF-1000D share the identical 1250x1200x190mm LMR chassis + FMR-fork platform, differ only in rated load)",
+      "fields": {
+        "max_payload": 600,
+        "vehicle_length": 1250,
+        "vehicle_width": 1200,
+        "max_speed": 2.0,
+        "battery_runtime": 8,
+        "charge_time": 90,
+        "navigation_type": ["Natural Feature (SLAM)", "QR/DM Code"],
+        "load_type": ["Pallet ISO", "Custom Carrier"],
+        "storage_system_type": ["Pallet-to-Person"]
+      },
+      "field_sources": {
+        "max_payload": "p.2 spec table, 'Basic Parameter', 'Rated Load (kg)' column 'QF-600D' = 600",
+        "vehicle_length": "p.2 spec table, 'Dimension (L1*b1*h1)(mm)' = '1250*1200*190' -- L1 component",
+        "vehicle_width": "p.2 spec table, same row -- b1 component",
+        "max_speed": "p.1 body bullet 'Max. running speed for differential AMR type is 2 m/s' + p.2 table 'Rated Running Speed (Empty/Rated Load)(mm/s)' = '1800/2000' -- converted 2000 mm/s (rated-load, conservative/worst-case figure, and matches the p.1 headline of 2 m/s exactly) to 2.0 m/s; printed empty-run figure was 1800 mm/s = 1.8 m/s, not used",
+        "battery_runtime": "p.2 spec table, 'Battery Performance', 'Run Time (h)' = '≥ 8'",
+        "charge_time": "p.2 spec table, 'Battery Performance', 'Charging Time (h)' = '≤ 1.5' -- AP0 unit for charge_time is minutes, converted 1.5 h × 60 = 90 min",
+        "navigation_type": "p.1 body bullet 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes' -- V-SLAM/L-SLAM mapped to 'Natural Feature (SLAM)', 2D barcode mapped to 'QR/DM Code'",
+        "load_type": "p.1 body bullet 'Various types of carriers: national standard pallets (ISO6780: 2003), non-standard pallets, and non-standard racks' -- ISO-standard pallet mapped to 'Pallet ISO', non-standard pallets/racks mapped to 'Custom Carrier'",
+        "storage_system_type": "p.1 'Applicable Scenarios' section, image caption 'Pallet-to-Person' plus body text 'Deep storage ... ultimate space utilization'"
+      },
+      "notes": "Brand confirmed HIKROBOT (logo top-right both pages, 'Hikrobotics.com' footer). Two-model table (QF-600D / QF-1000D) is a genuine variant pair, not a config matrix to collapse -- both entered as separate products per the variant-completion rule. 'Roadway Width (mm) ≥1800' (Motion Performance section) has no clean AP0 field match for the AMR scope (min_aisle_width only exists under Logistics:AGV:Forklift scope, not AMR) -- left unmapped, noted here for reviewer awareness since it is a real published spec. 'Applicable Pallet Entry/Inner/Outer Width/Length' fields (pallet-fit constraints, not vehicle dimensions) have no AP0 field match -- left unmapped. 'Ground Roller Docking Height ≤200mm' (third-party conveyor interface height) also has no AP0 field match, not min_ground_clearance (different concept -- conveyor docking height, not vehicle ground clearance) -- left unmapped. Drive method 'Differential drive' noted but drive_type field is Forklift-scope only, not applicable here. No radius/diameter turning figure printed on this flyer -- the min_turning_radius open question (see agent memory) does not arise for this product."
+    },
+    {
+      "product_name": "Hikrobot QF-1000D",
+      "product_type": "Mobile AMR",
+      "source_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf (read via image/visual rendering -- text and table extraction both failed on this file, garbled custom-font encoding, per prior-session notes)",
+      "db_status": "new",
+      "variant_group": "Hikrobot QF Series (QF-600D and QF-1000D share the identical 1250x1200x190mm LMR chassis + FMR-fork platform, differ only in rated load)",
+      "fields": {
+        "max_payload": 1000,
+        "vehicle_length": 1250,
+        "vehicle_width": 1200,
+        "max_speed": 2.0,
+        "battery_runtime": 8,
+        "charge_time": 90,
+        "navigation_type": ["Natural Feature (SLAM)", "QR/DM Code"],
+        "load_type": ["Pallet ISO", "Custom Carrier"],
+        "storage_system_type": ["Pallet-to-Person"]
+      },
+      "field_sources": {
+        "max_payload": "p.2 spec table, 'Basic Parameter', 'Rated Load (kg)' column 'QF-1000D' = 1000",
+        "vehicle_length": "p.2 spec table, 'Dimension (L1*b1*h1)(mm)' = '1250*1200*190' -- L1 component (shared with QF-600D)",
+        "vehicle_width": "p.2 spec table, same row -- b1 component (shared with QF-600D)",
+        "max_speed": "p.1 body bullet 'Max. running speed for differential AMR type is 2 m/s' + p.2 table 'Rated Running Speed (Empty/Rated Load)(mm/s)' = '1800/2000' (shared row, both models) -- converted 2000 mm/s to 2.0 m/s, same reasoning as QF-600D",
+        "battery_runtime": "p.2 spec table, 'Battery Performance', 'Run Time (h)' = '≥ 8' (shared row, both models)",
+        "charge_time": "p.2 spec table, 'Battery Performance', 'Charging Time (h)' = '≤ 1.5' (shared row) -- converted to 90 min",
+        "navigation_type": "p.1 body bullet, shared with QF-600D (same flyer, one product family)",
+        "load_type": "p.1 body bullet, shared with QF-600D",
+        "storage_system_type": "p.1 'Applicable Scenarios' section, shared with QF-600D"
+      },
+      "notes": "Same source flyer as QF-600D -- see that entry's notes for the full set of deliberately-unmapped fields (Roadway Width, pallet-fit dimensions, Ground Roller Docking Height) and brand-confirmation detail, not repeated here."
+    }
+  ]
+}

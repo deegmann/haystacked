@@ -1,0 +1,1522 @@
+{
+  "_meta": {
+    "purpose": "Local, cumulative index of which datasheet PDF documents which vehicle/company. Maintained by agv-datasheet-ingestor as a standing deliverable per processed group.",
+    "status": "LOCAL STAGING ONLY — not yet an AP0 field or an Airtable column. User has flagged this as a good future Airtable field (e.g. a 'source_datasheet' field on Product/Base Model) to be added later; this file is the interim record to migrate from when that AP0 change happens.",
+    "updated": "2026-08-06"
+  },
+  "entries": [
+    {
+      "pdf_file": "STU_flyer_eng_cemat_v2.pdf",
+      "company": "Hikrobot",
+      "products": [
+        "Hikrobot STU Series"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "date_processed": "2026-08-06",
+      "note": "backfilled by Tech Lead — file was correctly processed and moved to Analysed/ but missed in the agent's own source-index write for this group"
+    },
+    {
+      "pdf_file": "eks-215a-2021-factsheet-de-2026-08-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EKS 215a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "eks-215a-2021-specsheet-de-2026-08-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EKS 215a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "eks-215a-2021-specsheet-de-2026-08-pdf-data-2.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EKS 215a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of eks-215a-2021-specsheet-de-2026-08-pdf-data.pdf; content already captured, no separate extraction pass"
+    },
+    {
+      "pdf_file": "747505-040.pdf",
+      "company": "Toyota Material Handling Europe",
+      "products": [
+        "Toyota RAE160 Autopilot",
+        "Toyota RAE200 Autopilot",
+        "Toyota Reflex RAE250 Autopilot"
+      ],
+      "db_status": "mixed (RAE160/RAE250 conflict, RAE200 new)",
+      "findings_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Navios-OnePager-2025-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [],
+      "company_wide_context": true,
+      "db_status": "n/a (company-wide, applies to all base models)",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Planbare_Autonomie_Broschuere_DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [],
+      "company_wide_context": true,
+      "db_status": "n/a (company-wide, applies to all base models)",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "er-flex-brochure-2024_digital.pdf",
+      "company": "Enabled Robotics ApS",
+      "products": [
+        "ER-FLEX"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_enabled_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "er-flex-max-specifications-sheet-with-cable.pdf",
+      "company": "Enabled Robotics ApS",
+      "products": [
+        "ER-FLEX-MAX"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_enabled_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Sterimove-datasheet-EN.pdf",
+      "company": "Stäubli",
+      "products": [
+        "Sterimove"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_staubli.json",
+      "date_processed": "2026-08-06",
+      "note": "vendor's own datasheet marked 'Preliminary data' — treat values as provisional"
+    },
+    {
+      "pdf_file": "1688618048.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNR14",
+        "VisionNav VNR16",
+        "VisionNav VNR20"
+      ],
+      "db_status": "mixed (VNR14 new, VNR16/VNR20 conflict)",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06",
+      "note": "mini-catalog covering all three payload variants of the VNR reach-truck family; VNR14 pp.1-2, VNR16 pp.3-4, VNR20 pp.5-6"
+    },
+    {
+      "pdf_file": "download-product-advantages-amr-soto-data.pdf",
+      "company": "Magazino",
+      "products": [
+        "SOTO"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_magazino.json",
+      "date_processed": "2026-08-06",
+      "note": "Jungheinrich-branded/distributed document describing Magazino's SOTO — see coverage report company-relationship flag"
+    },
+    {
+      "pdf_file": "download-technical-data-amr-soto-data.pdf",
+      "company": "Magazino",
+      "products": [
+        "SOTO"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_magazino.json",
+      "date_processed": "2026-08-06",
+      "note": "Jungheinrich-branded/distributed document describing Magazino's SOTO — see coverage report company-relationship flag"
+    },
+    {
+      "pdf_file": "F3-1500_flyer_eng_cemat_v2.pdf",
+      "company": "Hikrobot",
+      "products": [
+        "Hikrobot F3-1500"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1688464515.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNSL14"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1688613405.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNP15"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1775592252.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNKQ20"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1775593635.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNE40"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1775596770.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNQ50"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1775597593.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNK15"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1785316235.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNE20"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "1785316235-2.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNE20"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of 1785316235.pdf"
+    },
+    {
+      "pdf_file": "Veeny_-_VNA_Datasheet_-_11112021.pdf",
+      "company": "Balyo",
+      "products": [
+        "VEENY"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "LOWY, Robotic Stacker, AGV:AMR | BALYO.pdf",
+      "company": "Balyo",
+      "products": [
+        "LOWY / LOWY HD"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "LOWY HD, Robotic Heavy Duty Stacker, AGV:AMR | BALYO.pdf",
+      "company": "Balyo",
+      "products": [
+        "LOWY / LOWY HD"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "date_processed": "2026-08-06",
+      "note": "flagged as a possible product-row split candidate, see findings JSON"
+    },
+    {
+      "pdf_file": "LOWY CB, Robotic Counterbalanced Stacker, AGV:AMR | BALYO.pdf",
+      "company": "Balyo",
+      "products": [
+        "LOWY CB"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "TUGGY, Robotic Tugger Truck, AGV:AMR | BALYO.pdf",
+      "company": "Balyo",
+      "products": [
+        "TUGGY"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "MiR1200 Pallet Jack specifications.pdf",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "products": [
+        "MiR1200 Pallet Jack"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "mir_palletjack_1_pager.pdf",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "products": [
+        "MiR1200 Pallet Jack"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "date_processed": "2026-08-06",
+      "note": "companion marketing 1-pager, minor lift-height figure discrepancy vs specs sheet noted in findings JSON"
+    },
+    {
+      "pdf_file": "MiR1350 Specifications 2.99.pdf",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "products": [
+        "MiR1350"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "MiR250 Specifications 2.99.pdf",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "products": [
+        "MiR250"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "MiR600 Specifications 2.99.pdf",
+      "company": "Mobile Industrial Robots A/S (MiR)",
+      "products": [
+        "MiR600"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_mir.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Grenzebach_Data_Sheet_L1200S-Li_en.pdf",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "products": [
+        "Grenzebach L1200S"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_grenzebach.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Grenzebach_Intralogistics_Data_Sheet_FF1200S_en.pdf",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "products": [
+        "Grenzebach FF1200S"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_grenzebach.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Grenzebach_Intralogistics_OL1200S_Brochure_EN.pdf",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "products": [
+        "Grenzebach OL1200S"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_grenzebach.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf",
+      "company": "KNAPP AG",
+      "products": [
+        "Open Shuttle Fork",
+        "Open Shuttle",
+        "KNAPP Open Shuttle 100",
+        "KNAPP Open Shuttle Boxgrip",
+        "KNAPP Open Shuttle 50 ASG"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "date_processed": "2026-08-06",
+      "note": "34pp product folder covering the full Open Shuttle line + KiSoft FCS company-wide fleet software section"
+    },
+    {
+      "pdf_file": "KNAPP-Folder Open Shuttle Productinfo de-2-2.pdf",
+      "company": "KNAPP AG",
+      "products": [
+        "Open Shuttle Fork",
+        "Open Shuttle",
+        "KNAPP Open Shuttle 100",
+        "KNAPP Open Shuttle Boxgrip",
+        "KNAPP Open Shuttle 50 ASG"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of KNAPP-Folder Open Shuttle Productinfo de-2.pdf"
+    },
+    {
+      "pdf_file": "KNAPP-Folder Open Shuttle Productinfo de-2-3.pdf",
+      "company": "KNAPP AG",
+      "products": [
+        "Open Shuttle Fork",
+        "Open Shuttle",
+        "KNAPP Open Shuttle 100",
+        "KNAPP Open Shuttle Boxgrip",
+        "KNAPP Open Shuttle 50 ASG"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_knapp.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of KNAPP-Folder Open Shuttle Productinfo de-2.pdf"
+    },
+    {
+      "pdf_file": "P-series.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ P500R",
+        "Geek+ P800R",
+        "Geek+ P1200R"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06",
+      "note": "company name never printed as extractable text; confirmed Geek+ by Tech Lead 2026-08-06"
+    },
+    {
+      "pdf_file": "X-series.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ X1200Z"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "S-series-1.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ S20T",
+        "Geek+ S20C",
+        "Geek+ S100C",
+        "Geek+ S20C-A",
+        "Geek+ S20C-H-SNE",
+        "Geek+ S20C-V3"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "S-series-2.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ S20T",
+        "Geek+ S20C",
+        "Geek+ S100C",
+        "Geek+ S20C-A",
+        "Geek+ S20C-H-SNE",
+        "Geek+ S20C-V3"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of S-series-1.pdf"
+    },
+    {
+      "pdf_file": "RS-series-1.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ RoboShuttle P40",
+        "Geek+ RoboShuttle RS5-D",
+        "Geek+ RoboShuttle RS8-DA",
+        "Geek+ RoboShuttle RS8-DX",
+        "Geek+ RoboShuttle RS11-DA",
+        "Geek+ RoboShuttle RS11-DX"
+      ],
+      "db_status": "mixed (RS5-D/RS8-DX/RS11-DX new, RS8-DA/RS11-DA/P40 enrich)",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "RS-series-1-2.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ RoboShuttle P40",
+        "Geek+ RoboShuttle RS5-D",
+        "Geek+ RoboShuttle RS8-DA",
+        "Geek+ RoboShuttle RS8-DX",
+        "Geek+ RoboShuttle RS11-DA",
+        "Geek+ RoboShuttle RS11-DX"
+      ],
+      "db_status": "mixed",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of RS-series-1.pdf"
+    },
+    {
+      "pdf_file": "RS-series-1-3.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ RoboShuttle P40",
+        "Geek+ RoboShuttle RS5-D",
+        "Geek+ RoboShuttle RS8-DA",
+        "Geek+ RoboShuttle RS8-DX",
+        "Geek+ RoboShuttle RS11-DA",
+        "Geek+ RoboShuttle RS11-DX"
+      ],
+      "db_status": "mixed",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of RS-series-1.pdf"
+    },
+    {
+      "pdf_file": "RS-series-3.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ RoboShuttle P40",
+        "Geek+ RoboShuttle RS5-D",
+        "Geek+ RoboShuttle RS8-DA",
+        "Geek+ RoboShuttle RS8-DX",
+        "Geek+ RoboShuttle RS11-DA",
+        "Geek+ RoboShuttle RS11-DX"
+      ],
+      "db_status": "mixed",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of RS-series-1.pdf"
+    },
+    {
+      "pdf_file": "F12ML.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ F12ML"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "F20MT.pdf",
+      "company": "Geek+ (Geekplus Technology Co.)",
+      "products": [
+        "Geek+ F-Series (F20MT Smart Forklift)"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_geekplus.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_L2-core_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV L2"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_L2-lift_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV L2 lift"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_M4-core_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV M4 core"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_M4-lift_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV M4 lift"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_M4-tow_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV M4"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06",
+      "note": "enriches existing Tugger-classified M4 row, see findings JSON notes"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_S3-core_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV S3"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_S3-tow_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV S3 tow"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_X1-core_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV X1"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_X1-lift-1200_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV X1 lift 1200"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_X1-spin_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV X1 spin"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV XS1"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SAFELOG_Datasheet_XS1-IntelliCart_EN-2.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV XS1"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf"
+    },
+    {
+      "pdf_file": "SAFELOG_Datenblatt_GT1-spin_EN.pdf",
+      "company": "SAFELOG GmbH",
+      "products": [
+        "SAFELOG AGV GT1 spin"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_safelog.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_c_matic_8925_dt_e_1025_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde C-MATIC"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_c_matic_hp_10_8928_dt_a_0523_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde C-MATIC HP"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde L-MATIC AC"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde L-MATIC AC k"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_l_matic_br133_de_a_0516.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde L-MATIC"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_l_matic_core_1195_01_dt_b_0425_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde L-MATIC core"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde L-MATIC HD k"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_p_matic_br1190_dt_a_0416.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde P-MATIC"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "DE_tb_r_matic_k_5190_dt_a_0425_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde R-MATIC k (R-MATIC 17 k)"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06",
+      "note": "partially extracted only (numeric VDI table not found on pp.2-3 read); flagged for follow-up re-read"
+    },
+    {
+      "pdf_file": "EN_ds_k_matic_5231_en_a_0224_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde K-MATIC"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "EN_ds_r_matic_1120_en_b_0623_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [
+        "Linde R-MATIC"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "lae250-technicky-list.pdf",
+      "company": "Toyota Material Handling Europe",
+      "products": [
+        "BT Levio LAE250 Autopilot"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "sae160-technicky-list.pdf",
+      "company": "Toyota Material Handling Europe",
+      "products": [
+        "Toyota Staxio SAE160 Autopilot"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "tae500-technicky-list-003.pdf",
+      "company": "Toyota Material Handling Europe",
+      "products": [
+        "Toyota Movit TAE500 Autopilot"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "tmha_sai125cb_brochure.pdf",
+      "company": "Toyota Material Handling Europe",
+      "products": [
+        "Toyota Autopilot SAI125CB"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_toyota.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "FL1500-data-sheet-EN.pdf",
+      "company": "Stäubli",
+      "products": [
+        "Stäubli FL1500"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_staubli.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "PF3-data-sheet-EN.pdf",
+      "company": "Stäubli",
+      "products": [
+        "Stäubli PF3"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_staubli.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "eae-2a-2024-factsheet-de-2026-08-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EAE 212a"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EAE 212a"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "eae-2a-2024-specsheet-de-2026-08-pdf-data-2.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EAE 212a"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf"
+    },
+    {
+      "pdf_file": "eae-2a-2024-specsheet-de-2026-08-pdf-data-3.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EAE 212a"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of eae-2a-2024-specsheet-de-2026-08-pdf-data.pdf"
+    },
+    {
+      "pdf_file": "eaea-flyer-de-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EAE 212a"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06",
+      "note": "marketing flyer, no new numeric data beyond factsheet/specsheet"
+    },
+    {
+      "pdf_file": "ekx-5a-20xx-factsheet-de-2026-08-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EKX 514a",
+        "EKX 516ka",
+        "EKX 516a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "ekx-5a-20xx-specsheet-de-2026-08-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "EKX 514a",
+        "EKX 516ka",
+        "EKX 516a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "erc-2a-2019-factsheet-de-2026-05-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "ERC 213a",
+        "ERC 217a"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "erc-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "ERC 213a",
+        "ERC 217a"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "erc-2a-2019-specsheet-de-2026-05-pdf-data-2.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "ERC 213a",
+        "ERC 217a"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06",
+      "note": "byte-identical duplicate of erc-2a-2019-specsheet-de-2026-05-pdf-data.pdf"
+    },
+    {
+      "pdf_file": "ere-2a-2019-factsheet-de-2026-05-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "Jungheinrich ERE 225a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "ere-2a-2019-specsheet-de-2026-05-pdf-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "Jungheinrich ERE 225a"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "download-factsheet-amr-arculee-m-data.pdf",
+      "company": "Jungheinrich AG",
+      "products": [
+        "arculee M"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_jungheinrich.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "AMADEUS-OnePager-2025-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "AMADEUS Classic",
+        "AMADEUS Counter",
+        "AMADEUS Wide",
+        "AMADEUS Low",
+        "AMADEUS Grip"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06",
+      "note": "general family one-pager, corroborates DB, no conflicts"
+    },
+    {
+      "pdf_file": "AMADEUS_Grip_Onepager_2022_DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "AMADEUS Grip"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06",
+      "note": "customer-application case study (insulation material), lower payload/lift than general spec"
+    },
+    {
+      "pdf_file": "Amy-FourPager-2025-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "AMY Deck",
+        "AMY Lift"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06",
+      "note": "generic AMY family doc, minor dimension near-mismatch noted, no fields added"
+    },
+    {
+      "pdf_file": "Arny-OnePager-2026-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "ARNY Mono",
+        "ARNY Duplex",
+        "ARNY Triplex",
+        "ARNY HD Triplex"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Lucy-OnePager-2026-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "LUCY"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "OSCAR-OnePager-2025-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "OSCAR Spin 180",
+        "OSCAR Spin 360",
+        "OSCAR Omni"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06",
+      "note": "min_ground_clearance likely mislabeled as vehicle height in DB; OSCAR Omni lift_height conflict"
+    },
+    {
+      "pdf_file": "SALLY-OnePager-2024-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "SALLY"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "SALLY_Kurier-OnePager-2024-DE.pdf",
+      "company": "DS Automotion GmbH",
+      "products": [
+        "SALLY Kurier"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [
+        "Omron LD-60",
+        "Omron LD-90",
+        "Omron LD-250"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06",
+      "note": "full cross-validation, no new fields, no conflicts"
+    },
+    {
+      "pdf_file": "i854_hd-1500_leaflet_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [
+        "Omron HD-1500"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06",
+      "note": "marketing leaflet, superseded by fuller i855 datasheet"
+    },
+    {
+      "pdf_file": "i855_hd-series_mobile_robot_datasheet_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [
+        "Omron HD-1500"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [
+        "Omron MD-650",
+        "Omron MD-900"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06",
+      "note": "battery_type conflict (Li-Ion in DB vs LiFePO4 in datasheet)"
+    },
+    {
+      "pdf_file": "md-series_leaflet_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [
+        "Omron MD-650",
+        "Omron MD-900"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06",
+      "note": "marketing leaflet, superseded by fuller i885 datasheet"
+    },
+    {
+      "pdf_file": "72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [],
+      "db_status": "company_wide_context",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "OMRON FLOW Core 3.1.1 Release Notes.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [],
+      "db_status": "company_wide_context",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06",
+      "note": "software changelog, minimal fillable AP0 content"
+    },
+    {
+      "pdf_file": "2022519_call-_door_box_13029-802_discontinuation_notice_en.pdf",
+      "company": "Omron Mobile Robotics",
+      "products": [],
+      "db_status": "out_of_scope",
+      "findings_file": "docs/research_findings_datasheet_20260806_omron.json",
+      "date_processed": "2026-08-06",
+      "note": "product discontinuation notice for an I/O accessory box, not a vehicle -- no fillable AP0 vehicle spec fields; moved to Analysed as a final disposition (was previously left in New/ pending this decision)"
+    },
+    {
+      "pdf_file": "AGILOX  OCF.html",
+      "company": "AGILOX Services GmbH",
+      "products": [
+        "AGILOX OCF"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_agilox.json",
+      "date_processed": "2026-08-06",
+      "note": "min_aisle_width conflict (1300 DB vs 2100 datasheet)"
+    },
+    {
+      "pdf_file": "Agilox ODM.pdf",
+      "company": "AGILOX Services GmbH",
+      "products": [
+        "AGILOX ODM 600/800"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_agilox.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Agilox OFL.pdf",
+      "company": "AGILOX Services GmbH",
+      "products": [
+        "AGILOX OFL"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_agilox.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Agilox One.pdf",
+      "company": "AGILOX Services GmbH",
+      "products": [
+        "AGILOX ONE"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_agilox.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "company": "AGILOX Services GmbH",
+      "products": [],
+      "db_status": "company_wide_context",
+      "findings_file": "docs/research_findings_datasheet_20260806_agilox.json",
+      "date_processed": "2026-08-06",
+      "note": "48pp brochure, only skimmed for company HQ confirmation (Austria, already correct in DB)"
+    },
+    {
+      "pdf_file": "NEURA_Mobile_Robots_ek_robotics_fts-checkliste_de.pdf",
+      "company": "ek robotics",
+      "products": [],
+      "db_status": "company_wide_context",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06",
+      "note": "blank customer intake form, standard environmental defaults captured"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_COMPACT_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [
+        "ek robotics COMPACT MOVE CB 10",
+        "ek robotics COMPACT MOVE CB 25"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_VARIO_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [
+        "ek robotics VARIO MOVE CB"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_X_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [
+        "ek robotics X MOVE 600",
+        "ek robotics X MOVE 1200"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_VNA_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [
+        "ek robotics VNA MOVE 1350",
+        "ek robotics VNA MOVE 1500"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_MEDI_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [
+        "ek robotics MEDI MOVE"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_HEAVY_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [],
+      "db_status": "flagged_insufficient_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06",
+      "note": "new product family (5 sub-variants AS/SG/CB/CT/CTO), only family-max headline figures given, not entered as a product this run"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_BHL_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [],
+      "db_status": "flagged_insufficient_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06",
+      "note": "new 4-way-forklift product family, no numeric payload/speed given at all, not entered"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_OUT_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [],
+      "db_status": "flagged_insufficient_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06",
+      "note": "new outdoor-rated product family, only 'up to 16000kg' headline given, not entered"
+    },
+    {
+      "pdf_file": "NMR_ek_robotics_CUSTOM_MOVE_Broschuere_de.pdf",
+      "company": "ek robotics",
+      "products": [],
+      "db_status": "flagged_insufficient_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+      "date_processed": "2026-08-06",
+      "note": "6 unlabeled example configurations shown, no per-SKU names to map to product rows, not entered"
+    },
+    {
+      "pdf_file": "AGV-Overview_DE_Flyer.pdf",
+      "company": "STILL GmbH",
+      "products": [
+        "AXL iGo",
+        "STILL AXV 12 iGo"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_still.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "AXL-iGo_DE_Brochure.pdf",
+      "company": "STILL GmbH",
+      "products": [
+        "AXL iGo"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_still.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Automation_DE_Brochure.pdf",
+      "company": "STILL GmbH",
+      "products": [],
+      "db_status": "no_new_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_still.json",
+      "date_processed": "2026-08-06",
+      "note": "company-wide marketing, no fields beyond siblings"
+    },
+    {
+      "pdf_file": "Intralogistic-Systems_DE_Brochure.pdf",
+      "company": "STILL GmbH",
+      "products": [],
+      "db_status": "no_new_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_still.json",
+      "date_processed": "2026-08-06",
+      "note": "company-wide marketing, no fields beyond siblings"
+    },
+    {
+      "pdf_file": "iGo_systems_DE_TD.pdf",
+      "company": "STILL GmbH",
+      "products": [
+        "EXV iGo",
+        "FM-X iGo",
+        "FM-X 12 iGo",
+        "FM-X 14 iGo",
+        "FM-X 17 iGo",
+        "FM-X 20 iGo",
+        "MX-X iGo"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_still.json",
+      "date_processed": "2026-08-06",
+      "note": "4 new FM-X variant products via variant completion"
+    },
+    {
+      "pdf_file": "Reach Truck Gen 2-Black Truck-Datasheet-EN.pdf",
+      "company": "Balyo",
+      "products": [
+        "REACHY"
+      ],
+      "db_status": "conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_balyo.json",
+      "date_processed": "2026-08-06",
+      "note": "battery_type conflict (Li-Ion DB vs lead-acid/TPPL datasheet)"
+    },
+    {
+      "pdf_file": "EN_p_robotics_en_a_0216.pdf",
+      "company": "Linde Material Handling",
+      "products": [],
+      "db_status": "no_new_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06",
+      "note": "T-MATIC name flagged, no numeric specs found"
+    },
+    {
+      "pdf_file": "b_automatisierungsloesungen_dt_a_1023_view.pdf",
+      "company": "Linde Material Handling",
+      "products": [],
+      "db_status": "no_new_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_linde.json",
+      "date_processed": "2026-08-06",
+      "note": "company brochure, confirms existing figures only"
+    },
+    {
+      "pdf_file": "Intralogistics_Brochure_EN-2023.pdf",
+      "company": "Grenzebach Maschinenbau GmbH",
+      "products": [],
+      "db_status": "no_new_data",
+      "findings_file": "docs/research_findings_datasheet_20260806_grenzebach.json",
+      "date_processed": "2026-08-06"
+    },
+    {
+      "pdf_file": "Mobile-Robotics-portfolio-EN.pdf",
+      "company": "Stäubli",
+      "products": [],
+      "db_status": "flagged_naming_ambiguity",
+      "findings_file": "docs/research_findings_datasheet_20260806_staubli.json",
+      "date_processed": "2026-08-06",
+      "note": "PF3 vs PF3 OMNI naming ambiguity surfaced"
+    },
+    {
+      "pdf_file": "Training-brochure-mobile robotics-EN.pdf",
+      "company": "Stäubli",
+      "products": [],
+      "db_status": "out_of_scope",
+      "findings_file": "docs/research_findings_datasheet_20260806_staubli.json",
+      "date_processed": "2026-08-06",
+      "note": "training curriculum brochure, no product specs"
+    },
+    {
+      "pdf_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf",
+      "company": "Hikrobot",
+      "products": [
+        "Hikrobot QF-600D",
+        "Hikrobot QF-1000D"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "date_processed": "2026-08-06",
+      "note": "Read via image-based rendering (text/table extraction both failed, garbled custom-font encoding, deferred twice before this run)."
+    },
+    {
+      "pdf_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng-2.pdf",
+      "company": "Hikrobot",
+      "products": [
+        "Hikrobot QF-600D",
+        "Hikrobot QF-1000D"
+      ],
+      "db_status": "duplicate",
+      "findings_file": "docs/research_findings_datasheet_20260806_hikrobot.json",
+      "date_processed": "2026-08-06",
+      "note": "Byte-identical duplicate of QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf (md5 71b59d73a68fc00048906af7682560b4); content already captured, entry recorded so nothing in Analysed/ is unaccounted for."
+    },
+    {
+      "pdf_file": "1685356775.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNST20"
+      ],
+      "db_status": "enrich",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06",
+      "note": "Turned out to be a dedicated single-product 14pp deck (VNST20 Pallet Jack), not a full-line catalog as previously assumed; model number resolved from cover-page image only."
+    },
+    {
+      "pdf_file": "1657089341.pdf",
+      "company": "VisionNav Robotics",
+      "products": [
+        "VisionNav VNT20-01",
+        "VisionNav VNT20-07",
+        "VisionNav VNL14-01",
+        "VisionNav VNL16-01",
+        "VisionNav VNQ40-07",
+        "VisionNav VNQ60-07"
+      ],
+      "db_status": "new",
+      "findings_file": "docs/research_findings_datasheet_20260806_visionnav.json",
+      "date_processed": "2026-08-06",
+      "note": "18pp English full-line catalog. T/L/Q40/Q60 series extracted (genuinely new model families). R-series pages (VNR14/VNR16/VNR25) deliberately NOT used to create/update rows -- internal naming collision in the vendor doc itself, flagged for Tech Lead reconciliation, see coverage report."
+    },
+    {
+      "pdf_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "company": "KIVNON Logística S.L.",
+      "products": [
+        "K05 (Underride)",
+        "KIVNON K07",
+        "K10HP One-Way",
+        "K10P One-Way",
+        "K11 Two-Way",
+        "K32 Tractor",
+        "K55A Pallet Stacker",
+        "KIVNON K50 Pallet Truck",
+        "KIVNON K60 Stacker"
+      ],
+      "db_status": "enrich_and_conflict",
+      "findings_file": "docs/research_findings_datasheet_20260806_kivnon.json",
+      "date_processed": "2026-08-06",
+      "note": "23pp 2026 full-line catalogue, deferred across 3 prior sessions, fully processed this run (text extraction was clean, contrary to earlier size-based assumption). K41 Platform not covered (no page in this catalogue)."
+    },
+    {
+      "pdf_file": "Kivnon-Catalogo-2026-—-Editable-ENG-2.pdf",
+      "company": "KIVNON Logística S.L.",
+      "products": [
+        "K05 (Underride)",
+        "KIVNON K07",
+        "K10HP One-Way",
+        "K10P One-Way",
+        "K11 Two-Way",
+        "K32 Tractor",
+        "K55A Pallet Stacker",
+        "KIVNON K50 Pallet Truck",
+        "KIVNON K60 Stacker"
+      ],
+      "db_status": "duplicate",
+      "findings_file": "docs/research_findings_datasheet_20260806_kivnon.json",
+      "date_processed": "2026-08-06",
+      "note": "Byte-identical duplicate of Kivnon-Catalogo-2026-—-Editable-ENG.pdf (md5 e5936bcb1bb6d83b199d3e448c921368); content already captured."
+    }
+  ]
+}

@@ -110,26 +110,37 @@ def test_U_D_DB_01_no_active_products_without_product_id():
 
 
 def test_U_D_DB_02_no_duplicate_extensions_per_base_model():
-    """Each active product's base_model_id must resolve to exactly one
-    base_model_extensions row.
+    """Every base_model_id referenced by an active product must resolve to
+    exactly one base_model_extensions row.
 
     JOIN_SQL (src/data_loader.py) joins products to base_model_extensions on
     base_model_id, not product_id — product_id is a TEXT PRIMARY KEY and can
-    never duplicate, so grouping on it (the previous version of this test)
-    always passes even when the real fan-out condition is present. When a
-    base_model has two extension rows (e.g. an old duplicate left over in
-    Airtable), the JOIN returns two rows for that product and data_loader
-    silently keeps whichever came back first — an arbitrary, undetected pick
-    between two different sets of field values.
-    Fix: remove the duplicate extension record in Airtable, then resync.
+    never duplicate, so grouping on it (an earlier version of this test)
+    always passes even when the real fan-out condition is present.
+
+    IMPORTANT (fixed 2026-08-24, OEM-rebadge false positive): this must count
+    rows directly in base_model_extensions, NOT via a join through products.
+    A base_model legitimately has multiple products by design (the OEM-rebadge
+    pattern, e.g. Magazino "SOTO" and "Jungheinrich SOTO" sharing one base
+    model) — joining products to extensions and grouping on base_model_id
+    fans out to N rows for N legitimate sibling products sharing one real
+    extension row, which an earlier version of this test misread as N
+    duplicate extensions. The actual danger case this test guards against is
+    a base_model with >1 EXTENSION row (ambiguous which one data_loader's
+    JOIN picks first) — a property of base_model_extensions itself, entirely
+    independent of how many products point at that base_model.
+    Fix if this ever fires for real: remove the duplicate extension record in
+    Airtable, then run sync_airtable.py.
     """
     con = sqlite3.connect(DB_PATH)
     rows = con.execute(
-        "SELECT p.base_model_id, COUNT(*) as cnt "
-        "FROM products p "
-        "JOIN base_model_extensions bme ON p.base_model_id = bme.base_model_id "
-        "WHERE p.active = 1 AND p.product_id IS NOT NULL "
-        "GROUP BY p.base_model_id HAVING cnt > 1"
+        "SELECT bme.base_model_id, COUNT(*) as cnt "
+        "FROM base_model_extensions bme "
+        "WHERE bme.base_model_id IN ("
+        "    SELECT DISTINCT base_model_id FROM products "
+        "    WHERE active = 1 AND product_id IS NOT NULL"
+        ") "
+        "GROUP BY bme.base_model_id HAVING cnt > 1"
     ).fetchall()
     con.close()
     dupes = {r[0]: r[1] for r in rows}

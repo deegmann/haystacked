@@ -1,0 +1,337 @@
+{
+  "company": "Omron Mobile Robotics",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus full-redo pass. EIGHT source files, all Omron: (1) `i828_ld-series_mobile_robot_datasheet_en.pdf` — 14 pp, full LD-series datasheet with two VDI-style spec tables (LD-60/90/90x and LD-250) plus battery, docking-station and accessory specs; (2) `i855_hd-series_mobile_robot_datasheet_en.pdf` — HD-1500 datasheet; (3) `i854_hd-1500_leaflet_en.pdf` — 2-page HD-1500 leaflet, © 2020 (Cat. No. I854-E-01 0420) — OLDER than the datasheet and disagrees with it on two figures; (4) `i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf` — MD-series datasheet; (5) `md-series_leaflet_en.pdf` — 2-page MD leaflet, © 2023 (Cat. No. I891-E-03 0923); (6) `OMRON FLOW Core 3.1.1 Release Notes.pdf` — fleet-software release notes, July 2023; (7) `72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf` — 52-page wireless network technical guide; (8) `2022519_call-_door_box_13029-802_discontinuation_notice_en.pdf` — accessory discontinuation notice. Files 6–8 are company-wide/infrastructure material and produced no product rows. IMPORTANT METHOD NOTE for the LD table: `extract_text()` and `extract_tables()` disagreed on the Run Time row, so I resolved it by reading pdfplumber word x-coordinates against the column-header positions on p.6 — see the LD-90 entry. That check prevented a false-positive conflict. Nothing written to Airtable.",
+  "company_wide_context": {
+    "source_file": "72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf, OMRON FLOW Core 3.1.1 Release Notes.pdf, 2022519_call-_door_box_13029-802_discontinuation_notice_en.pdf",
+    "fields": {
+      "fleet_management_system": "Proprietary",
+      "fleet_control_architecture": "Centralized",
+      "max_fleet_size": 100,
+      "multi_fleet_capable": true
+    },
+    "field_sources": {
+      "fleet_management_system": "OMRON FLOW Core 3.1.1 Release Notes.pdf p.1, 'Version: Fleet Operations Workspace (FLOW) Core 3.1.1'; p.2 'Software Manifest' lists the components (MobilePlanner, Fleet Simulator, SetNetGo, FLOW iQ, Integration Toolkit, MobileIO)",
+      "max_fleet_size": "i828_ld-series_mobile_robot_datasheet_en.pdf p.1, 'Fleet management: Supervises and coordinates the entire fleet of up to 100 vehicles'; i885_md_series…pdf p.1, 'Operates in coordination with a fleet of up to 100 AMRs'; both datasheets' Virtual Fleet Manager tables footnote '*1: Contact your local OMRON representative for fleets larger than 100.'",
+      "multi_fleet_capable": "OMRON FLOW Core 3.1.1 Release Notes.pdf p.2, 'Software & Platform Compatibility' matrix — a single FLOW Core version spans Lynx, LD-60/90/CT, LD-250, HD-1500 and EM2100, i.e. mixed-model fleets under one controller"
+    },
+    "applies_to": "all base models of this company",
+    "notes": "MUST be fanned out per base model at import time. THE MAIN VALUE OF THESE THREE FILES IS THE AP0 GAP THEY EXPOSE, not the fields they fill. See 'ap0_gaps' below — `72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf` is the most completely specified wireless-infrastructure requirement in the entire corpus and AP0 has nowhere to put any of it. Also note a compatibility constraint with real procurement consequences: `OMRON FLOW Core 3.1.1 Release Notes.pdf` p.1 states 'Minimum OS: SetNetGo 7.0.1' and p.2's compatibility matrix gives per-model minimum SetNetGo versions (LD-60/90 Atom Core 4.8.0, LD-250 5.1.0, HD-1500 6.2.2), while the LD datasheet p.1 warns 'All AMRs in a fleet must have the same version of the FLOW Core software installed.' A buyer adding new AMRs to an existing Omron fleet may be forced into a fleet-wide software upgrade — AP0 has no field for fleet-software version compatibility."
+  },
+  "products": [
+    {
+      "product_name": "Omron LD-60",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "enrich",
+      "variant_group": "LD-60 / LD-90 / LD-90x share one 698×500 mm platform and one spec table (p.6); ESD versions of all three exist as ordering options",
+      "fields": {
+        "cleanroom_class": "ISO 1–9",
+        "onboard_ui": true,
+        "battery_type": null,
+        "min_turning_radius": null
+      },
+      "field_sources": {
+        "cleanroom_class": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Cleanroom Rating ISO 5 / Class 100 (AMR, Battery and Docking Station)'",
+        "onboard_ui": "i828_ld-series_mobile_robot_datasheet_en.pdf p.7, 'Operator Display 8.89 cm diagonal TFT, 320 x 240 pixels, color screen' and 'Button ON button, OFF button, Brake-release button, and keyed mode selection'"
+      },
+      "notes": "The datasheet CONFIRMS almost every existing DB value on this row, which is worth recording explicitly: max_payload=60 (p.6 'Payload Maximum Weight 60 kg'), max_speed=1.8 (p.6 'Maximum Speed 1800 mm/s' — printed in mm/s, AP0 unit is m/s, converted 1800 mm/s ÷ 1000 = 1.8 m/s), vehicle_length=698 / vehicle_width=500 (p.10 dimension drawing), operating_temp 5–40 °C and humidity 95 % (p.6), IP20 (p.6), max_gradient=8.3 (p.6 'Up to 60 kg: 4.8° / 8.3% incline' — note the source gives BOTH degrees and percent and AP0's unit is %, so 8.3 is the right one to store; 4.8° would have been a factor-of-1.7 error), stop_accuracy=25 (p.6 'To standard target: ±25 mm, ±2°'), battery_runtime=12 (p.6 'Run Time (full payload) 12 h approx.'), charge_time=130 (p.9 'Recharge Time 2 hrs. 10 min. for 20% to 80% charge' — 2 h 10 min converted to 130 min, AP0 unit is min). CHARGE_TIME CAVEAT (recurring trap, shape b): 130 min is a 20 %→80 % PARTIAL charge, not time-to-full. The value is storable and correct as printed, but a reviewer comparing it against another supplier's time-to-full figure would be comparing unlike quantities. AP0 has no charge-window qualifier. battery_type: DB holds 'LiFePO4'; p.9 says 'Type Lithium-Ion (LiFePO4)' — confirms, no change. `min_turning_radius` deliberately LEFT NULL for the LD series: unlike the MD and HD sheets, the LD spec table publishes no 'Turn Radius' row at all (only 'Maximum Rotation Speed 180 °/s'), so there is nothing to cite. AP0 GAP — `floor_flatness_req`, and a sharper version of the recurring one: p.6 states 'Minimum Floor Flatness FF25 (ACI 117 standard)'. AP0's allowed values are ['Standard (FM2)','High (FM1)','Very High (F-number)','None stated'] — and the only F-number option is labelled 'VERY HIGH', whereas FF25 is a comparatively LENIENT flatness requirement. So the field's values conflate the measurement NOTATION with the stringency LEVEL, and selecting 'Very High (F-number)' here would encode the opposite of what the datasheet says. Left null. Also unstorable and genuinely selection-relevant: 'Traversable Step 15 mm max.', 'Traversable Gap 15 mm max.', 'Minimum Floor Compressive Strength 2.6 MPa' (p.6) — floor load-bearing capacity matters for mezzanines. PARTIAL STANDARDS COMPLIANCE — flagged, not a conflict: p.6 lists 'EN ISO 3691-4 (except: clauses 4.1.15b, 4.8.2.6 for items 6 and 7, 4.12, 4.14)'. The DB stores a bare 'ISO 3691-4', which reads as full conformity. AP0's multi-select cannot carry an exceptions list, and for a safety-driven buyer the excepted clauses could matter. RECURRING MIS-MAP — `rotation_capable`: the DB holds 1 on this row (and on all seven Omron rows). Nothing in this datasheet describes rotating a CARRIED rack to present a face to a picker (README §3); the LD-60 is a flat-top transport AMR with workflow_capability='Transport' and picking_mechanism='None' already stored. Its only rotation spec is 'Maximum Rotation Speed 180 °/s' — the chassis. Proposed false; flagged, NOT corrected."
+    },
+    {
+      "product_name": "Omron LD-90",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "conflict",
+      "variant_group": "LD-60 / LD-90 / LD-90x platform",
+      "fields": {
+        "cleanroom_class": "ISO 1–9",
+        "onboard_ui": true
+      },
+      "field_sources": {
+        "cleanroom_class": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Cleanroom Rating ISO 5 / Class 100'",
+        "onboard_ui": "i828_ld-series_mobile_robot_datasheet_en.pdf p.7, 'Operator Display 8.89 cm diagonal TFT'"
+      },
+      "conflicts": {
+        "max_gradient": {
+          "db": 8.3,
+          "datasheet": "8.3 % up to 60 kg payload; LEVEL FLOOR ONLY above 60 kg",
+          "source": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Maximum Slope — Up to 60 kg: 4.8° / 8.3% incline / Over 60 kg: Level floor only'",
+          "note": "COND_KO field. The LD-90 is a 90 kg-payload robot, i.e. it operates ABOVE the 60 kg threshold whenever it is loaded past two thirds — so 8.3 % is only true unladen or lightly laden. The DB row's own product_description makes the stronger, and incorrect, claim: 'Max slope 8.3% at ≤90kg payload'. The correct storable value for a fully-laden LD-90 is arguably 0. This is the payload-derating pattern again (7th+ instance) in an unusually consequential form: a gradient K.O. would pass this robot for a ramped facility it cannot climb when loaded. NOT resolved."
+        }
+      },
+      "notes": "battery_runtime = 12 h is CORRECT — a near-miss false positive worth recording. Plain text extraction of p.6 renders the Run Time rows as '15 h approx. 20 h approx.' and '12 h approx. 15 h approx.', which looks like LD-60 = 12 h and LD-90 = 15 h and would have produced a conflict flag against the DB's 12.0. Resolved by reading word x-coordinates against the column headers: the three model columns sit at x ≈ 225 (LD-60), 335 (LD-90) and 445 (LD-90x) — confirmed by the 'Maximum Speed' row, whose three values 1800 / 1350 / 900 mm/s land exactly on 225 / 335 / 445. The Run Time values land on x = 225 and x = 445 ONLY, with the LD-90 column empty, i.e. the LD-60 cell is merged across LD-60 and LD-90 and the 20 h / 15 h figures belong to the LD-90x. Same reasoning applies to 'Minimum Floor Compressive Strength 2.6 Mpa (x225) 3.27 Mpa (x335)'. Everything else on this row is confirmed: max_payload=90 (p.6), max_speed=1.35 (p.6 '1350 mm/s' → 1.35 m/s), 698×500 mm, IP20, stop_accuracy 25, charge_time 130 (20–80 % partial). Same `rotation_capable` mis-map observation as LD-60. Same FF25 / `floor_flatness_req` gap. Same partial-ISO-3691-4 caveat."
+    },
+    {
+      "product_name": "Omron LD-90x",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "new",
+      "variant_group": "LD-60 / LD-90 / LD-90x platform — LD-90x shares the 698×500 mm chassis and 90 kg rating with the LD-90 but is geared for cart transport (lower top speed, longer runtime)",
+      "fields": {
+        "max_payload": 90.0,
+        "max_speed": 0.9,
+        "vehicle_length": 698,
+        "vehicle_width": 500,
+        "battery_runtime": 15.0,
+        "charge_time": 130,
+        "battery_type": ["LiFePO4"],
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "ingress_protection_rating": "IP20",
+        "cleanroom_class": "ISO 1–9",
+        "stop_accuracy": 25,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "infrastructure_free": true,
+        "autonomous_charging": true,
+        "battery_swap_capable": true,
+        "functional_safety_level": "PLd",
+        "onboard_ui": true,
+        "workflow_capability": ["Transport"],
+        "picking_mechanism": "None",
+        "top_module_type": ["Custom"]
+      },
+      "field_sources": {
+        "max_payload": "i828_ld-series_mobile_robot_datasheet_en.pdf p.1 ordering table, 'LD-90x *3 ... 90 kg'; p.6 'Payload Maximum Weight ... 90 kg'",
+        "max_speed": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Maximum Speed 1800 mm/s | 1350 mm/s | 900 mm/s' — the third (LD-90x) column, confirmed by word x-position 445. Printed mm/s, AP0 unit m/s → 900 ÷ 1000 = 0.9 m/s",
+        "vehicle_length": "i828_ld-series_mobile_robot_datasheet_en.pdf p.10 dimension drawing (shared LD-60/90/90x platform)",
+        "vehicle_width": "i828_ld-series_mobile_robot_datasheet_en.pdf p.10 dimension drawing",
+        "battery_runtime": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Run Time (full payload) ... 15 h approx.' at x = 445 (LD-90x column); 'Run Time (no payload) ... 20 h approx.' at the same x",
+        "charge_time": "i828_ld-series_mobile_robot_datasheet_en.pdf p.9, 'Recharge Time 2 hrs. 10 min. for 20% to 80% charge' → 130 min (series-wide battery, ordering code 20452-700)",
+        "battery_type": "i828_ld-series_mobile_robot_datasheet_en.pdf p.9, 'Type Lithium-Ion (LiFePO4)'",
+        "operating_temp_min": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Ambient Temperature 5 to 40°C'",
+        "operating_temp_max": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Ambient Temperature 5 to 40°C'",
+        "operating_humidity_max": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Ambient Humidity 5% to 95% (non-condensing)'",
+        "ingress_protection_rating": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Ingress Protection Class IP20'",
+        "cleanroom_class": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Cleanroom Rating ISO 5 / Class 100'",
+        "stop_accuracy": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Stop Position Repeatability (single AMR) · To standard target: ±25 mm, ±2°'",
+        "navigation_type": "i828_ld-series_mobile_robot_datasheet_en.pdf p.6, 'Routing: Autonomous routing by localizing with safety scanning laser based on environment mapping'",
+        "infrastructure_free": "i828_ld-series_mobile_robot_datasheet_en.pdf p.1, 'Easy deployment: Short installation time, no facility modifications'",
+        "autonomous_charging": "i828_ld-series_mobile_robot_datasheet_en.pdf p.9, 'Charging Method Automatic or manual'",
+        "battery_swap_capable": "i828_ld-series_mobile_robot_datasheet_en.pdf p.2 accessory list, 'Battery — Removable and rechargeable power source for the AMR' and a charger 'to charge an AMR battery outside of the AMR'",
+        "functional_safety_level": "i828_ld-series_mobile_robot_datasheet_en.pdf p.7, 'Safety Scanning Laser — One at front of AMR / Class 1 / PLd safety per ISO13849-1 / 240° field of view'",
+        "onboard_ui": "i828_ld-series_mobile_robot_datasheet_en.pdf p.7, 'Operator Display 8.89 cm diagonal TFT, 320 x 240 pixels, color screen'",
+        "workflow_capability": "i828_ld-series_mobile_robot_datasheet_en.pdf p.1 footnote, '*3.For use in cart transporter applications.'",
+        "picking_mechanism": "i828_ld-series_mobile_robot_datasheet_en.pdf — no picking mechanism of any kind is described",
+        "top_module_type": "i828_ld-series_mobile_robot_datasheet_en.pdf p.4, 'N Payload Mounting Surface (Top Plate shown)'"
+      },
+      "notes": "NEW PRODUCT. Its distinguishing purpose is stated in a single footnote on p.1: '*3.For use in cart transporter applications.' — i.e. this is the cart-hauling variant, geared for half the top speed (0.9 vs 1.8 m/s) and correspondingly longer runtime (15 h laden vs 12 h). For a tender that specifies cart/trolley transport rather than top-plate transport, the LD-90x is the relevant LD, and the DB currently has no row for it. Same max_gradient caveat as the LD-90 (p.6: level floor only above 60 kg) — deliberately NOT filled, because a 90 kg-rated cart transporter operates above that threshold and 8.3 % would be misleading. Same FF25 / `floor_flatness_req` gap, same partial-ISO-3691-4 caveat, and `rotation_capable` deliberately NOT set (transport AMR, no rack rotation described)."
+    },
+    {
+      "product_name": "Omron LD-250",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "enrich",
+      "variant_group": "LD-250 — separate spec table (p.7–8), larger 969×720 mm platform",
+      "fields": {
+        "cleanroom_class": "ISO 1–9",
+        "onboard_ui": true
+      },
+      "field_sources": {
+        "cleanroom_class": "i828_ld-series_mobile_robot_datasheet_en.pdf p.8, 'Cleanroom Rating ISO 5 / Class 100 (AMR, Battery and Docking Station)'",
+        "onboard_ui": "i828_ld-series_mobile_robot_datasheet_en.pdf p.8, 'Operator Display 3.5 inch TFT, 320 x 240 pixels, color screen'"
+      },
+      "notes": "Datasheet CONFIRMS every stored value on this row, with no conflicts: max_payload=250 (p.7), max_speed=1.2 (p.7 '1200 mm/s' → 1.2 m/s), max_gradient=3.0 (p.7 'Max. 1.7° / 3% incline' — % taken, matching AP0's unit; note that unlike the LD-60/90 this figure carries NO payload qualifier, so it holds at full load), battery_runtime=10 (p.7 'Run Time (full payload) 10 h approx.'), stop_accuracy=25 (p.7), IP20, 5–40 °C, 95 % RH, charge_time=130 (p.9, 20–80 % partial), functional_safety_level='PLd' (p.8 'PLd safety per ISO13849-1'), vehicle 969×720 (p.10 drawing). Its 'Minimum Floor Compressive Strength 5 Mpa' (p.7) is nearly double the LD-60's 2.6 MPa — no AP0 field. Same FF25 / `floor_flatness_req` gap, same partial-ISO-3691-4 exceptions list, same `rotation_capable` mis-map observation. ESD ordering variant exists (see 'variant_options_flagged')."
+    },
+    {
+      "product_name": "Omron MD-650",
+      "product_type": "Mobile AMR",
+      "source_file": "i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf",
+      "db_status": "enrich",
+      "variant_group": "MD-650 / MD-900 share one chassis (1194×944×320 mm) and one spec table; described as 'Using the highly successful HD-1500 as a basis for design'",
+      "fields": {
+        "vehicle_length": 1194,
+        "vehicle_width": 944,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 8.75,
+        "battery_runtime": 8.0,
+        "charge_time": 30,
+        "stop_accuracy": 25,
+        "min_turning_radius": 0,
+        "cleanroom_class": "ISO 1–9",
+        "functional_safety_level": null,
+        "safety_standard": ["ISO 3691-4"],
+        "load_type": ["Pallet EUR", "Pallet ISO", "Custom Carrier"],
+        "onboard_ui": true,
+        "workflow_capability": ["Transport"],
+        "picking_mechanism": "None",
+        "top_module_type": ["Custom"],
+        "battery_swap_capable": true,
+        "ingress_protection_rating": null
+      },
+      "field_sources": {
+        "vehicle_length": "md-series_leaflet_en.pdf p.2 spec table, 'Length 1194 mm'; corroborated by the dimension drawing on i885_md_series…pdf p.7 (which also prints 597 = exactly half of 1194, a centreline dimension)",
+        "vehicle_width": "md-series_leaflet_en.pdf p.2, 'Width 944 mm'; same drawing",
+        "operating_temp_min": "i885_md_series…pdf p.4, 'Ambient Temperature 5 to 40°C'",
+        "operating_temp_max": "i885_md_series…pdf p.4, 'Ambient Temperature 5 to 40°C'",
+        "operating_humidity_max": "i885_md_series…pdf p.4, 'Ambient Humidity 5% to 95% (non-condensing)'",
+        "max_gradient": "i885_md_series…pdf p.4, 'Maximum Slope Max. 5° / 8.75% incline' — the source prints both degrees and percent; AP0's unit is % so 8.75 is taken (5° would be a ~1.75× error)",
+        "battery_runtime": "i885_md_series…pdf p.4, 'Run Time*5 10 h (no payload); 8 h (full payload)'; md-series_leaflet_en.pdf p.2, 'Run time — Full payload: 8 hours / No payload: 10.5 hours'. Took the full-payload figure, 8 h.",
+        "charge_time": "md-series_leaflet_en.pdf p.2, 'Charge Time < 30 minutes (5%-95%)'; the datasheet's battery block (i885_md_series…pdf p.6) gives 'Recharge Time 19.6 minutes (from 20% to 80%)*1'",
+        "stop_accuracy": "i885_md_series…pdf p.4, 'Stop Position Repeatability (Single AMR)*7 ... To standard target: ±25 mm, ±2°'",
+        "min_turning_radius": "i885_md_series…pdf p.4, 'Turn Radius 0 mm' (an explicit English 'Turn Radius' label — safe to map under the established radius-vs-diameter rule); corroborated by md-series_leaflet_en.pdf p.2, 'Turn radius 0 mm'",
+        "cleanroom_class": "i885_md_series…pdf p.4, 'Cleanroom Rating*2 ISO 4 / Class 10'",
+        "safety_standard": "md-series_leaflet_en.pdf p.1, 'Fully compliant with ISO 3691-4 and ANSI/RIA R15.08'; i885_md_series…pdf p.5 standards list includes 'EN ISO 3691-4' with NO exceptions clause",
+        "load_type": "md-series_leaflet_en.pdf p.1, 'an ideal choice for pallet-moving applications where pickup and drop-off stands can be used. Designed with a global audience in mind, the MD Series can accomodate European, US, and Asian pallet sizes.'",
+        "onboard_ui": "i885_md_series…pdf p.5, 'Display 127 mm diagonal LCD' with 'Operator Panel Controls: E-STOP button, ON/OFF buttons, Brake release button, Pendant port, Keyed Mode Selection Switch'",
+        "workflow_capability": "md-series_leaflet_en.pdf p.1, 'transport payloads up to 900 kg'; no picking function described",
+        "picking_mechanism": "i885_md_series…pdf — no picking mechanism described anywhere",
+        "top_module_type": "i885_md_series…pdf p.3, 'K Payload Mounting Surface / Top Plate'",
+        "battery_swap_capable": "i885_md_series…pdf p.3 accessory list, 'Battery*1 Removable and rechargeable power source for the AMR 73330-100'"
+      },
+      "conflicts": {
+        "battery_type": {
+          "db": "Li-Ion",
+          "datasheet": "Lithium-Ion (LiFePO4)",
+          "source": "i885_md_series…pdf p.6 battery block, 'Type Lithium-Ion (LiFePO4)' / 'Voltage 40 to 57 VDC (51.2 VDC nominal)' / 'Capacity 38 Ah nominal' / 'Energy 2048 Wh nominal'",
+          "note": "Not a contradiction — a refinement. AP0 offers BOTH 'Li-Ion' and 'LiFePO4' as separate allowed values, and LiFePO4 is the chemistry the source names (and the value already used on all four LD rows). Recorded as a conflict only because it edits a non-null field. Proposed value: 'LiFePO4' (or the union, if a reviewer prefers to keep both)."
+        }
+      },
+      "notes": "CHARGE_TIME — the trap in all three of its documented shapes appears in this one product, so the reasoning is spelled out. (a) THE RATIO: `md-series_leaflet_en.pdf` p.1 says the MD 'provides eight hours of runtime with a charging time of less than 30 minutes for a industry-best 16:1 uptime ratio' — the '16' is a ratio and must never reach `charge_time`; this is exactly the shape that already poisoned AGILOX ONE's row with a 3. (b) THE PARTIAL CHARGE: the datasheet's 19.6 min is explicitly '20% to 80%'. (c) THE NEAR-FULL CHARGE: the leaflet's '<30 minutes' is '5%-95%'. I recorded 30, because a 5–95 % window is far closer to time-to-full than a 20–80 % window and 30 is the conservative (larger) of the two — but a reviewer preferring the more precise 19.6 (→20) should know it covers only 60 % of the pack. AP0 has no charge-window qualifier and this product shows why one is needed. INGRESS PROTECTION LEFT NULL — AP0 GAP: `i885_md_series…pdf` p.4 states 'Ingress Protection Class*1 IP22 (IP10 for charging pads)', and AP0's allowed values are ['None','IP20','IP44','IP52','IP54','IP65','IP67'] — there is no IP22 and no IP10. Downgrading to IP20 would silently discard the drip-water protection the '2' denotes. Note also footnote *1: 'The supplied Top Plate Plugs must be inserted to achieve an IP22 rating' — the rating is conditional on assembly. FUNCTIONAL SAFETY LEFT NULL: unlike the LD sheets ('PLd safety per ISO13849-1'), the MD sheet lists 'EN ISO 13849-1' among its standards but states no Performance Level. Not inferred. MIN_TURNING_RADIUS = 0 AND THE PLAUSIBILITY CONTRADICTION (recurring finding, now with two more instances): `config/plausibility.json` sets `required_min_turning_radius.min = 100`, so a legitimately omnidirectional-in-place AMR entered as 0 — which is precisely what both Omron documents print — would be rejected as implausible. Also worth flagging for whoever rules on the radius/diameter question: the same table prints 'Swing Radius 729 mm', i.e. the space the chassis actually sweeps. A 0 mm turn radius and a 729 mm swing radius describe the same machine, and only the latter tells a planner how much clearance to leave. AP0 GAPS also surfaced here: `floor_flatness_req` again ('Minimum Floor Flatness FF25 (ACI 117 standard)' plus 'Minimum Floor Levelness FL25' — LEVELNESS is a second, separate requirement AP0 has no field for at all); 'Minimum Floor Compressive Strength 7.2 MPa' (MD-650) / '9.4 MPa' (MD-900); 'Minimum Coefficient of Friction Flat surfaces: 0,6; Inclined surfaces: 0.8'. RECURRING MIS-MAP — `rotation_capable`=1 on this DB row: the MD is a top-plate transport AMR; nothing in either file describes rotating a carried rack. Flagged, not corrected. Its genuinely notable manoeuvring feature is different and unstorable: 'capable of full reverse navigation' and 'Switchable footprint' / 'dual zone sets ... for switching safety footprints when picking up and dropping off payloads' (`md-series_leaflet_en.pdf` p.1)."
+    },
+    {
+      "product_name": "Omron MD-900",
+      "product_type": "Mobile AMR",
+      "source_file": "i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf",
+      "db_status": "enrich",
+      "variant_group": "MD-650 / MD-900 — identical chassis, different payload/speed rating",
+      "fields": {
+        "vehicle_length": 1194,
+        "vehicle_width": 944,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 8.75,
+        "battery_runtime": 8.0,
+        "charge_time": 30,
+        "stop_accuracy": 25,
+        "min_turning_radius": 0,
+        "cleanroom_class": "ISO 1–9",
+        "safety_standard": ["ISO 3691-4"],
+        "load_type": ["Pallet EUR", "Pallet ISO", "Custom Carrier"],
+        "onboard_ui": true,
+        "workflow_capability": ["Transport"],
+        "picking_mechanism": "None",
+        "top_module_type": ["Custom"],
+        "battery_swap_capable": true
+      },
+      "field_sources": {
+        "vehicle_length": "md-series_leaflet_en.pdf p.2, 'Length 1194 mm' (series-wide)",
+        "vehicle_width": "md-series_leaflet_en.pdf p.2, 'Width 944 mm'",
+        "operating_temp_min": "i885_md_series…pdf p.4, 'Ambient Temperature 5 to 40°C'",
+        "operating_temp_max": "i885_md_series…pdf p.4",
+        "operating_humidity_max": "i885_md_series…pdf p.4, '5% to 95% (non-condensing)'",
+        "max_gradient": "i885_md_series…pdf p.4, 'Max. 5° / 8.75% incline'",
+        "battery_runtime": "i885_md_series…pdf p.4, '8 h (full payload)'",
+        "charge_time": "md-series_leaflet_en.pdf p.2, 'Charge Time < 30 minutes (5%-95%)'",
+        "stop_accuracy": "i885_md_series…pdf p.4, 'To standard target: ±25 mm, ±2°'",
+        "min_turning_radius": "i885_md_series…pdf p.4, 'Turn Radius 0 mm'; md-series_leaflet_en.pdf p.2, 'Turn radius 0 mm'",
+        "cleanroom_class": "i885_md_series…pdf p.4, 'Cleanroom Rating*2 ISO 4 / Class 10'",
+        "safety_standard": "md-series_leaflet_en.pdf p.1, 'Fully compliant with ISO 3691-4 and ANSI/RIA R15.08'",
+        "load_type": "md-series_leaflet_en.pdf p.1, 'can accomodate European, US, and Asian pallet sizes'",
+        "onboard_ui": "i885_md_series…pdf p.5, 'Display 127 mm diagonal LCD'",
+        "workflow_capability": "md-series_leaflet_en.pdf p.1",
+        "picking_mechanism": "i885_md_series…pdf — none described",
+        "top_module_type": "i885_md_series…pdf p.3, 'Payload Mounting Surface / Top Plate'",
+        "battery_swap_capable": "i885_md_series…pdf p.3, removable battery 73330-100"
+      },
+      "conflicts": {
+        "battery_type": {
+          "db": "Li-Ion",
+          "datasheet": "Lithium-Ion (LiFePO4)",
+          "source": "i885_md_series…pdf p.6, 'Type Lithium-Ion (LiFePO4)'",
+          "note": "Same refinement as MD-650 — AP0 has a dedicated 'LiFePO4' value."
+        }
+      },
+      "notes": "CONFIRMS max_payload=900 (both files) and max_speed=1.8 (p.4 'Maximum Translational Speed (forward and reverse) ... 1800 mm/s' → 1.8 m/s; leaflet 'MD-900: 1.8 m/sec'). Everything in the MD-650 entry's notes applies here too (charge_time trap, IP22 gap, floor flatness/levelness/compressive strength, `rotation_capable` mis-map). One MD-900-specific number: 'Minimum Floor Compressive Strength 9.4 MPa' (p.4) — the highest floor-loading requirement anywhere in this corpus and a genuine site disqualifier on a weak slab or mezzanine, with no AP0 field. Also 'Maximum Moment of Inertia 300 kg-m2' and footnote *6 'The maximum rotational speed is reduced to 45 degrees/s when the AMR is traveling at speeds over 100 mm/s' — a speed-dependent derate of the rotation spec."
+    },
+    {
+      "product_name": "Omron HD-1500",
+      "product_type": "Mobile AMR",
+      "source_file": "i855_hd-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "conflict",
+      "variant_group": "HD-1500 — single model; the MD series is explicitly derived from it",
+      "fields": {
+        "vehicle_length": 1696,
+        "vehicle_width": 1195,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "ingress_protection_rating": "IP20",
+        "cleanroom_class": "ISO 1–9",
+        "stop_accuracy": 25,
+        "min_turning_radius": 0,
+        "battery_type": ["LiFePO4"],
+        "onboard_ui": true,
+        "battery_swap_capable": true
+      },
+      "field_sources": {
+        "vehicle_length": "i854_hd-1500_leaflet_en.pdf p.2, 'Length 1696 mm'; corroborated by the dimension drawing on i855_hd-series…pdf p.7 ('1696', '1195', '370')",
+        "vehicle_width": "i854_hd-1500_leaflet_en.pdf p.2, 'Width 1195 mm'; same drawing",
+        "operating_temp_min": "i855_hd-series…pdf p.4, 'Ambient Temperature 5 to 40°C'",
+        "operating_temp_max": "i855_hd-series…pdf p.4, 'Ambient Temperature 5 to 40°C'",
+        "operating_humidity_max": "i855_hd-series…pdf p.4, 'Ambient Humidity 5% to 95% (non-condensing)'",
+        "ingress_protection_rating": "i855_hd-series…pdf p.4, 'Ingress Protection Class IP20'",
+        "cleanroom_class": "i855_hd-series…pdf p.4, 'Cleanroom Rating *1 ISO 5 / Class 100'",
+        "stop_accuracy": "i855_hd-series…pdf p.4, 'Stop Position Repeatability (Single AMR) *5 ... To standard target: ±25 mm, ±2°'",
+        "min_turning_radius": "i855_hd-series…pdf p.4, 'Turn Radius 0 mm' (explicit English radius label)",
+        "battery_type": "i855_hd-series…pdf p.6 battery block, 'Type Lithium-Ion (LiFePO4)' / 'Voltage 48 to 57 VDC (52.8 nominal)' / 'Capacity 68 Ah nominal'",
+        "onboard_ui": "i855_hd-series…pdf p.5, 'Display 178 mm diagonal LCD' with a full Operator Panel control set",
+        "battery_swap_capable": "i855_hd-series…pdf p.2 accessory list, 'Battery *1 Removable and rechargeable power source for the AMR. 68330-000'"
+      },
+      "conflicts": {
+        "safety_standard": {
+          "db": "EN 1525 (legacy)|ANSI/ITSDF B56.5",
+          "datasheet": "EN ISO 3691-4, CAN/UL 3100 (and EN ISO 12100, EN ISO 13849-1, EN 60204-1, EN ISO 10218-1, EN 12895, CAN/CSA Z434)",
+          "source": "i855_hd-series…pdf p.4, 'Standards — AMR: EN ISO 12100, EN ISO 13849-1, EN 60204-1, EN ISO 10218-1, EN 61326-3-1, EN 61326-1, EN ISO 3691-4, EN 12895, CAN/CSA Z434, CAN / UL 3100, KS C 9610-6-2, KS C 9610-6-4'",
+          "note": "SCORING field. The current DB values are the two standards the datasheet does NOT list: neither 'EN 1525' nor 'ANSI B56.5' appears anywhere in the HD-1500 datasheet, while the two AP0-mappable standards it DOES list — EN ISO 3691-4 and UL 3100 — are both absent from the DB row. Note the direction of travel: EN 1525 is the superseded predecessor of ISO 3691-4, so the DB row looks like it was built from older material. (The LD-series sheet does still list ANSI B56.5, which is why this is an HD-specific conflict rather than a company-wide one.) Proposed value: ['ISO 3691-4','UL 3100']. NOT applied."
+        },
+        "charge_time": {
+          "db": 24,
+          "datasheet": "24 min (20 %→80 %, datasheet) vs 35 min for a FULL charge (leaflet)",
+          "source": "i855_hd-series…pdf p.6, 'Recharge Time 24 min. (20% to 80% charge)'; i854_hd-1500_leaflet_en.pdf p.1, Key Features, '− 35 minutes for full battery charge.'",
+          "note": "This is the clearest available illustration of the recurring `charge_time` partial-charge trap, because BOTH numbers exist for the same machine in the same supplier's material: 24 min covers 60 % of the pack, 35 min covers 100 %. The DB holds 24, i.e. the partial figure, presented as if it were time-to-full — which flatters the HD-1500 by ~46 % against any competitor whose sheet quotes a full charge. RECOMMENDATION: store 35 and note the 24 min 20–80 % figure separately. Not applied. Caveat for the reviewer: the leaflet is © 2020 and the datasheet is newer, so the 35 min could in principle be superseded — but they measure different things, so this is not a version conflict."
+        },
+        "vehicle_weight_note": {
+          "db": "n/a (no AP0 field)",
+          "datasheet": "506 kg (datasheet, with battery) vs 585 kg (leaflet)",
+          "source": "i855_hd-series…pdf p.4, 'Weight (with Battery) 506 kg'; i854_hd-1500_leaflet_en.pdf p.2, 'Vehicle Weight 585 kg'",
+          "note": "Recorded for completeness only — there is no AP0 dead-weight field (recurring gap, 5th+ supplier). A 79 kg discrepancy between two Omron documents for the same machine; the leaflet is the older of the two."
+        }
+      },
+      "notes": "CONFIRMS max_payload=1500, max_speed=1.8 (p.4 '1800 mm/s' → 1.8 m/s; leaflet '1.8 m/sec'), max_gradient=8.75 (p.4 '5° / 8.75% incline' — % taken to match AP0's unit), battery_runtime=9.0 (p.4 'Run Time *3 12.5 h (no payload), 9 h (full payload)'; leaflet agrees exactly). FUNCTIONAL SAFETY — flagged, DB not changed: the row holds 'PLd' and its description says 'PLd/SIL3 certified safety controller (both ratings claimed in brochure)', but neither of these two HD files states a Performance Level anywhere. p.4 lists 'EN ISO 13849-1' as a standard and p.5 describes the safety architecture (two Class 1M safety scanning lasers giving a 360° detection area with the scanning plane at 181 mm, dual-channel E-stop / protective-stop / safety outputs, five E-STOPs) without naming PLd. So the DB value is not contradicted here, just unsupported by this file pair. SAFETY_COVERAGE — flagged, DB not changed: the row holds 'Single plane (2D)'. p.5 documents ONE safety-rated plane at 181 mm PLUS 'Two Low Lasers ... to detect obstacles below the scanning plane' plus optional 'Supplementary Laser Scanners ... for object detection in the vertical plane', and the leaflet headlines '360° safety coverage with LiDAR technology'. Strictly, the safety-RATED coverage is a single plane and the low lasers are supplementary obstacle detection, so 'Single plane (2D)' is defensible — but AP0's three values conflate angular coverage (360°, which this has) with vertical coverage (one plane, which is what the value means), and the field cannot say 'one safety-rated plane plus non-rated low-obstacle detection'. Same observation applies to the MD series. RECURRING MIS-MAP — `rotation_capable`=1 on this row: the HD-1500 is a flat-top heavy transport AMR (`workflow_capability`='Transport', `picking_mechanism`='None' already stored). The only rotation specs are 'Maximum Rotational Speed 60°/s' and 'Turn Radius 0 mm' — the chassis. Flagged, NOT corrected. AP0 gap notes: 'Swing Radius 982 mm' (the clearance a planner actually needs, vs the 0 mm turn radius); 'Minimum Floor Flatness FF25 (ACI 117 standard)' (same `floor_flatness_req` problem); 'Minimum Floor Compressive Strength 5 MPa'; 'Minimum Coefficient of Friction 0.6'; and a rotation derate in footnote *4, 'The maximum rotational speed is reduced to 45°/s when the AMR is traveling at speeds over 300 mm/s'."
+    },
+    {
+      "product_name": "Omron LD-130CT",
+      "product_type": "Mobile AMR",
+      "source_file": "OMRON FLOW Core 3.1.1 Release Notes.pdf",
+      "db_status": "enrich",
+      "variant_group": "LD cart-transporter line",
+      "fields": {},
+      "notes": "NO SPECIFICATION COVERAGE in any of the eight files — flagged rather than enriched. Its only appearance is in the software compatibility matrix of `OMRON FLOW Core 3.1.1 Release Notes.pdf` p.2, where the row reads 'LD-60/90/CT' with SetNetGo minimums (Atom Core 4.8.0 / i5 Core 4.8.0) — which confirms the model is still supported by current fleet software as of July 2023 (i.e. do NOT treat it as discontinued) but supplies no product specifications. Note the DB row carries `humidity_control_capable = 1`, a field that does not appear in `config/fields.json` at all under any AGV scope — worth a separate look by whoever audits the schema. Also note the possible relationship to the LD-90x ('CT' and 'x' are both cart-transporter designations); a reviewer should check whether LD-130CT and LD-90x are the same product line under two names before importing the new LD-90x row."
+    }
+  ],
+  "variant_options_flagged": [
+    {
+      "name": "LD-60 ESD / LD-90 ESD / LD-90x ESD / LD-250 ESD",
+      "source": "i828_ld-series_mobile_robot_datasheet_en.pdf p.1 ordering table, with footnote '*2.For use in electrostatic-sensitive environments, compliant to the IEC 61340-5-1 standard.' — each has its own ordering code (37032-20000, 37042-20000, 37062-20000, 37222-20000).",
+      "recommendation": "Deliberately NOT created as separate product rows. Their only documented difference from the base models is ESD compliance to IEC 61340-5-1, and AP0 has no field for electrostatic-discharge protection — so four extra rows would be indistinguishable from their parents in every stored field, which would actively degrade the matching data. Recorded here instead. If a tender ever specifies ESD-safe transport (realistic for the semiconductor and electronics verticals Omron targets), AP0 needs an ESD field before these can be modelled. Same class of gap as the missing cleanroom detail and the missing wireless fields."
+    }
+  ],
+  "ap0_gaps": {
+    "wireless_infrastructure": "The strongest single instance of this recurring gap anywhere in the corpus. `72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf` p.12 prints a complete 'AMR Requirement' table: bandwidth '50 Kbps average / 500 Kbps when being monitored by MobilePlanner' PER AMR; latency 'Recommended: <= 10 ms / Maximum allowable: 50 ms'; wireless standards '802.11a (recommended), 802.11b, 802.11g'; signal strength 'Ideal case: >= -40 dBm / Recommended minimum: -60 dBm'; security methods 'Open, WPA-PSK, WPA2-PSK, PEAP-MSCHAPv2, EAP-TLS'; frequency '2.4GHz / 5GHz'. p.20 adds: 'OMRON's 10 ms requirement is considered to be very low latency' and lists the failure modes of a poor link — 'Frequent disconnections ... Network packet loss ... Collisions among AMRs when operating in close proximity.' A buyer with a marginal WiFi estate is a genuine deployment risk and AP0 stores none of it. Note this is a 52-page technical manual devoted entirely to the topic, which is itself evidence of how load-bearing it is.",
+    "floor_requirements": "Three distinct, quantified floor requirements appear on every Omron spec table and AP0 can store none of them properly: FLATNESS ('FF25 (ACI 117 standard)' — and AP0's only F-number value is labelled 'Very High', the opposite of what FF25 means); LEVELNESS ('FL25', MD only — no field at all); COMPRESSIVE STRENGTH (2.6 MPa LD-60, 3.27 MPa LD-90, 5 MPa LD-250 and HD-1500, 7.2 MPa MD-650, 9.4 MPa MD-900 — no field). Also step and gap traversal limits and minimum coefficient of friction.",
+    "esd_protection": "IEC 61340-5-1 ESD compliance is a first-class ordering option across the whole LD line (`i828_ld-series…pdf` p.1) and has no AP0 field.",
+    "ingress_protection_values": "IP22 (MD series, `i885_md_series…pdf` p.4) and IP10 (its charging pads) are not in AP0's allowed_values list, which jumps from IP20 to IP44.",
+    "charge_window_qualifier": "Every Omron charge figure carries a state-of-charge window — 20→80 % (LD 130 min, HD 24 min, MD 19.6 min), 5→95 % (MD <30 min), or none at all (HD leaflet 35 min full). `charge_time` is a bare integer in minutes and cannot say which. The HD-1500 shows the consequence precisely: 24 vs 35 minutes for the same battery.",
+    "fleet_software_compatibility": "`OMRON FLOW Core 3.1.1 Release Notes.pdf` p.1–2 makes fleet-wide software version alignment a hard constraint ('All AMRs in a fleet must have the same version of the FLOW Core software installed', `i828_ld-series…pdf` p.1) with per-model minimum OS versions. Adding a new AMR model to an existing fleet can force an upgrade of the whole fleet — a real cost and risk item with no AP0 representation."
+  },
+  "accessory_discontinuation_note": {
+    "source_file": "2022519_call-_door_box_13029-802_discontinuation_notice_en.pdf",
+    "summary": "Correction reissue dated 3 March 2023 (No. 20220519AE_2). The Call/Door Box model 13029-802 is discontinued — final order entry end of March 2023, last shipping end of June 2023 — and replaced by the Mobile I/O Box 23419-802 plus a now-separate Mobile I/O Box Power Supply 23419-812. The replacement 'will not work with robots that have earlier versions of the software' than FLOW Core 3.1.0.",
+    "impact_on_products": "NONE — this is a peripheral, not a vehicle, and no product field changes from it. Recorded so the file is accounted for in the source index. Two things worth a reviewer's attention: (1) the Call/Door Box is the accessory that lets Omron AMRs trigger automatic doors and call stations, i.e. it is the mechanism behind station/door integration, which AP0's `station_applications` list does not include as a value; (2) it corroborates the fleet-software-version constraint described under ap0_gaps."
+  }
+}

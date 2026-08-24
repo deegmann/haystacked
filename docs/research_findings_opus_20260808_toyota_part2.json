@@ -1,0 +1,92 @@
+{
+  "company": "Toyota Material Handling Europe",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Part 2 of the Toyota group (part 1 = docs/research_findings_opus_20260808_toyota_part1.json). Two remaining files: tae500-technicky-list-003.pdf (Autopilot towing truck TAE500, Tugger AGV) and tmha_sai125cb_brochure.pdf (Autopilot stacker truck SAI125CB, Forklift AGV). Both are VDI 2198 Typenblatt sheets. NOTE on the SAI125CB brochure's publisher: it is issued by Toyota Material Handling AUSTRALIA (8 Secombe Place, Moorebank NSW 2170), not TMH Europe — the DB company row is 'Toyota Material Handling Europe'. Same truck and same VDI data, but the sheet is not evidence of European availability; service_coverage was NOT touched. DELIBERATE DEVIATION FROM BLANKET VARIANT-SPLITTING on the SAI125CB: the sheet has two side-by-side columns (3.7 m Triplex Hi-Lo / 5.4 m Triplex Hi-Lo) but VDI row 1.2 'Model' reads SAI125CB in BOTH columns — this is one model with two mast options, not two models. Splitting it would fabricate a model designation that Toyota does not print. Recorded as one product with the mast axis documented in notes. (Contrast: the SAE160 in part 1 was split because its two columns carry genuinely different mast-type designations.) The TAE500 sheet is dated 2018 (749993-040, version 3, 2018-05-21, p.4) — old enough to warrant a currency check before import.",
+  "products": [
+    {
+      "product_name": "Toyota Movit TAE500 Autopilot",
+      "product_type": "Tugger AGV",
+      "source_file": "tae500-technicky-list-003.pdf",
+      "db_status": "enrich",
+      "variant_group": "TAE500 — single configuration column on the sheet",
+      "fields": {
+        "towing_capacity": 5000,
+        "turning_radius": 1597,
+        "vehicle_length": 1757,
+        "vehicle_width": 950,
+        "max_gradient": 3.0,
+        "max_speed": 2.22,
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "coupling_type": ["Automatic", "Manual"],
+        "train_configuration": "Tugger + trailers",
+        "manual_usage": true,
+        "autonomous_charging": true,
+        "navigation_type": ["Laser Reflector"]
+      },
+      "field_sources": {
+        "towing_capacity": "p.2, row '1.5 Rated capacity /rated load Q kg 5000/5000' — printed in kg, AP0 unit is kg, no conversion",
+        "turning_radius": "p.2, row '4.35 Turning radius Wa mm 1597' — printed in mm, AP0 unit mm, no conversion. Explicit unambiguous 'Turning radius' label",
+        "vehicle_length": "p.2, row '4.19 Overall length l1 mm 1757'",
+        "vehicle_width": "p.2, row '4.21 Overall width b1/b2 mm 950/800' — took the larger of the two printed widths (950) as the conservative footprint",
+        "max_gradient": "p.2, row '5.7 Gradeability, with/without load % 3/13' — took the LOADED figure (3 %) per the AP0 hint 'Max ramp gradient the LOADED unit handles'. Unloaded is 13 %",
+        "max_speed": "p.2, row '5.1 Travel speed, drive wheel direction. with/without load — Auto mode Towing pin, auto km/h 6,0/8,0' → printed 8,0 km/h (unloaded, automatic mode) → converted to 2.22 m/s (8.0 / 3.6). AP0 unit is m/s",
+        "battery_type": "p.2, rows '6.4 Battery voltage, nominal capacity K5 Lead-acid V/Ah 24/465-620' and '6.4 ... Li-Ion V/Ah 24/196-308'",
+        "coupling_type": "p.2, row '4.12 Coupling height — Towing pin Ø20, auto' and 'Towing pin Ø20, manual'; p.4 features 'Automatic tow coupling device. (optional)' / 'Manual tow coupling device. (optional)'",
+        "train_configuration": "p.1 title 'Autopilot towing truck 5.0 ton TAE500' + p.2 row 4.12 coupling height for towing pin/towing ball — a tractor pulling separate trailers",
+        "manual_usage": "p.2, row '1.4 Operator type Stand on/Autom.'; p.4 features 'Manual handling' and 'Automatic handling'",
+        "autonomous_charging": "p.4, features 'Automatic charging, Li-Ion battery. (optional)'",
+        "navigation_type": "p.4, features 'Automatic handling - Laser precision navigation.'"
+      },
+      "notes": "SPEED — the sheet gives four different speeds and AP0 has one field. Manual mode 6,0/11,0 km/h (loaded/unloaded, i.e. 3.06 m/s unloaded max); Auto mode with automatic towing pin 6,0/8,0 km/h; Auto mode with MANUAL towing pin only 6,0/6,0 km/h (1.67 m/s). Recorded the automatic-mode, automatic-pin, unloaded figure (2.22 m/s) because this is an AGV and that matches the existing DB value exactly. A buyer specifying the manual-pin option gets 1.67 m/s. COUPLING — a third option, 'Towing ball Ø50mm' (p.2, row 4.12), is printed but has no clean AP0 allowed value ('Towbar' is the nearest; 'Pintle Hook' is wrong). Not mapped; flagged instead. MAX_TRAILERS — NOT stated anywhere in this document. The DB holds 4; that value is not confirmed or contradicted here, left untouched. NOT MAPPED (no AP0 field): rated drawbar pull 1150 N / maximum drawbar pull 3500 N (row 1.7) — this is the physically meaningful towing-capability figure for a tractor and is arguably more useful than the 5000 kg rated load; wheelbase 1319 mm (1.9); service weight without battery 855 kg (2.1); overall height without scanner 2257 mm and with navigation scanner 2392/2969 mm (4.2.1) — AP0 has no vehicle-height field for Tuggers; stand height 130 mm (4.8); ground clearance 62/71 mm (4.32) — deliberately NOT written to min_ground_clearance, which is AMR-scope and per its AP0 hint means ROBOT HEIGHT, not the chassis gap; drive motor rating 2,8 kW (6.1); battery weight 338/538 kg (6.5); sound level 65,7 dB(A) (8.4); drive control 'BT Powerdrive' (8.1); clear width driver compartment entrance 450 mm (4.44). AISLE WIDTH — neither min_aisle_width nor tugger_min_aisle_width is stated; per the AP0 hint ('If no explicit aisle width is stated → output null') both left null. SAFETY — p.4 lists personal safety protection in drive direction and along sides (standard), in reverse direction (optional), and obstacle detection front/top (optional); no PL/SIL level, no ISO 3691-4 reference, no scanner count, so functional_safety_level, safety_standard and safety_coverage all left null. Obstacle DETECTION is not obstacle BYPASS — autonomous_obstacle_bypass left untouched (DB has 1)."
+    },
+    {
+      "product_name": "Toyota Autopilot SAI125CB",
+      "product_type": "Forklift AGV",
+      "source_file": "tmha_sai125cb_brochure.pdf",
+      "db_status": "enrich",
+      "variant_group": "SAI125CB — one model, two mast options (3.7 m and 5.4 m Triplex Hi-Lo). Not split into two products: VDI row 1.2 'Model' reads SAI125CB in both columns.",
+      "fields": {
+        "max_payload": 1250,
+        "lifting_height": 5400,
+        "min_total_height": 2430,
+        "min_aisle_width": 2963,
+        "vehicle_length": 2621,
+        "vehicle_width": 969,
+        "max_speed": 2.19,
+        "max_gradient": 2.0,
+        "battery_type": ["Li-Ion"],
+        "mast_type": "Triplex",
+        "load_type": ["Pallet EUR", "Pallet ISO", "Half-Euro"],
+        "multi_load_compatibility": true,
+        "stacking_capability": true,
+        "manual_usage": true,
+        "autonomous_charging": true,
+        "barcode_readers": true,
+        "load_detection": ["Barcode/DataMatrix", "RFID", "Mechanical/Tactile"],
+        "navigation_type": ["Laser Reflector"]
+      },
+      "field_sources": {
+        "max_payload": "p.2, row '1.5 Load capacity/rated load Q kg 1250' (both mast columns). Printed in kg, AP0 unit kg",
+        "lifting_height": "p.2, row 'Lift height h23 mm 3700 1) / 5400 1)' — took the 5.4 m mast option (5400 mm), the maximum orderable. AP0 unit mm, no conversion",
+        "min_total_height": "p.2, row 'Height with scanner h20 mm 2430/2750/2970' (identical for both mast columns) — took the lowest of the three scanner-mast options",
+        "min_aisle_width": "p.3, table 'Aisle width Auto mode Ast', column fork length 1250 mm / load 1200 x 800 mm → 2963 mm",
+        "vehicle_length": "p.2 row '4.19 Overall length l1 mm 2621 2)' and p.3 fork-length table, column FL 1250 → 2621 mm",
+        "vehicle_width": "p.2, row '4.21 Overall width b1 mm 969'",
+        "max_speed": "p.2, row '5.1.1 Travel speed, with/without load, automatic mode, drive wheel direction km/h 7.9/7.9' → printed 7.9 km/h → converted to 2.19 m/s (7.9 / 3.6). AP0 unit m/s",
+        "max_gradient": "p.2, row '5.8 Max. gradeability, with/without load % 2/5' — took the LOADED figure (2 %) per the AP0 hint. Unloaded is 5 %",
+        "battery_type": "p.2, row '6.4 Battery voltage/nominal capacity K5 Li-Ion V/Ah 24/300'",
+        "mast_type": "p.2, column headers 'SAI125CB (3.7 m Triplex Hi-Lo)' and 'SAI125CB (5.4 m Triplex Hi-Lo)'",
+        "load_type": "p.3, 'Aisle width Auto mode' table rows 'Load length mm 600 800 1000 1200 1200 1200' / 'Load width mm 800 1200 1200 800 1000 1200' → 1200x800 = Pallet EUR, 1200x1000 = Pallet ISO, 600x800 = Half-Euro",
+        "multi_load_compatibility": "p.3, same table — six distinct load footprints handled by one truck via fork-length selection",
+        "stacking_capability": "p.1 title 'Autopilot stacker truck 1.25 ton'; p.4 features 'Automatic — horizontal deep stacking'",
+        "manual_usage": "p.2, row '1.4 Operator type Automatic/Pedestrian'; p.4 features 'Manual handling'",
+        "autonomous_charging": "p.4, features 'Auto charging Lithium Ion battery' (listed WITHOUT an '(optional)' qualifier, unlike the neighbouring lines); corroborated by p.2 rows 'Distance centre of fork wheel to centre of autocharging plate Xcp mm 642' and 'Distance centre of machine to face of autocharging plate Ycp mm 471'",
+        "barcode_readers": "p.4, features 'Barcode scanner (optional)'",
+        "load_detection": "p.4, features 'Barcode scanner (optional)', 'RFID scanner (optional)', 'Load detection & fork tip sensors'",
+        "navigation_type": "p.4, features 'Laser precision navigation'"
+      },
+      "notes": "MAST CONFIGURATION AXIS (collapsed, documented): the two columns differ only in mast. 3.7 m column — lift height h23 3700, lift movement h3 3660, free lift h2 1238, height mast lowered h1 1802, height mast extended h4 4224, service weight 3300 kg. 5.4 m column — h23 5400, h3 5358, h2 1804, h1 2368, h4 5922, service weight 3415 kg. Everything else (payload, footprint, speeds, gradeability, battery, wheels, turning radius) is identical. Recorded the 5.4 m figures as the model's maximum capability, matching the existing DB value of 5400. MIN_TOTAL_HEIGHT — deliberately NOT taken from row '4.2 Height, mast lowered h1' (1802 / 2368 mm), because on this truck the NAVIGATION SCANNER MAST, not the fork mast, sets the true overall height: 2430 mm minimum (row h20, three scanner options 2430/2750/2970). 2430 > 2368, so the scanner figure governs in both mast variants. A reviewer taking h1 would understate the truck by 62-628 mm on a KO_IF_GT field. PAYLOAD DERATING (matrix, NOT collapsed into max_payload): p.3 'Lift capacities / Actual Capacity (kg)' gives payload as a function of lift height x load centre — at LC 650 mm: 3800 mm -> 1250 kg, 4300 -> 1150, 4800 -> 1000, 5400 -> 900. At LC 850 mm the 5400 mm figure falls to 650 kg. So the rated 1250 kg is only available up to ~3800 mm. Recorded max_payload = 1250 (VDI row 1.5, matching the DB) rather than the conservative 900, because 1250 is the printed rated capacity and overriding it would contradict row 1.5 — but a buyer needing 1250 kg AT 5.4 m would be wrongly matched. Flagged for the Tech Lead: AP0 has no payload-vs-lift-height derating field. MIN_AISLE_WIDTH MATRIX (collapsed, documented): p.3 gives six cells along a fork-length x load-footprint axis — FL650/600x800 -> 2404; FL850/800x1200 -> 2677; FL1050/1000x1200 -> 2851; FL1250/1200x800 -> 2963; FL1350/1200x1000 -> 2994; FL1400/1200x1200 -> 3032. Chose the FL1250 / 1200x800 EUR-pallet cell (2963) rather than the strict worst case (3032), because 2963 is the standard-EUR-pallet configuration and matches p.2's headline column (overall length 2621 = the FL1250 cell). The DB's 3000 is evidently the rounded product-page figure ('3m rack aisle') for the same measurement — NOT flagged as a conflict, but recommend replacing it with the exact 2963. Conservative alternative if the buyer uses 1200x1200 loads: 3032 mm. LIFT HEIGHT IN AUTOMATIC MODE — footnote 1) on p.2: 'Max height of load station in automode is h23 - 200mm', i.e. the usable automatic drop height is 5200 mm, not 5400. Same footnote as the part-1 Toyota trucks; still needs one ruling for the whole Autopilot range. DRIVE_TYPE NOT CHANGED, but flagged as internally ambiguous: the DB holds 'Counterbalanced' and the model suffix is 'CB', yet this VDI table repeatedly uses support-arm terminology — '3.1 Drive/Support arm wheel', '2.2 Axle load ... Drive/Support arm wheel', '4.26 Distance between support arms b4 665'. Evidence FOR counterbalanced (and why it was left alone): service weight 3300-3415 kg for a 1250 kg truck, length to face of forks l2 = 1371 mm, and an auto-mode aisle width of 2963 mm for an 800 mm-deep load — all three are counterbalance geometry, not straddle geometry. Reads as VDI-template boilerplate rather than a real straddle chassis. VEHICLE_LENGTH — 2621 mm is the FL1250 cell; the full range is 2021-2771 mm (2063-2813 with the fork tip stopping device), p.3. NOT MAPPED (no AP0 field): free lift h2 1238/1804 mm (row 4.3) — a genuinely differentiating figure for low-headroom stacking, and free_lift_open_closed_pallet is a BOOLEAN in AMR scope so it cannot hold it; turning radius Wa 1321 mm (row 4.35) — the recurring Forklift-scope gap, explicit label; lift speed 0.17/0.31 m/s and lowering speed 0.40/0.44 m/s (rows 5.2/5.3); fork dimensions 40/100 mm, 70/162 mm with safety bumper (4.22); width over forks 450/500/570/620 mm (4.25); ground clearance 39 mm below sensors / 33 mm centre of wheelbase (4.31/4.32) — again NOT written to min_ground_clearance; drive motor 2.5 kW, lift motor 3 kW (6.1/6.2); battery weight 260 kg (6.5); sound level <70 dB(A) (8.4); laser product safety Class 1 (EC 60825-1). SPEED DIRECTION DEPENDENCE (same pattern as the part-1 Toyota trucks): automatic mode is 7.9 km/h in drive-wheel direction but only 4.7 km/h in fork direction WITH personnel protection (PPS) and 1.1 km/h in BOTH directions WITHOUT PPS (rows 5.1.1-5.1.3); maintenance mode is 2.5 km/h. AP0's single max_speed hides a 7x spread. SAFETY — p.4 lists personal safety protection in drive direction, along sides and in fork direction (all standard) plus optional top and front obstacle detection and an optional mechanical fork bumper. No PL/SIL level and no ISO 3691-4 reference appear, so functional_safety_level and safety_standard were left null (the DB's ISO 3691-4 and Single plane (2D) are not sourced from this document). FORKS_FREE_FLOATING — the DB holds 1 with a product-page quote; this document neither confirms nor contradicts it, left untouched. LOAD_DETECTION 'Mechanical/Tactile' is inferred from the phrase 'fork tip sensors'; if a reviewer considers that too loose, drop it and keep only Barcode/DataMatrix + RFID (both explicitly named, both optional)."
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "KNAPP AG": {
+    "sonnet_file": "docs/research_findings_datasheet_20260806_knapp.json",
+    "opus_file": "docs/research_findings_opus_20260808_knapp.json",
+    "agree_count": 3,
+    "disagreements": [
+      {
+        "field": "certifications_generic",
+        "sonnet_value": null,
+        "opus_value": [
+          "CE"
+        ]
+      },
+      {
+        "field": "country",
+        "sonnet_value": null,
+        "opus_value": "AT"
+      },
+      {
+        "field": "fleet_management_system",
+        "sonnet_value": null,
+        "opus_value": "Proprietary"
+      },
+      {
+        "field": "hq_city",
+        "sonnet_value": null,
+        "opus_value": "Dobl"
+      },
+      {
+        "field": "infrastructure_free",
+        "sonnet_value": null,
+        "opus_value": true
+      },
+      {
+        "field": "installation_process",
+        "sonnet_value": "Client",
+        "opus_value": [
+          "Client"
+        ]
+      },
+      {
+        "field": "modification_process",
+        "sonnet_value": "Client: All",
+        "opus_value": [
+          "Client: All"
+        ]
+      },
+      {
+        "field": "reference_count",
+        "sonnet_value": null,
+        "opus_value": 150
+      }
+    ]
+  },
+  "Omron Mobile Robotics": {
+    "sonnet_file": "docs/research_findings_datasheet_20260806_omron.json",
+    "opus_file": "docs/research_findings_opus_20260808_omron.json",
+    "agree_count": 0,
+    "disagreements": [
+      {
+        "field": "fleet_control_architecture",
+        "sonnet_value": null,
+        "opus_value": "Centralized"
+      },
+      {
+        "field": "fleet_management_system",
+        "sonnet_value": null,
+        "opus_value": "Proprietary"
+      },
+      {
+        "field": "integration_capability",
+        "sonnet_value": [
+          "WMS",
+          "MES",
+          "MQTT"
+        ],
+        "opus_value": null
+      },
+      {
+        "field": "max_fleet_size",
+        "sonnet_value": null,
+        "opus_value": 100
+      },
+      {
+        "field": "multi_fleet_capable",
+        "sonnet_value": null,
+        "opus_value": true
+      }
+    ]
+  },
+  "DS Automotion GmbH": {
+    "sonnet_file": "docs/research_findings_datasheet_20260806_ds_automotion.json",
+    "opus_file": "docs/research_findings_opus_20260808_ds_automotion.json",
+    "agree_count": 5,
+    "disagreements": [
+      {
+        "field": "country",
+        "sonnet_value": null,
+        "opus_value": "AT"
+      },
+      {
+        "field": "distribution_model",
+        "sonnet_value": null,
+        "opus_value": "Direct"
+      },
+      {
+        "field": "hq_city",
+        "sonnet_value": null,
+        "opus_value": "Linz"
+      },
+      {
+        "field": "integration_capability",
+        "sonnet_value": [
+          "ERP"
+        ],
+        "opus_value": [
+          "ERP",
+          "WMS"
+        ]
+      },
+      {
+        "field": "modification_process",
+        "sonnet_value": null,
+        "opus_value": [
+          "Client: All"
+        ]
+      }
+    ]
+  },
+  "ek robotics": {
+    "sonnet_file": "docs/research_findings_datasheet_20260806_ek_robotics.json",
+    "opus_file": "docs/research_findings_opus_20260808_ek_robotics.json",
+    "agree_count": 3,
+    "disagreements": [
+      {
+        "field": "battery_type",
+        "sonnet_value": null,
+        "opus_value": [
+          "Li-Ion"
+        ]
+      },
+      {
+        "field": "cleanroom_class",
+        "sonnet_value": null,
+        "opus_value": "ISO 1–9"
+      },
+      {
+        "field": "industries_served",
+        "sonnet_value": null,
+        "opus_value": [
+          "Automotive",
+          "F&B",
+          "Pharma",
+          "General Manufacturing"
+        ]
+      },
+      {
+        "field": "reference_count",
+        "sonnet_value": null,
+        "opus_value": 400
+      }
+    ]
+  }
+}

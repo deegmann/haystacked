@@ -1,0 +1,93 @@
+{
+  "company": "Grenzebach Maschinenbau GmbH",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus redo pass, session 4 — addendum to research_findings_opus_20260808_grenzebach.json. One Grenzebach file remained in Analysed/: 'Intralogistics_Brochure_EN-2023.pdf' (14 pp., 2023). Like the Stäubli and Enabled Robotics orphans processed earlier this session, it is unidentifiable from its filename or first page; the company appears only in the last page's imprint ('Grenzebach Maschinenbau GmbH, Albanusstraße 1, 86663 Asbach-Bäumenheim/Hamlar, Germany').\n\nDOCUMENT CLASS: this is a SOLUTION brochure, not a datasheet. It contains no spec table and almost no numbers. Its value is (a) a company-wide software/architecture description, (b) three named customer case studies that state operational facts no datasheet would, and (c) one page of cross-fleet vehicle technology claims. Everything below is staged accordingly — mostly company_wide_context, with a small number of per-product items where the brochure names a specific model.\n\nMIXED-LANGUAGE ARTEFACT worth knowing about: p.5 contains a German paragraph ('Nahezu alle Player innerhalb der Industrie und des eCommerce verzeichnen Umsatz- und Auftragssteigerungen…') embedded in an otherwise English document, and p.6 attributes a quote 'bei Grenzebach'. The English brochure was evidently derived from a German original and one block was not translated. No effect on the extraction, but a reader of the raw text should not conclude the file is bilingual by design.\n\ncharge_time: not stated. The only charging figure is an electrical one ('up to 80 amperes charging current', p.9), which is a current, not a duration. Left null — the trap did not fire, but note this is a NEW near-miss shape: a charging spec that is neither a time nor a ratio.",
+  "company_wide_context": {
+    "source_file": "Intralogistics_Brochure_EN-2023.pdf",
+    "fields": {
+      "vda5050_compatible": true,
+      "multi_fleet_capable": true,
+      "fleet_management_system": "VDA 5050 compatible",
+      "integration_capability": ["ERP", "WMS"],
+      "installation_process": ["Supplier only", "Client"],
+      "modification_process": ["Client: All"],
+      "battery_type": ["Li-Ion"],
+      "industries_served": ["Automotive", "General Manufacturing", "3PL", "E-Commerce"],
+      "station_applications": ["Machine cell", "Conveyor", "Workstation"],
+      "country": "DE",
+      "hq_city": "Asbach-Bäumenheim"
+    },
+    "applies_to": "all base models of Grenzebach Maschinenbau GmbH",
+    "notes": "vda5050_compatible / multi_fleet_capable / fleet_management_system all come from the same architecture description, p.6: 'Grenzebach has developed the universal control system as the central software for controlling all automated guided vehicles. Based on the VDA 5050 standard for interface communication between control systems and individual vehicles, it controls all autonomous and automated vehicles REGARDLESS OF THEIR MANUFACTURER AND TYPE.' Reinforced by the p.6 software-ecosystem diagram, which prints 'VDA 5050' as the labelled boundary between the process and control levels, and by p.9 'VDA 5050 COMPATIBILITY — The VDA 5050 interface allows for maximum freedom when planning systems with just one software control center for all AGVs – regardless of their manufacturer and brand.' Stated three times in three different registers (prose, diagram, feature tile). NOTE vda5050_compatible is currently NULL on the DB's Grenzebach FF1200S row, and multi_fleet_capable is NULL on Grenzebach L1200S — both should be filled.\ninstallation_process / modification_process are the strongest findings in the file and they come from a CASE STUDY, not a capability claim — which makes them better evidence, not worse, because a named customer is on record. p.10, KÖNIG + NEURATH: the solution set includes a 'Training package to enable our customer to commission the entire system'; the narrative says 'With the help of training courses, the office furniture manufacturer can commission the vehicles itself'; the benefits list says 'Training and close contact resulting in commissioning by the customer'; and the customer is quoted directly: 'It was important to us that we would have enough control over the system to be able to change a route or start using a vehicle ourselves.' Route editing and vehicle commissioning by the customer are both explicit. installation_process keeps 'Supplier only' alongside 'Client' because the Swiss Post and Audi case studies on pp.9-10 are supplier-delivered.\nintegration_capability: p.6 'Interfaces to ERP, WMS, and other logistics control systems, as well as to various machines and systems, are part of the standard portfolio'; the p.6 ecosystem diagram puts 'ERP / WMS' at the administration level. The DB currently holds WMS only on all three Grenzebach rows — ERP is an enrichment.\nbattery_type: p.9 '24/7 USE — Lithium power, up to 48 V DC, and up to 80 amperes charging current ensure maximum availability during 24/7 operation'. Generic 'Lithium'; the DB's LiFePO4 on all three rows is more specific and is NOT contradicted — do not downgrade it.\nindustries_served: from the three named case studies — Audi Neckarsulm (p.10, Automotive), König + Neurath office furniture (p.10, General Manufacturing), Swiss Post via Gilgen Logistics (p.9, postal/parcel — mapped to 3PL). E-Commerce from p.5 'Nahezu alle Player innerhalb der Industrie und des eCommerce' and p.7's 'GtP warehouse for 3PL' / 'Returns handling' case set. Only 'Automotive' and 'General Manufacturing' are currently on the DB rows, and only via the earlier session.\nstation_applications: p.4 'We also take care of connections to robot cells, elevators, and area protection'; p.8 'we can take care of connections to fire-protection gates and elevators too' and 'Straightforward integration into existing environments … (e.g., elevators, robot cells, conveyors, and strapping systems)'; p.7 'ergonomic picking stations with a pick gate and put wall using pick-by-light and put-to-light systems'. Robot cells -> Machine cell; conveyors -> Conveyor; picking stations -> Workstation. Elevators and fire-protection gates have no allowed value.\nAP0 stores vda5050_compatible, multi_fleet_capable, fleet_management_system, integration_capability, installation_process, modification_process, battery_type, industries_served and station_applications at BASE-MODEL granularity — fan out per base model at import."
+  },
+  "products": [
+    {
+      "product_name": "Grenzebach L600",
+      "product_type": "Mobile AMR",
+      "source_file": "Intralogistics_Brochure_EN-2023.pdf",
+      "db_status": "new",
+      "variant_group": "Named alongside L1200S and OL1200S; the 'L' prefix and numeric suffix pattern suggest a 600 kg sibling of the 1200 kg L1200S, but the brochure does not confirm that the number is the payload.",
+      "fields": {
+        "product_type": "Mobile AMR"
+      },
+      "field_sources": {
+        "product_type": "Intralogistics_Brochure_EN-2023.pdf p.9, SWISS POST case study, 'THE GRENZEBACH SOLUTION SET': '» L600 automated guided vehicles for transporting goods in the warehouse'. Classified Mobile AMR by analogy with its L1200S sibling (also an underride goods-carrier transporter), not from a stated category."
+      },
+      "notes": "NEW PRODUCT CANDIDATE, evidence is ONE LINE. The DB holds Grenzebach FF1200S, L1200S and OL1200S; 'L600' appears nowhere in it. This is a real deployed model — it is named in a customer solution set for Swiss Post, alongside a universal control system and a safety-radio concept — but the brochure publishes NO specifications for it whatsoever.\nDELIBERATELY EXTRACTED ALMOST NOTHING: it would be easy and wrong to infer max_payload = 600 kg from the model name. The naming pattern is suggestive (L1200S carries 1200 kg) but a model number is not a spec, and max_payload is a hard K.O. field. Left null.\nRECOMMENDATION: do not import on this evidence. Flag as a gap and seek an L600 datasheet, or confirm with Grenzebach whether L600 is current or was superseded by the L1200S line.\nContext from the same case study that a reviewer may find useful: Swiss Post 'processes more than 30 million international shipments every year'; the deployment is in a LISTED BUILDING 'with pillars, shafts, and limited space' on a new mezzanine floor, and used 'Safety concept with safety radio communications' — a wireless-safety architecture that has no AP0 field."
+    },
+    {
+      "product_name": "Grenzebach OL1200S",
+      "product_type": "Mobile AMR",
+      "source_file": "Intralogistics_Brochure_EN-2023.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "safety_coverage": "Full 3D",
+        "omnidirectional_movement": true,
+        "vda5050_compatible": true,
+        "multi_fleet_capable": true
+      },
+      "field_sources": {
+        "safety_coverage": "Intralogistics_Brochure_EN-2023.pdf p.9, feature tile '360° DRIVE RANGE MONITORING — Detects disruptive factors with a minimum size of approximately 50 mm using a 3D VISION SYSTEM to avoid collisions (FUNCTION ON OL1200S).' The parenthetical is decisive: the brochure singles out OL1200S as the model that carries the 3D vision system, distinguishing it from the rest of the fleet, which p.9's adjacent '360° PERSONNEL SAFETY' tile describes as 'Equipped with blue light and two Lidar laser scanners' — i.e. 2D.",
+        "omnidirectional_movement": "Intralogistics_Brochure_EN-2023.pdf p.9, feature tile '360° MOBILITY — Grenzebach AGVs can move freely in any direction and rotate on their axis while stationary, with narrow pathways, 90° curves, turning maneuvers, and cross-docking of goods carriers not posing a problem either.' CONFIRMS the DB's existing value of 1 for OL1200S.",
+        "vda5050_compatible": "p.6 / p.9 — see company_wide_context. CONFIRMS the DB.",
+        "multi_fleet_capable": "p.6 'regardless of their manufacturer and type'. CONFIRMS the DB."
+      },
+      "notes": "CONFLICT — safety_coverage: DB holds 'Single plane (2D)'; p.9 explicitly attributes a 3D vision system to OL1200S by name. 'Full 3D' proposed. This is a SCORING field, so the consequence is a scoring difference rather than a disqualification, but the source could hardly be more specific — it names the model in parentheses precisely to say the function is not fleet-wide.\nENRICH CANDIDATE not filled — the same p.9 tile states the 3D system detects obstacles 'with a minimum size of approximately 50 mm'. Minimum detectable obstacle size has no AP0 field, and it is exactly the number that distinguishes a real 3D safety system from a marketing claim.\nAMBIGUITY FLAGGED, not resolved — the '360° MOBILITY' tile says 'Grenzebach AGVs' generically, i.e. it reads as a fleet-wide claim, yet the DB records omnidirectional_movement only on OL1200S (the 'O' prefix presumably standing for omnidirectional) and leaves it null on L1200S and FF1200S. Either the tile overgeneralises or L1200S/FF1200S are under-recorded. NOT propagated to the other two models — a marketing page's 'our AGVs' is weaker than a model-specific statement, and the DB's more conservative reading is likelier correct.\nWRONG-SCOPE values on the OL1200S DB row (flag only): route_type and route_programming are Logistics:AGV:Tugger fields on a Mobile AMR row; rotation_capable = 1 is under the same G2P-semantics doubt raised for DS Automotion in this batch (the AP0 hint means rotating the CARRIED RACK to face a picker, not the vehicle spinning)."
+    },
+    {
+      "product_name": "Grenzebach L1200S",
+      "product_type": "Mobile AMR",
+      "source_file": "Intralogistics_Brochure_EN-2023.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "multi_fleet_capable": true,
+        "pick_req_accuracy_dep": 250,
+        "load_type": ["Custom Carrier"],
+        "industries_served": ["Automotive", "General Manufacturing"]
+      },
+      "field_sources": {
+        "multi_fleet_capable": "p.6 'it controls all autonomous and automated vehicles regardless of their manufacturer and type'. CURRENTLY NULL on this row while FF1200S and OL1200S both hold 1.",
+        "pick_req_accuracy_dep": "p.9, feature tile 'AUTONOMOUS DETECTION OF GOODS CARRIERS — Detects the position of inaccurately placed goods carriers (+/- 250 mm) and makes it possible for these loads to be picked up automatically.' CAVEAT: the source gives ONE ± tolerance with NO AXIS. Recorded on the depth field only and deliberately not fanned out to pick_req_accuracy_angle. See the scope note below — AMR scope has no pick_req_accuracy_lat at all, so the lateral reading has nowhere to go even if that were the intended axis.",
+        "load_type": "p.8 'Grenzebach AGVs are compatible with almost all standard goods carriers – in the form of table trolleys, carts, frames, and racks'; p.7 'versatile racks, table trolleys, frames, mobile goods carriers, and custom solutions'. CONFIRMS the DB's 'Custom Carrier'.",
+        "industries_served": "p.10 case studies — Audi Neckarsulm names '30 L1200S Automated Guided Vehicles' (Automotive) and König + Neurath names 'L1200S automated guided vehicles' (office furniture manufacturing -> General Manufacturing). This is the only model in the range with named, model-specific industry references."
+      },
+      "notes": "ENRICH — multi_fleet_capable true (null on this row, set on both siblings), pick_req_accuracy_dep 250 (null), industries_served (null on this row).\n±250 mm is a notably LOOSE required pre-position tolerance compared with the rest of the corpus, which is a genuine selling point (forgiving of sloppy manual cart placement) rather than a weakness — worth a reviewer understanding the sign of it before treating a large number as poor performance. It is also stated as a headline vehicle technology, so confidence is good.\nAP0 SCOPE ASYMMETRY, new instance: Logistics:AGV:AMR has pick_req_accuracy_dep and pick_req_accuracy_angle but NO pick_req_accuracy_lat, while Logistics:AGV:Forklift has all three. For an underride AMR picking up a cart, lateral misplacement is at least as likely as depth misplacement. This is the same class of one-directional scope hole already logged this session for onboard_ui (AMR-only) and barcode_readers (Forklift-only).\nAP0 GAP — MULTI-FLOOR OPERATION, 4th independent instance this session. p.10 Audi: '30 L1200S Automated Guided Vehicles that can even communicate with elevators (production on three levels)' and 'Optimal transport routes across three floors, coordinated by the Grenzebach Universal Control System'. Also p.4 and p.8 list elevator connections as standard peripherals. With ek robotics MEDI MOVE, DS Automotion NAVIOS and Enabled Robotics all advertising the same capability, AP0's inability to express building-lift operation is now a four-supplier pattern.\nAP0 GAP — availability guarantee: p.10 Audi, 'Up to 99.5% availability'. No field.\nAP0 GAP — 'WiFi boxes for sensor connection' (p.10, König + Neurath solution set) and 'Safety concept with safety radio communications' (p.9, Swiss Post). Wireless dependency now has FOUR instances this session (Omron's dedicated wireless guide, Enabled Robotics, DS Automotion AMY, Grenzebach).\nWRONG-SCOPE values on the L1200S DB row (flag only): route_type, route_programming (Tugger scope) on a Mobile AMR row; rotation_capable = 1 under the G2P-semantics doubt described on the OL1200S entry."
+    },
+    {
+      "product_name": "Grenzebach FF1200S",
+      "product_type": "Forklift AGV",
+      "source_file": "Intralogistics_Brochure_EN-2023.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vda5050_compatible": true,
+        "pick_req_accuracy_lat": 250
+      },
+      "field_sources": {
+        "vda5050_compatible": "p.6 'Based on the VDA 5050 standard for interface communication between control systems and individual vehicles, it controls all autonomous and automated vehicles'; p.9 tile 'VDA 5050 COMPATIBILITY'. CURRENTLY NULL on this row while both L1200S and OL1200S hold 1 — and the p.6 claim is explicitly about the whole vehicle fleet, so the omission looks like a gap rather than a deliberate exclusion.",
+        "pick_req_accuracy_lat": "p.9 'AUTONOMOUS DETECTION OF GOODS CARRIERS — Detects the position of inaccurately placed goods carriers (+/- 250 mm)'. Same axis caveat as L1200S: one tolerance, no axis named. Recorded on the lateral field here because Forklift scope has all three axes and lateral misplacement is the usual failure mode for a fork pick."
+      },
+      "notes": "ENRICH — vda5050_compatible true (null on this row only) and pick_req_accuracy_lat 250 (null).\nTENSION worth a reviewer's eye, NOT flagged as a conflict: the DB records FF1200S with navigation_type = 'Inductive Loop' and infrastructure_free = 0, i.e. a wire-guided machine, whereas this brochure's vehicle-technology page (p.9) presents the fleet as freely navigating ('move freely in any direction', 'narrow pathways, 90° curves, turning maneuvers'). The brochure never mentions FF1200S by name, so it does not actually contradict the DB — the p.9 claims are generic. Recorded here only so a future reviewer does not mistake the generic page for evidence about FF1200S.\nWRONG-SCOPE values on the FF1200S DB row (flag only): route_type, route_programming (Tugger scope) and workflow_capability, grid_required, picking_mechanism (AMR scope) — five wrong-scope fields on a Forklift AGV row. Note also turning_radius = 1450, which is a Tugger-scope field holding what is presumably a real forklift turning radius; this is the SAME pattern found on Toyota RAE250 earlier in this session (a correct forklift turning radius parked in the tugger field because Forklift scope has none). Two independent instances now — strong evidence for the missing-Forklift-turning-radius gap."
+    }
+  ]
+}

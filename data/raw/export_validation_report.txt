@@ -1,6 +1,6 @@
-[OK ] companies: 38 rows
-[OK ] products: 266 rows
-[OK ] extensions: 266 rows
+[OK ] companies: 39 rows
+[OK ] products: 403 rows
+[OK ] extensions: 402 rows
 [OK ] companies: UUID format OK
 [OK ] extensions: boolean values OK
 [OK ] products → companies FK: resolved in SQLite (see JOIN verification)

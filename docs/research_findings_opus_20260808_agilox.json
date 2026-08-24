@@ -1,0 +1,244 @@
+{
+  "company": "AGILOX Services GmbH",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "4 PDFs processed: three print-to-PDF captures of agilox.net product pages (Agilox One.pdf, Agilox OFL.pdf, Agilox ODM.pdf — nav bar 'SOFTWARE PRODUKTE UNTERNEHMEN KARRIERE BLOG KONTAKT DE' captured, single page, no page numbering) and one real 20-page corporate brochure (agilox-corporate-folder-o-de_02_2026_web.pdf, dated '02/2026 Druckfehler und Änderungen vorbehalten.' on p.20). A fifth file in the folder, 'AGILOX  OCF.html', is not a PDF and was left untouched per instruction — so the OCF entry below is sourced ONLY from the corporate folder. The brochure's p.17 is a full four-product comparison matrix (ONE(+NFK) / OFL / OCF / ODM, with ODM occupying TWO columns for the 600 and 800 fork lengths) and is the single most valuable page in the whole AGILOX set. It was verified by rendering at 150 dpi with pdftoppm because pdfplumber's plain text linearisation mis-attached the '(geschl.)' qualifier from the OCF column to the OFL column — the render shows OFL = 'Palette 1.200 x 800 mm' and OCF = '(geschl.) Palette 1.200 x 1.200 mm'. TERMINOLOGY WARNING that governs this whole group: AGILOX distinguishes MIN. DURCHFAHRTSBREITE (pass-through width, a one-off gap the vehicle must squeeze through) from MIN. GANGBREITE (working aisle width) — and these differ by 200-400 mm. The ODM PRODUCT PAGE conflates them: it prints 'MIN. GANGBREITE 1.000 MM' where the brochure's matrix says ODM 600 Durchfahrtsbreite = 1.000 mm and Gangbreite = 1.300 mm. The brochure matrix is the authority. AP0's min_aisle_width hint maps to GANGBREITE. IMPORTANT NON-FINDING: min_turning_radius = 0 on the existing AMR rows is CORRECT, not a Blank-vs-Zero bug — the AP0 hint says literally '(0 if omnidirectional)' and every AGILOX vehicle is omnidirectional. Correspondingly, AGILOX's published DREHKREIS figures are turning-CIRCLE DIAMETERS (the brochure p.16 diagram labels 'G Drehkreis' as a full circle) and must NOT be written to min_turning_radius. Nothing was mapped from them.",
+  "company_wide_context": {
+    "source_file": "agilox-corporate-folder-o-de_02_2026_web.pdf",
+    "fields": {
+      "country": "AT",
+      "certifications_generic": ["CE"],
+      "safety_standard": ["ISO 3691-4", "UL 3100"],
+      "infrastructure_free": true,
+      "fleet_control_architecture": "Decentralized/Swarm",
+      "integration_capability": ["WMS", "ERP", "MES", "REST API"],
+      "autonomous_charging": true,
+      "battery_swap_capable": false,
+      "autonomous_obstacle_bypass": true,
+      "omnidirectional_movement": true,
+      "rotation_capable": true,
+      "navigation_type": ["Contour"],
+      "max_speed": 1.4,
+      "modification_process": ["Client: All"],
+      "service_coverage": ["AT", "DE", "FR", "ES", "PT", "BE", "NL", "LU", "DK", "EE", "FI", "GR", "GB", "IE", "IT", "LV", "LT", "NO", "PL", "SE", "CH", "CZ", "HU"]
+    },
+    "applies_to": "all base models of this company",
+    "notes": "These must be fanned out to EVERY AGILOX base model at import time — the schema stores them at Base-Model granularity, not Company granularity. SOURCES: country — p.3 'UNSERE STANDORTE: 1 Österreich - Headquarter'. certifications_generic CE — Agilox ODM.pdf, SAFETY add-on tile: 'Unsere AMRs sind für eine Vielzahl verschiedener Industrie-Sicherheitsstandards zertifiziert (z. B. CE, UL, ISO 3691-4)'. safety_standard — brochure p.5, SICHERHEIT: 'Unsere AMRs sind für eine Vielzahl verschiedener Industrie-Sicherheitsstandards zertifiziert (ISO 3691-4 and UL 3100)'. BOTH are AP0 allowed values and the DB currently stores only the non-conforming string 'ISO 3691-4 (verify)' on every AGILOX row — this document verifies ISO 3691-4 outright AND adds UL 3100. infrastructure_free — p.3 'Wir automatisieren ganze Intralogistikprozesse in nur wenigen Stunden. Und zwar ohne bauliche Veränderungen an der Infrastruktur' and p.14 'Da die Navigation ohne zusätzliche Infrastruktur passiert'; also Agilox OFL.pdf 'ohne Infrastrukturanpassungen'. fleet_control_architecture — p.14 'Die Steuerung der AGILOX-Flotte basiert auf Schwarm-intelligenz ... ohne zentrales Steuerungssystem'; p.14 also 'Es muss weder eine Software noch ein eigener Server für einen Leitrechner installiert werden'. integration_capability — p.14, JSON API tile: 'Kundensysteme (z. B. ERP, WMS, MES usw.) können über die AGILOX JSON-API einfach verbunden werden'; ERP and MES are NEW (the DB holds only WMS|REST API). 'REST API' is the closest AP0 value for a JSON-over-HTTP API; AGILOX's own wording is 'JSON-API'. autonomous_charging + battery_swap_capable — p.14, AGILOX CHARGING tile: '24/7-Betrieb durch selbstständiges Aufladen OHNE AKKUWECHSEL' — one sentence that sets both, and battery_swap_capable=false is a genuine negative statement (not an absence), so it is safe under Blank != Zero. autonomous_obstacle_bypass — p.15 USP map 'Umfahrung von Hindernissen' and 'Berechnung alternativer Routen'; p.4 'Die AMRs erkennen Hindernisse autonom und weichen aus'. omnidirectional_movement + rotation_capable — p.15 'Drehen auf der Stelle' and 'Parallele Bewegung'; Agilox One.pdf 'omnidirektionalen Antriebskonzept mit vier Fahreinheiten ... Parallel-, Diagonal- und Drehbewegungen um die eigene Achse'. navigation_type Contour — p.15 USP map, 'Konturenbasierte Navigation'. This is an EXPLICIT allowed-value match and is NEW: every AGILOX DB row currently holds only 'Natural Feature (SLAM)'. Recommend adding Contour rather than replacing. max_speed — 1,4 m/s is printed identically on all four product tiles (pp.10-13) and all three product pages. modification_process 'Client: All' — p.5 FLEXIBILITÄT: 'Nur ein einziger Klick und die AMRs reagieren ... Erstellen, verschieben oder ändern Sie einzelne Stationen, Kartendesigns oder ganze Arbeitsabläufe. Unabhängig und ohne zusätzliche Kosten.' Corroborated p.6 TRAINING: 'Sie lernen, wie Sie die AMRs warten, die HMI verwenden und neue Arbeitsabläufe erstellen'. service_coverage — p.3 'UNSERE STANDORTE' (Österreich HQ, Deutschland, Nordamerika, China, Frankreich, Iberien) + 'UNSERE VERTRIEBSPARTNER' (Benelux, Dänemark, Estland, Finnland, Griechenland, Großbritannien, Irland, Israel, Italien, Japan, Lettland, Litauen, Neuseeland, Norwegen, Polen, Schweden, Schweiz, Spanien, Südkorea, Tschechien, Türkei, Ungarn). 'Iberien' expanded to ES+PT and 'Benelux' to BE+NL+LU — flag if the reviewer prefers not to expand regional groupings. NOT STORABLE: Nordamerika, China, Israel, Japan, Neuseeland, Südkorea and Türkei have no code in AP0's Europe-only service_coverage allowed list. NOT MAPPED: installation_process — p.3 says AGILOX 'übernehmen die Erstinbetriebnahme' (supplier does initial commissioning) while p.4 Plug & Perform claims 'eine Implementierung in weniger als 12 Stunden'; these point in different directions and the allowed values are only 'Supplier only'/'Client', so left null. distribution_model — the company sells both directly (6 own locations) and through 22 sales partners; the AP0 field is a single-value Dropdown, so neither 'Direct' nor 'Dealer Network' is honest. Left null. fleet_management_system — see the per-product notes; the DB's 'Proprietary (X-SWARM)' is not an AP0 allowed value and this brochure arguably supports 'Open API' instead."
+  },
+  "products": [
+    {
+      "product_name": "AGILOX ONE",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox One.pdf; agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "db_status": "conflict",
+      "variant_group": "AGILOX ONE — Einfachscherenhub (single-scissor). Shares chassis with the Doppelscherenhub entry below (identical L x W x H and tare weight) and with AGILOX NFK, which is a narrow-fork OPTION of the same machine.",
+      "fields": {
+        "max_payload": 1000,
+        "lift_height": 620,
+        "max_speed": 1.4,
+        "vehicle_length": 1511,
+        "vehicle_width": 810,
+        "cleanroom_class": "ISO 1–9",
+        "load_type": ["Pallet EUR", "Pallet ISO", "Half-Euro", "Tote", "Custom Carrier"],
+        "omnidirectional_movement": true,
+        "rotation_capable": true,
+        "workflow_capability": ["Transport"]
+      },
+      "field_sources": {
+        "max_payload": "Agilox One.pdf, TECHNISCHE DETAILS table, column EINFACHSCHERENHUB, row 'MAX. LAST 1.000 KG (2.205 lbs)'; corroborated in the headline stat block '1.000 kg / 2.204 lbs — maximales Hubgewicht' and brochure p.10 tile",
+        "lift_height": "Agilox One.pdf, same table, row 'MAX. HUBHÖHE 620 MM (24 IN)'. Note the separate row 'MAX. STATIONSHÖHE (EPAL) 500 MM (20 IN)' — 620 is the fork stroke, 500 the reachable station height",
+        "max_speed": "Agilox One.pdf headline stat block, '1,4 m/s (4,6 ft/s) — maximale Geschwindigkeit'. Printed in m/s, AP0 unit m/s",
+        "vehicle_length": "brochure p.17 comparison matrix, row ABMESSUNGEN (L X B X H), column ONE (+NFK): '1.511 x 810 x 1.862 mm'; identical figure on Agilox One.pdf",
+        "vehicle_width": "same row, 810 mm",
+        "cleanroom_class": "brochure p.10, ONE feature list: 'REINRAUM – Zertifiziert für Reinraumanwendungen (Klasse 6)'. AP0's only non-None allowed value is the umbrella 'ISO 1–9' (en dash)",
+        "load_type": "Agilox One.pdf, MÖGLICHE LADUNGSTRÄGER: 'EUR 1 (Euro-Palette)', 'EUR 3 (Industrie-Palette)', 'EUR 6 (Euro-Halbpalette)', 'Boxen / Trays', 'FATH Kommissionierwagen', 'Adapterpalette für Dollies'",
+        "omnidirectional_movement": "Agilox One.pdf, MAXIMALE FLEXIBILITÄT: 'omnidirektionalen Antriebskonzept mit vier Fahreinheiten, das uneingeschränkte Bewegungsfreiheit gewährt'",
+        "rotation_capable": "same section: 'Parallel-, Diagonal- und Drehbewegungen um die eigene Achse'",
+        "workflow_capability": "brochure p.10: 'der kompakte und wendige Boden-zu-Boden-AMR, der Paletten problemlos durch schmale Gänge transportiert'"
+      },
+      "notes": "CONFLICT — min_aisle_width: the DB row holds 1300 mm. That is wrong on TWO counts. (a) SCOPE: min_aisle_width exists only in Logistics:AGV:Forklift and Logistics:AGV:Tugger scope; this row is Mobile AMR, so the field should not be populated here at all. (b) VALUE: brochure p.17 gives ONE a MIN. GANGBREITE of 1.600 mm and a MIN. DURCHFAHRTSBREITE of 1.400 mm — 1300 matches neither, and is in fact the ODM 600's Gangbreite. Looks like a cross-product copy error. CONFLICT — charge_time: the DB holds 3 (minutes). Agilox One.pdf's row reads 'LADEZEIT — 3 Minuten laden = 1 Stunde Betrieb', which is a charge-to-runtime RATIO, not a time-to-full. AP0's charge_time is 'Integer min' to charge; 3 minutes to full charge is not what the source says. Contrast the ODM page, which states a real one ('20 – 100 % in ca. 11 Min.'). Recommend nulling or re-sourcing. NOT STORABLE (AP0 scope gap, hit again): MIN. GANGBREITE 1.600 mm, MIN. DURCHFAHRTSBREITE 1.400 mm, IDEALE GANGBREITE 2.000 mm, MIN./IDEALE GANGBREITE BEI GEGENVERKEHR 2.600/2.900 mm, MIN. GANGBREITE (PARALLEL) 1.800 mm — six distinct, explicitly-labelled corridor widths on brochure p.17 and none of them has an AMR-scope home. This is the richest single example of the missing-AMR-aisle-width gap found so far. NOT MAPPED (deliberately): DREHKREIS 2.100 mm (brochure p.17 row G, and Agilox One.pdf) is a turning-circle DIAMETER, not a radius; min_turning_radius=0 is already correct for an omnidirectional vehicle per the AP0 hint. Also unmapped: overall height 1.862 mm, tare weight 420 kg, ABSTAND BLOCKLAGER 50/200 mm and ABSTAND EINZELSTATIONEN 100 mm (p.17 rows H/I/J — real deployment-planning numbers with no AP0 field). FORK OPTIONS: 'GABELN – Variable Gabelgrößen und Materialien', 'NFK – Narrow Fork: Monogabel für schmale Ladungsträger', 'BCO – Mit dem Box Carrier können Kisten mühelos bewegt werden' (brochure p.10) — the BCO box carrier supports the 'Tote' load type recorded above."
+    },
+    {
+      "product_name": "AGILOX ONE (Doppelscherenhub)",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox One.pdf",
+      "db_status": "new",
+      "variant_group": "AGILOX ONE — double-scissor lift variant. Identical chassis to the standard ONE (same 1.511 x 810 x 1.862 mm, same 420 kg tare); trades payload for lift height.",
+      "fields": {
+        "max_payload": 750,
+        "lift_height": 1100,
+        "max_speed": 1.4,
+        "vehicle_length": 1511,
+        "vehicle_width": 810,
+        "omnidirectional_movement": true,
+        "rotation_capable": true,
+        "workflow_capability": ["Transport"]
+      },
+      "field_sources": {
+        "max_payload": "Agilox One.pdf, TECHNISCHE DETAILS table, column DOPPELSCHERENHUB, row 'MAX. LAST 750 KG (1.653 lbs)'; corroborated in the body text 'hebt der AGILOX ONE in der Standardvariante mit einem Einfachscherenhub 1.000 kg auf bis zu 500 mm und mit einem Doppelscherenhub 750 kg auf bis zu 1.000 mm'",
+        "lift_height": "same table column, row 'MAX. HUBHÖHE 1.100 MM (43 IN)'. The companion row 'MAX. STATIONSHÖHE (EPAL) 1.000 MM (39 IN)' matches the body text's 'auf bis zu 1.000 mm'",
+        "max_speed": "Agilox One.pdf headline stat block, 1,4 m/s (shared across both columns)",
+        "vehicle_length": "same table, row ABMESSUNGEN — identical 1.511 x 810 x 1.862 MM in both columns",
+        "vehicle_width": "same row, 810 mm",
+        "omnidirectional_movement": "Agilox One.pdf, MAXIMALE FLEXIBILITÄT (applies to the model, both lift variants)",
+        "rotation_capable": "same section, 'Drehbewegungen um die eigene Achse'",
+        "workflow_capability": "brochure p.10, ONE described as a Boden-zu-Boden transport AMR"
+      },
+      "notes": "VARIANT-COMPLETION FINDING — this variant is absent from the DB. Agilox One.pdf's TECHNISCHE DETAILS table has TWO columns (EINFACHSCHERENHUB / DOPPELSCHERENHUB) and the DB holds only the single-scissor figures (max_payload 1000, lift_height 620). The double-scissor is a materially different machine on two hard K.O. fields: it lifts 1.100 mm instead of 620 mm (nearly double) but carries only 750 kg instead of 1.000 kg. A tender needing 1 m of lift currently matches no AGILOX ONE at all. Note the payload/lift trade-off runs in OPPOSITE directions, so neither variant dominates the other — this is exactly the case where collapsing to one row loses real matching capability. Whether this becomes its own Product row or a second Base Model under a shared ONE base is the import author's call; the chassis is provably shared (identical dimensions and tare weight). Corridor geometry is identical to the standard ONE (brochure p.17 column 'ONE (+NFK)' is not split by lift variant): DREHKREIS 2.100 mm, MIN. GANGBREITE 1.600 mm, MIN. DURCHFAHRTSBREITE 1.400 mm — none storable in AMR scope. Cleanroom Klasse 6 and the full load-carrier list from the ONE page apply equally but were not duplicated here; apply the standard ONE's values."
+    },
+    {
+      "product_name": "AGILOX NFK",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox One.pdf; agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "db_status": "enrich",
+      "variant_group": "NFK = 'Narrow Fork', a fork OPTION of the AGILOX ONE, not an independent machine.",
+      "fields": {
+        "max_speed": 1.4,
+        "vehicle_length": 1511,
+        "vehicle_width": 810,
+        "omnidirectional_movement": true,
+        "rotation_capable": true
+      },
+      "field_sources": {
+        "max_speed": "brochure p.10 / Agilox One.pdf headline stat block, 1,4 m/s",
+        "vehicle_length": "brochure p.17 comparison matrix, column header literally 'ONE (+NFK)', row ABMESSUNGEN '1.511 x 810 x 1.862 mm' — the NFK shares the ONE's exact envelope",
+        "vehicle_width": "same row, 810 mm",
+        "omnidirectional_movement": "Agilox One.pdf, MAXIMALE FLEXIBILITÄT",
+        "rotation_capable": "same section"
+      },
+      "notes": "CLASSIFICATION QUESTION FOR THE TECH LEAD — the DB carries AGILOX NFK as a standalone product with max_payload 1000 and lifting_height 620 (i.e. the plain ONE's Einfachscherenhub figures). Both 2026 documents treat NFK as an ACCESSORY of the ONE, not a model: brochure p.10 lists it under the ONE's option bullets ('NFK – Narrow Fork: Monogabel für schmale Ladungsträger', alongside GABELN, BCO and REINRAUM), and the p.17 comparison matrix has no NFK column at all — its column is headed 'ONE (+NFK)', i.e. one set of numbers covering both. So either (a) NFK should be merged into AGILOX ONE as a fork option, or (b) it stays as a variant row but must be understood as sharing the ONE base model entirely. Nothing in the corpus supports it as an independent machine with its own geometry. Note the existing row also stores lifting_height = 620, which is a FORKLIFT-scope field on a Mobile AMR row (the AMR-scope equivalent is lift_height) — a wrong-scope value regardless of how the merge question is decided. No new numeric values are proposed here beyond the shared envelope, because the documents publish none specific to the NFK."
+    },
+    {
+      "product_name": "AGILOX OFL",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox OFL.pdf; agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "db_status": "conflict",
+      "variant_group": "AGILOX OFL — scissor-less free-lift AMR; two published payload classes (800 kg / 1.200 kg) on one spec column.",
+      "fields": {
+        "max_payload": 800,
+        "lift_height": 1390,
+        "max_speed": 1.4,
+        "vehicle_width": 800,
+        "load_type": ["Pallet EUR", "Pallet ISO", "Half-Euro", "Custom Carrier"],
+        "omnidirectional_movement": true,
+        "rotation_capable": true,
+        "onboard_ui": true,
+        "workflow_capability": ["Transport"],
+        "station_applications": ["Floor", "Conveyor", "Standard rack"]
+      },
+      "field_sources": {
+        "max_payload": "Agilox OFL.pdf headline stat block, '800 kg / 1.764 lbs — maximales Hubgewicht'. The TECHNISCHE DETAILS row reads 'MAX. LAST 800 KG / 1.200 KG (1.764 lbs / 2.646 lbs)' — see notes",
+        "lift_height": "Agilox OFL.pdf, TECHNISCHE DETAILS row 'MAX. HUBHÖHE 1390 MM (54,7 in)'. Companion row 'MAX. STATIONSHÖHE (EPAL) 1.200 MM (47,2 in)' is the reachable station height, matching the headline stat '1.200 mm maximale Stationshöhe'",
+        "max_speed": "Agilox OFL.pdf headline stat block, '1,4 m/s (4,6 ft/s)'",
+        "vehicle_width": "brochure p.17 comparison matrix, row ABMESSUNGEN, column OFL: '1.635 x 800 x 1.988 mm' — width 800 mm agrees with Agilox OFL.pdf",
+        "load_type": "Agilox OFL.pdf, MÖGLICHE LADUNGSTRÄGER: 'EUR 1 (Euro-Palette)', 'EUR 3 (Industrie-Palette)', 'EUR 6 (Euro-Halbpalette)', 'FATH Adapterpalette für Dollies', 'Kundenspezifische Ladungsträger'",
+        "omnidirectional_movement": "Agilox OFL.pdf intro: 'Als wendiger und omnidirektionaler Freihub-AMR'",
+        "rotation_capable": "brochure p.15 USP map, 'Drehen auf der Stelle' (applies fleet-wide)",
+        "onboard_ui": "Agilox OFL.pdf, EINFACHE BEDIENUNG: 'Dank des integrierten Displays ist der AGILOX OFL besonders benutzerfreundlich gestaltet. Dieses bietet dem Shopfloor-Personal eine übersichtliche Statusanzeige und einfache Interaktionsmöglichkeit'",
+        "workflow_capability": "Agilox OFL.pdf intro: 'befördert er Paletten und kundenspezifische Ladungsträger bis zu 800 kg auf erhöhte Stationen'",
+        "station_applications": "Agilox OFL.pdf, REGALBEDIENUNG & STAPELN: 'Ob das Beliefern von der Fördertechnik, Einlagerung in der ersten Regalebene oder Stapeln von Ladungsträgern'"
+      },
+      "notes": "CONFLICT (AGILOX vs AGILOX, not DB vs datasheet) — vehicle_length: Agilox OFL.pdf's TECHNISCHE DETAILS says '1.655 x 800 x 1.988 MM (65,2 x 31,5 x 78,3 in)' but the brochure p.17 matrix says '1.635 x 800 x 1.988 mm'. A 20 mm discrepancy between two first-party documents. The DB holds 1655 (the product page's figure). The imperial cross-check favours the PRODUCT PAGE: 65,2 in = 1656 mm, consistent with 1655, whereas 1635 mm would be 64,4 in. Recommend keeping 1655 and treating the brochure cell as the typo. vehicle_length therefore NOT proposed for change and deliberately omitted from fields above. PAYLOAD OPTION NOT PROMOTED — the spec row states 'MAX. LAST 800 KG / 1.200 KG' and brochure p.7 says '< 800 kg oder < 1.200 kg', so a 1.200 kg OFL is orderable, but every headline stat block (product page and brochure p.11) leads with 800 kg. Recorded 800 to match both the headline and the existing DB value; the 1.200 kg option is flagged rather than written, because raising max_payload (a KO_IF_LT field) would make the OFL pass tenders the standard machine cannot serve. Reviewer decision: either a second variant row or a documented uplift to 1200. CONFLICT — safety_coverage: the DB stores the literal string 'Full 3D (360° + 3D sensors)', which is NOT an AP0 allowed value (the allowed set is 'Single plane (2D)' / 'Limited 3D (e.g. waterfall)' / 'Full 3D'). The parenthetical must be stripped. On the substance, Agilox OFL.pdf supports it reasonably well: 'Dank optimiertem Scanner- und Sensordesign wird eine lückenlose 360°-Sicherheitszone gewährleistet. Zudem ist der AGILOX OFL mit einer NEUEN GENERATION der Obstacle Avoidance ausgestattet, wodurch sich der überwachte Bereich nochmals erweitert' — note this is the only AGILOX product whose page claims an enhanced obstacle-avoidance generation as standard rather than as an add-on. WRONG-SCOPE VALUES ALREADY IN THE DB ROW: lifting_height (1200), drive_type ('Reach Truck') and stacking_capability are all Logistics:AGV:Forklift-scope fields sitting on a Mobile AMR row. 'Reach Truck' is also substantively odd — the OFL is repeatedly described as 'scherenlos' (scissor-less) free-lift, never as a reach truck. NOT STORABLE (AMR aisle gap): MIN. GANGBREITE 1.600 mm and MIN. DURCHFAHRTSBREITE 1.400 mm (both on the product page AND brochure p.17), plus IDEALE GANGBREITE 2.000 mm, GEGENVERKEHR 2.600/2.900 mm, PARALLEL 1.900 mm. NOT MAPPED: DREHKREIS 2.200 mm (turning-circle diameter — see the group-level note), tare weight 575 kg, overall height 1.988 mm."
+    },
+    {
+      "product_name": "AGILOX OCF",
+      "product_type": "Forklift AGV",
+      "source_file": "agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "db_status": "conflict",
+      "variant_group": "AGILOX OCF — omnidirectional counterbalanced AMR; brochure p.12 states it is available in several configurations (Hubkapazität, Gabellänge, Hubhöhe, Gabelbreitenanpassung) without publishing the individual figures.",
+      "fields": {
+        "max_payload": 1500,
+        "min_aisle_width": 2100,
+        "max_speed": 1.4,
+        "vehicle_length": 2795,
+        "vehicle_width": 1200,
+        "drive_type": "Counterbalanced",
+        "omnidirectional_movement": true,
+        "multi_load_compatibility": true,
+        "stacking_capability": true,
+        "fork_spread": ["Auto"]
+      },
+      "field_sources": {
+        "max_payload": "brochure p.12, OCF tile: 'MAX. HUBGEWICHT 1.500 kg / 3.306 lbs'; corroborated on p.7 portfolio overview: 'AGILOX OCF … < 1.500 kg'",
+        "min_aisle_width": "brochure p.17 comparison matrix, row 'MIN. GANGBREITE' (marker B), column OCF: '2.100 mm'. Verified against a 150 dpi pdftoppm render of p.17",
+        "max_speed": "brochure p.12, OCF tile: 'MAX. GESCHWINDIGKEIT 1,4 m/s / 4,6 ft/s'",
+        "vehicle_length": "brochure p.17, row ABMESSUNGEN (L X B X H), column OCF: '2.795 x 1.200 x 2.566 mm'",
+        "vehicle_width": "same row, 1.200 mm",
+        "drive_type": "brochure p.12: 'Der AGILOX OCF erreicht neue Höhen und ist der omnidirektionale AMR mit GEGENGEWICHT'",
+        "omnidirectional_movement": "same sentence",
+        "multi_load_compatibility": "brochure p.12: 'Er hebt und transportiert schwere Lasten in OFFENEN ODER GESCHLOSSENEN Paletten'; p.7: 'Standardisierte Palettentypen & kundenspezifische Ladungsträger'",
+        "stacking_capability": "brochure p.12: 'vom Boden zur Station' combined with p.7 'Boden-zu-Station'; the OCF is the counterbalanced stacker of the range",
+        "fork_spread": "brochure p.12: available configurations include 'Gabelbreitenanpassung' (fork-width adjustment)"
+      },
+      "notes": "CONFLICT — min_aisle_width, and it is the most consequential finding in the AGILOX group: the DB holds 1300 mm; brochure p.17 states 2.100 mm for the OCF. An 800 mm gap on a hard K.O. (KO_IF_GT) field, in the direction that makes the OCF look FAR better than AGILOX claims — it would currently pass narrow-aisle tenders it cannot physically serve. The DB's 1300 is exactly the ODM 600's MIN. GANGBREITE from the same matrix row, and the identical 1300 also sits on the AGILOX ONE row (whose true figure is 1.600 mm), so this looks like one cross-product copy error propagated to two rows. Note also that 1300 is not even the OCF's narrowest published number — its MIN. DURCHFAHRTSBREITE is 1.700 mm. NOTE ON SOURCING: this entry is built from the corporate brochure ONLY. The dedicated OCF document in the folder is 'AGILOX  OCF.html', which is not a PDF and was left untouched per instruction — it should be processed separately, and it very likely carries the Hubhöhe/Hubkapazität figures the brochure withholds. lifting_height NOT PROPOSED, flagged instead: the DB holds 1600 mm; the brochure publishes only 'MAX. STATIONSHÖHE 1.450 mm' (p.12) and no MAX. HUBHÖHE for the OCF. These are different quantities — on the OFL, AGILOX publishes both and they differ by 190 mm (1.390 Hubhöhe vs 1.200 Stationshöhe). So 1600 is not contradicted, but it is also not confirmed, and the DB's convention across AGILOX rows is inconsistent (the OFL row stores Stationshöhe in lifting_height and Hubhöhe in lift_height; the OCF row stores 1600 in lifting_height, which matches neither published OCF figure). Worth one look. LOAD FOOTPRINT: p.17 gives the OCF's reference carrier as '(geschl.) Palette 1.200 x 1.200 mm' — a CLOSED 1200x1200 pallet, which is neither Pallet EUR nor Pallet ISO. The DB's existing 6-value load_type list is not contradicted and was left alone. NOT MAPPED: DREHKREIS 3.500 mm (diameter), overall height 2.566 mm, MIN. DURCHFAHRTSBREITE 1.700 mm, IDEALE GANGBREITE 2.700 mm, GEGENVERKEHR 3.200/3.800 mm, PARALLEL 3.200 mm, ABSTAND BLOCKLAGER 100/200 mm. DB CLEANUP: fork_spread is stored as the literal 'Auto (optional)', which is not an AP0 allowed value — should be 'Auto'."
+    },
+    {
+      "product_name": "AGILOX ODM 600",
+      "product_type": "Mobile AMR",
+      "source_file": "Agilox ODM.pdf; agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "db_status": "conflict",
+      "variant_group": "AGILOX ODM — dolly AMR. The DB has ONE merged row 'AGILOX ODM 600/800'; brochure p.17 gives the 600 and 800 SEPARATE columns with different dimensions and different corridor geometry. Split proposed.",
+      "fields": {
+        "max_payload": 300,
+        "lift_height": 250,
+        "max_speed": 1.4,
+        "vehicle_length": 1095,
+        "vehicle_width": 400,
+        "charge_time": 11,
+        "cleanroom_class": "ISO 1–9",
+        "load_type": ["Custom Carrier"],
+        "omnidirectional_movement": true,
+        "rotation_capable": true,
+        "workflow_capability": ["Transport"],
+        "barcode_readers": true
+      },
+      "field_sources": {
+        "max_payload": "Agilox ODM.pdf, TECHNISCHE DETAILS row 'MAX. LAST 300 KG (661 lbs)'; corroborated in the headline stat block and brochure p.13 tile and p.7 ('< 300 kg')",
+        "lift_height": "Agilox ODM.pdf, row 'MAX. HUBHÖHE 250 MM (10 in)'; corroborated in the body text 'Die Ladungsträger können auf bis zu 250 mm Höhe gehoben werden'",
+        "max_speed": "Agilox ODM.pdf, row 'MAX. GESCHWINDIGKEIT 1,4 m/s (4,6 ft/s)'",
+        "vehicle_length": "brochure p.17 comparison matrix, row ABMESSUNGEN, first ODM column: '1.095 x 400 x 1.235 mm'; identical figure on Agilox ODM.pdf",
+        "vehicle_width": "same row, 400 mm",
+        "charge_time": "Agilox ODM.pdf, row 'LADEZEIT — 20 – 100 % in ca. 11 Min.'. AP0 unit is minutes; recorded 11. Note this is a 20→100 % charge, not 0→100 %",
+        "cleanroom_class": "brochure p.13, ODM feature list: 'REINRAUM – Zertifiziert für Reinraumanwendungen (Klasse 6)'",
+        "load_type": "Agilox ODM.pdf, row 'LADUNGSTRÄGER — DOLLIES 600 x 400 MM (24 x 16 in)'; brochure p.17 'Dolly 600 x 400 mm'. Mapped to Custom Carrier — AP0 has no 'Dolly' value",
+        "omnidirectional_movement": "Agilox ODM.pdf, UNEINGESCHRÄNKTE BEWEGUNGSFREIHEIT: 'mit einem omnidirektionalen Antrieb konzipiert, sodass eine uneingeschränkte Bewegungsfreiheit gewährleistet werden kann'",
+        "rotation_capable": "same section: 'Zudem sind Parallel-, Diagonal- und Drehbewegungen um die eigene Achse ein Klacks für unseren ODM'",
+        "workflow_capability": "Agilox ODM.pdf: 'für den schnellen Transport von Dollies von einem Ort zum anderen'",
+        "barcode_readers": "Agilox ODM.pdf, FUNKTIONEN UND ADD-ONS, 'BARCODE READER — Scanner zur Erkennung von Barcodes und QR-Codes' (an add-on)"
+      },
+      "notes": "CONFLICT — the ODM PRODUCT PAGE mislabels its own aisle figure, and this is a trap for any future re-extraction. Agilox ODM.pdf prints 'MIN. GANGBREITE 1.000 MM (35 in)', but brochure p.17 assigns 1.000 mm to MIN. DURCHFAHRTSBREITE and gives MIN. GANGBREITE = 1.300 mm for the ODM 600. AGILOX's own p.16 diagram distinguishes the two (marker A = Durchfahrtsbreite, marker B = Gangbreite). The brochure matrix is the authority; the product page's label is wrong. Neither figure is storable anyway (Mobile AMR has no aisle field), but a reviewer reading only the product page would record a 300 mm-too-narrow aisle. CONTRADICTION INSIDE THE BROCHURE (recorded, not resolved) — the ODM's DREHKREIS is given as '1.700 / 1.900 mm (66,9 in / 74,8 in)' on p.13 and as '1.300 mm / 1.600 mm' on p.17 row G. Agilox ODM.pdf independently says 1.700 MM (67 in), so 2 of 3 statements say 1700 for the ODM 600. Geometry mildly favours the p.17 figure (the vehicle's circumscribed circle is sqrt(1095^2+400^2) = 1166 mm), but the loaded swept circle would be larger. No AP0 field is affected — Drehkreis is a diameter and min_turning_radius is correctly 0 for an omnidirectional vehicle — so this is reported for completeness only. VARIANT SPLIT PROPOSED: see the sibling 'AGILOX ODM 800' entry. The existing merged row 'AGILOX ODM 600/800' currently carries the 600's numbers only. STATION HEIGHT 0: the headline stat block reads '0 mm — maximale Stationshöhe' (also brochure p.13). That is a genuine printed zero meaning floor-to-floor only ('Boden-zu-Boden' on p.7), NOT a missing value — worth stating explicitly because it is the one place in this batch where 0 is real. It does not conflict with lift_height = 250 mm, which is the stroke used to pick the dolly up off the floor. DB CLEANUP: load_type is stored as 'Roll Container|Custom Carrier (dolly)' — the parenthetical '(dolly)' makes it a non-conforming allowed value. NOT MAPPED: overall height 1.235 mm, tare weight 160 kg, fork width 205 mm ('Mit einer 205 mm breiten Gabel'), ABSTAND BLOCKLAGER 0/50 mm, ABSTAND EINZELSTATIONEN 50 mm. ADD-ONS also listed: OBSTACLE AVOIDANCE ('Zusätzliche 3D-Sensorik in Fahrtrichtung zur Erhöhung der Sicherheit im Mensch-Maschine-Mischumfeld') and PLUG & PERFORM ('Implementierung unserer AMRs in weniger als 12 [Stunden]'). The Obstacle-Avoidance wording matters for safety_coverage across the range: the 3D sensing is an ADD-ON on the ODM and ONE pages, whereas the OFL page presents it as fitted."
+    },
+    {
+      "product_name": "AGILOX ODM 800",
+      "product_type": "Mobile AMR",
+      "source_file": "agilox-corporate-folder-o-de_02_2026_web.pdf",
+      "db_status": "new",
+      "variant_group": "AGILOX ODM — 800 mm fork variant. Same 400 mm width and 1.235 mm height as the ODM 600; longer chassis, larger dolly, wider corridor requirement.",
+      "fields": {
+        "max_payload": 300,
+        "lift_height": 250,
+        "max_speed": 1.4,
+        "vehicle_length": 1295,
+        "vehicle_width": 400,
+        "cleanroom_class": "ISO 1–9",
+        "load_type": ["Custom Carrier"],
+        "omnidirectional_movement": true,
+        "rotation_capable": true,
+        "workflow_capability": ["Transport"]
+      },
+      "field_sources": {
+        "max_payload": "brochure p.13, ODM tile: 'MAX. HUBGEWICHT 300 kg / 661 lbs' (one figure covers both fork lengths); p.7 '< 300 kg'",
+        "lift_height": "Agilox ODM.pdf, 'MAX. HUBHÖHE 250 MM (10 in)' — the product page's TECHNISCHE DETAILS table is headed 'ODM Varianten: ODM 600 | ODM 800', so its single-column values apply to both",
+        "max_speed": "brochure p.13 tile, '1,4 m/s / 4,6 ft/s'",
+        "vehicle_length": "brochure p.17 comparison matrix, row ABMESSUNGEN, SECOND ODM column: '1.295 x 400 x 1.235 mm'. Verified against a 150 dpi pdftoppm render of p.17",
+        "vehicle_width": "same row, 400 mm",
+        "cleanroom_class": "brochure p.13, ODM feature list: 'REINRAUM – Zertifiziert für Reinraumanwendungen (Klasse 6)'",
+        "load_type": "brochure p.17, second ODM column: 'Dolly 800 x 600 mm'; p.13 'GABELLÄNGEN – 600 mm und 800 mm / DOLLIES – Transportiert verschiedene Dolly-Größen'. Mapped to Custom Carrier",
+        "omnidirectional_movement": "Agilox ODM.pdf, UNEINGESCHRÄNKTE BEWEGUNGSFREIHEIT",
+        "rotation_capable": "same section",
+        "workflow_capability": "Agilox ODM.pdf: dolly transport"
+      },
+      "notes": "VARIANT-COMPLETION FINDING — the DB's single row 'AGILOX ODM 600/800' carries only the 600's geometry. The 800 is a genuinely different footprint: 1.295 mm long vs 1.095 mm (+200 mm) and it carries an 800 x 600 mm dolly instead of a 600 x 400 mm one. Its corridor requirements are correspondingly wider throughout brochure p.17: MIN. DURCHFAHRTSBREITE 1.200 vs 1.000 mm, MIN. GANGBREITE 1.600 vs 1.300 mm, IDEALE GANGBREITE 2.100 vs 1.800 mm, GEGENVERKEHR 1.900/2.800 vs 1.700/2.500 mm, PARALLEL 1.800 vs 1.700 mm. NONE of these is storable — Mobile AMR has no aisle-width field in AP0 — which means that after import the ODM 600 and ODM 800 would be distinguishable ONLY by vehicle_length. That is the strongest concrete argument encountered so far for adding an AMR-scope aisle-width field: without it, the split arguably is not worth doing. Payload, lift height, speed, cleanroom class and all navigation/safety attributes are identical to the 600. DREHKREIS is reported as 1.900 mm on p.13 and 1.600 mm on p.17 (same intra-document contradiction as the 600) — not mapped either way, since it is a diameter and min_turning_radius is 0 for omnidirectional vehicles."
+    }
+  ]
+}

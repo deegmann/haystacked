@@ -1,0 +1,514 @@
+{
+  "company": "KIVNON Logística S.L.",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus full-redo pass. Single source document: 'Kivnon-Catalogo-2026-—-Editable-ENG.pdf' (23 pp, EN, Edition 2026), byte-identical duplicate 'Kivnon-Catalogo-2026-—-Editable-ENG-2.pdf' (md5 e5936bcb1bb6d83b199d3e448c921368) collapsed into one processing unit. The catalogue is a multi-product catalogue covering EIGHT models (K05, K07, K10, K11, K32, K50, K55, K60) plus company and technology sections. The DB currently holds TEN Kivnon products, so the mapping is not 1:1 in either direction — see 'coverage_mismatches' below. Several DB models (K10P, K41, K55A naming) are NOT in the 2026 catalogue, and several catalogue sub-configurations (K07-SQ600/SQ1500, K50-S2002/S3002, K55B, K60-S1516/S1530) have no DB row. Variant completion proposed accordingly. Nothing here has been written to Airtable.",
+  "company_wide_context": {
+    "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+    "fields": {
+      "fleet_management_system": "Proprietary",
+      "vda5050_compatible": true,
+      "integration_capability": ["MES", "ERP", "WMS", "OPC-UA"],
+      "fleet_control_architecture": "Centralized",
+      "installation_process": ["Supplier only"],
+      "distribution_model": "Direct|Dealer Network",
+      "industries_served": ["Automotive", "3PL", "Retail", "E-Commerce", "General Manufacturing", "F&B", "Pharma"]
+    },
+    "field_sources": {
+      "fleet_management_system": "p.18, '— KIVNON FLEET MANAGER / Multi-robot orchestration ... Centralized coordination of Kivnon AGV and AMR fleets'",
+      "vda5050_compatible": "p.18, '— VDA 5050 / Open protocol for mixed fleets ... Connectivity with external fleet managers through VDA 5050'; also per-model footer lines 'COMPATIBLE WITH VDA 5050' on pp.10, 11, 12, 14, 15",
+      "integration_capability": "p.18, '— PLC / OPC-UA / TCP-UDP / Industrial integration' and '— ERP · MES · WMS · ASRS / Business-system bridges'; also p.8 '— CONNECTIVITY — VDA 5050, Wi-Fi, OPC-UA, UDP/TCP and Kivnon Fleet Manager integration'",
+      "fleet_control_architecture": "p.18, 'from a single control layer'",
+      "installation_process": "p.20, '03 — DEPLOYMENT Turnkey installation / On-site commissioning, map or route validation, fleet calibration, safety checks'",
+      "distribution_model": "p.20 'Global partner network ... Kivnon teams and certified partners'; p.22 '15 — GLOBAL PARTNER NETWORK'",
+      "industries_served": "p.5, '02 — INDUSTRIES', numbered list 01 Automotive / 02 Logistics & distribution / 03 Retail / 04 E-commerce / 05 General manufacturing / 06 Food & beverage / 07 Pharma & healthcare / 08 Electronics"
+    },
+    "applies_to": "all base models of this company",
+    "notes": "MUST be fanned out per base model at import time — these are Base-Model-granularity fields in AP0, not Company-granularity. AP0 GAP: p.5 item 08 'Electronics' has no matching value in industries_served allowed_values ['None','Automotive','F&B','Pharma','E-Commerce','General Manufacturing','3PL','Retail'] — dropped, not forced into 'General Manufacturing'. AP0 GAP (recurring, 4th supplier this pass): p.5 item 07 is 'Pharma & healthcare' — there is still no healthcare/hospital value; only 'Pharma' captured. fleet_management_system is a single-select and cannot express 'proprietary product that also speaks VDA 5050' (recurring modelling limitation) — recorded as 'Proprietary' with vda5050_compatible=true alongside; do NOT treat the existing DB value 'VDA 5050 compatible|Open API' as an error on this basis (it is also multi-valued in the DB, which the AP0 single-select does not permit — separate data-hygiene observation)."
+  },
+  "company_fields": {
+    "fields": {},
+    "conflicts": {
+      "founding_year": {
+        "db": 2009,
+        "datasheet": 2008,
+        "source": "p.4, '— FOUNDED / 2008, Mataró (Barcelona). Owned by Cap Capital since 2025.'; corroborated on the same page by '+17 YEARS MANUFACTURING & DEPLOYING' (2008 + 17 = 2025/26)",
+        "note": "Two internally consistent statements on the same page. Flagged only — not overwritten."
+      },
+      "hq_city": {
+        "db": "Barberà del Vallès",
+        "datasheet": "Mataró (Barcelona)",
+        "source": "p.4 '2008, Mataró (Barcelona)'; p.23 '— HQ / Mataró, Barcelona / Carrer de la Cosidora, 2, 08302 Mataró, Spain'",
+        "note": "Full postal address printed on p.23. Likely a genuine relocation since the DB record's 2025-05-01 last_updated; still flagged, not overwritten."
+      }
+    },
+    "notes": "country=ES already correct (p.23 '08302 Mataró, Spain'). certifications_generic: the catalogue makes NO CE/ISO claim anywhere — the existing DB value 'CE|TÜV|EU Machinery Directive 2006/42/EC' is neither confirmed nor contradicted by this document (and 'TÜV' / 'EU Machinery Directive 2006/42/EC' are not AP0 allowed_values for that field — recurring non-conforming-value observation). employee_count_range not stated. reference_count deliberately left NULL: p.4 prints '+6.000 ROBOTS IN THE FIELD' and '+60 ACTIVE CLIENTS' — neither is a project count, and AP0's unit for the field is '# projects'."
+  },
+  "products": [
+    {
+      "product_name": "K05 (Underride)",
+      "product_type": "Tugger AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "conflict",
+      "variant_group": "Twister family; catalogue model code K05-M1000",
+      "fields": {
+        "vehicle_length": 800,
+        "vehicle_width": 800,
+        "max_speed": null,
+        "min_fleet_size": null
+      },
+      "field_sources": {
+        "vehicle_length": "p.8, 'DIMENSIONS 800 × 800 × 280 mm' (L×W×H) — AP0 unit mm, printed mm, no conversion",
+        "vehicle_width": "p.8, 'DIMENSIONS 800 × 800 × 280 mm'"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db": 500.0,
+          "datasheet": 450.0,
+          "source": "p.7 portfolio map row 'K05 ... 450 kg'; p.8 headline stat 'MAX. PAYLOAD 450 kg'; p.8 spec row 'MAX. PAYLOAD 450 kg onboard / 1.000 kg tow'",
+          "note": "Stated THREE times independently in this document (portfolio map, headline stat block, spec table) — very strong evidence against a source-side typo. DB's towing_capacity=1000.0 matches the catalogue's '1.000 kg tow' exactly, which suggests the DB row was built from an older sheet where onboard payload was 500 kg. K.O.-level field: do not resolve silently."
+        },
+        "max_speed": {
+          "db": 1.0,
+          "datasheet": 0.7,
+          "source": "p.7 portfolio map (K05 row, via family description); p.8 headline 'MAX. SPEED. 0,7 m/s'; p.8 spec row 'MAX. SPEED 0,7 m/s'",
+          "note": "German-style decimal comma in source ('0,7 m/s'); AP0 unit is m/s so no conversion needed. Stated twice on p.8."
+        },
+        "navigation_type": {
+          "db": "Natural Feature (SLAM)|Magnetic Tape|QR/DM Code",
+          "datasheet": "Magnetic Tape",
+          "source": "p.7 portfolio map 'K05 ... 450 kg / Magnetic'; p.8 spec row 'NAVIGATION Magnetic'",
+          "note": "The 2026 catalogue lists Magnetic ONLY for K05 (contrast: K07 'QR / SLAM', K10/K11/K32 'Magnetic / SLAM', K50/K55 'SLAM'), i.e. the omission looks deliberate rather than abbreviated. Additive-vs-restrictive conflict: the DB may be right if it reflects a configuration this catalogue no longer offers. Flagged, not narrowed."
+        }
+      },
+      "notes": "PRODUCT-TYPE AMBIGUITY (not flagged as a conflict): the catalogue calls the K05 a 'Compact lifting & rotation AMR' (p.8 subtitle) and files it under the 'Twister' family, while the DB stores product_type='Tugger AGV' with train_configuration='Underride/Mouse'. The machine genuinely does both — 'MAX. PAYLOAD 450 kg onboard / 1.000 kg tow' (p.8) and 'TRANSPORT PIN, lift table, conveyor, top load'. I kept the DB's Tugger classification and scoped extraction to Tugger fields accordingly; a reviewer may reasonably decide otherwise. AP0 GAP (new this pass): p.8 'LIFT Integrated lifting table, 60 mm stroke' — Tugger scope has NO lift-height field at all (lift_height is AMR-scope, lifting_height is Forklift-scope), so a real, published, K.O.-relevant capability of an underride tugger cannot be stored. Recorded here in notes only; deliberately NOT written into an out-of-scope field. RECURRING PATTERN CHECK — rotation_capable: the DB holds 1 for K05. The catalogue's supporting text is '360° rotation for compact, fast flows' and 'Combines compact lifting, towing and full manoeuvrability' (p.8), which describes the VEHICLE turning, not a carried rack being turned to face a picker (AP0/README §3 semantics). Contrast K07 on p.9, which explicitly says 'with independent platform rotation'. K05's value is therefore PROBABLY a mis-map of the documented pattern — flagged, NOT corrected. safety_coverage left NULL: p.8 says only 'SAFETY Front scanner', which states angular coverage, not the 2D/3D plane count AP0's allowed_values ask for."
+    },
+    {
+      "product_name": "KIVNON K07 SQ600",
+      "product_type": "Mobile AMR",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K07 Twister Series — shares series architecture with SQ1000/SQ1500; SQ600 has its OWN smaller chassis (950×650×250 mm) distinct from SQ1000/SQ1500 (1150×820×255 mm), so it is arguably a separate base model",
+      "fields": {
+        "max_payload": 600.0,
+        "vehicle_length": 950,
+        "vehicle_width": 650,
+        "max_speed": 2.5,
+        "navigation_type": ["QR/DM Code", "Natural Feature (SLAM)"],
+        "rotation_capable": true,
+        "workflow_capability": ["Transport", "Goods-to-Person"],
+        "top_module_type": ["Lift", "Conveyor"],
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.9, 'MAX. PAYLOAD 600 / 1.000 / 1.500 kg' — first of three series values, paired with MODELS row 'K07-SQ600 · SQ1000 · SQ1500'",
+        "vehicle_length": "p.9, 'DIMENSIONS K07-SQ600: 950 × 650 × 250 mm'",
+        "vehicle_width": "p.9, 'DIMENSIONS K07-SQ600: 950 × 650 × 250 mm'",
+        "max_speed": "p.7 portfolio map 'K07 ... 2.5 m/s no load'; p.9 headline 'MAX. SPEED. 2,5 m/s'; p.9 spec row 'MAX. SPEED 2,1 – 2,5 m/s no load'",
+        "navigation_type": "p.9, 'NAVIGATION QR Code or SLAM'; p.7 portfolio map 'QR / SLAM'",
+        "rotation_capable": "p.9, 'SYSTEM Rotational lifting platform' + body text 'designed for onboard loads up to 1,500 kg with independent platform rotation'",
+        "workflow_capability": "p.17, '07 — Goods-to-person / K07 · K50 / Movement of totes, kits or palletized goods to picking, packing or replenishment points'; p.17 '01 — Kitting K05 · K07' and '02 — Line feeding K07 · K32'",
+        "top_module_type": "p.9, 'LIFT 60 mm' and 'Option to customise with onboard conveyors'",
+        "vda5050_compatible": "p.9, '— CONNECTIVITY — COMPATIBLE WITH FLEET MANAGEMENT SYSTEMS, INCLUDING VDA 5050, DEPENDING ON PROJECT CONFIGURATION.'"
+      },
+      "notes": "max_speed: the spec row prints a RANGE '2,1 – 2,5 m/s no load' while the headline prints the single figure 2,5 m/s. Took the headline/upper figure because max_speed is a SCORING (not K.O.) field and the manufacturer's own headline is the top-of-range claim; the '2,1' lower bound and the 'no load' qualifier are recorded here so a reviewer can pick the conservative 2.1 instead. NOTE: 2.5 m/s is at the very top of the plausibility band for human-shared areas and is explicitly an UNLADEN figure. rotation_capable=true is a POSITIVE case of the pattern that has been mis-mapped elsewhere in this corpus: the source says the PLATFORM rotates independently of the chassis ('Rotational lifting platform'), i.e. the carried load can be turned to present a face — exactly the AP0/README §3 semantics. Lift stroke is 60 mm (p.9) — recorded but NOT written to lift_height, since a 60 mm latent-lift stroke is a jack stroke, not a stacking height, and entering it in a K.O. lift field would be misleading; flagging for a reviewer ruling. AP0 GAP (recurring, 13th+ instance): no aisle-width field exists in AMR scope, and the catalogue markets the K07 for 'high-density layouts' (p.9)."
+    },
+    {
+      "product_name": "KIVNON K07",
+      "product_type": "Mobile AMR",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "enrich",
+      "variant_group": "K07 Twister Series — existing DB row (max_payload 1000.0) corresponds to catalogue model K07-SQ1000; shares chassis 1150×820×255 mm with K07-SQ1500",
+      "fields": {
+        "vehicle_length": 1150,
+        "vehicle_width": 820,
+        "max_speed": 2.5,
+        "rotation_capable": true,
+        "workflow_capability": ["Transport", "Goods-to-Person"],
+        "top_module_type": ["Lift", "Conveyor"],
+        "load_type": ["Tote", "Plastic Bin", "Custom Carrier"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.9, 'DIMENSIONS ... K07-SQ1000 / K07-SQ1500: 1150 × 820 × 255 mm'",
+        "vehicle_width": "p.9, same row",
+        "max_speed": "p.9, headline 'MAX. SPEED. 2,5 m/s' (spec row: '2,1 – 2,5 m/s no load')",
+        "rotation_capable": "p.9, 'SYSTEM Rotational lifting platform'; body text 'independent platform rotation'",
+        "workflow_capability": "p.17, '07 — Goods-to-person / K07 · K50'",
+        "top_module_type": "p.9, 'LIFT 60 mm'; 'Option to customise with onboard conveyors'",
+        "load_type": "p.9, '— KEY APPLICATIONS ... Boxes, bins, KLTs and industrial loads'"
+      },
+      "notes": "Existing DB row already holds max_payload=1000.0 and navigation_type='Natural Feature (SLAM)' — the catalogue's 'QR Code or SLAM' (p.9) is a SUPERSET, so this is an additive multi-select difference, not a contradiction; proposing QR/DM Code be ADDED is still an edit to a non-null field, so it is recorded here rather than in 'fields': proposed navigation_type = ['Natural Feature (SLAM)', 'QR/DM Code']. DB omnidirectional_movement=1 is not confirmed or contradicted by the catalogue (it documents platform rotation, not omnidirectional travel) — left untouched. Same 60 mm lift-stroke caveat as the SQ600 entry."
+    },
+    {
+      "product_name": "KIVNON K07 SQ1500",
+      "product_type": "Mobile AMR",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K07 Twister Series — shares the 1150×820×255 mm chassis with K07-SQ1000 (the existing 'KIVNON K07' DB row); same base model, higher payload rating",
+      "fields": {
+        "max_payload": 1500.0,
+        "vehicle_length": 1150,
+        "vehicle_width": 820,
+        "max_speed": 2.5,
+        "navigation_type": ["QR/DM Code", "Natural Feature (SLAM)"],
+        "rotation_capable": true,
+        "workflow_capability": ["Transport", "Goods-to-Person"],
+        "top_module_type": ["Lift", "Conveyor"],
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.7 portfolio map 'K07 ... 1.500 kg'; p.9 headline 'MAX. PAYLOAD 1.500 kg'; p.9 spec row 'MAX. PAYLOAD 600 / 1.000 / 1.500 kg' (third series value)",
+        "vehicle_length": "p.9, 'K07-SQ1000 / K07-SQ1500: 1150 × 820 × 255 mm'",
+        "vehicle_width": "p.9, same row",
+        "max_speed": "p.9, headline 'MAX. SPEED. 2,5 m/s'",
+        "navigation_type": "p.9, 'NAVIGATION QR Code or SLAM'",
+        "rotation_capable": "p.9, 'SYSTEM Rotational lifting platform'",
+        "workflow_capability": "p.17, '07 — Goods-to-person / K07 · K50'",
+        "top_module_type": "p.9, 'LIFT 60 mm'; 'Option to customise with onboard conveyors'",
+        "vda5050_compatible": "p.9, connectivity footer"
+      },
+      "notes": "Variant completion — the DB holds only the 1000 kg configuration. Model code decodes transparently: SQ600/SQ1000/SQ1500 = payload in kg, matching the 'MAX. PAYLOAD 600 / 1.000 / 1.500 kg' row 1:1."
+    },
+    {
+      "product_name": "K10HP One-Way",
+      "product_type": "Tugger AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "enrich",
+      "variant_group": "Mouse family; catalogue calls this simply 'K10 ONE-WAY MOUSE' with a single 5.000 kg rating, matching the DB's K10HP (5000 kg) row",
+      "fields": {
+        "vehicle_length": 1492,
+        "vehicle_width": 460,
+        "route_type": null
+      },
+      "field_sources": {
+        "vehicle_length": "p.10, 'DIMENSIONS 1.492 × 460 × 332 mm' (thousands separator is a dot in this document)",
+        "vehicle_width": "p.10, same row"
+      },
+      "notes": "Catalogue confirms the existing DB values towing_capacity=5000 ('MAX. PAYLOAD 5.000 kg', p.7 and p.10 — stated twice), max_speed=1.0 ('MAX. SPEED 1 m/s', p.10) and train_configuration='Underride/Mouse' family. Note the catalogue prints 'MAX. PAYLOAD 5.000 kg' for a machine whose only transfer mechanism is 'TRANSPORT PIN' (p.10) — i.e. this is a TOWED load, correctly stored in towing_capacity, not max_payload; the DB has this right and max_payload is correctly NULL. p.10 also prints 'RELIABILITY 99 % accumulated, 16 yr field data' — no AP0 field for a reliability/availability figure (new observation; also stated as a pull-quote on p.4). navigation 'Magnetic or SLAM' (p.10) is consistent with the DB's existing multi-select. safety: 'SAFETY Front scanner' only — safety_coverage left NULL for the same reason as K05."
+    },
+    {
+      "product_name": "K11 Two-Way",
+      "product_type": "Tugger AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "enrich",
+      "variant_group": "Mouse family; bidirectional sibling of K10, longer chassis",
+      "fields": {
+        "vehicle_length": 2010,
+        "vehicle_width": 500,
+        "max_speed": 1.0
+      },
+      "field_sources": {
+        "vehicle_length": "p.11, 'DIMENSIONS 2.010 × 500 × 333 mm'",
+        "vehicle_width": "p.11, same row",
+        "max_speed": "p.7 portfolio map (K11 row) and p.11 headline 'MAX. SPEED. 1,0 m/s' + spec row 'MAX. SPEED 1 m/s'"
+      },
+      "notes": "max_speed was NULL in the DB — filled. towing_capacity=5000 confirmed ('MAX. PAYLOAD 5.000 kg', p.7 + p.11). Bidirectional operation confirmed ('OPERATION Bidirectional', p.11) — no AP0 field for bidirectional travel; note that this is distinct from omnidirectional_movement (which the catalogue does NOT claim for K11) so omnidirectional_movement was deliberately left NULL rather than set true. Safety 'Front + rear scanners' (p.11)."
+    },
+    {
+      "product_name": "K32 Tractor",
+      "product_type": "Tugger AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "conflict",
+      "variant_group": "Tugger family, single model",
+      "fields": {
+        "max_trailers": 4
+      },
+      "field_sources": {
+        "max_trailers": "p.12, 'TRAIN Up to 4–5 trolleys'"
+      },
+      "conflicts": {
+        "max_speed": {
+          "db": 1.0,
+          "datasheet": 0.7,
+          "source": "p.12 headline 'MAX. SPEED. 0,7 m/s'; p.12 spec row 'MAX. SPEED 0,7 m/s'",
+          "note": "Stated twice on the same page."
+        },
+        "coupling_type": {
+          "db": "Manual",
+          "datasheet": "Manual, semi-auto (PIN) or auto",
+          "source": "p.12, 'COUPLING Manual, semi-auto (PIN) or auto'",
+          "note": "The DB row's product_description explicitly asserts 'MANUAL rear-pin coupling (no auto-hitch)' and auto_hitch is NULL, so this is a substantive contradiction, not just an additive multi-select difference — the catalogue offers automatic coupling. coupling_type is a K.O. field. Proposed value if confirmed: ['Automatic','Manual'] and auto_hitch=true. NOT applied."
+        },
+        "navigation_type": {
+          "db": "Magnetic Tape",
+          "datasheet": "Magnetic or SLAM",
+          "source": "p.7 portfolio map 'K32 ... Magnetic / SLAM'; p.12 spec row 'NAVIGATION Magnetic or SLAM'",
+          "note": "Additive: proposed ['Magnetic Tape','Natural Feature (SLAM)']. Would also make the DB's route_type='Fixed Route' questionable (SLAM implies flexible routing), but route_type is a K.O. field and was NOT touched."
+        },
+        "vehicle_length": {
+          "db": null,
+          "datasheet": 1492,
+          "source": "p.12, 'DIMENSIONS 1.492 × 460 × 332 mm'",
+          "note": "PLAUSIBILITY / SOURCE-SIDE DOUBT — deliberately NOT proposed as a fill. The K32 spec block on p.12 prints EXACTLY the same dimension string as the K10 block on p.10 ('1.492 × 460 × 332 mm'), for two machines that are visually and functionally different (a low-profile underride mouse vs. a tractor). Compounding this, the existing DB product_description independently records '1170x480x1040mm' for the K32 — a 1040 mm height is consistent with a tractor and utterly inconsistent with a 332 mm underride profile. Reads as a catalogue copy-paste error. Flagged for the reviewer; no dimension value entered for K32."
+        }
+      },
+      "notes": "max_trailers: source prints a range 'Up to 4–5 trolleys' with no configuration axis given. max_trailers is a K.O. field, so per the conservative rule for matrix/range values I took the LOWER bound (4); the '5' is recorded here. towing_capacity=2000 confirmed (p.7 and p.12, twice). Safety 'Front + rear scanners' (p.12)."
+    },
+    {
+      "product_name": "KIVNON K50-S2002 Pallet Mover",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K50 Pallet Mover Series — 2 t configuration; sibling K50-S3002 has a different (taller) chassis, so these are probably two base models, not one",
+      "fields": {
+        "max_payload": 2000.0,
+        "lifting_height": 205,
+        "vehicle_length": 1730,
+        "vehicle_width": 942,
+        "max_speed": 1.2,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "infrastructure_free": true,
+        "drive_type": "Pallet Mover",
+        "stacking_capability": false,
+        "load_type": ["Pallet EUR", "Pallet ISO"],
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.13, 'MAX. PAYLOAD 2.000 kg · 3.000 kg' (first of two series values, paired with 'MODELS K50-S2002 · K50-S3002'); model code decodes S2002 = 2000 kg",
+        "lifting_height": "p.13, 'LIFT HEIGHT ≈ 205 mm' — note the approximation sign is printed in the source",
+        "vehicle_length": "p.13, 'DIMENSIONS K50-S2002: 1.730 × 942 × 1.920 mm'",
+        "vehicle_width": "p.13, same row",
+        "max_speed": "p.7 portfolio map 'K50 ... 1.2 m/s'; p.13 spec row 'MAX. SPEED 1,0 – 1,2 m/s'",
+        "navigation_type": "p.7 portfolio map 'K50 ... SLAM'; p.13 'NAVIGATION SLAM'",
+        "infrastructure_free": "p.16, '03 · SLAM ... AMRs build and update the map of their environment in real time with LiDAR, planning dynamic routes with no floor infrastructure'",
+        "drive_type": "p.13 title '09 · K50 PALLET MOVER SERIES' / 'AUTONOMOUS PALLET MOVER'; 'Direct replacement of manual pallet trucks'",
+        "stacking_capability": "p.13, 'LIFT HEIGHT ≈ 205 mm' — a ~205 mm lift is a pallet-truck jack stroke, incapable of placing one pallet on top of another (README §6a definition)",
+        "load_type": "p.13, 'Transport of pallets up to 2 t or 3 t'",
+        "vda5050_compatible": "p.18 company-wide VDA 5050 section"
+      },
+      "conflicts_with_existing_db_row": {
+        "note": "See the 'KIVNON K50 Pallet Truck' entry below — the existing DB row holds max_payload=1000.0 and lifting_height=150, which matches NEITHER catalogue configuration. Treated as a conflict on that row rather than silently reassigning it to one of these two variants."
+      },
+      "notes": "max_speed: spec row prints a range '1,0 – 1,2 m/s' with no stated configuration axis; the portfolio map headline gives 1.2, so 1.2 taken (SCORING field, not K.O.). p.13 'SYSTEM Bidirectional + in-place rotation' documents CHASSIS rotation only — deliberately NOT mapped to rotation_capable (which is AMR-scope anyway, and means rotating a carried rack). p.13 'SAFETY 360° laser coverage' describes angular, not vertical, coverage — safety_coverage left NULL rather than guessed at 'Single plane (2D)' vs 'Full 3D'. AP0 GAP (recurring, now 9+ instances): no turning-radius field exists in Forklift scope, though 'in-place rotation' is a headline claim here."
+    },
+    {
+      "product_name": "KIVNON K50-S3002 Pallet Mover",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K50 Pallet Mover Series — 3 t configuration; taller chassis (2.118 mm vs 1.920 mm) than K50-S2002",
+      "fields": {
+        "max_payload": 3000.0,
+        "lifting_height": 205,
+        "vehicle_length": 1740,
+        "vehicle_width": 950,
+        "max_speed": 1.2,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "infrastructure_free": true,
+        "drive_type": "Pallet Mover",
+        "stacking_capability": false,
+        "load_type": ["Pallet EUR", "Pallet ISO"],
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.7 portfolio map 'K50 ... 3.000 kg'; p.13 'MAX. PAYLOAD 2.000 kg · 3.000 kg' (second series value); model code S3002 = 3000 kg",
+        "lifting_height": "p.13, 'LIFT HEIGHT ≈ 205 mm' (series-wide, single value)",
+        "vehicle_length": "p.13, 'DIMENSIONS ... K50-S3002: 1.740 × 950 × 2.118 mm'",
+        "vehicle_width": "p.13, same row",
+        "max_speed": "p.13, 'MAX. SPEED 1,0 – 1,2 m/s'",
+        "navigation_type": "p.13, 'NAVIGATION SLAM'",
+        "infrastructure_free": "p.16, SLAM section, 'no floor infrastructure'",
+        "drive_type": "p.13, 'AUTONOMOUS PALLET MOVER'",
+        "stacking_capability": "p.13, ~205 mm lift — jack stroke, not block stacking",
+        "load_type": "p.13, 'Transport of pallets up to 2 t or 3 t'",
+        "vda5050_compatible": "p.18"
+      },
+      "notes": "Variant completion. 3000 kg is the highest payload in the Kivnon range and sits comfortably inside the forklift-AGV plausibility band. Same 360°-laser / in-place-rotation caveats as K50-S2002."
+    },
+    {
+      "product_name": "KIVNON K50 Pallet Truck",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "conflict",
+      "variant_group": "existing DB row, K50 family",
+      "fields": {},
+      "conflicts": {
+        "max_payload": {
+          "db": 1000.0,
+          "datasheet": "2000 or 3000 (two configurations, no 1000 kg option listed)",
+          "source": "p.7 portfolio map 'K50 ... 3.000 kg'; p.13 'MAX. PAYLOAD 2.000 kg · 3.000 kg'; p.13 body 'Transport of pallets up to 2 t or 3 t'",
+          "note": "K.O. field. The 2026 catalogue documents no 1 t K50. Sibling-row check performed per the false-positive checklist: the DB's other Kivnon forklift rows are K55A (1200 kg) and K60 (2000 kg), so the 1000 kg figure is not a mis-filed sibling value. Either the DB reflects a discontinued configuration or it is wrong. NOT resolved."
+        },
+        "lifting_height": {
+          "db": 150,
+          "datasheet": 205,
+          "source": "p.13, 'LIFT HEIGHT ≈ 205 mm'",
+          "note": "K.O. field. Both are plausible pallet-truck jack strokes; the catalogue's value is explicitly approximate ('≈'). Low-severity but flagged because the field is K.O.-level."
+        }
+      },
+      "notes": "This row should probably be RECONCILED against the two new K50-S2002 / K50-S3002 variant entries above rather than enriched in place — that is a base-model/entity decision for the Tech Lead, not for this agent. Its currently-NULL fields (max_speed, vehicle_length/width, infrastructure_free, drive_type, load_type) were deliberately NOT filled from the catalogue, because which physical configuration this row denotes is exactly what is in dispute; filling them would bake in an unreviewed assumption."
+    },
+    {
+      "product_name": "K55A Pallet Stacker",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "enrich",
+      "variant_group": "K55 Compact Stacker; catalogue lists two chassis: K55-S1215 and K55B",
+      "fields": {
+        "vehicle_length": 1920,
+        "vehicle_width": 920,
+        "max_speed": 1.0,
+        "infrastructure_free": true,
+        "vda5050_compatible": true,
+        "station_applications": ["Floor", "Standard rack", "Shuttle rack"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.14, 'DIMENSIONS K55-S1215: 1920 × 920 × 2340 mm'",
+        "vehicle_width": "p.14, same row",
+        "max_speed": "p.14, 'MAX. SPEED 1 m/s'",
+        "infrastructure_free": "p.7 portfolio map 'K55 ... SLAM'; p.14 'NAVIGATION SLAM'; p.16 SLAM section 'no floor infrastructure'",
+        "vda5050_compatible": "p.14 footer, '— COMPATIBLE WITH VDA 5050'",
+        "station_applications": "p.14, 'Connection with ASRS and staging areas'; p.17 '06 — Buffer & staging / K55 Forklift Series / Compact pallet transfer and staging for buffer zones, ASRS interfaces and constrained warehouse areas'"
+      },
+      "notes": "NAMING AMBIGUITY — flagged, not resolved. The DB row is 'K55A Pallet Stacker'; the 2026 catalogue names 'K55-S1215' and 'K55B Pallet Mover'. There is no 'K55A' in the catalogue and no 'K55-S1215' in the DB. I matched the DB row to K55-S1215 because payload (1200 kg) and lift (1500 mm) agree exactly with the DB's stored values — but if 'K55A' is in fact the catalogue's 'K55B', the dimensions I have proposed (1920×920 vs K55B's 1933×920×2346) are wrong by ~13 mm. A reviewer should confirm the model-code mapping before import. Catalogue CONFIRMS the existing DB values max_payload=1200 ('MAX. PAYLOAD 1.200 kg', p.7 and p.14) and lifting_height=1500 ('LIFT HEIGHT up to 1.500 mm', p.14, and headline 'MAX. LIFT 1.500 mm') — no conflict. DB drive_type='Straddle Stacker' is consistent with the catalogue's 'Compact autonomous forklift ... for narrow aisles' but is not independently stated; left untouched. p.14 'SAFETY Safety scanners according to configuration / K55B: safety PLC + 2 emergency stops' — the safety PLC + e-stop detail belongs to K55B; no functional_safety_level (PL/SIL) rating is stated anywhere in this document, so that field stays NULL."
+    },
+    {
+      "product_name": "KIVNON K55B Pallet Mover",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K55 Compact Stacker series — near-identical chassis to K55-S1215 (1933×920×2346 vs 1920×920×2340 mm), almost certainly the same base model",
+      "fields": {
+        "max_payload": 1200.0,
+        "lifting_height": 1500,
+        "vehicle_length": 1933,
+        "vehicle_width": 920,
+        "max_speed": 1.0,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "infrastructure_free": true,
+        "stacking_capability": true,
+        "load_type": ["Pallet EUR", "Pallet ISO"],
+        "vda5050_compatible": true,
+        "station_applications": ["Floor", "Standard rack", "Shuttle rack"]
+      },
+      "field_sources": {
+        "max_payload": "p.14, 'MAX. PAYLOAD 1.200 kg' (series-wide single value)",
+        "lifting_height": "p.14, 'LIFT HEIGHT up to 1.500 mm' (series-wide)",
+        "vehicle_length": "p.14, 'DIMENSIONS ... K55B: 1933 × 920 × 2346 mm'",
+        "vehicle_width": "p.14, same row",
+        "max_speed": "p.14, 'MAX. SPEED 1 m/s'",
+        "navigation_type": "p.14, 'NAVIGATION SLAM'",
+        "infrastructure_free": "p.16 SLAM section",
+        "stacking_capability": "p.14, '11 · K55 PALLET STACKER' / 'Compact autonomous lifting for narrow aisles and 1,200 kg pallets' with a 1.500 mm lift — sufficient to place a loaded pallet on top of another (README §6a)",
+        "load_type": "p.14, 'Transport & lifting of pallets up to 1,2 t'",
+        "vda5050_compatible": "p.14 footer",
+        "station_applications": "p.14, 'Connection with ASRS and staging areas'"
+      },
+      "notes": "Variant completion. Only distinguishing specs printed for K55B are its dimensions and its safety fit-out ('K55B: safety PLC + 2 emergency stops', p.14); everything else is series-wide. Whether K55B warrants a separate Product row at all, or is the same machine as the DB's 'K55A', is the open naming question described on the K55A entry — a reviewer may well merge these two."
+    },
+    {
+      "product_name": "KIVNON K60-S1516 Stacker",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K60 Stacker Series — 1.5 t / 1.6 m configuration; shares the 1595×1012 mm footprint with K60-S1530",
+      "fields": {
+        "max_payload": 1500.0,
+        "lifting_height": 1600,
+        "vehicle_length": 1595,
+        "vehicle_width": 1012,
+        "max_speed": 1.2,
+        "navigation_type": ["Natural Feature (SLAM)", "Vision"],
+        "infrastructure_free": true,
+        "stacking_capability": true,
+        "load_type": ["Pallet EUR", "Pallet ISO"],
+        "load_detection": ["Camera/Vision", "Laser/LiDAR profiling"],
+        "station_applications": ["Floor", "Standard rack"],
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.15, 'MAX. PAYLOAD 1.500 kg · 2.000 kg' (first series value) cross-read with 'MODELS K60-S1516 · S1530 · S2030' — the model code decodes as payload(15/20 → 1500/2000 kg) + lift(16/30 → 1600/3000 mm), which reproduces both printed value pairs exactly",
+        "lifting_height": "p.15, 'LIFT HEIGHT 1.600 mm · 3.000 mm' (first series value); model code S15-16",
+        "vehicle_length": "p.15, 'DIMENSIONS K60-S1516: 1595 × 1012 × 1920 mm'",
+        "vehicle_width": "p.15, same row",
+        "max_speed": "p.7 portfolio map (K60 row); p.15 'MAX. SPEED 1,2 m/s'",
+        "navigation_type": "p.7 portfolio map 'K60 ... SLAM + vision'; p.15 'NAVIGATION LSLAM + VSLAM'",
+        "infrastructure_free": "p.15, 'turning a conventional warehouse into an automated warehouse without civil works'; p.16 SLAM section 'no floor infrastructure'",
+        "stacking_capability": "p.15, 'Automatic put-away in racks up to 3 m' with a 1.6 m lift — capable of placing a loaded pallet above floor level",
+        "load_type": "p.15, 'Intensive pallet handling'",
+        "load_detection": "p.15, 'Combines SLAM navigation, vision cameras and precise positioning'; p.16 '03 · SLAM ... Selected models incorporate cameras for advanced obstacle detection and positioning support in pallet handling or rack put-away'",
+        "station_applications": "p.15, 'Automatic put-away in racks up to 3 m'; 'Feeding picking or production areas'",
+        "vda5050_compatible": "p.15 footer, '— COMPATIBLE WITH VDA 5050'"
+      },
+      "notes": "Model-code decode is the load-bearing inference here and is stated explicitly so a reviewer can check it: three model codes (S1516, S1530, S2030) against two printed payloads (1500/2000 kg) and two printed lift heights (1600/3000 mm). The decode payload=first two digits×100, lift=last two digits×100 is the only assignment consistent with all three codes AND with the 'MAX. LIFT 3.000 mm' / 'MAX. PAYLOAD 2.000 kg' headline pair. If a reviewer disagrees, the safe fallback is a single K60 product carrying the conservative K.O. values (1500 kg, 1600 mm). AP0 GAP: 'LSLAM + VSLAM' distinguishes laser SLAM from visual SLAM; navigation_type has 'Natural Feature (SLAM)' and 'Vision' but no way to express that both are SLAM modalities of one stack — both selected."
+    },
+    {
+      "product_name": "KIVNON K60-S1530 Stacker",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "new",
+      "variant_group": "K60 Stacker Series — 1.5 t / 3.0 m configuration; shares the 1595×1012 mm footprint with K60-S1516, taller mast (2315 mm vs 1920 mm)",
+      "fields": {
+        "max_payload": 1500.0,
+        "lifting_height": 3000,
+        "vehicle_length": 1595,
+        "vehicle_width": 1012,
+        "min_total_height": 2315,
+        "max_speed": 1.2,
+        "navigation_type": ["Natural Feature (SLAM)", "Vision"],
+        "infrastructure_free": true,
+        "stacking_capability": true,
+        "load_type": ["Pallet EUR", "Pallet ISO"],
+        "load_detection": ["Camera/Vision", "Laser/LiDAR profiling"],
+        "station_applications": ["Floor", "Standard rack"],
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.15, 'MAX. PAYLOAD 1.500 kg · 2.000 kg' + model code S15-30",
+        "lifting_height": "p.15, 'LIFT HEIGHT 1.600 mm · 3.000 mm' + model code S15-30; headline 'MAX. LIFT 3.000 mm'",
+        "vehicle_length": "p.15, 'DIMENSIONS K60-S1530: 1595 × 1012 × 2315 mm'",
+        "vehicle_width": "p.15, same row",
+        "min_total_height": "p.15, third dimension of 'K60-S1530: 1595 × 1012 × 2315 mm'",
+        "max_speed": "p.15, 'MAX. SPEED 1,2 m/s'",
+        "navigation_type": "p.15, 'NAVIGATION LSLAM + VSLAM'",
+        "infrastructure_free": "p.15, 'without civil works'",
+        "stacking_capability": "p.15, 'Automatic put-away in racks up to 3 m'",
+        "load_type": "p.15, 'Intensive pallet handling'",
+        "load_detection": "p.15, 'vision cameras and precise positioning'",
+        "station_applications": "p.15, 'Automatic put-away in racks up to 3 m'",
+        "vda5050_compatible": "p.15 footer"
+      },
+      "notes": "min_total_height taken from the third (H) figure of the printed L×W×H triple. CAVEAT for the reviewer: AP0's min_total_height is a lowered/closed mast height, and this catalogue does not label its third dimension as such — it is simply overall height, which for a 3 m-lift stacker is very likely the mast-lowered height (2315 mm < 3000 mm lift, so it cannot be the raised height). Recorded on that geometric reasoning, not on an explicit label. Same for S2030 below."
+    },
+    {
+      "product_name": "KIVNON K60 Stacker",
+      "product_type": "Forklift AGV",
+      "source_file": "Kivnon-Catalogo-2026-—-Editable-ENG.pdf",
+      "db_status": "enrich",
+      "variant_group": "K60 Stacker Series — existing DB row (2000 kg / 3000 mm) corresponds to catalogue model K60-S2030; largest chassis in the series (1991×993 mm)",
+      "fields": {
+        "vehicle_length": 1991,
+        "vehicle_width": 993,
+        "min_total_height": 2336,
+        "max_speed": 1.2,
+        "load_detection": ["Camera/Vision", "Laser/LiDAR profiling"],
+        "load_type": ["Pallet EUR", "Pallet ISO"],
+        "station_applications": ["Floor", "Standard rack"],
+        "drive_type": "Straddle Stacker"
+      },
+      "field_sources": {
+        "vehicle_length": "p.15, 'DIMENSIONS ... K60-S2030: 1991 × 993 × 2336 mm'",
+        "vehicle_width": "p.15, same row",
+        "min_total_height": "p.15, third dimension of the same triple",
+        "max_speed": "p.15, 'MAX. SPEED 1,2 m/s'",
+        "load_detection": "p.15, 'Combines SLAM navigation, vision cameras and precise positioning'",
+        "load_type": "p.15, 'Intensive pallet handling'",
+        "station_applications": "p.15, 'Automatic put-away in racks up to 3 m'; 'Integration with WMS, ASRS & Fleet Manager'",
+        "drive_type": "p.15, '11 · K60 STACKER SERIES' / 'Autonomous high-lift stacker'"
+      },
+      "notes": "Catalogue CONFIRMS the existing DB values max_payload=2000 ('MAX. PAYLOAD 2.000 kg', p.7 headline and p.15 series row), lifting_height=3000 ('MAX. LIFT 3.000 mm', p.15) and infrastructure_free=1 ('without civil works', p.15) and stacking_capability=1 — no conflicts on this row. navigation_type: DB holds 'Natural Feature (SLAM)'; catalogue's 'LSLAM + VSLAM' (p.15) additionally supports 'Vision' — additive, proposed union ['Natural Feature (SLAM)','Vision'], recorded here rather than in 'fields' because it edits a non-null value. drive_type='Straddle Stacker' is an interpretation of 'stacker' — the catalogue does not print a VDI drive-type classification, so a reviewer may prefer to leave it NULL."
+    }
+  ],
+  "coverage_mismatches": {
+    "db_products_not_in_this_catalogue": [
+      "K10P One-Way (1800 kg towing) — the 2026 catalogue documents only a single K10 rated 5.000 kg (p.7, p.10). No 1.8 t K10 variant appears. Candidate for the discontinued-product review; NOT deactivated here.",
+      "K41 Platform (250 kg open-platform AMR, 1550×800×220 mm) — absent from the 2026 catalogue entirely; the portfolio map on p.7 and the fleet line-up on p.19 both list exactly eight models (K05 K07 K10 K11 K32 K50 K55 K60) with no K41. Strong candidate for the discontinued-product review; NOT deactivated here."
+    ],
+    "catalogue_models_with_no_db_row": [
+      "K07-SQ600, K07-SQ1500 (p.9)",
+      "K50-S2002, K50-S3002 (p.13) — and the existing 'KIVNON K50 Pallet Truck' row matches neither",
+      "K55B (p.14)",
+      "K60-S1516, K60-S1530 (p.15)"
+    ]
+  }
+}

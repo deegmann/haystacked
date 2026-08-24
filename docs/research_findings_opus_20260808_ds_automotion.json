@@ -1,0 +1,289 @@
+{
+  "company": "DS Automotion GmbH",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus redo pass, session 4. Ten DS Automotion files, all German, all carrying the same footer 'DS Automotion GmbH | Lunzerstraße 60 | 4030 Linz | Österreich':\n  PRODUCT SHEETS (8): AMADEUS-OnePager-2025-DE.pdf (2 pp., series sheet covering classic/counter/wide/low/grip), AMADEUS_Grip_Onepager_2022_DE.pdf (2 pp., an APPLICATION paper for insulation-board production, not a generic product sheet), Arny-OnePager-2026-DE.pdf (2 pp., 4-variant table), Lucy-OnePager-2026-DE.pdf (2 pp.), Amy-FourPager-2025-DE.pdf (3 pp. of content), OSCAR-OnePager-2025-DE.pdf (2 pp., 3-variant table), SALLY-OnePager-2024-DE.pdf (2 pp.), SALLY_Kurier-OnePager-2024-DE.pdf (2 pp.).\n  COMPANY-WIDE (2): Navios-OnePager-2025-DE.pdf (fleet manager NAVIOS) and Planbare_Autonomie_Broschuere_DE.pdf (12 pp., the ARCOS vehicle software brochure). Neither describes a vehicle; both are staged in company_wide_context.\n\nDATE SPREAD MATTERS HERE: the sheets span 2022-2026. Where a 2022 application paper disagrees with a 2025/2026 series sheet, the newer sheet is treated as describing the current product and the older one as describing one delivered configuration. This is the crux of the AMADEUS Grip conflicts below and a reviewer should read that entry before acting on it.\n\nDS Automotion's own naming is a rollup: AMADEUS, ARNY, OSCAR, AMY and SALLY are BAUREIHEN (series), each with named variants, and the DB already models them as separate products. The sheets mostly publish ONE technical block for the whole series plus a small per-variant table; where a value is series-wide it is stated once here and its applicability noted, rather than duplicated into every variant with false precision.\n\nRECURRING TRAP AVOIDED — min_ground_clearance. OSCAR-OnePager-2025-DE.pdf p.2 says 'die OSCAR-Baureihe eine mit 25 mm ausreichend große Bodenfreiheit'. That 25 mm was NOT written to min_ground_clearance: AP0's hint defines that field as the ROBOT'S HEIGHT (clearance needed to drive UNDER the carrier), and the DB's existing OSCAR values (260/295/320/380) are the vehicle heights from the same page's variant table. The DB is right and the literal 'Bodenfreiheit' would have been a serious K.O.-field error.\n\ncharge_time: NOT stated on any of the ten files — neither as an absolute nor as a ratio. Left null everywhere. No trap fired.",
+  "company_wide_context": {
+    "source_file": "Navios-OnePager-2025-DE.pdf; Planbare_Autonomie_Broschuere_DE.pdf; Amy-FourPager-2025-DE.pdf p.2",
+    "fields": {
+      "fleet_management_system": "VDA 5050 compatible",
+      "fleet_control_architecture": "Hybrid",
+      "vda5050_compatible": true,
+      "multi_fleet_capable": true,
+      "autonomous_obstacle_bypass": true,
+      "integration_capability": ["ERP", "WMS"],
+      "modification_process": ["Client: All"],
+      "distribution_model": "Direct",
+      "country": "AT",
+      "hq_city": "Linz"
+    },
+    "applies_to": "all base models of DS Automotion — both files describe the software layer (NAVIOS fleet manager + ARCOS vehicle software) that every DS Automotion vehicle ships with",
+    "notes": "vda5050_compatible: Navios-OnePager-2025-DE.pdf p.1 headline 'VDA 5050 inklusive' and 'Eine zuverlässige Einbindung von Fremdfahrzeugen ist durch die VDA 5050 problemlos möglich'; Planbare_Autonomie_Broschuere_DE.pdf p.5 'integrierte VDA 5050 Schnittstelle … Damit kann nicht nur mit der VDA 5050-kompatiblen NAVIOS Leitsteuerung kommuniziert werden, sondern es können Fahrzeuge auch an eine bestehende VDA 5050 Leitsteuerung angebunden werden.'\nmulti_fleet_capable = TRUE is the single most valuable company-wide finding here: the same two sentences state BOTH directions of interoperability (foreign vehicles into NAVIOS, and DS vehicles into a foreign VDA 5050 master). NO DS Automotion product row in the DB currently carries multi_fleet_capable at all — it is null on all 24. Also 'VDA 5050 & LIF kompatibel' badges appear on Planbare_Autonomie_Broschuere_DE.pdf p.6/p.12, Amy-FourPager-2025-DE.pdf p.3 and (as a rotated, glyph-interleaved badge) Lucy-OnePager-2026-DE.pdf p.2.\nfleet_control_architecture = 'Hybrid' is a PROPOSED CHANGE, not a confirmation: every DS Automotion row in the DB holds 'Centralized', but Planbare_Autonomie_Broschuere_DE.pdf describes a deliberately mixed architecture — p.4 'Zentraler Flottenmanager: Unsere Fahrzeuge treffen ihre Entscheidungen nicht nur auf Grund ihrer eigenen Sensordaten, sondern kommunizieren auch mit dem zentralen Flottenmanager' AND p.8 'Damit an Kreuzungen keine Kollisionen zwischen autonomen Fahrzeugen auftreten, müssen die Fahrzeuge über kooperative Navigation verfügen. Dies bedeutet, dass sie die Vorfahrt selbstständig klären, ohne dabei auf ein zentrales Verkehrssteuerungssystem vertrauen zu müssen.' On-board right-of-way arbitration WITHOUT the central controller is the textbook definition of the decentralised half of a hybrid. The whole 'Planbare Autonomie' concept (p.3: Autonomiezonen where vehicles may move autonomously, elsewhere virtually track-guided) is precisely a hybrid by design. Flagged for a Tech Lead decision rather than applied.\nautonomous_obstacle_bypass: Planbare_Autonomie_Broschuere_DE.pdf p.4 'Autonome Funktionen wie die freie Bahnplanung zum Umfahren von Hindernissen', p.5 'Hindernisse können effizient umfahren werden', p.8 'Mittels reaktiver Navigation können diese als Hindernisse wahrgenommen und umfahren werden'. This is unambiguous re-routing, not stop-and-wait — the exact distinction the AP0 hint draws. Currently true on only 5 of 24 DS Automotion rows; the ARCOS brochure supports fanning it out, WITH the caveat that ARCOS makes it configurable per Autonomiezone (p.3: autonomous functions can be deliberately disabled where they are a disadvantage).\nintegration_capability: Navios-OnePager-2025-DE.pdf p.2 'über die Anbindung eines ERP-Systems' (ERP) and 'Zusätzlich zur Materialfluss- und Flottensteuerung kann mit NAVIOS auch eine Lager- oder Stellplatzverwaltung umgesetzt werden' (native warehouse/slot management = WMS). The DB's existing 'SAP|WMS|REST API|OPC-UA|MQTT' lists are supersets and are not contradicted.\nmodification_process 'Client: All': Planbare_Autonomie_Broschuere_DE.pdf p.7 'ARCOS bietet eine simple Benutzeroberfläche, mit der zu jederzeit der Status einzelner Fahrzeuge abgerufen und Systemparameter während der Laufzeit aktualisiert werden können', plus 'Inbetriebnahme- und Trouble-Shooting-Wizards' and 'Benutzer- und Rechteverwaltung'. Runtime parameter editing by the customer is explicit; full route/layout editing is not, so a reviewer may prefer 'Supplier limited'.\ndistribution_model 'Direct': Amy-FourPager-2025-DE.pdf p.2 'Wir sind OEM-Hersteller der Fahrzeuge und Übergabestationen sowie der gesamten Software und offerieren Komplettlösungen aus einer Hand. Eine Lösung von einem Ansprechpartner'; Navios-OnePager-2025-DE.pdf p.1 'Ein Ansprechpartner: Bei uns bekommen Sie alles aus einem Haus'.\nAP0 stores fleet_*, vda5050_compatible, multi_fleet_capable, autonomous_obstacle_bypass, integration_capability and modification_process at BASE-MODEL granularity, so all of the above must be fanned out per base model at import, not written once centrally."
+  },
+  "products": [
+    {
+      "product_name": "AMADEUS Classic / Wide / Low / Counter (series-level values)",
+      "product_type": "Forklift AGV",
+      "source_file": "AMADEUS-OnePager-2025-DE.pdf",
+      "db_status": "conflict",
+      "variant_group": "AMADEUS Baureihe. The 2025 sheet shows five members — AMADEUS classic, counter, wide, low and grip — and describes them as 'vier kombinierbaren Ausführungen' plus grip. The DB additionally holds 'AMADEUS Rack', which does NOT appear on this sheet. Values below are the SERIES-LEVEL technical block on p.2 and apply to classic/counter/wide/low unless a variant sheet says otherwise ('Technische Details abweichend' is printed against wide, low and grip).",
+      "fields": {
+        "product_type": "Forklift AGV",
+        "max_payload": 2000,
+        "max_speed": 1.8,
+        "lifting_height": 2800,
+        "navigation_type": ["Laser Reflector", "Natural Feature (SLAM)"],
+        "autonomous_charging": true,
+        "battery_swap_capable": true,
+        "battery_type": ["Li-Ion", "Lead-Acid"],
+        "load_type": ["Pallet EUR", "Pallet ISO", "Custom Carrier"],
+        "stacking_capability": true,
+        "safety_coverage": "Single plane (2D)"
+      },
+      "field_sources": {
+        "product_type": "p.1 'AMADEUS — Der Hochhubstapler'",
+        "max_payload": "p.2 'Technische Details — Nutzlast: max. 1,5 t / 2,0 t' -> the sheet gives TWO payload classes for the series; 2000 kg recorded as the upper. Also p.1 headline 'Nutzlast bis max. 2.000 kg'.",
+        "max_speed": "p.2 'Geschwindigkeit: max. 1,8 m/s' (already AP0's unit) — CONFIRMS the DB's 1.8 on classic/counter/wide/low/rack/grip",
+        "lifting_height": "p.2 'Hubhöhe / Monomast: Gabeloberkante: 85 mm – 1.200 mm; Duplex-Mast: 85 mm – 2.800 mm'; restated as the p.2 sidebar headline 'Hubhöhe bis max. 2.800 mm'. The maximum across both mast options is 2800 mm.",
+        "navigation_type": "p.2 'Navigation: Laser, SLAM' and the prose 'Die Fahrzeuge beherrschen die Lasernavigation ebenso wie die konturbasierte Navigation (SLAM). Es sind sowohl Anwendungen mit reinem Lasernavigationssystem als auch solche mit konturbasierter Navigation (SLAM) möglich, bei denen zusätzlich Reflektoren eingebunden werden'. Reflectors are named explicitly -> Laser Reflector; 'konturbasierte Navigation (SLAM)' -> Natural Feature (SLAM).",
+        "autonomous_charging": "p.2 'Energieversorgung: automat. Laden, Batteriewechsel'",
+        "battery_swap_capable": "same row — 'Batteriewechsel'",
+        "battery_type": "p.2 'Batterie: Lithium, Blei, Reinblei, Blei-Gel'. Lithium -> Li-Ion; Blei / Reinblei (pure lead, TPPL) / Blei-Gel are all lead-acid chemistries -> Lead-Acid. Note AP0 cannot distinguish TPPL or gel from flooded lead-acid, which is a real procurement distinction (maintenance, gassing, battery-room requirements).",
+        "load_type": "p.1 'Er kann nicht nur Europaletten und Industriepaletten aufnehmen, sondern auch Boxen, Container oder auf Sie abgestimmte Sondergüter.' Europalette -> Pallet EUR; Industriepalette -> Pallet ISO; Sondergüter/Container -> Custom Carrier.",
+        "stacking_capability": "p.1 'Der Hochhubstapler' + p.2 lift heights to 2800 mm",
+        "safety_coverage": "p.2 'Personensicherheit: Geschützt integrierte Laserscanner mit 360° Rundumsicht'. 360° coverage from LASER SCANNERS is a horizontal plane, hence 'Single plane (2D)'. The sheet lists cameras only as an OPTION ('Als weitere Optionen sind Kameras für einen zusätzlichen Objektschutz … möglich'), so 3D coverage is not standard."
+      },
+      "notes": "CONFLICT — lifting_height on AMADEUS Classic, AMADEUS Wide and AMADEUS Grip: the DB holds 2880 mm on all three, but this 2025 series sheet states the Duplex mast tops out at 2.800 mm (twice: in the Technische-Details block and as a page headline). 2880 vs 2800 is an 80 mm discrepancy on a HARD K.O. FIELD — small enough to look like a transposition or an older mast spec, large enough to disqualify a supplier at a 2.85 m rack. AMADEUS Counter's DB value of 2800 already agrees. Flagged, not corrected.\nDIVERGENCE (not a conflict) — max_payload: the sheet's series block gives '1,5 t / 2,0 t' but the DB holds 1200 kg for AMADEUS Counter and 2200 kg for AMADEUS Rack, neither of which is one of those two classes. AMADEUS Rack does not appear on this sheet at all, so it cannot be checked from here; Counter is marked 'Technische Details abweichend' on the sheet, which explicitly licenses a different figure. No action beyond noting.\nENRICH — navigation_type on AMADEUS Counter: the sheet says 'AMADEUS counter: zzgl. Magnet' (additionally magnet), and the DB's Counter row has 'Natural Feature (SLAM)|Contour|Laser Reflector' with no magnetic entry. AP0's nearest allowed value is 'Magnetic Tape', but see the SEMANTIC GAP note below.\nSEMANTIC GAP, recurring across this whole supplier: DS Automotion uses REFERENCE MAGNETS / 'Magnetpunktnavigation' / 'Magnetgrid' — discrete magnet points embedded in the floor, read as landmarks — which is a fundamentally different technology from continuous magnetic TAPE that the vehicle follows. AP0 offers only 'Magnetic Tape'. Every DS Automotion magnetic value in the DB is therefore approximate. Sources: AMADEUS-OnePager-2025-DE.pdf p.2 'zzgl. Magnet'; OSCAR-OnePager-2025-DE.pdf p.2 'beherrscht zusätzlich die Magnetpunktnavigation' and 'Navigation: SLAM, Magnetpunktfolge'; AMADEUS_Grip_Onepager_2022_DE.pdf p.2 'navigiert mit Hilfe von Referenzmagneten'; Planbare_Autonomie_Broschuere_DE.pdf p.9 'Lokalisierung: Konturbasiert / Laser / Magnetgrid'.\nAP0 SCOPE GAP (9th instance) — onboard_ui is AMR-scope only, but AMADEUS-OnePager-2025-DE.pdf p.2 states 'Für die Interaktion mit Menschen verfügt sie über ein 10\" Touch-Display und kann zudem mit einer Sprachausgabe ausgestattet werden' on a FORKLIFT. Same for LUCY ('10,1\" Touch-Display als Option') and SALLY ('7\" Touch-Panel'). Nowhere to store any of them on the forklifts.\nAP0 GAP — no field for the collision-avoidance signalling options on p.2: 'Blue-Spot-Projektoren und Laser-Lane-Marker zur Kollisionsvermeidung mit manuellen Staplern'. In a mixed manual/automated site this is a genuine safety differentiator.\nWRONG-SCOPE values on all six AMADEUS DB rows (flag only): grid_required = 0 is a Logistics:AGV:AMR field sitting on Forklift AGV rows."
+    },
+    {
+      "product_name": "AMADEUS Grip",
+      "product_type": "Forklift AGV",
+      "source_file": "AMADEUS_Grip_Onepager_2022_DE.pdf",
+      "db_status": "conflict",
+      "variant_group": "AMADEUS Baureihe, clamp-attachment variant. IMPORTANT: this file is titled 'LÖSUNGEN FÜR DIE Dämmstoffproduktion' (solutions for insulation-board production) — it is an APPLICATION case sheet for one industry, dated 2022, not a generic product datasheet. Read the conflict notes before treating its numbers as the product's specification.",
+      "fields": {
+        "max_payload": 800,
+        "lifting_height": 600,
+        "max_speed": 1.8,
+        "navigation_type": ["Magnetic Tape"],
+        "battery_type": ["Li-Ion"],
+        "special_fork_option": ["Clamp"],
+        "fleet_management_system": "Proprietary",
+        "safety_coverage": "Single plane (2D)",
+        "industries_served": ["General Manufacturing"]
+      },
+      "field_sources": {
+        "max_payload": "p.2 'Technische Daten | Nutzlast: bis 800 kg'; restated in prose 'Mit einer Nutzlast von max. 800 kg schafft es der AMADEUS 2 Blöcke … zu transportieren'",
+        "lifting_height": "p.2 '| Hubhöhe: 85-600 mm' — maximum 600 mm",
+        "max_speed": "p.2 '| Geschwindigkeit: max. 1,8 m/s'",
+        "navigation_type": "p.2 '| Navigation: Magnet' and prose 'Der AMADEUS navigiert mit Hilfe von Referenzmagneten durch die Produktions- und Lagerhallen'. See the reference-magnet vs magnetic-tape semantic gap noted on the series entry.",
+        "battery_type": "p.2 '| Batterie: Li-NMC (24 V / 208 Ah / 312 Ah) Trog 63' — Li-NMC is a lithium-ion chemistry",
+        "special_fork_option": "p.1 'Mit unserem sanft klammernden AMADEUS Grip transportieren wir die Blöcke' — a clamp attachment, not forks. Maps to the AP0 allowed value 'Clamp'. The DB currently has NO special_fork_option on the Grip row, which is the clearest single enrichment on this supplier: the clamp IS the defining feature of the variant.",
+        "fleet_management_system": "p.2 'Unser inhouse produzierter Flottenmanager NAVIOS bietet Leitsteuerung, Lagerverwaltung und Prozessabwicklung in einem einzigen Produkt.' 'inhouse produziert' = proprietary. NOTE this is in tension with the DB's 'VDA 5050 compatible|Open API' — see notes.",
+        "safety_coverage": "p.2 '| Personensicherheit: Geschützt integrierte Laserscanner mit 360° Rundumsicht'",
+        "industries_served": "p.1 title 'LÖSUNGEN FÜR DIE Dämmstoffproduktion' — insulation-board manufacturing"
+      },
+      "notes": "THREE CONFLICTS, ALL WITH THE SAME LIKELY EXPLANATION — read this before acting.\nCONFLICT 1 max_payload: DB 2000 kg vs sheet 800 kg.\nCONFLICT 2 lifting_height: DB 2880 mm vs sheet 600 mm (range 85-600).\nCONFLICT 3 navigation_type: DB 'Laser Reflector|Natural Feature (SLAM)' vs sheet 'Magnet' only.\nWHY THEY MAY ALL BE FALSE POSITIVES: this is a 2022 APPLICATION paper describing one delivered solution for insulation-block handling — a clamp carrying two 1.050x1.600x6.000 mm foam blocks, which are bulky but light, on reference magnets in a fixed production hall. The 2025 series sheet (AMADEUS-OnePager-2025-DE.pdf) lists 'AMADEUS grip' as a series member and prints 'Technische Details abweichend' against it, i.e. it explicitly declines to give the Grip's numbers and points elsewhere. So the DB's 2000 kg / 2880 mm / laser+SLAM may be the Grip's PRODUCT capability while 800 kg / 600 mm / magnet is one CONFIGURATION. Equally, the DB values may simply have been copied from AMADEUS Classic. Genuinely undecidable from these two files — the coincidence that the DB's Grip row is field-for-field almost identical to its Classic row (same 2000 kg, same 2880 mm, same navigation pair, same speed) is the strongest hint that it was, and that is exactly what a reviewer should check.\nCONFLICT 4 (independent of the above) fleet_management_system: DB 'VDA 5050 compatible|Open API' vs this sheet's 'inhouse produzierter Flottenmanager NAVIOS'. Both are true — NAVIOS is proprietary AND speaks VDA 5050 (Navios-OnePager-2025-DE.pdf p.1 'VDA 5050 inklusive'). AP0's fleet_management_system is a single-select Dropdown, so it CANNOT express 'proprietary product that implements an open standard'. This is an AP0 modelling limitation, not a data error, and it affects every DS Automotion row. Do not change the value on the strength of this.\nAP0 GAP — 'Lastgröße: 2 x max. 1.050x1.600x6.000 mm (BxTxH)' (p.2): the load envelope is the single most important spec for this variant and there is no field for it.\nNot recorded: 'ROI in nur 1,5 Jahren' (p.1) and 'Trog 63' battery tray designation — no AP0 fields."
+    },
+    {
+      "product_name": "ARNY Mono / ARNY Duplex / ARNY Triplex / ARNY HD Triplex",
+      "product_type": "Forklift AGV",
+      "source_file": "Arny-OnePager-2026-DE.pdf",
+      "db_status": "enrich",
+      "variant_group": "ARNY Baureihe, four variants published side by side in one table on p.2 (mono / duplex / triplex, plus ARNY HD triplex). All four already exist in the DB with matching names.",
+      "fields": {
+        "min_aisle_width": 3700,
+        "max_payload": {"ARNY Mono": 1500, "ARNY Duplex": 1200, "ARNY Triplex": 1000, "ARNY HD Triplex": 1000},
+        "lifting_height": {"ARNY Mono": 1500, "ARNY Duplex": 4500, "ARNY Triplex": 7400, "ARNY HD Triplex": 10800},
+        "max_speed": 1.5,
+        "drive_type": "Counterbalanced",
+        "navigation_type": ["Contour", "Magnetic Tape", "Laser Reflector"],
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "autonomous_charging": true,
+        "battery_swap_capable": true,
+        "special_fork_option": ["Side-Shift"],
+        "load_type": ["Pallet EUR", "Pallet ISO", "Custom Carrier"],
+        "safety_coverage": "Single plane (2D)",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "min_aisle_width": "p.2 prose: 'Die Besonderheit ist die kompakte Bauweise für das effiziente Navigieren in engen Gassen ab 3,7 m Breite.' Printed as '3,7 m' -> converted to 3700 mm (AP0 unit is mm). THE HEADLINE FINDING OF THIS GROUP: min_aisle_width is a HARD K.O. field and is currently NULL on all four ARNY rows.",
+        "max_payload": "p.2 table row 'Transportgewicht max. — 1.500 kg | 1.200 kg | 1.000 kg | 1.000 kg' across the mono/duplex/triplex/HD-triplex columns. CONFIRMS all four DB values exactly.",
+        "lifting_height": "p.2 table row 'Hub — 1,5 m | 4,5 m | 7,4 m | 10,8 m' -> printed in metres, converted to 1500 / 4500 / 7400 / 10800 mm (AP0 unit mm). CONFIRMS all four DB values exactly. Also p.1/p.2 headline 'Hubhöhe bis zu 10,8 m'.",
+        "max_speed": "p.2 table row 'Geschwindigkeit max. — 1,5 m/s' (identical across all four). CONFIRMS the DB.",
+        "drive_type": "p.1 'ARNY — Der Gegengewichtsstapler' (counterbalance truck). CONFIRMS the DB.",
+        "navigation_type": "p.2 table row 'Navigation — Kontur-, Magnet-, Laser- oder Hybridnavigation'. CONFIRMS the DB's Contour|Magnetic Tape|Laser Reflector. ('Hybridnavigation' = combinations of the three, not a fourth technology.)",
+        "battery_type": "p.2 table row 'Batterie — Blei-Säure, Reinblei, Lithium'. Blei-Säure and Reinblei -> Lead-Acid; Lithium -> Li-Ion. NOTE the DB holds 'Lead-Acid|LiFePO4'; the sheet says only 'Lithium' generically, so LiFePO4 is neither confirmed nor contradicted — see notes.",
+        "autonomous_charging": "p.2 table row 'Energieversorgung — Batteriewechsel (manuell) oder automatisches Laden'",
+        "battery_swap_capable": "same row — 'Batteriewechsel (manuell)'",
+        "special_fork_option": "p.2 table row 'Gabelausführung — ISO-Gabelträger, geschmiedete Zinken; optional: Seitenschub, Neigungsverstellung, Zinkenverstellung'. Seitenschub -> Side-Shift. CONFIRMS the DB.",
+        "load_type": "p.2 prose 'Die verschiedenen Ausführungen der Gabel mittels ISO Aufhängung erlauben den Transport unterschiedlicher Ladungsträger von Paletten oder Gitterboxen bis hin zu Großladungsträgern aller Art.' Paletten -> Pallet EUR + Pallet ISO; Gitterboxen and Großladungsträger -> Custom Carrier (AP0 has no mesh-box-pallet value; see notes).",
+        "safety_coverage": "p.2 table rows 'Personensicherheit — 3 Sicherheitslaserscanner für 360° Rundumschutz' and 'Objektschutz — Kameras'; prose 'Ein 3D-Objektschutz ist optional erhältlich.' Three 2D laser scanners give 360° in one plane; 3D is explicitly OPTIONAL.",
+        "stacking_capability": "p.2 'Hub' row and p.1 'Hohe Belastbarkeit in großen Höhen'"
+      },
+      "notes": "ENRICH, headline value — min_aisle_width = 3700 mm on all four ARNY variants (currently null). Hard K.O. field, stated unambiguously in metres on p.2. This one sentence is the highest-value single extraction in the DS Automotion group.\nENRICH — fork_spread: p.2 lists 'Zinkenverstellung' (fork-tine adjustment) as an option, which is exactly what fork_spread describes, but the sheet does NOT say whether it is manual or automatic. AP0's allowed values are None / Manual / Auto and there is no 'available, mechanism unstated' value, so this is left NULL rather than guessed. Flagged because the capability clearly exists.\nNOTE, NOT a conflict — battery_type: the DB holds 'Lead-Acid|LiFePO4'; the sheet says 'Lithium'. LiFePO4 is a lithium chemistry, so the sheet is a generalisation of the DB value, not a contradiction. Recorded as Li-Ion above only because that is AP0's generic lithium value; a reviewer should NOT overwrite an existing, more specific LiFePO4 with the generic Li-Ion. Same situation on AMADEUS, LUCY, AMY and OSCAR.\nQUESTIONED existing DB value — safety_coverage = 'Full 3D (360° + 3D sensors)' on all four ARNY rows. Two problems: (a) the string is NOT an AP0 allowed value (the parenthetical suffix makes it non-conforming — recurring finding #5); (b) the sheet states 3D-Objektschutz is OPTIONAL and the standard fit is three 2D laser scanners. 'Single plane (2D)' is proposed for the standard machine. Flagged, not corrected.\nAP0 GAP — 'Eigengewicht ohne Batterie 4.200 / 4.800 / 5.600 / 5.990 kg' (p.2): no field for vehicle dead weight, which matters for floor loading and mezzanine limits on a 6-tonne truck.\nAP0 GAP — the sheet praises 'der kleine Wenderadius' (p.2) but publishes no figure, and there is no Forklift-scope turning-radius field to hold one anyway (recurring finding #2).\nAP0 GAP — 'Gitterbox' (mesh box pallet) has no allowed value in load_type and is folded into 'Custom Carrier'. It is a standardised, extremely common European carrier and arguably deserves its own value alongside 'Pallet EUR'.\nWRONG-SCOPE values on all four ARNY DB rows (flag only): grid_required = 0 (AMR scope) on Forklift AGV rows."
+    },
+    {
+      "product_name": "LUCY",
+      "product_type": "Forklift AGV",
+      "source_file": "Lucy-OnePager-2026-DE.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 1.6,
+        "max_payload": 500,
+        "lifting_height": 600,
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "navigation_type": ["Contour"],
+        "drive_type": "Straddle Stacker",
+        "load_type": ["Pallet EUR", "Roll Container", "Custom Carrier"],
+        "multi_load_compatibility": true,
+        "safety_coverage": "Single plane (2D)",
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_speed": "p.2 'Technische Details — Geschwindigkeit: max. 1,6 m/s'. CURRENTLY NULL IN THE DB — the LUCY row is the only DS Automotion product with no max_speed at all.",
+        "max_payload": "p.2 'Transportgewicht: max. 500 kg'; also p.1 headline 'Nutzlast max. 500 kg' and prose 'Selbst Paletten bis zu 500 kg können mit LUCY transportiert werden'. CONFIRMS the DB.",
+        "lifting_height": "p.2 'Hub: 600 mm'. CONFIRMS the DB.",
+        "battery_type": "p.2 'Batterie: Blei-Gel, Lithium'. Blei-Gel -> Lead-Acid (ENRICH: the DB has only Li-Ion); Lithium -> Li-Ion.",
+        "navigation_type": "p.2 'Navigation: Konturbasierte Lokalisierung (KBL)'. NOTE the DB also holds 'Laser Reflector', which this sheet does NOT mention — not contradicted, just unsupported here.",
+        "drive_type": "p.1 'LUCY — Kompaktes Radarm FTF' (Radarme = support/straddle arms); p.2 'Der Fahrzeugkopf, sowie Radarme und Lastaufnahmemittel sind als eigenständige Module ausgeführt'. CONFIRMS the DB's 'Straddle Stacker'.",
+        "load_type": "p.1 'Rollcontainer, Gestelle, Regale, Bodenroller mit gestapelten KLTs und vieles mehr können automatisch aufgenommen und wieder abgesetzt werden. Selbst Paletten bis zu 500 kg …'. Rollcontainer -> Roll Container; Paletten -> Pallet EUR; Gestelle/Regale/Bodenroller -> Custom Carrier. CONFIRMS the DB.",
+        "multi_load_compatibility": "p.1 'Dank der modularen Bauweise ist LUCY zum Transport unterschiedlichster Ladungsträger geeignet' and 'Eine Anpassung des geschraubten Lastaufnahmemittels an kundenspezifische Ladungsträger ist sehr einfach zu realisieren'. CAVEAT: the second sentence describes a BOLT-ON change of the load-handling module, i.e. a manual reconfiguration — which is arguably the opposite of the AP0 hint's 'in ONE workflow without manual reconfiguration'. CONFIRMS the DB's existing 1, but a reviewer could reasonably argue for false.",
+        "safety_coverage": "p.2 'Personensicherheit: Geschützt integrierte Laserscanner / Trittschutzleiste / Optional 3D-Objektschutz mit Kamera'; 'Schutzfeld: 360°'. 3D is explicitly optional.",
+        "vda5050_compatible": "p.2 bottom-right badge. The badge text is rendered as rotated, glyph-interleaved fragments ('ku onV mdD pA L aI F5 ti-0 bF5 eil0 le') which de-interleave to 'VDA 5050 … kompatibel' — the same badge appears cleanly on Amy-FourPager-2025-DE.pdf p.3 as 'VDA 5050 und LIF-File kompatibel'. CONFIRMS the DB."
+      },
+      "notes": "ENRICH — max_speed 1.6 m/s (currently null) and battery_type adding Lead-Acid (DB has Li-Ion only).\nPRE-EXISTING non-conforming DB value (flag only): load_detection = 'Camera/Vision (verify)'. The '(verify)' suffix is not an AP0 allowed value. This sheet says 'Optional 3D-Objektschutz mit Kamera' — a camera exists but only as an option and for OBJECT PROTECTION (safety), not load detection, so the '(verify)' cannot be cleared from here and the value itself is questionable.\nAP0 SCOPE GAP — p.2 'Display: 10,1\" Touch-Display als Option' on a Forklift AGV; onboard_ui is AMR-scope only.\nAP0 GAP — 'Eigengewicht ohne Batterie: 660 kg' (p.2) and 'Trittschutzleiste' (foot-guard contact strip, a standard DS Automotion safety feature across LUCY/OSCAR/SALLY) have no fields.\nWRONG-SCOPE value on the LUCY DB row (flag only): grid_required = 0 (AMR scope) on a Forklift AGV row."
+    },
+    {
+      "product_name": "AMY Deck / AMY Lift",
+      "product_type": "Mobile AMR",
+      "source_file": "Amy-FourPager-2025-DE.pdf",
+      "db_status": "conflict",
+      "variant_group": "AMY Baureihe. The sheet publishes ONE technical block and lists three load-handling modules ('Lastaufnahmemittel (LAM): Aktiv mit Hub-Kamm, Passiv mit Schwerkraft-Klinke, Plattform'), which is presumably what the DB models as AMY Lift (Hub-Kamm) and AMY Deck (Plattform). A THIRD module — the passive gravity-latch — has no DB row.",
+      "fields": {
+        "max_payload": 25,
+        "max_speed": 1.8,
+        "navigation_type": ["Contour"],
+        "autonomous_charging": true,
+        "battery_type": ["Li-Ion"],
+        "load_type": ["Plastic Bin"],
+        "safety_coverage": "Single plane (2D)",
+        "station_applications": ["Conveyor", "Workstation"],
+        "vehicle_length": 638,
+        "vehicle_width": 428,
+        "min_ground_clearance": 349,
+        "vda5050_compatible": true,
+        "installation_process": ["Supplier only"]
+      },
+      "field_sources": {
+        "max_payload": "p.3 'Technische Details — Traglast: max. 25 kg'. CONFIRMS both DB rows.",
+        "max_speed": "p.3 'Geschwindigkeit: max. 1,8 m/s'. CONFIRMS both DB rows.",
+        "navigation_type": "p.3 'Navigation: konturbasiert'. CONFIRMS the DB's 'Contour'.",
+        "autonomous_charging": "p.3 'Energieversorgung: Automatisches Laden über Ladekontakte'. CONFIRMS the DB.",
+        "battery_type": "p.3 'Batterie: Lithium' — generic. The DB holds the more specific 'LiFePO4', which this does not contradict; do not downgrade it.",
+        "load_type": "p.3 'AMY wurde speziell für Kleinladungsträger bis zu 400 x 600 mm konzipiert'. KLT (Kleinladungsträger) is the standard European small plastic container -> 'Plastic Bin'. CURRENTLY NULL on both DB rows.",
+        "safety_coverage": "p.3 'Schutzsystem: Laserscanner vorne und hinten, optionale Kamera'. Front+rear 2D laser scanners; camera optional. CURRENTLY NULL on both DB rows.",
+        "station_applications": "p.3 'Stationen: Rollenförderer, Schwerkraft-Klinke, Hub-Kamm' -> Rollenförderer = roller conveyor -> 'Conveyor'; the gravity-latch and lifting-comb transfer stations are manned/unpowered hand-over points -> 'Workstation'. CURRENTLY NULL on both DB rows.",
+        "vehicle_length": "p.3 'Abmessungen in mm: 638 (l) x 428 (b) x 349 (h)' — length",
+        "vehicle_width": "same row — width 428 mm",
+        "min_ground_clearance": "same row — height 349 mm. Per the AP0 hint this field holds the ROBOT'S HEIGHT (clearance needed to drive under the carrier), so the 'h' figure is the correct source, not any under-chassis gap.",
+        "vda5050_compatible": "p.3 badge 'VDA 5050 und LIF-File kompatibel'; p.2 'eine vorkonfigurierte NAVIOS-Steuerung nach dem VDA 5050-Standard'. CONFIRMS the DB.",
+        "installation_process": "p.2 'Vorkonfigurierte AMR-Systeme — Unsere AMR-Systeme werden vollständig eingerichtet geliefert. Dies reduziert die Fehlerquote bei der Installation erheblich' and 'Kurze Inbetriebnahmezeit (IBN) — Dank sorgfältiger Vorbereitung der Inbetriebnahme und der Montageinfrastruktur können unsere Systeme meist innerhalb einer Woche implementiert werden.' Supplier-delivered, supplier-commissioned."
+      },
+      "notes": "CONFLICT — dimensions. The sheet gives ONE set of dimensions for AMY (638 x 428 x 349 mm) but the DB holds two different sets: AMY Deck 690 x 453 (min_ground_clearance null) and AMY Lift 640 x 520 with min_ground_clearance = 580. None of the six DB figures matches the sheet. AMY Lift's 640 mm length is within 2 mm of the sheet's 638, which suggests the DB rows came from a per-variant source this sheet does not reproduce — and 580 mm is far taller than 349 mm, plausibly the Hub-Kamm module in its RAISED position rather than the vehicle height. Flagged for manual resolution; do NOT overwrite the per-variant DB rows with this single series figure.\nPOSSIBLE MISSING VARIANT: the sheet lists THREE load-handling modules (Hub-Kamm active / Schwerkraft-Klinke passive / Plattform) and the DB has two rows. The passive gravity-latch module — 'Das in Zusammenarbeit mit dem Fraunhofer IML Institut entwickelte Lastaufnahmemittel zur passiven Lastübergabe … Durch die von Schwerkraft gesteuerte Lösung werden keine zusätzlichen Antriebe und Sensoren für das Lasthandling benötigt' (p.2) — may warrant a third product row. Flagged as a question, not created: it is genuinely unclear whether DS Automotion sells it as a distinct model or as an option on AMY Deck.\nENRICH (currently null on both rows): load_type 'Plastic Bin', safety_coverage, station_applications, vehicle dimensions for AMY Deck.\nAP0 GAP — 'Eigengewicht: 60 kg' and 'Kommunikation mit Leitrechner: WLAN' (p.3). The WLAN dependency is a real deployment prerequisite with no home (same gap as the Omron wireless guide and the Enabled Robotics WiFi row in this batch — now three instances).\nAP0 GAP — the sheet's central sales claim, 'Steigerung der Effizienz bis zu 80 %*' with the footnote '*Unter der Annahme durchschnittlicher Personalkosten von 50.000 EUR pro Jahr im Drei-Schicht-Betrieb' (p.1), and 'meist innerhalb einer Woche implementiert' (p.2), have no fields. lead_time_weeks was considered for the latter but deliberately NOT filled: 'implementation within a week once prepared' is not the order-to-commissioning time the field means.\nWRONG-SCOPE values on both AMY DB rows (flag only): grid_required = 0 and rotation_capable = 1. grid_required is at least in AMR scope; rotation_capable is the more serious one — see the OSCAR entry for the full argument."
+    },
+    {
+      "product_name": "OSCAR spin 180 / OSCAR spin 360 / OSCAR omni",
+      "product_type": "Mobile AMR",
+      "source_file": "OSCAR-OnePager-2025-DE.pdf",
+      "db_status": "conflict",
+      "variant_group": "OSCAR Baureihe, three variants in a side-by-side table on p.2. The DB holds a FOURTH, 'OSCAR Omni XL' (1700 x 900, lift 200 mm), which does not appear on this 2025 sheet at all.",
+      "fields": {
+        "max_payload": 1000,
+        "max_speed": 1.6,
+        "lift_height": {"OSCAR Spin 180": 80, "OSCAR Spin 360": 130, "OSCAR Omni": 160},
+        "vehicle_length": {"OSCAR Spin 180": 1620, "OSCAR Spin 360": 1620, "OSCAR Omni": 1520},
+        "vehicle_width": {"OSCAR Spin 180": 560, "OSCAR Spin 360": 712, "OSCAR Omni": 720},
+        "min_ground_clearance": {"OSCAR Spin 180": 260, "OSCAR Spin 360": 295, "OSCAR Omni": 320},
+        "navigation_type": ["Natural Feature (SLAM)", "Magnetic Tape"],
+        "autonomous_charging": true,
+        "battery_type": ["Li-Ion"],
+        "omnidirectional_movement": {"OSCAR Omni": true, "OSCAR Spin 180": false, "OSCAR Spin 360": false},
+        "load_type": ["Roll Container", "Custom Carrier"],
+        "safety_coverage": "Single plane (2D)",
+        "top_module_type": ["Lift"]
+      },
+      "field_sources": {
+        "max_payload": "p.2 'Technische Details — Transportgewicht: max. 1,0 t' -> 1000 kg; also p.1 headline 'Nutzlast bis max. 1,0 t' and prose 'Eine hohe Nutzlast von 1.000 kg'. CONFIRMS the DB's OSCAR Omni (1000). NOTE the DB's OSCAR Spin 180 and Spin 360 rows have max_payload NULL, and the DB's OSCAR Omni XL holds 1250 — outside this sheet's series figure, consistent with it being a later/larger variant.",
+        "max_speed": "p.2 'Geschwindigkeit: max. 1,6 m/s'. CONFIRMS all four DB rows.",
+        "lift_height": "p.2 'Hub: 80 mm / 130 mm / 160 mm' — three figures matching the three variant columns in the order spin 180 / spin 360 / omni. CONFIRMS the DB exactly (80 / 130 / 160).",
+        "vehicle_length": "p.2 variant table: 'OSCAR spin 180 — 1.620 x 560 x 260 mm', 'OSCAR spin 360 — 1.620 x 712 x 295 mm', 'OSCAR omni — 1.520 x 720 x 320 mm'",
+        "vehicle_width": "same row (second figure of each L x W x H triple)",
+        "min_ground_clearance": "same row (third figure = vehicle HEIGHT, which is what AP0's min_ground_clearance hint asks for). CONFIRMS the DB's 260 / 295 / 320 exactly — a useful independent validation that the DB's odd-looking 'ground clearance = vehicle height' values are CORRECT and were not an error.",
+        "navigation_type": "p.2 'Navigation: SLAM, Magnetpunktfolge' and prose 'Die OSCAR-Baureihe navigiert konturbasiert (SLAM) per KBL-Technologie und beherrscht zusätzlich die Magnetpunktnavigation.'",
+        "autonomous_charging": "p.2 'Energieversorgung: automatisches Laden' and prose 'Die Ladung der integrierten Batterien erfolgt im Fahrzeug über Bodenkontakte.' CONFIRMS the DB.",
+        "battery_type": "p.2 'Batterie: Lithium' — generic; the DB's LiFePO4 on Spin 180/360/Omni is more specific and is not contradicted.",
+        "omnidirectional_movement": "p.2 prose 'OSCAR omni ist flächenbeweglich, das gestattet ihm in alle Richtungen zu fahren. OSCAR spin kann sich im Stand drehen und sehr enge Kurven fahren.' Explicitly contrasts holonomic (omni) with rotate-in-place-only (spin). CONFIRMS the DB's omnidirectional_movement = 1 on OSCAR Omni; the DB leaves it null on both Spin rows, and this sheet supports FALSE for them. Corroborated by the variant table: omni is the only one where 'Bereitstellung und Transport erfolgt längs oder quer'; both spins say 'längs' only.",
+        "load_type": "p.1 'Ob Untersatzwägen, Gestelle, Boxen oder Rollwägen, all dies kann automatisch aufgenommen, transportiert und abgesetzt werden'; p.2 table 'Transport von Rollwagen / Bodenroller / Rolluntersetzer', 'Transport von Gestellen mit Füßen', 'Transport von aufgeständerter Ladung'. CONFIRMS the DB.",
+        "safety_coverage": "p.2 'Personensicherheit: Geschützt integrierte Laserscanner mit 180° oder 360° Rundumsicht / Trittschutzleiste'. 2D laser only; no 3D option is even offered on this sheet.",
+        "top_module_type": "the 80/130/160 mm 'Hub' row and the underride concept ('Das Unterfahr-Fahrzeug'). CONFIRMS the DB's 'Lift'."
+      },
+      "notes": "CONFLICT — OSCAR Spin 360 dimensions: DB holds vehicle_length 1670 and vehicle_width 700; the sheet's variant table says 1.620 x 712 x 295 mm. min_ground_clearance (295) matches exactly, which makes the length/width mismatch on the SAME table row harder to explain away as a different source. 50 mm on length and 12 mm on width. Flagged. (Spin 180 and Omni match the DB perfectly on all three axes, so this is an isolated row, not a systematic offset.)\nQUESTIONED existing DB value, high value — rotation_capable = 1 on all four OSCAR rows (and on AMY Deck, AMY Lift, SALLY, SALLY Kurier, SALLY Rollgang: 9 rows in total). AP0's hint for rotation_capable reads: 'Can rotate the carried rack/pod IN PLACE to present a chosen face (hallmark of G2P). Source: shelf rotation / spin. rotation_capable + grid_required ≈ goods-to-person; both false ≈ pure transport.' That is about turning the LOAD to face a picker, not about the VEHICLE spinning. OSCAR is explicitly a pure underride transport vehicle and the sheet's only relevant sentence is 'OSCAR spin kann sich im Stand drehen' — the VEHICLE rotating on the spot. The DB values look like a systematic mis-mapping of 'spin/rotate on the spot' onto a goods-to-person field, plausibly helped along by the variant being NAMED 'spin'. Proposed false on all nine rows. Flagged for a Tech Lead decision, not corrected — this is a cross-supplier semantic question, not a DS Automotion data error, and the same mis-reading is likely present on other suppliers' rows.\nAP0 GAP, significant and specific to underride AGVs — the sheet's 'Unterfahrmaß mind.' row (610 x 280 / 760 x 315 / 770 x 340 mm, B x H) gives the MINIMUM OPENING under the cart that the robot needs. That is exactly the quantity a buyer must check against their existing trolley fleet, and it is exactly what the FIELD NAME 'min_ground_clearance' promises — but AP0's hint has redefined that field to mean the robot's height instead, leaving the true clearance requirement homeless. Note the two are NOT the same number: OSCAR omni is 320 mm tall but needs a 340 mm opening (20 mm of tolerance) and 770 mm of width, and the WIDTH requirement has no field at all.\nTRAP AVOIDED — 'die OSCAR-Baureihe eine mit 25 mm ausreichend große Bodenfreiheit' (p.2) was NOT written to min_ground_clearance. See researcher_notes.\nAP0 GAP — 'Nahtlos im Gehäuse eingelassene LED-Leuchten sorgen nicht nur für die nötige Aufmerksamkeit, sondern dienen der Kommunikation mit dem Umfeld' (p.2): human-facing status signalling has no field, and it recurs on Stäubli Sterimove and Enabled Robotics in this same batch.\nOSCAR Omni XL is NOT covered by this sheet — no datasheet on file for it."
+    },
+    {
+      "product_name": "SALLY / SALLY Rollgang",
+      "product_type": "Mobile AMR",
+      "source_file": "SALLY-OnePager-2024-DE.pdf",
+      "db_status": "enrich",
+      "variant_group": "The file is titled 'SALLY mit Rollgang' on p.1 but its Technische-Details block is the base SALLY vehicle. Values are therefore proposed for BOTH the DB's 'SALLY' and 'SALLY Rollgang' rows, which share the chassis; the roller conveyor is the top module.",
+      "fields": {
+        "max_payload": 100,
+        "max_speed": 1.6,
+        "ingress_protection_rating": "IP44",
+        "battery_type": ["LiFePO4"],
+        "navigation_type": ["Contour", "Natural Feature (SLAM)"],
+        "autonomous_charging": true,
+        "onboard_ui": true,
+        "load_type": ["Plastic Bin", "Custom Carrier"]
+      },
+      "field_sources": {
+        "max_payload": "p.2 'Technische Details — Transportgewicht max. 100 kg'; prose 'ausgelegt für kleinere Lasten bis zu 100 kg'. CONFIRMS the DB.",
+        "max_speed": "p.2 'Geschwindigkeit max. 1,6 m/s'; also the sidebar 'Geschwindigkeit bis 1,6 m/s' and prose 'die 1,6 m/s flinke SALLY'. Stated three times. CONFIRMS the DB.",
+        "ingress_protection_rating": "p.2 'SALLY wurde nach höchsten Industriestandards konstruiert, kommt mit einer IP-Schutzklasse von IP44'. CURRENTLY NULL on both DB rows — and IP44 is a meaningful differentiator (most AMRs in this corpus are IP20).",
+        "battery_type": "p.2 'Batterie LiFePo4 (48 V / 40 Ah)'. CONFIRMS the DB's LiFePO4 — and note this is the one place DS Automotion states the chemistry precisely rather than writing 'Lithium'.",
+        "navigation_type": "p.2 'Navigation — Konturbasierte Lasernavigation' plus prose 'tastet SALLY mit einem Laser-Scanner die Konturen des umgebenden Raums ab und erstellt eine Landkarte mit leicht wieder auffindbaren Merkmalen' (contour/SLAM) and 'Zusätzlich nutzt SALLY — etwa zur automatischen Lastübergabe — künstliche Landmarken, denn ihr hybrides Navigationssystem erlaubt die Kombination unterschiedlicher Ortungsmethoden.' CONFIRMS the DB.",
+        "autonomous_charging": "p.2 'Ladung — induktiv oder über Ladekontakte'. CONFIRMS the DB.",
+        "onboard_ui": "p.2 'Individuelle Aufbauten: … 7\" Touch-Panel, zusätzlicher Not-Aus, Blinker, Lichter, Fingerabdruck-Scanner, Barcode-/RFID-Lesegerät und vieles mehr'. OPTION, not standard — recorded true because the AP0 field asks whether an onboard screen exists, but the optional status matters.",
+        "load_type": "p.1 'Ob als Zulieferer für Arbeitsmaterial in KLT-Boxen oder mit dem Kurier-Aufsatz …' -> KLT -> Plastic Bin; p.2 'Kundenspezifische Lastaufnahmemittel ermöglichen Ihnen dabei beinahe unbeschränkte Einsatzmöglichkeiten' -> Custom Carrier. NOTE the DB holds 'Tote|Custom Carrier'; 'Plastic Bin' vs 'Tote' for a KLT is a genuine AP0 ambiguity (both allowed values could describe the same box) and this is NOT proposed as a change."
+      },
+      "notes": "ENRICH — ingress_protection_rating IP44 (currently null on SALLY, SALLY Rollgang and SALLY Kurier). The clearest enrichment in the SALLY family.\nENRICH — onboard_ui true (optional 7\" touch panel), currently null.\nNOT RECORDED — 'Kursplanung: Autonom Navigierend / Virtuelle Leitlinie' (p.2). This maps conceptually onto route_type ('Fully Dynamic' + 'Fixed Route'), but route_type is Logistics:AGV:Tugger scope and SALLY is a Mobile AMR, so there is nowhere to put it. 10th+ wrong-scope observation this pass and a genuine modelling gap: 'Planbare Autonomie' — the ability to be track-guided in some zones and autonomous in others — is DS Automotion's single biggest differentiator and AP0 cannot express it for AMRs at all.\nAP0 GAP — the optional-equipment list on p.2 ('Fingerabdruck-Scanner, Barcode-/RFID-Lesegerät, zusätzlicher Not-Aus, Blinker, Lichter') has no home; barcode/RFID reading in particular is Forklift-scope only (barcode_readers), the same asymmetry logged for Enabled Robotics in this batch.\nWRONG-SCOPE / questioned value on both DB rows (flag only): rotation_capable — see the OSCAR entry."
+    },
+    {
+      "product_name": "SALLY Kurier",
+      "product_type": "Mobile AMR",
+      "source_file": "SALLY_Kurier-OnePager-2024-DE.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 50,
+        "max_speed": 1.0,
+        "navigation_type": ["Contour", "Natural Feature (SLAM)"],
+        "battery_type": ["LiFePO4"],
+        "autonomous_obstacle_bypass": true,
+        "task_interleaving": true,
+        "safety_coverage": "Limited 3D (e.g. waterfall)",
+        "ingress_protection_rating": "IP44"
+      },
+      "field_sources": {
+        "max_payload": "p.2 'Technische Details — Transportgewicht max. 50 kg'; p.1 headline 'Nutzlast max. 50 kg'. CONFIRMS the DB.",
+        "max_speed": "p.2 'Geschwindigkeit max. 1,0 m/s'. CONFIRMS the DB.",
+        "navigation_type": "p.2 'Navigation — Autonom mittels konturbasierter Lasernavigation (SLAM)' and the Navigation panel 'nutzt die flinke SALLY kurier die \"SLAM\" Technologie (Simultaneous Localization and Mapping), um anhand natürlicher Umgebungsmerkmale ihre Bahn zu überprüfen'. ENRICH: the DB holds only 'Contour' on this row — 'Natural Feature (SLAM)' is stated outright here, including the expanded acronym.",
+        "battery_type": "p.2 'Batterie LiFePo4'. CONFIRMS the DB.",
+        "autonomous_obstacle_bypass": "p.2 'kann der SALLY kurier mit Hilfe von 3D-Kameras und unserer Fahrzeugsoftware ARCOS auch selbst Entscheidungen treffen und so Hindernissen ausweichen oder vor ihnen anhalten' and 'Es folgt eine adaptive Fahrkursberechnung um dem Hindernis auszuweichen.' Explicit re-routing, not just stopping. CONFIRMS the DB.",
+        "task_interleaving": "p.2 'SPONTANE TRANSPORTE — An ihren Fahrzielen kann SALLY kurier weitere Transportaufträge aufnehmen. Die Route wird dabei stetig optimiert.' and 'EFFIZIENZ — Mehrere Lieferaufträge können dank Routenplanung in einer Fahrt optimal erledigt werden.' Picking up new jobs mid-run is exactly the AP0 hint's 'mixes … in one run'. CURRENTLY NULL in the DB.",
+        "safety_coverage": "p.2 'Sicherheit — 360° Trittschutzleiste und Kontaktleiste / zwei Not-Aus-Schalter / zwei 3D Kameras / Absturzsicherung für Treppen und Schächte / optische Personenerkennung mittels Laserscanner vorne'. TWO 3D cameras are STANDARD here (unlike every other DS Automotion product, where 3D is optional), but the laser is front-only — a partial 3D field, hence 'Limited 3D'.",
+        "ingress_protection_rating": "IP44 carried over from SALLY-OnePager-2024-DE.pdf p.2 ('SALLY wurde nach höchsten Industriestandards konstruiert, kommt mit einer IP-Schutzklasse von IP44') — SALLY kurier is the same base vehicle with a cabinet superstructure. CROSS-DOCUMENT ATTRIBUTION, weaker than a value printed on this sheet; a reviewer may prefer to hold it."
+      },
+      "notes": "ENRICH — task_interleaving true (currently null), navigation_type adding 'Natural Feature (SLAM)' (currently 'Contour' only), safety_coverage 'Limited 3D' (currently null).\nAP0 GAP — NO HEALTHCARE / HOSPITAL VERTICAL. This product is explicitly and exclusively a hospital robot: p.1 'Sichere Fahrt in Richtung digitales Krankenhaus … Transport von Sterilgut, Dokumenten, Laborproben, Instrumenten, Medikamenten … So wird das Krankenhauspersonal von Bring-Diensten entlastet'. industries_served's allowed values are None / Automotive / F&B / Pharma / E-Commerce / General Manufacturing / 3PL / Retail — none of which is healthcare. The DB currently records 'General Manufacturing|3PL|Pharma' for it, which is a poor fit reached by necessity. Combined with Stäubli Sterimove (aseptic pharma) in this same batch, healthcare/life-sciences is now a visible hole in the vertical list.\nAP0 GAP — access control ('Der Zugang zu den Fächern ist entweder über Barcode oder optional über einen RFID Transponder nur für autorisiertes Personal möglich', p.2), the two user levels (Stationspersonal / Leitstandspersonal), the transport statistics/chain-of-custody logging, and 'Absturzsicherung für Treppen und Schächte' (stairwell/shaft fall protection). For a hospital buyer, controlled access to the payload and fall protection are decision-grade, and none is storable.\nAP0 GAP — 'modular aufgebauter Schrank … ist leicht zu reinigen und zu desinfizieren' (p.2): cleanability/disinfectability, the same gap flagged on Stäubli Sterimove's EHEDG and VHP rows.\nWRONG-SCOPE / questioned value on the DB row (flag only): rotation_capable — see the OSCAR entry."
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "company": "Hikrobot",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "OPUS REDO PASS. Blind independent re-extraction of the 4 Hikrobot files in Datasheets/AGV_AMR/Analysed/ (3 unique + 1 byte-identical duplicate). No sonnet-era findings consulted. 3 unique files → 5 products: 1 existing Forklift AGV (F3-1500, conflict), 2 NEW STU-series tote robots, and 2 pallet-handling robots from the 'QF' flyer (1 new, 1 existing). MAJOR CAVEAT ON ONE FILE: 'QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf' has a BROKEN TEXT LAYER — its embedded subset fonts carry no ToUnicode map, so pdfplumber/pdfminer return scrambled characters. PDF page rendering is unavailable in this environment (pdftoppm/poppler not installed), so the file was recovered by solving the character substitution as a cipher using in-document cribs. Everything extracted from that file is marked and should be verified against a rendered page before import. Scope discipline: F3-1500 extracted against '*' + 'Logistics:AGV' + 'Logistics:AGV:Forklift'; the STU and QF products against '*' + 'Logistics:AGV' + 'Logistics:AGV:AMR'.",
+  "company_wide_context": {
+    "source_file": "F3-1500_flyer_eng_cemat_v2.pdf / STU_flyer_eng_cemat_v2.pdf / QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf",
+    "fields": {},
+    "applies_to": "n/a — no company-scope ('*') field is stated in any of these three flyers.",
+    "notes": "None of the three flyers prints a company address, country, certification mark, or founding information; all three are CEMAT trade-fair product flyers. The only company-level fact stated is authorship ('self-designed entirely by Hikrobot', F3-1500_flyer_eng_cemat_v2.pdf p.1; 'developed by Hikrobot for high-density and high-efficiency warehousing scenarios', STU_flyer_eng_cemat_v2.pdf p.1), which maps to no AP0 field. The DB's country=CN is neither confirmed nor contradicted here."
+  },
+  "products": [
+    {
+      "product_name": "Hikrobot F3-1500",
+      "product_type": "Forklift AGV",
+      "source_file": "F3-1500_flyer_eng_cemat_v2.pdf",
+      "db_status": "conflict",
+      "variant_group": "Single model; the flyer's spec table has one column ('Model  F3-1500').",
+      "fields": {
+        "max_payload": 1500,
+        "max_speed": 1.5,
+        "vehicle_length": 1632,
+        "vehicle_width": 863,
+        "min_total_height": 1986,
+        "stop_accuracy": 10,
+        "load_type": ["Pallet ISO"],
+        "load_detection": ["Laser/LiDAR profiling"],
+        "safety_coverage": "Single plane (2D)",
+        "station_applications": ["Floor"]
+      },
+      "field_sources": {
+        "max_payload": "p.2, Specification table, row 'Rated Load  1500kg'",
+        "max_speed": "p.2, Specification table, row 'Running Speed  1.5/1.2m/s' — higher of the two (1.5) taken; corroborated by p.1 key feature 'Efficient Transferring: max. running speed 1.5m/s', which explicitly labels 1.5 as the MAXIMUM. Printed unit m/s = AP0 unit, no conversion.",
+        "vehicle_length": "p.2, Specification table, row 'Dimension (Length*Width*Height)  1632*863*1986mm' — first figure",
+        "vehicle_width": "p.2, same row — second figure (863)",
+        "min_total_height": "p.2, same row — third figure (1986). NOTE: the flyer prints one unqualified overall height; it does not say whether a mast is collapsed (see notes).",
+        "stop_accuracy": "p.2, Specification table, row 'Positioning Accuracy  ±10mm'; corroborated by p.1 key feature 'Precise positioning: millimeter-level positioning accuracy'",
+        "load_type": "p.2, Specification table, row 'Standard Pallet Dimension  1200*1000mm' — a 1200×1000 mm pallet is the ISO/industrial size, not the 1200×800 EUR pallet. Corroborated by p.2 'Adaptive Carrier: Plastic Pallet / Wooden Pallet / Rack'.",
+        "load_detection": "p.2, safety diagram callout 'Pallet recognition laser'; corroborated by p.1 key feature 'Pallet Recognition: autonomous fork picking according to the location of the pallet, and can identify the black, stainless steel and other special pallets' (identifying black and stainless-steel pallets is a known LiDAR-profiling strength and a known camera weakness)",
+        "safety_coverage": "p.1 key feature 'Configuration upgrade: standard with 3 obstacle avoidance lasers, 360 ° safety protection around the body' + p.2 callouts 'Head and fork tip obstacle avoidance laser', 'Body surround bumper strip' — multiple 2D laser planes plus a tactile bumper, no 3D/volumetric sensing named",
+        "station_applications": "p.1 'Applicable Scenarios: Lineside carrying / Ground Storage' (Ground Storage listed three times) — floor-level pick and drop"
+      },
+      "notes": "CONFLICTS (existing DB values NOT overwritten): (1) max_speed DB=2.1 m/s vs datasheet 1.5 m/s — source: p.2 table row 'Running Speed 1.5/1.2m/s' AND p.1 key feature 'max. running speed 1.5m/s'. The flyer states 1.5 twice and explicitly calls it the maximum, so 2.1 is not supported by anything in this document. (2) vehicle_width DB=870 mm vs datasheet 863 mm — source: p.2, 'Dimension (Length*Width*Height) 1632*863*1986mm'. The DB's length (1632) matches this row exactly, so only the width digit diverges — consistent with a rounding rather than a different variant. (3) load_detection DB='Camera/Vision' vs datasheet 'Pallet recognition laser' (p.2 diagram callout) → 'Laser/LiDAR profiling'. The p.1 claim that it identifies 'black, stainless steel and other special pallets' actively argues for laser over vision. NOT MAPPED / KO FIELD NOT STATED — lifting_height: the flyer never states a lift height. Its 'Fork Height/Width/Length 60/175/1230mm' row (p.2) gives fork GEOMETRY (60 mm fork thickness, 175 mm fork width, 1230 mm fork length), not a lift stroke, and 'Applicable Scenarios' are all ground-level ('Lineside carrying', 'Ground Storage'). The DB's lifting_height=200 is neither confirmed nor contradicted by this document. min_total_height CAVEAT: 1986 mm is the only height given and the flyer does not qualify it as mast-collapsed; AP0 defines min_total_height as 'lowest overall vehicle height (mast collapsed)'. Recorded, flagged. NOT MAPPED — no AP0 field: 'Load Center Distance 600mm'; 'Fork Height/Width/Length 60/175/1230mm'; 'Fork Distance 680mm'; 'Emergency stop buttons on both sides'; 'Large panels in-position detection'; 'Body surround bumper strip'; 'Low Obstacle Detection: can effectively detect low obstacles such as forks of manual forklift' (p.1). WRONG-SCOPE FIELD AVOIDED: p.1 states 'Flexible movement: forward moving, backward moving, arc moving, rotate in place', which would map to rotation_capable — but rotation_capable exists only in 'Logistics:AGV:AMR' scope and this is a Forklift AGV, so it was not written. LEFT NULL DELIBERATELY: navigation_type (the flyer never names a navigation technology — DB has 'Natural Feature (SLAM)', unsupported here); infrastructure_free; battery_type; operating temperatures; IP rating; min_aisle_width (DB has 2100; no aisle or roadway width appears anywhere in this flyer). SCOPE BUG IN EXISTING DB ROW (pre-existing): this product is product_type='Forklift AGV' but carries route_type and route_programming (scope 'Logistics:AGV:Tugger') and workflow_capability, grid_required, picking_mechanism (scope 'Logistics:AGV:AMR'). Also fleet_management_system is stored as 'Proprietary (RCS 2000)', which is not an AP0 allowed value ('Proprietary' / 'Open API' / 'VDA 5050 compatible' / 'Third-party WMS native') — the same malformed pattern appears on the Q7-1000D and Q7-1500D rows."
+    },
+    {
+      "product_name": "Hikrobot STU MR-TP6-30SCH",
+      "product_type": "Mobile AMR",
+      "source_file": "STU_flyer_eng_cemat_v2.pdf",
+      "db_status": "new",
+      "variant_group": "STU series. The flyer's p.2 table has TWO model columns, MR-TP6-30SCH and MR-TP6-30SCW, which are identical on every spec except the applicable tote dimension — same 12 m picking height, same 30/50 kg rated load, same 3 m/s travel and 2 m/s lift speed, same navigation, power, safety and environment rows. Almost certainly one chassis with two tote-handling configurations; base-model grouping is left to the import-script author.",
+      "fields": {
+        "max_payload": 30,
+        "max_speed": 3.0,
+        "shelf_height": 12000,
+        "navigation_type": ["Vision"],
+        "operating_temp_min": -10,
+        "operating_temp_max": 45,
+        "storage_system_type": ["Tote-to-Person"],
+        "onboard_container_type": ["Tote"],
+        "workflow_capability": ["Goods-to-Person", "Transport"],
+        "picking_mechanism": "Bin-transfer",
+        "safety_coverage": "Single plane (2D)"
+      },
+      "field_sources": {
+        "max_payload": "p.2, 'Basic Parameters' block, row 'Execution Structure Rated Load(kg)  30/50' — CONSERVATIVE value (30) taken for this KO field; the flyer offers 30 or 50 kg execution structures without naming which is standard. SEE NOTES for a plausibility flag.",
+        "max_speed": "p.2, 'Motion Performance' block, row 'Max. Running Speed(m/s)  3'; corroborated by p.1 'Efficient Transfer — Max. 3m/s running and 2m/s lifting'. Printed unit m/s = AP0 unit. SEE NOTES for a plausibility flag.",
+        "shelf_height": "p.2, 'Basic Parameters' block, row 'Picking Height(m)  12' — printed unit is METRES, AP0 unit is mm → converted 12 m → 12000 mm. Corroborated by p.1 'High Density Storage — Single layer suitable for 3m~12m warehouse applications'. Mapped to shelf_height (whose AP0 hint reads 'Max shelf/rack/pod height handled ... RoboShuttle ~11 m') rather than lift_height, which the hint reserves for the stroke that raises a cart/rack/pod off the floor.",
+        "navigation_type": "p.2, 'Basic Parameters' block, row 'Navigation Mode  Visual' → 'Vision' per the AP0 mapping rule ('vision' / 'camera-based' → 'Vision')",
+        "operating_temp_min": "p.2, 'Environment' block, row 'Temperature  -10~45℃' — lower bound. NEGATIVE value: checked against config/unit_semantics.json, °C is a signed unit, sign preserved deliberately.",
+        "operating_temp_max": "p.2, same row — upper bound 45",
+        "storage_system_type": "p.1 'STU series products are the new generation of CTU mobile robots developed by Hikrobot for high-density and high-efficiency warehousing scenarios' + 'extremely narrow tote-to-tote spacing' + 'Proven and reliable CTU clamping, grab components for high density and mixed tote scenarios'; p.2 'Adaptive carrier: Totes / Carton'",
+        "onboard_container_type": "p.2, 'Adaptive carrier  Totes  Carton' + p.2 row 'Applicable Tote Dimension (L × W × H)'",
+        "workflow_capability": "p.1 'STRP Solution (STU + Q1P)' and 'STU + Conveyor Line Solution' under 'Applicable Scenarios' — a goods-to-person tote solution; the robot itself also performs transport within the roadway",
+        "picking_mechanism": "p.1 'Proven and reliable CTU clamping, grab components for high density and mixed tote scenarios' + 'The actuator is equipped with multiple foolproof mechanisms to ensure cargo security' — a container/tote transfer actuator, i.e. 'Bin-transfer'",
+        "safety_coverage": "p.2, 'Safety' block, row 'Obstacle Avoidance Laser  Standard' + p.1 'System safety interlock, STU configuration front and rear double laser' — 2D laser planes only, no 3D sensing named"
+      },
+      "notes": "NEW PRODUCT — no STU-series or CTU product exists in the DB for Hikrobot. PRODUCT_TYPE JUDGEMENT (flagged): classified as 'Mobile AMR' by analogy with the DB's existing tote-to-person robots (Geek+ RoboShuttle RS8-DA / RS11-DA / P40 are all Mobile AMR). It is a rack-climbing container-transfer robot operating in a fixed roadway, which is arguably closer to an ASRS shuttle than to a free-roaming floor AMR — worth a Tech Lead sanity check, since product_type is a hard K.O. PLAUSIBILITY FLAGS (both recorded verbatim, neither is a read error): (a) max_payload = 30 kg is far below config/plausibility.json's required_max_payload floor of 100 kg — but this is a single-tote handler, so 30–50 kg is genuinely correct and the plausibility floor is simply tuned for pallet-class vehicles. (b) max_speed = 3.0 m/s exceeds this project's plausibility guidance (up to ~2.5 m/s even in automated zones) — but the STU runs inside an enclosed rack roadway with no human access, where 3 m/s is credible, and the flyer states it twice (p.1 headline and p.2 table). NOT MAPPED — no AP0 field: 'Max. Lifting Speed (m/s) 2'; 'Applicable Tote Dimension (L × W × H) 600*400*300 / 650*450*300'; 'Power Supply Method  Slide Touch/Battery'; 'Roadway Safety Linkage  Standard'; 'Sound and Light Alarm  Standard'; 'Noise/dB(A) ≤70'; p.1 claims 'Increase efficiency by more than 100% of single-unit stereoscopic warehouse', 'Multiple STUs can be deployed in parallel in a single roadway', 'Expandable to multi-layer combinations for ultra-high storage', 'Multiple actuators to support multi-deep, high-density storage', 'Modular design, the main components can be quickly disassembled for maintenance'. LEFT NULL DELIBERATELY: battery_type ('Slide Touch/Battery' names a power-SUPPLY method, not a cell chemistry); grid_required (AP0's NULL RULE explicitly forbids inferring it from 'racking' or 'shelving', and the flyer describes conventional 'box cross-beam racks', not an AutoStore-style grid); vehicle_length / vehicle_width / max_payload of the carried tote / IP rating / humidity — none stated. 'Support 24h continuous operation' (p.1) was NOT mapped to autonomous_charging: the flyer attributes it to 'A variety of energy options', not to unattended charging."
+    },
+    {
+      "product_name": "Hikrobot STU MR-TP6-30SCW",
+      "product_type": "Mobile AMR",
+      "source_file": "STU_flyer_eng_cemat_v2.pdf",
+      "db_status": "new",
+      "variant_group": "STU series — see the MR-TP6-30SCH entry. This variant differs ONLY in the tote size it handles (800×600×450 mm vs the SCH's 600×400×300 / 650×450×300 mm). Every other row in the p.2 table is identical.",
+      "fields": {
+        "max_payload": 30,
+        "max_speed": 3.0,
+        "shelf_height": 12000,
+        "navigation_type": ["Vision"],
+        "operating_temp_min": -10,
+        "operating_temp_max": 45,
+        "storage_system_type": ["Tote-to-Person"],
+        "onboard_container_type": ["Tote"],
+        "workflow_capability": ["Goods-to-Person", "Transport"],
+        "picking_mechanism": "Bin-transfer",
+        "safety_coverage": "Single plane (2D)"
+      },
+      "field_sources": {
+        "max_payload": "p.2, row 'Execution Structure Rated Load(kg)  30/50' (MR-TP6-30SCW column) — conservative value taken",
+        "max_speed": "p.2, row 'Max. Running Speed(m/s)  3' (MR-TP6-30SCW column)",
+        "shelf_height": "p.2, row 'Picking Height(m)  12' (MR-TP6-30SCW column) — converted 12 m → 12000 mm",
+        "navigation_type": "p.2, row 'Navigation Mode  Visual' (MR-TP6-30SCW column)",
+        "operating_temp_min": "p.2, row 'Temperature  -10~45℃' (MR-TP6-30SCW column) — lower bound, sign preserved",
+        "operating_temp_max": "p.2, same row — upper bound",
+        "storage_system_type": "p.1, same CTU/tote-to-person description as the SCH variant",
+        "onboard_container_type": "p.2, row 'Applicable Tote Dimension (L × W × H)  800*600*450' + 'Adaptive carrier: Totes / Carton'",
+        "workflow_capability": "p.1 'Applicable Scenarios: STRP Solution (STU + Q1P) / STU + Conveyor Line Solution'",
+        "picking_mechanism": "p.1 'Proven and reliable CTU clamping, grab components'",
+        "safety_coverage": "p.2, row 'Obstacle Avoidance Laser  Standard' + p.1 'front and rear double laser'"
+      },
+      "notes": "NEW PRODUCT. All caveats from the MR-TP6-30SCH entry apply identically (product_type judgement, both plausibility flags, unmapped rows, deliberately-null fields). The ONLY documented difference between the two variants is the applicable tote dimension — a reviewer may reasonably decide these should be one product with a configuration note rather than two rows; they were split here because the manufacturer's own table presents them as two distinct model numbers, per the variant-completion rule."
+    },
+    {
+      "product_name": "Hikrobot Q7-600D",
+      "product_type": "Mobile AMR",
+      "source_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf",
+      "db_status": "new",
+      "variant_group": "'QF' pallet-handling series. The p.2 table has two model columns; this is the 600 kg one, sharing every merged-cell row (dimensions, pallet compatibility, drive method, roadway width, docking height, run time, charging time) with the 1000 kg sibling. Almost certainly one chassis in two payload ratings.",
+      "fields": {
+        "max_payload": 600,
+        "max_speed": 1.8,
+        "vehicle_length": 1250,
+        "vehicle_width": 1200,
+        "navigation_type": ["Natural Feature (SLAM)", "Vision", "QR/DM Code"],
+        "battery_runtime": 8.0,
+        "load_type": ["Pallet ISO", "Custom Carrier"],
+        "workflow_capability": ["Transport"],
+        "station_applications": ["Floor", "Conveyor"]
+      },
+      "field_sources": {
+        "max_payload": "p.2, spec table row 'Rated Load (kg)' — first model column, decoded value 600. DECODED FROM A SCRAMBLED TEXT LAYER (see product notes and researcher_notes).",
+        "max_speed": "p.2, spec table row 'Rated Running Speed (Empty/Rated Load) (mm/s)  1800/2000' — printed unit is mm/s, AP0 unit is m/s → converted 1800 mm/s → 1.8 m/s. CONSERVATIVE value taken (see notes: the row's two figures are internally odd). Cross-check: p.2 bullet 'Max. running speed for differential AMR type is 2 m/s'.",
+        "vehicle_length": "p.2, spec table row 'Dimension (L*W*H)(mm)  1250*1200*1?0' — first figure. Merged cell, applies to both models.",
+        "vehicle_width": "p.2, same row — second figure (1200)",
+        "navigation_type": "p.2, bullet 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes' → V-SLAM (visual SLAM) → 'Vision' + 'Natural Feature (SLAM)'; L-SLAM (laser SLAM) → 'Natural Feature (SLAM)'; '2D barcode' → 'QR/DM Code' per the AP0 hint's 'barcode' / 'data matrix' mapping",
+        "battery_runtime": "p.2, spec table row 'Run Time (h)  ≥8' — printed unit h = AP0 unit hours. Merged cell, applies to both models.",
+        "load_type": "p.2, bullet 'Various types of carriers: national standard pallets (ISO6780: 2003), non-standard pallets, and non-standard racks' → ISO-standard pallets plus non-standard carriers",
+        "workflow_capability": "p.1 'The QF pallet-handling mobile robot combines the advantages of latent mobile robot (LMR) and forklift mobile robot (FMR) ... it retains the flexibility of LMR while being able to directly carry pallets'",
+        "station_applications": "p.2, bullet 'Rich third-party devices for docking: supports direct interaction with third-party devices such as ground roller conveyors, elevators, freight elevators, air shower gates, etc.' → 'Conveyor'; plus p.2 row 'Ground Roller Docking Height (mm) ≤200' and the floor-level pallet workflow → 'Floor'"
+      },
+      "notes": "*** READ FIRST — THIS PRODUCT WAS RECOVERED FROM A BROKEN TEXT LAYER AND NEEDS HUMAN VERIFICATION BEFORE IMPORT. *** The source file 'QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf' embeds five subset fonts (all prefixed VBJISM+) with NO ToUnicode CMap, so both pdfplumber and pdfminer return scrambled characters (the title extracts as '!\"#$%&&'()*%+,&-+.#/01-&'#2010('). PDF page rendering is unavailable in this environment (pdftoppm/poppler not installed), so the file could not simply be read as an image. It was instead decoded by solving the encoding as a monoalphabetic substitution, using in-document cribs — the filename gave the title plaintext ('QF Pallet-handling Mobile Robot'), which anchored the heading fonts, and 'Applicable Pallet Entry Height (mm)' / 'Rated Load (kg)' / '(ISO6780: 2003)' / '360° protection' / 'increased by 25%' anchored the body font and its digits. The decode is self-consistent and produces fluent English throughout, but at least four different subset encodings are in play and each was solved independently, so individual glyphs remain fallible. PRODUCT NAME UNCERTAINTY: the two model cells decode as a 3-character prefix + '-600D' and + '-1000D'. The prefix decodes to 'Q7' under the table-heading font's map, which matches the DB's existing 'Hikrobot Q7-1000D' naming — but the flyer's TITLE calls the family 'QF', and the prefix cell is in a different subset font than any crib could independently verify. Recorded as 'Q7-600D' to match the DB family convention; a reviewer should confirm whether the correct name is 'Q7-600D' or 'QF-600D'. STRONG CORROBORATION that the decode is right: the sibling model's decoded figures (1000 kg rated load, 1800 mm/s speed) match the DB's existing 'Hikrobot Q7-1000D' row EXACTLY (max_payload=1000, max_speed=1.8) — that row was almost certainly derived from this same flyer, which independently validates the digit map. UNRESOLVED GLYPH: the vehicle height in 'Dimension (L*W*H)(mm) 1250*1200*1?0' contains the one digit glyph that appears nowhere else in the document, so it could not be pinned down (it is either 4 or 9, i.e. 140 mm or 190 mm). No AP0 field was written from it — the AMR-scope min_ground_clearance would have been the candidate, and it is a KO field, so guessing was not acceptable. INTERNALLY ODD ROW (flagged, conservative value used): 'Rated Running Speed (Empty/Rated Load) (mm/s)  1800/2000' states the LOADED speed (2000) as higher than the EMPTY speed (1800), which is backwards. Either the label's order is reversed or one figure is a source error. 1.8 m/s was recorded as the conservative reading, matching what the DB already holds for the sibling model. NOT MAPPED — AP0 SCOPE GAP (recurring this session): p.2 states 'Roadway Width (mm)  ≥1800', which is an explicit aisle-width requirement — but min_aisle_width exists only in 'Logistics:AGV:Forklift' and 'Logistics:AGV:Tugger' scope, and this product is a Mobile AMR. Value recorded here in prose only. NOT MAPPED — no AP0 field: 'Applicable Pallet Entry Height (mm) 100-130'; 'Applicable Pallet Inner Width (mm) ≤215'; 'Applicable Pallet Outer Width (mm) 665-1000'; 'Applicable Pallet Length (mm) 600-1500'; 'Drive Method  Differential drive'; 'Ground Roller Docking Height (mm) ≤200'; 'Charging Time (h) ≤1.5' (this is a charging DURATION and would fit AP0's charge_time, but charge_time's unit is MINUTES — ≤1.5 h = ≤90 min; recorded as 90 would be defensible, but since '≤' makes it an upper bound of unclear precision on an already-uncertain decode, it was left out and is noted here instead). PRODUCT_TYPE JUDGEMENT (flagged): recorded as 'Mobile AMR' to match the DB's existing Q7-1000D classification and because p.1 describes it as an LMR (latent mobile robot) chassis. But it carries FMR forks and directly handles pallets, so the same Forklift-AGV-vs-Mobile-AMR question raised for the MiR1200 Pallet Jack applies here too. Other unmapped p.2 bullets: 'Extension modules and assemblies: supports rapid delivery and convenient operation'; 'Compared with traditional forklift, it supports extremely narrow roadway picking and putaway with the moving speed increased by 25% to increase reservoir capacity'; 'Supports various safety protection plans to realize 360° protection'; and the closing note 'The above parameters are standard products, according to the actual handling carrier, the whole robot size support customization.'"
+    },
+    {
+      "product_name": "Hikrobot Q7-1000D",
+      "product_type": "Mobile AMR",
+      "source_file": "QF Pallet-handling Mobile Robot_Flyer_2024 Cemat_eng.pdf",
+      "db_status": "enrich",
+      "variant_group": "'QF' pallet-handling series — the 1000 kg sibling of Q7-600D. Shares every merged-cell row in the p.2 table.",
+      "fields": {
+        "vehicle_length": 1250,
+        "vehicle_width": 1200,
+        "navigation_type": ["Natural Feature (SLAM)", "Vision", "QR/DM Code"],
+        "battery_runtime": 8.0,
+        "load_type": ["Pallet ISO", "Custom Carrier"],
+        "workflow_capability": ["Transport"],
+        "station_applications": ["Floor", "Conveyor"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, spec table row 'Dimension (L*W*H)(mm)  1250*1200*1?0' — merged cell covering both models; first figure",
+        "vehicle_width": "p.2, same row — second figure",
+        "navigation_type": "p.2, bullet 'Multiple navigation modes switching: switching among V-SLAM, L-SLAM, and 2D barcode navigation modes'",
+        "battery_runtime": "p.2, spec table row 'Run Time (h)  ≥8'",
+        "load_type": "p.2, bullet 'Various types of carriers: national standard pallets (ISO6780: 2003), non-standard pallets, and non-standard racks'",
+        "workflow_capability": "p.1 intro paragraph describing pallet transport",
+        "station_applications": "p.2, bullet on third-party device docking (ground roller conveyors, elevators, freight elevators, air shower gates) + 'Ground Roller Docking Height (mm) ≤200'"
+      },
+      "notes": "ENRICH ONLY — no conflict. The two fields the DB already holds are confirmed exactly by this flyer: max_payload=1000 (p.2 'Rated Load (kg)', second model column) and max_speed=1.8 (p.2 'Rated Running Speed (Empty/Rated Load) (mm/s) 1800/2000' → 1800 mm/s = 1.8 m/s). This exact match is itself the strongest evidence that the cipher decode of this file is correct (see the Q7-600D entry for the full decoding caveat, which applies equally here). All the same caveats apply: broken text layer recovered by substitution-cipher analysis, unverified model-name prefix ('Q7' vs the title's 'QF'), one unresolved height digit ('1250*1200*1?0', 140 or 190 mm), and the internally odd empty-vs-loaded speed row. The DB's navigation_type='Natural Feature (SLAM)' and infrastructure_free=1 are both supported by the flyer's 'V-SLAM, L-SLAM' bullet. SCOPE BUG IN EXISTING DB ROW (pre-existing): product_type='Mobile AMR' but the row carries vna_capable and stacking_capability, both scope 'Logistics:AGV:Forklift'."
+    }
+  ]
+}

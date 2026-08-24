@@ -1,0 +1,533 @@
+{
+  "company": "Linde Material Handling",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus full-redo pass. THIRTEEN source files: nine product datasheets carrying real VDI 2198 Typenblätter — `DE_tb_c_matic_8925_dt_e_1025_view.pdf` (C-MATIC 10/15), `DE_tb_c_matic_hp_10_8928_dt_a_0523_view.pdf` (C-MATIC HP 10), `DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf` (L-MATIC AC 1.2/1.6 t × 2 mast groups), `DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf` (L-MATIC 12/16 AC k), `DE_tb_l_matic_core_1195_01_dt_b_0425_view.pdf` (L-MATIC core), `DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf` (L-MATIC HD / HD k), `DE_tb_l_matic_br133_de_a_0516.pdf` (legacy L-MATIC BR 133, 2016), `DE_tb_p_matic_br1190_dt_a_0416.pdf` (legacy P-MATIC BR 1190, 2016), `DE_tb_r_matic_k_5190_dt_a_0425_view.pdf` (R-MATIC 12/17/25 k) — plus `EN_ds_k_matic_5231_en_a_0224_view.pdf` (K-MATIC, 3 mast configs), `EN_ds_r_matic_1120_en_b_0623_view.pdf` (R-MATIC, 4 configs, 'based on R16 HD'), and two overview brochures, `EN_p_robotics_en_a_0216.pdf` and `b_automatisierungsloesungen_dt_a_1023_view.pdf`. THE SINGLE MOST IMPORTANT FINDING OF THIS GROUP IS NOT A FIELD VALUE — it is that several Linde MATIC models and several STILL iGo models are demonstrably the SAME PHYSICAL MACHINE under two KION Group brands, evidenced by identical VDI Typenblatt values down to battery weights and footnote wording. See `kion_platform_sharing` below; it needs a Tech Lead decision before either brand's rows are enriched further. Second structural finding: the whole legacy MATIC line is Balyo-powered (`DE_tb_p_matic_br1190_dt_a_0416.pdf` p.2 row 1.1 literally reads 'LINDE/BALYO'), and Balyo is a separate company in the DB. Nothing written to Airtable.",
+  "kion_platform_sharing": {
+    "claim": "Linde MATIC and STILL iGo are in several cases the same vehicle under two brands. Both companies are KION Group brands and both have their own DB rows, so the matching engine currently treats one factory's machine as two independent suppliers.",
+    "evidence": [
+      {
+        "pair": "STILL EXV iGo  ==  Linde L-MATIC HD k",
+        "strength": "conclusive",
+        "detail": "Compare `iGo_systems_DE_TD.pdf` p.6 (STILL, processed earlier in this same session) against `DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf` p.2 column 'L-MATIC HD k'. Identical on: Eigengewicht 1550 kg; h1 1915; h2 150; h3 2844; h4 3364; h13 86; l1 2208; l2 966; b1 1000; Gabelzinken 71/182/1250; b3 780; b5 560; b4 255; m2 20; Ast (800×1200 längs) 2925; Wenderadius 1744; Energieverbrauch 0.925 kWh/h; battery 3PzS 24 V/375 Ah, 333 kg; Fahrmotor 2.3 kW; Hubmotor 3.2 kW. Both sheets even carry the SAME footnote, '+75 mm mit 4PzS'. Two independently published Typenblätter do not agree on nineteen values by coincidence."
+      },
+      {
+        "pair": "STILL AXV 12 iGo  ==  Linde L-MATIC core",
+        "strength": "conclusive",
+        "detail": "DB `STILL AXV 12 iGo` holds max_payload 1200, lifting_height 1844, min_aisle_width 2480. `DE_tb_l_matic_core_1195_01_dt_b_0425_view.pdf` p.2: Q 1,2 t; Hub h3 1844 mm; Arbeitsgangbreite 800×1200 längs, automatisierter Betrieb, Ast 2480 mm. All three match exactly, including the unusual 1844."
+      },
+      {
+        "pair": "STILL AXH 10 iGo  ==  Linde C-MATIC HP 10",
+        "strength": "conclusive",
+        "detail": "DB `STILL AXH 10 iGo` holds max_payload 1000, max_speed 2.2, lifting_height 40, min_aisle_width 2948. `DE_tb_c_matic_hp_10_8928_dt_a_0523_view.pdf` p.2: Q 1.0 t; 5.1 Fahrgeschwindigkeit 2.2 m/s; 4.4 Hub h3 40 mm; 4.34 Arbeitsgangbreite Ast 2948 mm. Four of four, including the arbitrary 2948."
+      },
+      {
+        "pair": "STILL ACH 10 / ACH 15 iGo  ==  Linde C-MATIC 10 / C-MATIC 15",
+        "strength": "conclusive",
+        "detail": "DB `STILL ACH 10 iGo` (1000 kg, lift 60, aisle 1897, QR nav) and `ACH 15 iGo` (1500 kg, lift 60, aisle 1897, QR nav). `DE_tb_c_matic_8925_dt_e_1025_view.pdf` p.2: C-MATIC 10 = 1,0 t and C-MATIC 15 = 1,5 t; 4.4 Hub h3 60 mm for both; 4.34 Ast 1897 mm for both; p.1 'Intelligente Softwaresteuerung mit effizienter Orientierung über QR-Codes'."
+      },
+      {
+        "pair": "STILL ACH 06 iGo  ==  a 600 kg C-MATIC variant",
+        "strength": "strong but indirect",
+        "detail": "Earlier in this session I flagged STILL's ACH 06 (600 kg) as unsupported, because STILL's own 2026 material only ever says 'ACH 10-15 iGo'. `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3 resolves it from the Linde side: the AMR column reads 'Traglasten von 600 kg, 1.000 kg und 1.500 kg'. A 600 kg member of this platform therefore does exist — it is simply absent from the C-MATIC Typenblatt in `DE_tb_c_matic_8925…pdf`, which covers only the 10 and 15. RETRACTS the 'possibly discontinued' flag on STILL ACH 06 iGo."
+      },
+      {
+        "pair": "STILL FM-X iGo series  ~~  Linde R-MATIC k series (same chassis, different ratings)",
+        "strength": "same platform, NOT the same product",
+        "detail": "`DE_tb_r_matic_k_5190_dt_a_0425_view.pdf` p.5 and `iGo_systems_DE_TD.pdf` p.10 share the chassis: Radstand 1275/1453/1669 in both; tyres Ø360×130 front and Ø285×100 rear (Ø360×140 / Ø350×100 on the largest); b11 1167; b4 920; Fahrmotor 6.5 kW; Hubmotor 14 kW; h1 2450; Freihub 1925. But the payload ratings differ per brand: FM-X 12/17/25 iGo = 1100/1600/2400 kg vs R-MATIC 12/17/25 k = 1070/1550/2330 kg. Same truck, differently derated (or differently rounded) by each brand. `EN_ds_r_matic_1120_en_b_0623_view.pdf` (R-MATIC 'based on R16 HD') shares the same chassis constants too."
+      },
+      {
+        "pair": "STILL MX-X iGo  ~~  Linde K-MATIC (same VNA platform)",
+        "strength": "same platform",
+        "detail": "`EN_ds_k_matic_5231_en_a_0224_view.pdf` p.2 and `iGo_systems_DE_TD.pdf` p.12 share: h6 (overhead guard/cabin) 2555; h7 (seat height) 460; fork dimensions 50/120/1250; fork carriage width b3 710; fork spread b5 470/640; m1 40; m2 87; drive motor 7.0 kW S2 60 min; lift motor 24.0 kW S3 15 %; 80 V PzS batteries weighing 1863 kg and 2178 kg. Ratings differ slightly (K-MATIC 1.45 t / Ast 1850–2000; MX-X iGo 1.4 t / Ast 1800)."
+      }
+    ],
+    "recommendation": "DO NOT enrich either brand's rows further until the Tech Lead rules on how KION-internal rebadges should be modelled. This is the same class of question already settled for Magazino SOTO ↔ Jungheinrich ('extra brand', separate Product row sharing one Base Model), and the Entity Model's Product/Base-Model split is designed for exactly this. The operational risk if it is left alone: a tender shortlist that looks like two competing offers is really one manufacturer twice, which distorts any 'number of qualifying suppliers' judgement. Note this cuts both ways — it also means a spec published by only one of the two brands can legitimately be used to fill the other's NULLs, once the base-model link exists."
+  },
+  "company_wide_context": {
+    "source_file": "b_automatisierungsloesungen_dt_a_1023_view.pdf, EN_p_robotics_en_a_0216.pdf, DE_tb_r_matic_k_5190_dt_a_0425_view.pdf",
+    "fields": {
+      "fleet_management_system": "Proprietary",
+      "infrastructure_free": true,
+      "integration_capability": ["WMS", "ERP"],
+      "manual_usage": true,
+      "installation_process": ["Supplier only"]
+    },
+    "field_sources": {
+      "fleet_management_system": "DE_tb_r_matic_k_5190_dt_a_0425_view.pdf p.2 equipment list, 'MATIC:move (einfache Inbetriebnahme)' / 'MATIC:move+ (übergreifende Systemlösungen)' / 'MATIC:analytics (Analysetool zur Optimierung von Einsatz und Leistung)'",
+      "infrastructure_free": "EN_p_robotics_en_a_0216.pdf p.7, 'Linde-MATIC robotic trucks are equipped with smart features allowing them to operate in the same environment alongside people and other vehicles without any additional infrastructure. The robots navigate using existing structural features such as walls, racking or columns'; b_automatisierungsloesungen_dt_a_1023_view.pdf p.3, 'Freie Navigation (keine Reflektoren o. Ä. erforderlich)'",
+      "integration_capability": "DE_tb_c_matic_8925_dt_e_1025_view.pdf p.5, 'Standardschnittstellen mit bestehenden WMS, ERP etc.' and 'Standardschnittstellen mit Infrastruktur: Türen, Zubringer etc.'; EN_ds_k_matic_5231_en_a_0224_view.pdf p.1, 'Straightforward integration into common WMS and ERP systems'",
+      "manual_usage": "b_automatisierungsloesungen_dt_a_1023_view.pdf p.3, 'Darüber hinaus erlaubt es die Dual-Use-Funktion, die Geräte sowohl automatisiert als auch manuell zu nutzen'; VDI row 1.4 on every Typenblatt ('Automatisch/Hand', 'manuell/autonom', 'Sitzend/automatisiert'). EXCEPTIONS: C-MATIC (row 1.4 'Automatik' only) and L-MATIC core (row 1.4 'Wartung/Automatik' — manual mode is a MAINTENANCE mode, not productive dual use).",
+      "installation_process": "b_automatisierungsloesungen_dt_a_1023_view.pdf p.3, 'Umfassende Beratung mit anschließender Planung und Simulation … Budgetierung, Projektumsetzung & Inbetriebnahme … Schneller, leistungsstarker Service vor Ort'"
+    },
+    "applies_to": "all base models of this company",
+    "notes": "MUST be fanned out per base model. `infrastructure_free` has ONE clear exception that must not be over-written: the C-MATIC (8925) navigates by QR codes on the floor (`DE_tb_c_matic_8925…pdf` p.1 and p.5, 'Navigation mit QR-Codes mit max. Intervall von 1400 × 1400 mm'), which IS floor infrastructure — the DB correctly holds infrastructure_free=0 for it. BALYO RELATIONSHIP — flagged for the Tech Lead: `DE_tb_p_matic_br1190_dt_a_0416.pdf` p.2 and `DE_tb_l_matic_br133_de_a_0516.pdf` p.2 both print row '1.1 Hersteller (Kurzbezeichnung): **LINDE/BALYO**', and the P-MATIC text on p.1 names the navigation 'die zuverlässige Geo-Navigation \"Driven by BALYO\"'. Balyo exists as a separate company in the DB with its own products. The newer 2023–2025 datasheets (C-MATIC HP, L-MATIC core/AC k, R-MATIC k) no longer print the BALYO name, so this may be a legacy arrangement — but the two 2016 sheets are unambiguous, and the same 'geoguidance' framing survives in `EN_p_robotics_en_a_0216.pdf` p.9 ('Linde-MATIC geoguidance'). Same modelling question as Magazino↔Jungheinrich, from the technology-licence side rather than the rebadge side."
+  },
+  "products": [
+    {
+      "product_name": "Linde C-MATIC",
+      "product_type": "Mobile AMR",
+      "source_file": "DE_tb_c_matic_8925_dt_e_1025_view.pdf",
+      "db_status": "enrich",
+      "variant_group": "C-MATIC series 8925-23 — the Typenblatt covers C-MATIC 10 (1.0 t) and C-MATIC 15 (1.5 t) on ONE identical chassis; the existing DB row (1500 kg) is the C-MATIC 15",
+      "fields": {
+        "min_turning_radius": 619,
+        "vehicle_length": 1180,
+        "vehicle_width": 832,
+        "lift_height": 60,
+        "min_ground_clearance": 260,
+        "max_gradient": 5.0,
+        "battery_type": ["Li-Ion"],
+        "operating_temp_min": 0,
+        "operating_temp_max": 40,
+        "autonomous_charging": true,
+        "stop_accuracy": 5,
+        "rotation_capable": true,
+        "load_type": ["Pallet EUR", "UK Pallet", "Custom Carrier"],
+        "integration_capability": ["WMS", "ERP"],
+        "workflow_capability": ["Transport"],
+        "picking_mechanism": "None",
+        "top_module_type": ["Lift"]
+      },
+      "field_sources": {
+        "min_turning_radius": "p.2, VDI row '4.35 Wenderadius Wa (mm) 618,5' — an explicit RADIUS label, and footnote 5 independently prints the matching DIAMETER ('Rotationsdurchmesser ohne Last C-MATIC 10/15: 1237 mm'), 618,5 × 2 = 1237. This is the cleanest radius/diameter cross-check in the corpus: both quantities printed side by side and internally consistent. Rounded 618,5 → 619 for the Integer field.",
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 1180'",
+        "vehicle_width": "p.2, VDI row '4.21 Gesamtbreite b1/b2 (mm) 832'",
+        "lift_height": "p.2, VDI row '4.4 Hub h3 (mm) 60'",
+        "min_ground_clearance": "p.2, VDI row '4.15 Höhe gesenkt h13 (mm) 260' — per the AP0 hint, this field holds the ROBOT HEIGHT / clearance needed to drive UNDER a carrier, which for an underride platform vehicle is exactly its lowered height. NOT the chassis-to-floor gap.",
+        "max_gradient": "p.2, VDI row '5.8 Max. Steigfähigkeit mit/ohne Last % < 5,0'",
+        "battery_type": "p.2, VDI rows '6.3 Batterie … Li-ION' and '6.4 Batteriespannung/Nennkapazität 51,2/42'",
+        "operating_temp_min": "p.5, equipment list under 'Umgebung', 'Umgebungstemperatur +0 – +40°C'",
+        "operating_temp_max": "p.5, 'Umgebungstemperatur +0 – +40°C'",
+        "autonomous_charging": "p.5, under 'Energie', 'Ladekontakt für automatisches Zwischenladen'",
+        "stop_accuracy": "p.5, under 'Navigation', 'Genauigkeit beim Anhalten ±5 mm' (the same block also gives 'Genauigkeit beim Positionieren ±10 mm' and 'Winkelgenauigkeit ±1°')",
+        "rotation_capable": "p.1, '→ Drehbare Plattform zur Ausrichtung der Ladung'; p.5, 'Drehen, Transportieren und Abstellen der Last mit 90°, 180° und 270°'",
+        "load_type": "p.2 footnote 4 and p.4 adapter-plate table, 'EPAL1, CP2: 800 × 1200 mm / EPAL3, CP1: 1000 × 1200 mm / Australien, GMA und Nordamerika: 1016 × 1219 mm'",
+        "integration_capability": "p.5, 'Standardschnittstellen mit bestehenden WMS, ERP etc.'",
+        "workflow_capability": "p.1, 'Automatisiertes Plattformfahrzeug für kurze und mittlere Strecken'",
+        "picking_mechanism": "no picking mechanism described",
+        "top_module_type": "p.2, 'Hub h3 60 mm' with a rotating load platform / adapter plate"
+      },
+      "notes": "`rotation_capable = true` is a GENUINE positive here and worth contrasting with the many false ones in this corpus: the source says the PLATFORM rotates to orient the LOAD ('Drehbare Plattform zur Ausrichtung der Ladung', p.1; 'Drehen … der Last mit 90°, 180° und 270°', p.5) — the carried item is turned, not merely the chassis. Same distinction as Kivnon K07 earlier in this session. The DB already holds nothing for this field, so it is a fill, not an override. AISLE WIDTH — the recurring AMR gap, with an unusually precise value going to waste: p.2 row '4.34 Arbeitsgangbreite … Ast (mm) 1897' (footnote: 'Einschließlich 200 mm (min.) Sicherheitsabstand'; with the adapter plate, 1642/1762/1898 mm depending on pallet). AP0 has no aisle-width field in AMR scope, so none of it is storable — while the identical machine sold as a STILL ACH 10/15 iGo has 1897 stored in the FORKLIFT-scope `min_aisle_width` field on its AMR row. That is the gap and its corruption, visible on the same machine from both sides. FLOOR/STEP LIMITS, unstorable: footnote 6, 'Zulässige Stufenhöhe bei Nenngeschwindigkeit ≤ 5 mm – mit reduzierter Geschwindigkeit ≤ 10 mm, überfahrbarer Spalt bei Nenngeschwindigkeit ≤ 5 mm – mit reduzierter Geschwindigkeit ≤ 30 mm'. Also unstorable: the QR-code grid pitch requirement, p.4 'Der maximale QR-Code Abstand (CUD) ist begrenzt auf 1500 mm. Der Standard-CUD beträgt 1400 mm.' — a hard site-preparation constraint. max_speed: DB holds 1.2; p.2 row 5.1 gives '4,3/5,4 km/h' laden/unladen → 1.19 / 1.50 m/s. The DB's 1.2 is the LADEN figure correctly converted; noted rather than flagged, but be aware other suppliers' max_speed values in this DB are unladen figures, so the comparison is not apples-to-apples."
+    },
+    {
+      "product_name": "Linde C-MATIC 10",
+      "product_type": "Mobile AMR",
+      "source_file": "DE_tb_c_matic_8925_dt_e_1025_view.pdf",
+      "db_status": "new",
+      "variant_group": "C-MATIC series 8925-23 — identical chassis to the C-MATIC 15 in EVERY dimension row; the only differing rows are 1.5 Nenntragfähigkeit (1,0 vs 1,5 t) and 2.1 Eigengewicht (230 vs 235 kg). Same base model.",
+      "fields": {
+        "max_payload": 1000.0,
+        "min_turning_radius": 619,
+        "vehicle_length": 1180,
+        "vehicle_width": 832,
+        "lift_height": 60,
+        "min_ground_clearance": 260,
+        "max_speed": 1.2,
+        "max_gradient": 5.0,
+        "battery_type": ["Li-Ion"],
+        "operating_temp_min": 0,
+        "operating_temp_max": 40,
+        "autonomous_charging": true,
+        "stop_accuracy": 5,
+        "rotation_capable": true,
+        "navigation_type": ["QR/DM Code"],
+        "infrastructure_free": false,
+        "grid_required": true,
+        "workflow_capability": ["Transport"],
+        "picking_mechanism": "None"
+      },
+      "field_sources": {
+        "max_payload": "p.2, VDI row '1.5 Nenntragfähigkeit/Last Q (t) 1,0' in the 'C-MATIC 10' column (row 1.2); p.4 platform table, 'Tragfähigkeit (kg) 1000'",
+        "min_turning_radius": "p.2, row '4.35 Wenderadius Wa (mm) 618,5'; footnote 5 confirms the 1237 mm diameter",
+        "vehicle_length": "p.2, row 4.19 = 1180",
+        "vehicle_width": "p.2, row 4.21 = 832",
+        "lift_height": "p.2, row '4.4 Hub h3 (mm) 60'",
+        "min_ground_clearance": "p.2, row '4.15 Höhe gesenkt h13 (mm) 260'",
+        "max_speed": "p.2, row '5.1 Fahrgeschwindigkeit mit/ohne Last km/h 4,3/5,4' → laden 4,3 km/h ÷ 3.6 = 1.19 m/s ≈ 1.2 (AP0 unit m/s; unladen would be 1.5)",
+        "max_gradient": "p.2, row '5.8 … % < 5,0'",
+        "battery_type": "p.2, rows 6.3/6.4, 'Li-ION … 51,2/42'",
+        "operating_temp_min": "p.5, 'Umgebungstemperatur +0 – +40°C'",
+        "operating_temp_max": "p.5, same row",
+        "autonomous_charging": "p.5, 'Ladekontakt für automatisches Zwischenladen'",
+        "stop_accuracy": "p.5, 'Genauigkeit beim Anhalten ±5 mm'",
+        "rotation_capable": "p.1, 'Drehbare Plattform zur Ausrichtung der Ladung'",
+        "navigation_type": "p.1, 'Intelligente Softwaresteuerung mit effizienter Orientierung über QR-Codes'; p.5, 'Navigation mit QR-Codes mit max. Intervall von 1400 × 1400 mm'",
+        "infrastructure_free": "p.4, 'Der maximale QR-Code Abstand (CUD) ist begrenzt auf 1500 mm' — floor-mounted QR markers are required infrastructure",
+        "grid_required": "p.4, the QR-code CUD grid (1400 × 1400 mm standard, 1500 mm maximum) is a structured floor grid",
+        "workflow_capability": "p.1, 'Automatisiertes Plattformfahrzeug für kurze und mittlere Strecken'",
+        "picking_mechanism": "none described"
+      },
+      "notes": "Variant completion — the DB holds only the 1.5 t C-MATIC. Note the load-carrier dependency that AP0 cannot express: p.2 footnote 3 says 'Mit Ladefläche: Tische als Ladungsträger sind erforderlich. Palettenhandling mit Adapterplatte', and p.4 specifies exactly what those tables must look like ('Grundabmessungen l6 × b12 × m2 (mm) 1200 × 1200 × 290', 'Ladehöhe, ohne Last h11 (mm) 330') and that 'Zentriert unter der Ladefläche ist ein QR-Code für die Identifikation und die Ausrichtung von Lasten erforderlich'. A buyer must supply purpose-built, QR-tagged tables; that is a substantial hidden project cost with no AP0 field. See also `Linde C-MATIC` notes for the aisle-width gap and step/gap limits."
+    },
+    {
+      "product_name": "Linde C-MATIC HP",
+      "product_type": "Mobile AMR",
+      "source_file": "DE_tb_c_matic_hp_10_8928_dt_a_0523_view.pdf",
+      "db_status": "enrich",
+      "variant_group": "C-MATIC HP 10, series 8928-01 — a different machine from the C-MATIC 8925 despite the shared name (natural-feature navigation instead of QR, 2.2 m/s instead of 1.2)",
+      "fields": {
+        "vehicle_length": 1440,
+        "vehicle_width": 634,
+        "lift_height": 40,
+        "min_ground_clearance": 222,
+        "min_turning_radius": 1592,
+        "autonomous_obstacle_bypass": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 1440'",
+        "vehicle_width": "p.2, VDI row '4.21 Gesamtbreite b1 (mm) 634'",
+        "lift_height": "p.2, VDI row '4.4 Hub h3 (mm) 40'",
+        "min_ground_clearance": "p.2, VDI row '4.15 Höhe gesenkt h13 (mm) 222' (footnote 2: 'Adapterplatte +158 mm'); p.4 use-case table, 'Trolley-Transport … Bauhöhe (Hub abgesenkt) h13 (mm) 222'",
+        "min_turning_radius": "p.2, VDI row '4.35 Wenderadius Wa (mm) 1592' — explicit radius label; footnote 6 gives the laden-with-adapter-plate figure, 'Mit Adapterplatte und EPAL1 oder EPAL3 (beladen 800, 1000 × 1200) Wa=1327 mm'",
+        "autonomous_obstacle_bypass": "p.1, '→ Selbstständiges Umfahren von Hindernissen und flexible Lastaufnahme für störungsfreie Prozessabläufe'"
+      },
+      "notes": "CONFIRMS existing values: max_payload=1000 (p.2 row 1.5 'Q (t) 1.0'), max_speed=2.22 (p.2 row '5.1 Fahrgeschwindigkeit mit / ohne Last (m / s) 2.2'; p.1 'maximale Geschwindigkeit von 8 km / h' — 8 ÷ 3.6 = 2.22, so the DB's 2.22 is the km/h figure converted and the datasheet's own m/s row rounds to 2.2; not flagged), infrastructure_free=1 (p.1 'Navigation mit natürlichen Merkmalen für optimale Orientierung ohne zusätzliche Infrastruktur'), top_module_type='Lift'. AISLE WIDTH — the AMR gap again, and here the datasheet publishes THREE different values depending on load handling: p.2 row 4.34 'Ast (mm) 2948' with footnote 5, 'Hohe Toleranz (+ / -300 mm & + / -15°) 90°-Aufnahme, Ast=3669 mm' and 'Mit Adapterplatte Ast=2857 mm'. None storable in AMR scope. The 2948 is the figure currently sitting in the STILL AXH 10 iGo row's Forklift-scope min_aisle_width field — see `kion_platform_sharing`. Also unstorable and useful: p.2 row '10.7 Schalldruckpegel LpAZ (dB(A)) < 70'; p.3 note 'Abmessungen Sicherheitsfeld vorne min. 185 x 1650 mm (lsf x bsf) und hinten min. 185 x 1650 mm' — the safety-field footprint, which determines how much clear space the vehicle needs around it; and p.4's centre-of-gravity envelope table ('Max. Verschiebung des Schwerpunkts in Hauptfahrtrichtung (l) 30 mm', 'seitlich 60/80 mm', 'Max. Höhe Schwerpunkt hc1 800 mm'), which is a real load-preparation constraint. `battery_type`: DB holds 'Li-Ion'; p.2 row 6.4 gives only '48 / 120 V/Ah' with no chemistry — neither confirmed nor contradicted, left alone."
+    },
+    {
+      "product_name": "Linde L-MATIC AC",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf",
+      "db_status": "conflict",
+      "variant_group": "L-MATIC AC series 1170 — the Typenblatt has FOUR columns: 1.2 t and 1.6 t, each in a low-mast (h1 1515) and a high-mast (h1 2665) build. The existing DB row (1600 kg, 4200 mm) is the 1.6 t high-mast build.",
+      "fields": {
+        "vehicle_length": 3270,
+        "vehicle_width": 890,
+        "min_total_height": 2665,
+        "max_gradient": 3.0,
+        "mast_type": "Duplex"
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) … 3270' (1.6 t columns)",
+        "vehicle_width": "p.2, VDI row '4.21 Gesamtbreite b1/b2 (mm) 790/890' — took b2 (over the load arms) as the wider",
+        "min_total_height": "p.2, VDI row '4.2 Höhe Hubgerüst, eingefahren h1 (mm) … 2665' (high-mast build)",
+        "max_gradient": "p.2, VDI row '5.8 Max. Steigfähigkeit mit/ohne Last % 3/3'",
+        "mast_type": "p.2, rows 4.2/4.4/4.5 describe a two-stage mast with free lift ('4.3 Freihub h2 150')"
+      },
+      "conflicts": {
+        "max_speed": {
+          "db": 2.0,
+          "datasheet": 1.7,
+          "source": "p.2, VDI row '5.1 Max. Fahrgeschwindigkeit mit/ohne Last vorwärts m/s 1.7/1.7' — identical in all four columns; reverse is '0.8/0.8'",
+          "note": "The DB holds 2.0 m/s on FIVE of the six Linde forklift rows (L-MATIC, L-MATIC AC, L-MATIC AC k, L-MATIC HD k, L-MATIC core, K-MATIC), which looks like a default fill rather than a per-model figure. Only two of those are supported by their own datasheets (K-MATIC 2.0 m/s, L-MATIC core 7.2 km/h ≈ 2.0 m/s unladen); the L-MATIC AC's own Typenblatt says 1.7 in every column."
+        },
+        "min_aisle_width": {
+          "db": 3400,
+          "datasheet": 3800,
+          "source": "p.2, VDI row '4.34.1 Arbeitsgangbreite bei Paletten, 1050 x 1250 quer, Automatikbetrieb Ast (mm) 3370 | 3730 | 3430 | 3800' and row '4.34.2 (850 x 1250 längs) 3340 | 3710 | 3340 | 3710'",
+          "note": "K.O. field, and the DB value is OPTIMISTIC by 400 mm for the build it represents. The four printed values span 3370–3800 across the payload/mast matrix; for the 1.6 t high-mast build (the one matching the DB's 1600 kg / 4200 mm) the correct worst-case is 3800. 3400 is roughly the 1.2 t low-mast figure — the wrong column. Note also that these Ast figures are quoted for 1050×1250 and 850×1250 pallets, NOT the 800×1200 EPAL most other sheets in this corpus use, so cross-supplier comparison of this field is already shaky."
+        }
+      },
+      "notes": "PAYLOAD/LIFT MATRIX that AP0 collapses: the four columns are (1.2 t, h3 1924), (1.6 t, h3 1844), (1.2 t, h3 4224), (1.6 t, h3 4144). So the 1.6 t rating costs 80 mm of lift in both mast groups — a small but real payload/height coupling, and the DB's 4200 mm sits between the two high-mast values (it matches p.1's marketing round-off, '→ Tragkraft bis zu 1,6 t und Hubhöhe bis zu 4,2 m', which is really the 1.2 t figure of 4224). Strictly, a 1.6 t L-MATIC AC lifts 4144 mm, not 4200. Flagged as an accuracy note rather than a conflict because the difference is 56 mm. VARIANT COMPLETION NOT PROPOSED for the 1.2 t builds: they would be three additional rows differing only in payload and ~80 mm of lift, and the two mast groups are already representable. A reviewer may disagree; the numbers are all here. AP0 GAP (recurring, now 11+): p.2 row '4.35 Wenderadius Wa (mm) 1668 | 2033' — explicit radius, no Forklift-scope field. Dead weight 2020–2275 kg (row 2.1). Fork spread b5 314/682 mm (row 4.25) — an adjustable spread with no stated mechanism, the recurring `fork_spread` gap. Sound pressure <70 dB(A) (row 10.7)."
+    },
+    {
+      "product_name": "Linde L-MATIC AC k",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf",
+      "db_status": "conflict",
+      "variant_group": "L-MATIC AC k series 1171-01 — TWO columns, 'L-MATIC 12 AC k' (1.0 t) and 'L-MATIC 16 AC k' (1.4 t). The existing DB row (1400 kg) is the 16 AC k.",
+      "fields": {
+        "vehicle_length": 3133,
+        "min_total_height": 2015,
+        "forks_free_floating": true,
+        "drive_type": "Counterbalanced",
+        "fork_spread": ["Auto"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 2768 | 3133' — 16 AC k column",
+        "min_total_height": "p.2, VDI row '4.2 Höhe Hubgerüst eingefahren h1 (mm) 2015' (both columns)",
+        "forks_free_floating": "p.1, '→ Freitragende Gabel zur Aufnahme geschlossener Ladungsträger'",
+        "drive_type": "p.1, '→ Automatisierter Gegengewichts-Hochhubwagen für flexibles Lasthandling' ('Gegengewicht' = counterbalance; the 'k' suffix denotes the counterbalanced build across the whole Linde MATIC range)",
+        "fork_spread": "p.2, VDI row '4.25 Gabelaußenabstand b5 (mm) 540-850' — a printed RANGE, not a fixed pair, on an automated truck with no operator to move the tines"
+      },
+      "conflicts": {
+        "lifting_height": {
+          "db": 3800,
+          "datasheet": 2844,
+          "source": "p.2, VDI row '4.4 Hub h3 (mm) 2844' (identical in both columns); row '4.5 Höhe Hubgerüst ausgefahren h4 (mm) 3639'",
+          "note": "K.O. field, ~950 mm discrepancy. A third figure exists and matches neither: `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3 says of the free-carrying-fork model 'Traglast bis 1.600 kg / Hubhöhe bis 1,60 m'. So Linde's own material offers 2844 mm (Typenblatt, Dec 2025), 1600 mm (automation brochure, Oct 2023) and the DB holds 3800 mm. The 3639 mm h4 (extended mast height) is the closest thing to 3800 in the source and may be where the DB value came from — h4 is the mast's own height, not the lift. **Most likely explanation: the DB stores h4 where it should store h3.** Worth checking the other Linde rows for the same substitution."
+        },
+        "max_payload": {
+          "db": 1400.0,
+          "datasheet": "1400 (L-MATIC 16 AC k) — confirmed, but see note",
+          "source": "p.2, VDI row '1.5 Nenntragfähigkeit/Last Q (t) 1,0 | 1,4'",
+          "note": "NOT a conflict against the Typenblatt — 1400 is right for the 16 AC k. Flagged only because `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3 says 'Traglast bis 1.600 kg' for this model family, and because the model DESIGNATIONS (12, 16) do not match the actual ratings (1.0 t, 1.4 t) — the same designation-vs-actual derate found across the STILL FM-X series and the Linde R-MATIC k series. A reader who trusts the model number will be 200 kg wrong."
+        },
+        "max_speed": {
+          "db": 2.0,
+          "datasheet": "not stated",
+          "source": "p.2 — the 1171-01 Typenblatt has NO section 5 (Leistungsdaten) at all; it jumps from row 4.31 to section 6 (E-Motor).",
+          "note": "Recorded so the reviewer knows the 2.0 is unverified rather than contradicted. See the L-MATIC AC entry for why the 2.0 across five Linde rows looks like a default fill."
+        }
+      },
+      "notes": "VARIANT COMPLETION CANDIDATE — `L-MATIC 12 AC k` (1.0 t, l1 2768 mm, otherwise identical) has no DB row. Deliberately NOT written up as a separate product entry here because the only differences the Typenblatt records are payload (1,0 vs 1,4 t), overall length (2768 vs 3133), wheelbase (1262 vs 1627), axle loads and battery capacity (375 vs 500 Ah) — the reviewer may reasonably treat it as a configuration rather than a product. All figures are cited above if they decide otherwise. `fork_spread = Auto` is the one genuinely inferential value in this entry and is flagged as such: the source gives a spread RANGE (540–850 mm) on a vehicle whose row 1.4 is 'manuell/autonom', and an automated truck adjusting tines to closed carriers implies powered adjustment — but the sheet never says 'automatisch'. A reviewer who wants strictness should null it. This is the recurring `fork_spread` 'available, mechanism unstated' gap, third instance. Dead weight 2391 / 2486 kg (row 2.1). Ground clearance under mast 30 mm (row 4.31). No aisle width, no speed, no gradient printed on this Typenblatt — an unusually thin VDI sheet."
+    },
+    {
+      "product_name": "Linde L-MATIC core",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_core_1195_01_dt_b_0425_view.pdf",
+      "db_status": "enrich",
+      "variant_group": "L-MATIC core, series 1195-01 — single configuration",
+      "fields": {
+        "min_aisle_width": 2750,
+        "vehicle_length": 1785,
+        "vehicle_width": 887,
+        "min_total_height": 1415,
+        "battery_type": ["Li-Ion"],
+        "mast_type": "Duplex"
+      },
+      "field_sources": {
+        "min_aisle_width": "p.2, VDI row '4.34.1 Arbeitsgangbreite bei Palette 1000 × 1200 quer Ast (mm) 2148¹⁾/2750²⁾' with footnotes '1) Wartungsmodus' and '2) Automatisierter Betrieb'. Took the AUTOMATED figure (2750) — the maintenance-mode 2148 describes a human driving the truck and is irrelevant to an AGV tender — and the larger of the two automated values (row 4.34.2, 800×1200 längs, gives 2480).",
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 1785'",
+        "vehicle_width": "p.2, VDI row '4.21 Gesamtbreite b1 (mm) 887'",
+        "min_total_height": "p.2, VDI row '4.2 Höhe Hubgerüst eingefahren h1 (mm) 1415'",
+        "battery_type": "p.2, VDI rows '6.3 Batterie … Li-ION: 1P8S 206' and '6.4 … 24/206'",
+        "mast_type": "p.2, rows 4.2–4.5 with '4.3 Freihub h2 (mm) 264' — two-stage mast with free lift"
+      },
+      "notes": "CONFIRMS max_payload=1200 (p.2 row 1.5 'Q (t) 1,2') and lifting_height=1844 (p.2 row '4.4 Hub h3 (mm) 1844'). IMPORTANT NUANCE the DB cannot hold: p.1 states '→ Tragkraft bis zu 1,2 Tonnen, maximale Hubhöhe bis zu 1,84 Metern (**Einlagerungshöhe: 1,78 Meter**)'. So the usable STORAGE height is 1780 mm while the mast LIFT is 1844 mm — the same Hub-vs-Einlagerhöhe question flagged across the STILL group, here stated explicitly by the manufacturer on the front page. If `lifting_height` is meant to answer 'how high can this truck put a pallet', 1780 is the honest number and 1844 overstates by 64 mm. max_speed: DB holds 2.0; p.2 row 5.1 gives '4/4¹⁾ | 6,0/7,2²⁾ km/h' with the same maintenance/automated footnotes → automated mode is 6.0 km/h laden (1.67 m/s) and 7.2 km/h unladen (2.0 m/s). The DB's 2.0 is the unladen automated figure — correct, but note it is the only Linde row where the 2.0 is actually supported. AP0 GAP: p.2 row '4.35 Wenderadius im manuellen Betrieb Wa (mm) 1261' — explicitly a MANUAL-mode radius, and no Forklift-scope field to hold it anyway. Dead weight 850 kg — the lightest Linde forklift here. Ground clearance 17 mm mid-wheelbase (row 4.32), which is very low and a real floor-quality constraint with no field."
+    },
+    {
+      "product_name": "Linde L-MATIC HD k",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf",
+      "db_status": "conflict",
+      "variant_group": "Series 1173-01 — TWO columns, 'L-MATIC HD' and 'L-MATIC HD k'. The DB has a row only for the HD k. **This is the machine STILL sells as the EXV iGo** (see kion_platform_sharing).",
+      "fields": {
+        "min_aisle_width": 2925,
+        "vehicle_length": 2208,
+        "vehicle_width": 1000,
+        "min_total_height": 1915,
+        "max_gradient": 3.0,
+        "battery_type": ["Lead-Acid"],
+        "mast_type": "Duplex"
+      },
+      "field_sources": {
+        "min_aisle_width": "p.2, VDI row '4.34.2 Arbeitsgangbreite bei Palette 800 × 1200 längs Ast (mm) 2910 (2546)²⁾ | 2925 (2530)¹⁾ ²⁾ ³⁾' — HD k column, automated value 2925 (the bracketed figure is footnote 2, 'In Klammern: Manueller Modus'). Footnote 1 adds '+75 mm mit 4PzS' and footnote 3 'Minimale Arbeitsgangbreite mit reduzierter Geschwindigkeit', so the true worst case is 3000 mm with the larger battery, and even 2925 requires reduced speed.",
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 2137 | 2208' — HD k column",
+        "vehicle_width": "p.2, VDI row '4.21 Gesamtbreite b1 (mm) 800 | 1000'",
+        "min_total_height": "p.2, VDI row '4.2 Höhe Hubgerüst, eingefahren h1 (mm) 1665 | 1915'",
+        "max_gradient": "p.2, VDI row '5.8 Max. Steigfähigkeit mit/ohne Last % 3/3'",
+        "battery_type": "p.2, VDI row '6.3 Batterie … 3 PzS SL' (lead-acid), '6.4 … 24/375', '6.5 Batteriegewicht 333 kg'",
+        "mast_type": "p.2, '4.3 Freihub h2 150' — two-stage with free lift"
+      },
+      "conflicts": {
+        "lifting_height": {
+          "db": 3000,
+          "datasheet": 2844,
+          "source": "p.2, VDI row '4.4 Hub h3 (mm) 2344 | 2844' — HD k column is 2844; p.1 says '→ Tragkraft bis zu 1,6 t und Hubhöhe bis zu 3,5 m'",
+          "note": "K.O. field. THREE figures again: 2844 (Typenblatt Hub, HD k), 3500 (p.1 marketing, which is really the HD variant's ceiling with its taller mast options), 3000 (DB). The corroboration from the STILL side is decisive: `iGo_systems_DE_TD.pdf` p.6 gives the identical machine's h3 as 2844 with mast options to 3744. So 2844 is the base-mast lift and 3000 matches nothing. Recommend 2844 for the base configuration, or 3744 if the DB row is meant to represent the top mast option — but not 3000."
+        },
+        "max_speed": {
+          "db": 2.0,
+          "datasheet": 2.0,
+          "source": "p.2, VDI row '5.1 Fahrgeschwindigkeit mit/ohne Last km/h 6,12/6,12 (6/6)²⁾ | 7,2/7,2' — HD k is 7.2 km/h ÷ 3.6 = 2.0 m/s",
+          "note": "NOT a conflict — recorded here because it is the one Linde forklift row where the ubiquitous 2.0 m/s is independently verified, which sharpens the suspicion about the other four. The HD (non-k) variant is slower at 6.12 km/h = 1.7 m/s."
+        }
+      },
+      "notes": "VARIANT COMPLETION CANDIDATE — `L-MATIC HD` (non-k) is fully specified in the left column of the same Typenblatt (1.6 t, h3 2344, l1 2137, b1 800, Ast 2910 automated, Wa 1712, 6.12 km/h, Initialhub h5 60 mm, dead weight 1230 kg) and has no DB row. It is a materially different truck from the HD k — 200 mm narrower, 500 mm less lift, 15 % slower — so it is a stronger candidate for its own row than the L-MATIC 12 AC k was. `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3 additionally advertises this family as 'Traglasten von 1.600 bis 2.000 kg / Hubhöhen bis 3,50 m', implying a 2000 kg build that appears in no Typenblatt here. AP0 GAP: p.2 row '4.35 Wenderadius im manuellen Betrieb Wa (mm) 1712 | 1744' — explicit radius, manual mode, no Forklift-scope field. Ground clearance 20 mm (HD k) / 20–80 mm (HD, depending on 'Radarme niedrige Position/hohe Position', footnote 4)."
+    },
+    {
+      "product_name": "Linde L-MATIC",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_l_matic_br133_de_a_0516.pdf",
+      "db_status": "conflict",
+      "variant_group": "LEGACY L-MATIC, Baureihe 133 (document dated 05/2016) — superseded by the 1170 / 1173-01 / 1195-01 series above",
+      "fields": {
+        "vehicle_length": 2285,
+        "vehicle_width": 804,
+        "min_total_height": 1490,
+        "min_aisle_width": 2868
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 2285'",
+        "vehicle_width": "p.2, VDI row '4.21 Gesamtbreite b1/b2 (mm) 804'",
+        "min_total_height": "p.2, VDI row '4.2 Höhe Hubgerüst eingefahren h1 (mm) 1490'",
+        "min_aisle_width": "p.2, VDI row '4.33 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast (mm) 2868 (2774)' — took the larger, unbracketed value (row 4.34, 800×1200 längs, gives 2739)"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db": 1600.0,
+          "datasheet": "1,2 t / 2,0 t (two ratings on one row)",
+          "source": "p.2, VDI row '1.5 Tragfähigkeit/Last Q (t) 1,2 / 2,0 ¹⁾'",
+          "note": "K.O. field. The legacy BR 133 sheet gives 1.2 t and 2.0 t; the DB holds 1600, which is neither. 1600 kg is the rating of the CURRENT L-MATIC HD/HD k (series 1173-01), so this row may in fact be tracking the modern truck under the old model name. Since this document is from 2016 and the newer datasheets are 2024–2025, the sensible action is probably to decide which generation this DB row represents rather than to change a number. NOT resolved."
+        },
+        "lifting_height": {
+          "db": 2900,
+          "datasheet": 1924,
+          "source": "p.2, VDI row '4.4 Hub h3 (mm) 1924'; row '4.5 Höhe Hubgerüst ausgefahren h4 (mm) 2460'",
+          "note": "K.O. field, and again neither the Hub (1924) nor the extended mast height (2460) is 2900. Same generation question as above."
+        },
+        "max_speed": {
+          "db": 2.0,
+          "datasheet": "6/6 km/h (1.67 m/s), max. 7,2/2,9",
+          "source": "p.2, VDI row '5.1 Fahrgeschwindigkeit mit/ohne Last (km/h) 6/6 (max. 7,2/2,9)¹⁰⁾'",
+          "note": "7.2 km/h = 2.0 m/s appears only as a bracketed maximum; the stated operating speed is 6 km/h = 1.67 m/s."
+        }
+      },
+      "notes": "LEGACY DOCUMENT — treat with care. Its most valuable content is not a spec: row '1.1 Hersteller (Kurzbezeichnung)' reads **'LINDE/BALYO'**, establishing the Balyo relationship (see company_wide_context notes). GENERATION QUESTION FOR THE REVIEWER: the DB has both a `Linde L-MATIC` row and four newer L-MATIC rows (AC, AC k, HD k, core). Since none of the BR 133's numbers match the `Linde L-MATIC` row, either that row represents a current truck under a legacy name, or it is a stale record. It should probably be reconciled against the 1173-01 family rather than enriched from this 2016 sheet. I have therefore filled only geometry fields that are currently NULL and flagged everything else. Initialhub h5 125 mm (row 4.6) — an initial-lift feature (raising the load arms to clear closed carriers) with no AP0 field, present here and on the L-MATIC HD (60 mm)."
+    },
+    {
+      "product_name": "Linde P-MATIC",
+      "product_type": "Tugger AGV",
+      "source_file": "DE_tb_p_matic_br1190_dt_a_0416.pdf",
+      "db_status": "conflict",
+      "variant_group": "P-MATIC, Baureihe 1190 (document dated 04/2016)",
+      "fields": {
+        "max_gradient": 5.0,
+        "coupling_type": null
+      },
+      "field_sources": {
+        "max_gradient": "p.2, VDI row '5.8 Max. Steigfähigkeit mit/ohne Last (%) 5,0 / 14,0' — took the LADEN figure (5.0) as the conservative value for a K.O.-adjacent field; the 14.0 % applies unladen. Row 5.7 gives the continuous ratings, '<3,0 / 14,0'."
+      },
+      "conflicts": {
+        "vehicle_length": {
+          "db": 1778,
+          "datasheet": 1750,
+          "source": "p.2, VDI row '4.19 Gesamtlänge l1 (mm) 1750'",
+          "note": "UNIT FORENSICS — the DB value is almost certainly an imperial artefact, not an independent measurement: 1778 mm = 70.00 inches exactly, and the sibling `vehicle_width` value 914 mm = 36.00 inches exactly. Both DB dimensions are round-inch conversions, which means they came from a US-market sheet, while the German Typenblatt gives 1750 × 798/790 mm. Same forensic pattern as Stäubli PF3's 2721 kg = 6000 lb. The two sets are genuinely different (1750 ≠ 1778 even allowing for rounding), so this is a real discrepancy about which document is authoritative for the European market — flagged, not resolved."
+        },
+        "vehicle_width": {
+          "db": 914,
+          "datasheet": 798,
+          "source": "p.2, VDI row '4.21 Gesamtbreite b1/b2 (mm) 798 / 790'",
+          "note": "See above — 914 mm = exactly 36 inches. A 116 mm difference is too large to be a rounding artefact."
+        }
+      },
+      "notes": "CONFIRMS towing_capacity=5000 (p.2 row '1.5 Tragfähigkeit/Last Q (t) 5,0'), turning_radius=1485 (p.2 row '4.35 Wenderadius Wa (mm) 1485' — explicit radius, and `turning_radius` IS in Tugger scope, so this row is one of the few in the corpus where the field is used correctly), max_speed=2.22 (p.2 row '5.1 Fahrgeschwindigkeit mit/ohne Last (km/h) 8 / 8' → 8 ÷ 3.6 = 2.22), battery_type='Lead-Acid'. SECOND BALYO CITATION: row '1.1 Hersteller (Kurzbezeichnung) **LINDE/BALYO**', and p.1 body text 'profitiert von allen Linde Qualitätsstandards und der zuverlässigen Geo-Navigation \"Driven by BALYO\"'. UNSTORABLE BUT IMPORTANT FOR A TUGGER: p.2 row '5.5 Zugkraft mit/ohne Last (N) 1800' and '5.6 Max. Zugkraft (N) 4000' — the actual drawbar pull, which together with the 5 % gradient determines what train this tractor can really move; `towing_capacity` (5000 kg) says nothing about the force available. Also row '4.12 Kupplungshöhe h10 (mm) 300 / 290 / 345 / 400' — four selectable coupling heights, a hard compatibility constraint against a customer's existing trailers that `coupling_type` (Automatic/Manual/Pintle Hook/Towbar) cannot express; and row '4.36 Kleinster Drehpunktabstand b13 (mm) 1360'. `coupling_type` LEFT NULL: the sheet gives coupling HEIGHTS but never says whether the coupling is automatic or manual. `max_trailers`: DB holds 6; this sheet states no trailer count — neither confirmed nor contradicted. LEGACY-DOCUMENT CAVEAT: dated 04/2016, and no newer P-MATIC datasheet is present in this corpus, so P-MATIC coverage is nine years old."
+    },
+    {
+      "product_name": "Linde R-MATIC",
+      "product_type": "Forklift AGV",
+      "source_file": "EN_ds_r_matic_1120_en_b_0623_view.pdf",
+      "db_status": "conflict",
+      "variant_group": "R-MATIC series 1120, 'based on R16 HD' — FOUR mast configurations, all 1.6 t. Distinct from the newer R-MATIC k (series 5190).",
+      "fields": {
+        "vehicle_length": 2515,
+        "vehicle_width": 1570,
+        "min_total_height": 2980,
+        "max_gradient": 3.0,
+        "battery_type": ["Lead-Acid"],
+        "mast_type": "Triplex",
+        "load_detection": ["Camera/Vision"],
+        "safety_coverage": null
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI row '4.19 Overal length l1 (mm) 2515' (configs 1–3; config 4 is 2659)",
+        "vehicle_width": "p.2, VDI row '4.21 Overal width front b1/b2 (mm) 1290/1570' — took b2",
+        "min_total_height": "p.2, VDI row '4.2 Height of mast lowered h1 (mm) 2980' (config 1; configs 2–4 are 3530/3930/4930)",
+        "max_gradient": "p.2, VDI row '5.8 Maximum climbing ability, with/without load % 3/3'",
+        "battery_type": "p.2, VDI rows '6.3 Battery according to DIN 43531/35/36 … 3/3' and '6.4 Battery voltage/rated capacity 48/560'",
+        "mast_type": "p.2, four configurations with large free lift (h2 1739–3689) — a three-stage mast",
+        "load_detection": "p.1, '→ Unique 3D camera for optimum load detection'"
+      },
+      "conflicts": {
+        "min_aisle_width": {
+          "db": 2900,
+          "datasheet": "2990 minimum; 3240 worst case across the four configurations",
+          "source": "p.2, VDI row '4.34.1 Aisle width for pallets 1000 × 1200 crossways (AUTOMATIC) Ast (mm) 3100 | 3100 | 3100 | 3240' and row '4.34.2 (800 × 1200 along forks, AUTOMATIC) 2990 | 2990 | 2990 | 3160'",
+          "note": "K.O. field, DB is OPTIMISTIC. Every printed figure is ≥ 2990, and these are already the AUTOMATIC-mode figures (the sheet labels them so explicitly). Conservative worst case across the matrix is 3240. Footnote 1 adds 'Depends on customer project conditions' and footnote 2 'Max. 25 mm overhang included' — so even the printed numbers are conditional."
+        },
+        "lifting_height": {
+          "db": 11000,
+          "datasheet": 11344,
+          "source": "p.2, VDI row '4.4 Lift h3 (mm) 6844 | 8444 | 9644 | 11344' (config 4); p.1 '→ Storage and retrieval up to a height of 11 meters'",
+          "note": "LOW SEVERITY, flagged for completeness only — 11000 is p.1's rounded marketing figure and 11344 is the top mast option's true lift. The DB is conservative here, which is the safe direction for a K.O. field. Recorded so the reviewer can decide whether the corpus should standardise on engineering or marketing figures (this group alone has four instances of the same choice)."
+        }
+      },
+      "notes": "CONFIRMS max_payload=1600 (p.2 row 1.5, all four configs) and max_speed=1.95 (p.2 row '5.1 Travel speed, (forward/backward) (m/s) 1.95/0.75' — note the reverse speed is only 0.75 m/s, which for a shuttling reach truck materially affects cycle time and has no AP0 field). AP0 GAP: p.2 row '4.35 **Front turning radius auto mode** Wa (mm) 1808' — an unusually explicit label (radius, front, automatic mode) and still no Forklift-scope field to put it in. SAFETY: p.1 '→ 360-degree safety monitoring to detect people or obstacles in the work area' — angular coverage again, not a 2D/3D plane count, so `safety_coverage` left null. `load_detection = Camera/Vision` is well supported ('Unique 3D camera for optimum load detection', p.1) and `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3 elaborates: 'die innovative 3D-Kamera ermöglicht eine flexible Last- und Stellplatzerkennung — wodurch sich die Geräte auch kosteneffizient für die Andienung von Standardregalen nutzen lassen'. Dead weight not published on this sheet. Note the model is explicitly a converted standard truck ('based on R16 HD'), consistent with `EN_p_robotics_en_a_0216.pdf` p.6, '# Standard trucks: volume production, high-quality, proven reliability'."
+    },
+    {
+      "product_name": "Linde R-MATIC k (R-MATIC 17 k)",
+      "product_type": "Forklift AGV",
+      "source_file": "DE_tb_r_matic_k_5190_dt_a_0425_view.pdf",
+      "db_status": "conflict",
+      "variant_group": "R-MATIC k series 5190 — THREE variants: R-MATIC 12 k (1.07 t), 17 k (1.55 t), 25 k (2.33 t). The DB row is the 17 k.",
+      "fields": {
+        "min_total_height": 2900,
+        "special_fork_option": ["Side-Shift"],
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "safety_coverage": null
+      },
+      "field_sources": {
+        "min_total_height": "p.5, VDI row '4.2 Höhe Hubgerüst, eingefahren h1 (mm) 2900' (all three variants in the standard configuration; the mast table on p.4 offers h1 from 2450 to 4200)",
+        "special_fork_option": "p.2 equipment list under 'Gabelzinken/Anbaugeräte', 'Seitenschieber +- 80 mm' (side-shift ±80 mm); the same block offers 'Gabelzinklänge: 850/1050/1250 mm' and 'Gabelneiger 2/4°'",
+        "battery_type": "p.1, '→ Wahl zwischen Blei-Säure- oder Li-ION-Batterien mit optionaler Schnellladelösung'; p.2 'Energie' block, 'Blei-Säure-Batterie 465-775 Ah' and 'Li-ION-Batterie 13-35 kWh'"
+      },
+      "conflicts": {
+        "lifting_height": {
+          "db": 10274,
+          "datasheet": "10274 is a mast-table Hub value; the corresponding MAXIMUM AUTOMATED STORAGE HEIGHT is 9974",
+          "source": "p.4 mast table, columns 'h3:10274 / h1:4200 / h2:3225 / h4:11249 / **h*:9974**', with the legend 'h*: Maximale automatisierte Einlagerhöhe'; p.1 says '→ Präzises Ein- und Auslagern von Waren bis 2300 kg in Höhen bis zu 10 m'",
+          "note": "THE CLEANEST AVAILABLE STATEMENT OF THE Hub-vs-Einlagerhöhe PROBLEM, because this manufacturer publishes a dedicated row for it and names it 'maximale AUTOMATISIERTE Einlagerhöhe'. The DB stores the mast's lift (10274), but the height at which this truck can actually place a pallet under automation is 9974 mm — 300 mm lower. For a K.O. field this is the difference between winning and failing a 10 m high-bay tender. The second mast group's top option is h3 10474 / h* 10174, so a 10 m automated storage height IS achievable, just not with the mast the DB's number implies. Recommend the reviewer decide globally whether `lifting_height` means Hub or Einlagerhöhe; this datasheet makes the case that it should be the latter for automated trucks."
+        },
+        "min_aisle_width": {
+          "db": 3075,
+          "datasheet": "3075 (17 k, 800×1200 längs) — confirmed; 3175 for 1000×1200 quer",
+          "source": "p.5, VDI rows '4.34.1 Arbeitsgangbreite bei Palette 1000 × 1200 quer Ast (mm) 3025 | 3175 | 3275' and '4.34.2 (800 × 1200 längs) 2950 | 3075 | 3200'",
+          "note": "NOT a conflict — 3075 is exactly right for the 17 k with 800×1200 pallets, so the DB row was built carefully. Flagged only to record that the 1000×1200 figure for the same truck is 3175, i.e. 100 mm wider, and AP0 stores one number without saying which pallet it assumes. Given `min_aisle_width` is K.O.-level, standardising the pallet basis across the corpus would be worth a ruling."
+        },
+        "turning_radius_wrong_scope": {
+          "db": 1710,
+          "datasheet": 1710,
+          "source": "p.5, VDI row '4.35 Wenderadius Wa (mm) 1540 | 1710 | 1950'",
+          "note": "THE VALUE IS CORRECT AND THE FIELD IS WRONG. `turning_radius` is a **Tugger-scope** field and this is a Forklift AGV row. This is the THIRD independent instance of the same corruption already documented for Toyota Reflex RAE250 (1903) and Grenzebach FF1200S (1450): a real, correctly-read forklift turning radius stored in the tugger field because Forklift scope has none. Three suppliers, three sessions, same mechanism. Flag only — do not clear it, since clearing would destroy a correct measurement with nowhere else to go."
+        }
+      },
+      "notes": "CONFIRMS max_payload=1550 (p.5 row '1.5 Nenntragfähigkeit/Last Q (t) 1,07 | 1,55 | 2,33'), vehicle_length=2686 (row 4.19), vehicle_width=1464 (row 4.21 b2), max_speed=2.0 (row '5.1 Fahrgeschwindigkeit mit/ohne Last m/s 2/2'; reverse 1.2), mast_type='Triplex' (p.4 heading 'TRIPLEX HUBGERÜST'), drive_type='Reach Truck' (p.1 'Automatisierter Schubmaststapler'), load_detection='Camera/Vision' (p.2 '2D-Sensorik zur Detektion von Ladungsträgern und Ladungsumgebungen', 'Lasterkennung (Erkennung von Gitterboxen durch seitlich platzierte Palettensensoren)', 'Lasterkennung (Erkennung gestapelter Ladungsträger bei Lastaufnahme)'), onboard_ui (p.2 'Touchdisplay' — though `onboard_ui` is AMR-scope, so it sits wrong-scope on this Forklift row; recurring). WRONG-SCOPE VALUES ON THIS ROW (flag only): `turning_radius`, `route_type`, `route_programming` (Tugger scope) plus `workflow_capability`, `grid_required`, `picking_mechanism`, `rack_pin_compatible`, `free_lift_open_closed_pallet`, `onboard_ui` (AMR scope) — NINE wrong-scope fields on one Forklift row, the worst single row seen in this pass (previous worst was five, on ek robotics COMPACT MOVE CB 25). VARIANT COMPLETION CANDIDATES: `R-MATIC 12 k` (1.07 t, l1 2640, Ast 2950/3025, Wa 1540) and `R-MATIC 25 k` (2.33 t, l1 2830, Ast 3200/3275, Wa 1950) — both fully specified on p.5 and absent from the DB. The 25 k matters most: at 2330 kg it is the highest-payload Linde AGV in the corpus and the only one that could serve a >2 t reach-truck tender. AP0 GAPS: p.2 lists safety features AP0 cannot represent — '2D-Laserschutzvorhang in Fahrtrichtung zur Erkennung von Hindernissen über Bodenhöhe' and the same at the sides (light curtains ABOVE floor level, i.e. a second detection plane), 'Linde BlueSpot', 'Rote Warnlinien seitlich', 'Zusätzlicher Sensor (Ultra Sonic) für erweiterten Personenschutz vor den Lastarmen', and two selectable safety field sets ('Sicherheitsfeldsatz 850 x 1250 mm' / '1250 x 1250 mm'). Between the 360° scanner and the two vertical light curtains this is arguably 'Limited 3D (e.g. waterfall)' rather than a single plane — but the sheet never uses the AP0 vocabulary, so `safety_coverage` was left null rather than argued into a value."
+    },
+    {
+      "product_name": "Linde K-MATIC",
+      "product_type": "Forklift AGV",
+      "source_file": "EN_ds_k_matic_5231_en_a_0224_view.pdf",
+      "db_status": "conflict",
+      "variant_group": "K-MATIC series 5231 — THREE mast configurations, all rated 1.45 t",
+      "fields": {
+        "vehicle_length": 4258,
+        "vehicle_width": 1750,
+        "min_total_height": 4900,
+        "special_fork_option": ["Telescopic"],
+        "battery_type": ["Lead-Acid"],
+        "drive_type": "VNA Turret",
+        "mast_type": "Triplex"
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI row '4.19 Overall length l1 (mm) 3843 | 4158 | 4258' — took the largest (the 14 m configuration, matching the DB's 14000 lift)",
+        "vehicle_width": "p.2, VDI row '4.21 Overall width b1/b2 (mm) 1450/1600 | 1450/1650 | 1450/1750' — took b2 of the 14 m configuration",
+        "min_total_height": "p.2, VDI row '4.2 Mast height, lowered h1 (mm) 4900 | 5400 | 6400' — took the SMALLEST as the field's semantics ask for a minimum; note the 14 m configuration's lowered height is 6400 mm, which is the number that actually constrains a doorway",
+        "special_fork_option": "p.2, VDI row '4.38 Distance to swivelling-fork pivot l8 (mm) 1053 | 1148 | 1248' and row '4.29 Reach, lateral b7 (mm) 1405 | 1430 | 1510' — a swivelling/reaching fork head",
+        "battery_type": "p.2, VDI row '6.4 Battery type, voltage, nominal capacity K5 V/Ah — PzS, 80 V/700 Ah | PzS, 80 V/840 Ah'",
+        "drive_type": "p.1, 'Reliable logistics in narrow aisle warehouses'; p.2 row 4.29 lateral reach + row 4.38 swivelling-fork pivot",
+        "mast_type": "p.2, rows 4.2–4.5 with large free lift (h2 4150/5150) — three-stage"
+      },
+      "conflicts": {
+        "min_aisle_width": {
+          "db": 1800,
+          "datasheet": "1850 (7.2 m config) / 1850–1900 (11.55 m) / 2000 (14.35 m)",
+          "source": "p.2, VDI row '4.34 Aisle width predetermined load dimensions (800 × 1200/1000 × 1200) Ast (mm) 1850/-- | 1850/1900 | 2000/2000'",
+          "note": "K.O. field, DB OPTIMISTIC. Every printed value is ≥ 1850, and the configuration matching the DB's stored 14 000 mm lift needs **2000 mm**. So the current record would win 1.8 m VNA tenders that this truck's 14 m build cannot serve. Worth noting that 1800 is exactly the figure STILL publishes for the sibling MX-X iGo, which shares this platform — possibly a cross-brand copy."
+        },
+        "lifting_height": {
+          "db": 14000,
+          "datasheet": "14350 (Lift h3, tallest configuration); 16000 'possible on request'",
+          "source": "p.2, VDI row '4.4 Lift h3 (mm) 7200 | 11550 | 14350'; p.1 '→ Automated truck with lifting capacity up to 1450 kg and 14 m lifting height (16 m lifting height possible on request)'; b_automatisierungsloesungen_dt_a_1023_view.pdf p.3, 'Hubhöhe bis 16 m'",
+          "note": "LOW SEVERITY. 14000 is the marketing round-off of 14350; the DB is conservative, which is the safe direction. The more interesting number is the 16 m 'on request' option, stated in two independent Linde documents — if a 16 m VNA tender arrives, K-MATIC should not be excluded on a 14 000 mm stored value. AP0 has no way to record a build-to-order ceiling distinct from the catalogue maximum."
+        }
+      },
+      "notes": "CONFIRMS max_payload=1450 (p.1 'Load capacity 1.45 t'; p.2 row 1.5 in all three columns), max_speed=2.0 (p.2 row '5.1 Travel speed, laden/unladen m/s 2/2'), vna_capable=1, infrastructure_free=1 (p.1 '→ Control via intelligent contour navigation without additional infrastructure'), stacking_capability=1, manual_usage — NOTE row '1.4 Operation: Automated' for all three columns, i.e. this sheet does NOT support the DB's manual_usage=1 (unlike every other Linde Typenblatt, which says 'Automatisch/Hand'). Flagged, not changed, because a 'k'-less K-MATIC may still offer a maintenance mode. `station_applications`: p.1 '→ Seamless interaction with conveyor technology and transfer stations' supports ['Conveyor','Standard rack'] — not proposed as a fill because the DB row is thinly populated and the reviewer may want a fuller pass. AP0 GAPS on this sheet: row '4.35 Turning radius Wa (mm) 2257/2435 | 2477/2655' — an explicit English 'Turning radius' label, TWO values per configuration (presumably laden/unladen or fork-in/fork-out), and no Forklift-scope field; row '4.11 Additional lift h9 (mm) 1800' — an auxiliary lift with no field; row '4.8 Seat height … h7 460' — this is a MAN-UP truck (operator rides to height), which AP0 cannot distinguish from man-down, though it changes the safety case entirely. Service weight 9258–12477 kg (row 2.1) — no dead-weight field. Sound pressure 68 dB(A) (row 10.7)."
+    }
+  ],
+  "coverage_mismatches": {
+    "db_products_with_no_current_datasheet": [
+      "None — every active Linde DB row is covered by at least one of these 13 files."
+    ],
+    "documented_models_with_no_db_row": [
+      "Linde C-MATIC 10 (1.0 t) — `DE_tb_c_matic_8925_dt_e_1025_view.pdf` p.2. Written up as a product entry above.",
+      "A 600 kg C-MATIC — `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3, 'Traglasten von 600 kg, 1.000 kg und 1.500 kg'. No Typenblatt in this corpus; not written up.",
+      "Linde L-MATIC 12 AC k (1.0 t) — `DE_tb_l_matic_ac_k_1171_dt_b_1225_view.pdf` p.2.",
+      "Linde L-MATIC HD (non-k) — `DE_tb_l_matic_hd_hdk_1173_01_dt_d_0524_view.pdf` p.2, left column. Materially different from the HD k (200 mm narrower, 500 mm less lift, 15 % slower).",
+      "A 2000 kg L-MATIC HD build — `b_automatisierungsloesungen_dt_a_1023_view.pdf` p.3, 'Traglasten von 1.600 bis 2.000 kg'. No Typenblatt.",
+      "Linde L-MATIC AC 1.2 t (both mast groups) — `DE_tb_l_matic_ac_1170_dt_c_1024_view.pdf` p.2.",
+      "Linde R-MATIC 12 k (1.07 t) and R-MATIC 25 k (2.33 t) — `DE_tb_r_matic_k_5190_dt_a_0425_view.pdf` p.5. **The 25 k is the highest-payload Linde AGV in the corpus and the only one able to serve a >2 t reach-truck tender.**"
+    ]
+  }
+}

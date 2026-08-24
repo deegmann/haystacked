@@ -1,0 +1,139 @@
+{
+  "company": "Omron Mobile Robotics",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "FULL-BATCH CONTINUATION RUN. Files were initially triaged as belonging to 'Hikrobot' based on their position among Hikrobot-named files in New/, but their content is unambiguously OMRON Corporation (LD Series, HD-1500, MD Series datasheets, plus company-wide 'AMR Wireless Communication Technical Guide' and 'FLOW Core 3.1.1 Release Notes') -- corrected before extraction, no Hikrobot content was misattributed. LD-60/LD-90/LD-250 were found to be ALREADY comprehensively filled in the DB (product_type, navigation_type, max_payload, max_speed, vehicle dims, operating_temp, ingress_protection_rating, max_gradient, stop_accuracy, battery_type, battery_runtime, charge_time, fleet_management_system, integration_capability, etc.) and EVERY value cross-checked against this exact LD-series datasheet (i828) matched precisely -- strong evidence the DB's existing Omron LD-series data was itself sourced from this exact document (or an identical prior revision) in an earlier general research batch, not by this datasheet-ingestion agent. No new fields were addable for LD-60/90/250; only their cross-validation is recorded. HD-1500 and MD-650/MD-900 were comprehensively filled with the family-wide fields (fleet mgmt, safety, route) but were MISSING several device-specific numeric fields that the LD-series siblings already had (operating_temp, ingress_protection_rating, battery_type, stop_accuracy, min_turning_radius) -- these were added below. A genuine CONFLICT was found for both MD-650 and MD-900: their DB battery_type is 'Li-Ion' (generic) but this datasheet explicitly states 'Type: Lithium-Ion (LiFePO4)', the same specific chemistry already correctly recorded for their LD-series siblings -- flagged, not overwritten.",
+  "company_wide_context": {
+    "source_file": "72503-100_amr_wireless_communication_technical_guide_technical_manual_en.pdf + OMRON FLOW Core 3.1.1 Release Notes.pdf",
+    "fields": {
+      "integration_capability": ["WMS", "MES", "MQTT"]
+    },
+    "field_sources": {
+      "integration_capability": "wireless guide, TCP-port reference tables: 'any other equipment or servers that communicate with the Fleet Manager will need access to ports listing here. This includes WMS/MES and MP clients' (WMS/MES); FLOW Core release notes + LD-series datasheet's Software Licenses table lists 'Integration Toolkit - MQTT API User's Manual' (I637/M107) as a standard FLOW Core component (MQTT)"
+    },
+    "applies_to": "all Omron Mobile Robotics base models currently missing integration_capability (per this run's DB snapshot: LD-130CT, MD-650, MD-900 -- LD-60/90/250 and HD-1500 already have this field filled with an equal-or-broader set and should NOT be overwritten)",
+    "notes": "Both source documents are IT/technical-integration guides, not product datasheets -- the wireless guide is almost entirely cybersecurity/network-configuration advice with no other fillable AP0 Base-Model fields found; the FLOW Core release notes document is a software changelog (version-to-version fix list) with no fillable AP0 fields at all beyond confirming the FLOW Core software name already recorded as 'Proprietary (FLOW Core)' on several Omron products. VDA5050 compatibility was NOT found stated anywhere in either document (Omron's own fleet architecture is proprietary 'Advanced Robotics Command Language' / FLOW Core, with an MQTT-based Integration Toolkit as the standardised interface) -- vda5050_compatible deliberately left unaddressed (not set true or false) rather than guessed."
+  },
+  "products": [
+    {
+      "product_name": "Omron LD-60",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "enrich",
+      "fields": {},
+      "field_sources": {},
+      "notes": "Full cross-validation, no new fields addable: max_payload=60, max_speed=1.8 (1800mm/s), vehicle_length=698/vehicle_width=500, operating_temp_min=5/max=40, ingress_protection_rating=IP20, max_gradient=8.3 ('Up to 60kg: 4.8°/8.3% incline'), stop_accuracy=25 ('To standard target: ±25mm'), battery_type=LiFePO4, battery_runtime=12 (full-payload figure), charge_time=130 (2hrs10min for 20-80%), fleet_management_system='Proprietary (FLOW Core)', max_fleet_size=100, integration_capability='WMS|ERP|MES' -- every one of these already-filled DB values matches this datasheet exactly."
+    },
+    {
+      "product_name": "Omron LD-90",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "enrich",
+      "fields": {},
+      "field_sources": {},
+      "notes": "Full cross-validation, no new fields addable (same document, LD-90 column): max_payload=90, max_speed=1.35 (1350mm/s), vehicle dims/environment/battery fields identical to LD-60's, max_gradient=8.3 (LD-90 is 90kg, but the datasheet's own threshold text says 'Over 60kg: Level floor only' which would imply 0% for LD-90 -- the DB's 8.3 actually matches the LD-60/90x shared row before the weight-threshold caveat is applied; not flagged as a conflict since the datasheet's own presentation is ambiguous about whether the caveat applies per-unit-loaded-weight or per-model, and 8.3 is defensible either way) -- all other fields match exactly, no new fields addable."
+    },
+    {
+      "product_name": "Omron LD-250",
+      "product_type": "Mobile AMR",
+      "source_file": "i828_ld-series_mobile_robot_datasheet_en.pdf",
+      "db_status": "enrich",
+      "fields": {},
+      "field_sources": {},
+      "notes": "Full cross-validation, no new fields addable: max_payload=250, max_speed=1.2 (1200mm/s), vehicle_length=969/vehicle_width=720, operating_temp/ingress_protection_rating/battery_type identical to siblings, max_gradient=3.0 ('Max. 1.7°/3% incline'), stop_accuracy=25, battery_runtime=10 (full-payload), charge_time=130 -- every already-filled DB value matches this datasheet exactly."
+    },
+    {
+      "product_name": "Omron HD-1500",
+      "product_type": "Mobile AMR",
+      "source_file": "i855_hd-series_mobile_robot_datasheet_en.pdf + i854_hd-1500_leaflet_en.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "ingress_protection_rating": "IP20",
+        "battery_type": ["LiFePO4"],
+        "stop_accuracy": 25,
+        "min_turning_radius": 0,
+        "max_fleet_size": 100
+      },
+      "field_sources": {
+        "operating_temp_min": "p.4 spec table, 'Ambient Temperature 5 to 40°C'",
+        "operating_temp_max": "p.4 spec table, same row",
+        "ingress_protection_rating": "p.4 spec table, 'Ingress Protection Class IP20'",
+        "battery_type": "p.6 Battery block, 'Type Lithium-Ion (LiFePO4)'",
+        "stop_accuracy": "p.4 spec table, 'Stop Position Repeatability (Single AMR): To standard target: ±25mm, ±2°'",
+        "min_turning_radius": "p.4 spec table, 'Turn Radius 0 mm' -- explicit, no radius/diameter ambiguity (differential-drive AMR, genuine in-place rotation)",
+        "max_fleet_size": "p.6 footnote '*1. Contact your local OMRON representative for fleets larger than 100' next to the Virtual Fleet Manager sizing table"
+      },
+      "notes": "Cross-checked already-filled fields: max_gradient=8.75 matches '5°/8.75% incline' exactly, battery_runtime=9 matches the full-payload figure ('9h full payload' vs '12.5h no payload' -- DB uses the conservative full-payload figure, consistent with LD-series convention), charge_time=24 matches '24 min. (20% to 80% charge)' exactly -- no conflicts. vehicle_length/vehicle_width deliberately left null: the datasheet's p.7 dimensioned drawing (labels 1195/1696/850/370/211mm) has no clear axis mapping in extracted text, and unlike the LD-series drawing (independently cross-validated via the DB's own pre-existing 698x500/969x720 values matching the drawing numbers), there is no existing DB value to confirm which HD-1500 drawing number is length vs width -- left unmapped rather than guessed (CONTEXT-level field, not KO, so no image-based re-read triggered per this agent's escalation rule)."
+    },
+    {
+      "product_name": "Omron MD-650",
+      "product_type": "Mobile AMR",
+      "source_file": "i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf + md-series_leaflet_en.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "max_gradient": 8.75,
+        "stop_accuracy": 25,
+        "min_turning_radius": 0,
+        "battery_runtime": 8,
+        "charge_time": 20,
+        "max_fleet_size": 100
+      },
+      "field_sources": {
+        "operating_temp_min": "p.4 spec table, 'Ambient Temperature 5 to 40°C'",
+        "operating_temp_max": "p.4 spec table, same row",
+        "max_gradient": "p.4 spec table, 'Maximum Slope Max. 5° / 8.75% incline'",
+        "stop_accuracy": "p.4 spec table, 'Stop Position Repeatability (Single AMR): To standard target: ±25mm, ±2°'",
+        "min_turning_radius": "p.4 spec table, 'Turn Radius 0 mm' -- explicit, no radius/diameter ambiguity",
+        "battery_runtime": "p.4 spec table, 'Run Time 10 h (no payload); 8 h (full payload)' -- used the full-payload (conservative) figure, consistent with the LD-series/HD-1500 convention already in this DB",
+        "charge_time": "p.6 Battery block, 'Recharge Time 19.6 minutes (from 20% to 80%)' -- rounded to nearest integer minute (field is Integer type)",
+        "max_fleet_size": "p.6 footnote, same '100 AMR' Virtual Fleet Manager sizing cap as HD-1500/LD-series"
+      },
+      "conflicts": {
+        "battery_type": {
+          "db_value": "Li-Ion",
+          "datasheet_value": "LiFePO4 (p.6 Battery block, 'Type Lithium-Ion (LiFePO4)')",
+          "note": "Not overwritten. LiFePO4 is a specific lithium-ion sub-chemistry with its own AP0 allowed_value distinct from generic 'Li-Ion' -- this datasheet is explicit and matches the same chemistry already correctly recorded for the LD-series/HD-1500 siblings, suggesting the MD-series DB value may be an imprecise generic label rather than a genuinely different battery. Flagged for Tech Lead correction."
+        }
+      },
+      "notes": "ingress_protection_rating intentionally left unmapped: this datasheet states 'IP22 (IP10 for charging pads)', but IP22 is not a valid AP0 allowed_value for this field (allowed=['None','IP20','IP44','IP52','IP54','IP65','IP67']) -- left null rather than rounding/guessing to a nearby valid value."
+    },
+    {
+      "product_name": "Omron MD-900",
+      "product_type": "Mobile AMR",
+      "source_file": "i885_md_series_amr_(autonomous_mobile_robot)_datasheet_en.pdf + md-series_leaflet_en.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "max_gradient": 8.75,
+        "stop_accuracy": 25,
+        "min_turning_radius": 0,
+        "battery_runtime": 8,
+        "charge_time": 20,
+        "max_fleet_size": 100
+      },
+      "field_sources": {
+        "operating_temp_min": "p.4 spec table, 'Ambient Temperature 5 to 40°C' (shared MD-650/MD-900 row)",
+        "operating_temp_max": "p.4 spec table, same row",
+        "max_gradient": "p.4 spec table, 'Maximum Slope Max. 5° / 8.75% incline' (shared row)",
+        "stop_accuracy": "p.4 spec table, 'Stop Position Repeatability (Single AMR): To standard target: ±25mm, ±2°' (shared row)",
+        "min_turning_radius": "p.4 spec table, 'Turn Radius 0 mm' (shared row)",
+        "battery_runtime": "p.4 spec table, 'Run Time 10 h (no payload); 8 h (full payload)' (shared row, same figure for both MD-650 and MD-900) -- full-payload figure used",
+        "charge_time": "p.6 Battery block, 'Recharge Time 19.6 minutes (from 20% to 80%)' (shared row)",
+        "max_fleet_size": "p.6 footnote, same '100 AMR' cap"
+      },
+      "conflicts": {
+        "battery_type": {
+          "db_value": "Li-Ion",
+          "datasheet_value": "LiFePO4 (p.6 Battery block, 'Type Lithium-Ion (LiFePO4)') -- same conflict and caveat as MD-650 above",
+          "note": "Not overwritten, see MD-650's identical flag above."
+        }
+      },
+      "notes": "ingress_protection_rating left unmapped for the same IP22-is-not-a-valid-allowed-value reason as MD-650. max_speed=1.8 already correctly filled in DB (datasheet's MD-900 column: 1800mm/s), no conflict."
+    }
+  ]
+}

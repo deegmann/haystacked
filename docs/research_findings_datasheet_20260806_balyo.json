@@ -1,0 +1,158 @@
+{
+  "company": "Balyo",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "5 files, all marketing/spec web-pages saved as single-page-ish PDFs (Balyo's 'Driven by BALYO' product line, each built on a named OEM base truck per the DB's own base_model_name convention: VEENY=Linde VNA, REACHY=Linde Reach, LOWY/LOWY HD=Linde Stacker, TUGGY=Linde Tractor, LOWY CB=Linde CB). All 5 base models already exist in the DB with every field NULL -- pure enrichment, no new products. 'Veeny_-_VNA_Datasheet_-_11112021.pdf' text-extracts as badly character-duplicated garbage (a font-rendering artifact, not a content issue) -- fell back to visual page-image reading per the 'text first, drawings/images only on demand' rule, since several KO fields (max_payload, lifting_height, min_aisle_width) were unreadable from text alone; the rendered image showed ONE clean visible data table matching the values ultimately used, while pdfplumber's text/table extraction returned FOUR overlapping garbled tables (apparently hidden/leftover text layers from other Balyo product templates reused when this PDF was authored, not actually visible on the page) -- deliberately ignored those hidden layers in favor of what's actually visible on the rendered page. 'LOWY / LOWY HD' is a single combined DB product row, but the two source files (LOWY.pdf, LOWY HD.pdf) describe two datasheets with materially different lift height (2.9m vs 3.0m), aisle width (2.9m vs 2.95m) and overall dimensions -- flagged below as a possible split candidate for the Tech Lead, not acted on unilaterally; conservative (worst-case) values were used for the merged row's KO fields in the meantime.",
+  "products": [
+    {
+      "product_name": "VEENY",
+      "product_type": "Forklift AGV",
+      "source_file": "Veeny_-_VNA_Datasheet_-_11112021.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 1500,
+        "lifting_height": 14710,
+        "min_aisle_width": 1800,
+        "max_speed": 2.0,
+        "vna_capable": true,
+        "battery_type": [
+          "Lead-Acid"
+        ],
+        "integration_capability": [
+          "WMS",
+          "ERP"
+        ],
+        "barcode_readers": true,
+        "infrastructure_free": true
+      },
+      "field_sources": {
+        "max_payload": "visible page-image table, 'Maximum weight kg/lbs 1500 / 3306.93'; also body text 'base lifting capacity of 1500 Kgs / 3306 lbs'",
+        "lifting_height": "visible page-image table, 'Maximum picking height mm/in 14710 / 579.1'; body text 'can pick pallets up to a height of 14710mm / 579.1 in' (drop height 14510mm also stated, not used -- picking height is the taller/governing figure)",
+        "min_aisle_width": "'FEATURES & DATA' box, 'Aisle Width: From 1800 mm (800 x 1200 mm pallet)'",
+        "max_speed": "visible page-image table, 'Forward speed (with 360° Safety) m/s/mph 2 / 4.47'",
+        "vna_capable": "product literally named 'VEENY - VNA ROBOT BY BALYO', DB base_model_name is 'Balyo VEENY (Linde VNA)'",
+        "battery_type": "'FEATURES & DATA' box, 'Energy: Lead-Acid'",
+        "integration_capability": "body text 'can interface with your machines, conveyors, WMS or ERP softwares for a full integration'",
+        "barcode_readers": "'FEATURES & DATA' box, 'Load Identification: Barcode reader'",
+        "infrastructure_free": "body text 'embeds the unique infrastructure-free navigation technology developed as a result of 10 years of research & development'"
+      },
+      "notes": "min_turning_radius, vehicle_length/width not confidently extractable -- the visible table shows 'Overall width/length: Depending upon configuration' rather than a fixed figure for this particular sheet revision, so left null rather than guessed."
+    },
+    {
+      "product_name": "LOWY / LOWY HD",
+      "product_type": "Forklift AGV",
+      "source_file": "LOWY, Robotic Stacker, AGV:AMR | BALYO.pdf + LOWY HD, Robotic Heavy Duty Stacker, AGV:AMR | BALYO.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 1600,
+        "lifting_height": 2900,
+        "min_aisle_width": 2950,
+        "max_speed": 2.0,
+        "vehicle_length": 2350,
+        "vehicle_width": 811,
+        "battery_type": [
+          "Lead-Acid",
+          "Li-Ion"
+        ],
+        "infrastructure_free": true,
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "max_payload": "both sheets headline '1600 kgs / 3500 lbs Load capacity'",
+        "lifting_height": "CONSERVATIVE (lower/worse-case) value used per K.O.-field policy: base LOWY sheet headline '2.9m / 10ft UP TO Lift Height'; LOWY HD sheet headline '3m / 10ft UP TO Lift Height' -- 2.9m (2900mm) used since it's the lower bound across the two sub-models sharing this one DB row",
+        "min_aisle_width": "CONSERVATIVE (larger/worse-case) value used: base LOWY sheet 'FROM 2.9m/10ft Aisle width'; LOWY HD sheet 'FROM 2950mm/9'8\" Aisle width' -- 2950mm (the larger figure) used",
+        "max_speed": "both sheets 'Travel Speed: Up to 2m/s / 4.4mph'",
+        "vehicle_length": "base LOWY sheet 'SPECIFICATIONS: Length x width x height ... 2350mm x 811mm x 2327mm / 7'8\" x 2'8\" x 7'8\"' -- taken from the base LOWY sheet, NOT the HD sheet (which lists 2137x800x2337mm instead, not used since this field can only hold one figure per the merged row)",
+        "vehicle_width": "same source as vehicle_length",
+        "battery_type": "base LOWY sheet 'Energy & Charging options: Lead Acid / NMC / TPPL'; LOWY HD sheet 'Battery options: Lead Acid / LTO batteries' -- NMC and LTO are both Li-ion chemistries mapped to AP0's 'Li-Ion' allowed value; TPPL (thin-plate pure lead) mapped to 'Lead-Acid'",
+        "infrastructure_free": "base LOWY sheet body text 'BALYO's proprietary infrastructure-free navigation' (applies to both sub-models per shared BALYO platform description)",
+        "autonomous_charging": "base LOWY sheet 'SPECIFICATIONS: ... Autocharge or wireless'"
+      },
+      "notes": "FLAG for Tech Lead: source material treats LOWY (base) and LOWY HD as two distinct SKUs with different lift heights (2.9m vs 3.0m), aisle widths (2.9m vs 2.95m) and overall dimensions (2350x811x2327mm vs 2137x800x2337mm) -- the DB currently merges them into one 'LOWY / LOWY HD' product row. Not split here (not this agent's call), but the conservative-value approach used above may understate LOWY HD's actual (higher) lift-height capability or overstate base LOWY's aisle-width requirement if a reviewer later wants per-SKU precision. Recommend considering a split into two Product rows sharing one base model, matching the LOWY CB precedent (already a separate row)."
+    },
+    {
+      "product_name": "LOWY CB",
+      "product_type": "Forklift AGV",
+      "source_file": "LOWY CB, Robotic Counterbalanced Stacker, AGV:AMR | BALYO.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_payload": 1600,
+        "lifting_height": 4000,
+        "min_aisle_width": 3400,
+        "max_speed": 2.0,
+        "vehicle_length": 3247,
+        "vehicle_width": 890,
+        "battery_type": [
+          "Lead-Acid",
+          "Li-Ion"
+        ],
+        "infrastructure_free": true,
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "max_payload": "headline '1600 kgs / 3500 lbs Load capacity'",
+        "lifting_height": "headline '4m / 13ft UP TO Lift Height'",
+        "min_aisle_width": "headline '3.4m / 11.4ft FROM Aisle width'",
+        "max_speed": "'Travel Speed: Up to 2m/s / 4.4mph'",
+        "vehicle_length": "'SPECIFICATIONS: Length x width x height ... 3247mm x 890mm x 2097mm / 10'8\" x 2'11\" x 7'8\"'",
+        "vehicle_width": "same source as vehicle_length",
+        "battery_type": "'Battery options: Lead Acid / TPPL / NMC (Auto charge with docking station)' -- NMC mapped to Li-Ion, TPPL mapped to Lead-Acid",
+        "infrastructure_free": "body text references BALYO's 'proprietary infrastructure-free navigation' (same platform-level claim as sibling LOWY sheets)",
+        "autonomous_charging": "'Battery options: ... (Auto charge with docking station)'"
+      },
+      "notes": "Distinct DB row already exists for LOWY CB, unlike base LOWY/LOWY HD -- no split ambiguity here."
+    },
+    {
+      "product_name": "TUGGY",
+      "product_type": "Tugger AGV",
+      "source_file": "TUGGY, Robotic Tugger Truck, AGV:AMR | BALYO.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "towing_capacity": 7000,
+        "vehicle_length": 1706,
+        "vehicle_width": 709,
+        "max_speed": 2.0,
+        "battery_type": [
+          "Lead-Acid",
+          "Li-Ion"
+        ],
+        "infrastructure_free": true,
+        "coupling_type": [
+          "Automatic"
+        ],
+        "auto_hitch": true
+      },
+      "field_sources": {
+        "towing_capacity": "headline 'SMART 7000 KGS / 15000 LBS Pulling capacity'; body text 'TUGGY can pull carts & trailers up to 7 tons'",
+        "vehicle_length": "'SPECIFICATIONS: Length x width x height ... 1706mm x 709mm x 2351mm / 5'7\" x 2'4\" x 7'8\"'",
+        "vehicle_width": "same source as vehicle_length",
+        "max_speed": "'Travel Speed: 2 m/s / 4mph'",
+        "battery_type": "'Battery: Lead Acid / Li-ion / TPPL' -- Li-Ion is an exact AP0 allowed_value match here (unlike sibling sheets which only said NMC/LTO)",
+        "infrastructure_free": "body text references BALYO's proprietary infrastructure-free navigation (shared platform-level claim, same as LOWY family)",
+        "coupling_type": "body text 'Tuggy can now work with automatic trailers to hitch & unhitch when needed, providing true autonomy' -- 'automatic' hitching maps to AP0's exact allowed_value 'Automatic'",
+        "auto_hitch": "same body text as coupling_type -- 'BALYO's Tuggy robot effortlessly unhitches from trailers or carts' + 'hitch & unhitch when needed'"
+      },
+      "notes": "turning_radius, tugger_min_aisle_width, max_trailers, train_configuration not stated in this marketing-page-style source -- would need a fuller spec sheet to fill."
+    },
+    {
+      "product_name": "REACHY",
+      "product_type": "Forklift AGV",
+      "source_file": "Reach Truck Gen 2-Black Truck-Datasheet-EN.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "barcode_readers": true
+      },
+      "field_sources": {
+        "barcode_readers": "p.1 'FEATURES & DATA' block, 'Load Identification: barcode reader 2D'; p.2 confirms '2D barcode reader: triggers custom actions upon scanning barcode and also ensures product traceability'"
+      },
+      "conflicts": {
+        "battery_type": {
+          "db_value": "Li-Ion",
+          "datasheet_value": "'lead-acid or TPPL' (p.1 'Energy: lead-acid or TPPL auto charging (2020)'; TPPL = Thin Plate Pure Lead, a lead-acid sub-chemistry) -- p.2 restates 'Energy options: standard lead-acid or TPPL opportunity fast charging technology'",
+          "note": "Not overwritten. This datasheet (dated 01/2020 per its own footer) never mentions Li-Ion as an option, only lead-acid/TPPL -- possible the DB's Li-Ion value reflects a newer generation of REACHY not covered by this specific (older) datasheet revision. Flagged for Tech Lead review rather than assumed wrong given the document's age."
+        }
+      },
+      "notes": "max_payload=1600 and min_aisle_width=2900 already filled in DB, both match this datasheet exactly ('up to 1600kg' per stacking-height table row, 'Able to fit in 2900mm aisle width'). lifting_height=11000 (DB) vs this datasheet's 'up to 11455mm / 451in' headline -- a ~4% difference, not flagged as a hard conflict (plausible rounding/revision difference). vehicle_length/vehicle_width intentionally left null: the p.1 dimensions table extracted with severely garbled/duplicated text (overlapping metric/imperial unit columns rendered as interleaved characters by pdfplumber, a font/layout artifact similar to the one flagged for Balyo's Veeny datasheet in the prior continuation run) -- candidate readings (~2960mm length, ~1270mm width) were visible but not confidently parseable; left unmapped rather than guessed. This datasheet's own footer explicitly identifies it as the source for 'REACHY, the Reach Truck Driven by BALYO' -- confirms (does not newly establish) the pre-existing Balyo↔Linde R-MATIC OEM-rebadge relationship already documented in this batch's Linde findings."
+    }
+  ]
+}

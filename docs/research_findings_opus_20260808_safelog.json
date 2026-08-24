@@ -1,0 +1,765 @@
+{
+  "company": "SAFELOG GmbH",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Fresh independent opus re-extraction (redo pass). 11 SAFELOG datasheet PDFs, all identical 4-page layout: p.1 cover, p.2 prose + dimensioned drawing + DEVICE INFORMATION block, p.3 TECHNICAL DATA table (PERFORMANCE / ELECTRICAL DATA / SAFETY DEVICE / OPERATION DATA), p.4 photos + peripherals + company footer. SAFELOG structures its range as 5 chassis families (M4, L2, X1, S3, GT1, XS1) with per-chassis functional variants ('core' = no load handling, 'lift' = scissor/central lift, 'tow' = lifting-bolt trailer coupling, 'spin' = lift with independently rotating turntable). The DB currently holds only 6 family-level rows; the datasheets document 11 distinct variants -> variant completion applied, one product entry per printed 'Product name'. Variants of one family share the chassis (identical length/turning radius/battery/speed) and differ only in the load-handling module and topload rating. IMPORTANT CROSS-CUTTING FLAG: the DB carries infrastructure_free=true and navigation_type='Natural Feature (SLAM)' for every SAFELOG row; the datasheets list the STANDARD localization stack as 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (M4/L2/X1/S3) resp. 'Odometry, grid codes' (GT1/XS1) - i.e. predominantly infrastructure-bound. The datasheets never state 'infrastructure-free', so I left the field null rather than flagging a hard conflict, but the existing DB value is not datasheet-supported and should be re-verified. Also: 'LiDAR (LLS)' is not disambiguated in any of the 11 documents (LLS could be reflector-based laser localization OR natural-contour SLAM) - I deliberately did NOT map it to an AP0 navigation_type value. SCOPE BUG OBSERVED IN DB (not introduced by me): product 'SAFELOG AGV X1' (product_type Mobile AMR) carries values in lifting_height (80) and stacking_capability (0), both of which exist only in scope Logistics:AGV:Forklift; and all six SAFELOG rows carry vna_capable=0, also Forklift-only scope. The AMR-scope equivalent of lifting_height is lift_height.",
+  "company_wide_context": {
+    "source_file": "all 11 SAFELOG_Datasheet_*.pdf",
+    "fields": {
+      "country": "DE",
+      "hq_city": "Markt Schwaben",
+      "certifications_generic": [
+        "CE"
+      ]
+    },
+    "applies_to": "Company record (L1) SAFELOG GmbH",
+    "notes": "Footer on p.4 of every datasheet: 'SAFELOG GmbH | Henleinstrasse 4 | 85570 Markt Schwaben | Germany'. CE taken from the p.3 'Conformity' row (CE, FCC). FCC has no AP0 allowed value. Note the AP0 hint for safety_standard explicitly excludes CE from that field - CE is recorded here as a company-level generic certification only."
+  },
+  "products": [
+    {
+      "product_name": "SAFELOG M4 lift",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_M4-lift_EN.pdf",
+      "db_status": "new",
+      "variant_group": "SAFELOG M4 (shared chassis with M4 core and M4 tow: same 1,460 mm length, 1 m turning radius, LiFePO4 21 Ah standard battery, 0.02-1/1.6 m/s speed band)",
+      "fields": {
+        "max_payload": 1000,
+        "max_speed": 1.6,
+        "vehicle_length": 1460,
+        "stop_accuracy": 5,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.2,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "lift_height": 40,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Lift"
+        ],
+        "load_type": [
+          "Custom Carrier"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, TECHNICAL DATA / PERFORMANCE, row 'Topload level (kg)' = '1,000' (Standard column); corroborated p.2 prose 'lift standard market racks, elevated pallets and load carriers weighing up to 1,000 kg'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'; 1.6 m/s is the printed top speed (unloaded), 1.0 m/s is the loaded figure - see notes",
+        "vehicle_length": "p.2 prose 'a length of 1.46 m' -> converted to 1460 mm (AP0 unit mm); the same figure '1460' is printed as a dimension callout on the M4 LIFT SIDE VIEW drawing, p.2",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "battery_type": "p.3, ELECTRICAL DATA, row 'Battery type and quantity' = 'LiFePO4 (1)' standard",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[2.4] 1.2' -> 1.2 h with load (standard 1x21 Ah battery); 2.4 h without load",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20' (Standard column)",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 drawing callout 'INDUCTIVE CHARGING PLATE'; p.4 peripherals 'Charging station' + 'Charging plate (inductive charging)'",
+        "operating_temp_min": "p.3, OPERATION DATA, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, OPERATION DATA, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, OPERATION DATA, row 'Max. grade (%)' = '5'",
+        "safety_coverage": "p.3, SAFETY DEVICE, row 'Personnel safety' = 'Safety laser scanner'; p.2 drawing shows two floor-level scanners -> 2D plane only, no 3D sensing stated",
+        "onboard_ui": "p.2 drawing callout 'CONTROL PANEL'; p.4 image caption 'Control panel and display'",
+        "lift_height": "p.3, row 'Lifting height (scissor lift) (mm)' = '40'",
+        "min_turning_radius": "p.3, footnote block, label 'Turning radius (m):' value '1' -> converted to 1000 mm (AP0 unit mm); corroborated p.2 prose 'With a turning radius of 1 m'",
+        "top_module_type": "p.2 drawing callout 'LIFTING UNIT' (two lifting rails); p.2 prose 'Using two lifting rails mounted on the long side'",
+        "load_type": "p.2 prose 'standard market racks, elevated pallets and load carriers' - no pallet standard named, mapped to the generic allowed value 'Custom Carrier'",
+        "navigation_type": "p.3, PERFORMANCE, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, '2D camera'->Vision. NOT mapped: RFID and odometry (no AP0 allowed value), 'LiDAR (LLS)' (the document never says whether LLS is reflector-based or natural-contour, so it could be Laser Reflector OR Natural Feature (SLAM) - deliberately left unmapped)."
+      },
+      "notes": "max_speed: the datasheet prints two speeds ('0.02 - 1/1.6 (w/o load)'). I recorded the top figure 1.6 m/s (unloaded) per the AP0 hint's 'top travel speed'; the loaded/rated figure is 1.0 m/s and is the more realistic operational value - reviewer may prefer it. battery_runtime is the loaded standard-battery figure; optional 2/3/4-cell packs give 2.3/3.5/4.6 h loaded (p.3 Optional column). ingress_protection_rating deliberately NULL: unlike M4 core/M4 tow, the M4 lift 'Conformity' row prints only 'CE, FCC' with no IP code (p.3). load_type is an interpretation of prose, not a printed carrier standard - flagged. infrastructure_free left null (see researcher_notes). infrastructure_free left null (see researcher_notes)."
+    },
+    {
+      "product_name": "SAFELOG M4 core",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_M4-core_EN.pdf",
+      "db_status": "new",
+      "variant_group": "SAFELOG M4 (shared chassis with M4 lift and M4 tow)",
+      "fields": {
+        "max_payload": 300,
+        "max_speed": 1.6,
+        "vehicle_length": 1460,
+        "stop_accuracy": 5,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.2,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "operating_humidity_max": null,
+        "max_gradient": 5,
+        "ingress_protection_rating": "IP54",
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Conveyor",
+          "Custom"
+        ],
+        "station_applications": [
+          "Conveyor"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '300'; corroborated p.2 prose 'can transport a topload of up to 300 kg'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "vehicle_length": "p.2 prose 'a length of 1.46 m' -> 1460 mm; dimension callout '1460' on M4 CORE SIDE VIEW, p.2",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[2.4] 1.2' -> 1.2 h loaded",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.4 peripherals 'Charging station' / 'Charging plate (inductive charging)'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "ingress_protection_rating": "p.3, SAFETY DEVICE, row 'Conformity' = 'CE, FCC, IP54'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callout 'CONTROL PANEL'; p.4 'Control panel and display'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm; p.2 prose 'a turning radius of 1 m'",
+        "top_module_type": "p.2 prose 'With the help of variable superstructures ... The superstructures can also be optionally equipped with conveyor technology. It can also be used as an assembly platform.'",
+        "station_applications": "p.4 image caption 'Conveyor system structure as a use case' + p.2 prose 'optionally equipped with conveyor technology'",
+        "navigation_type": "p.3, PERFORMANCE, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, '2D camera'->Vision. NOT mapped: RFID and odometry (no AP0 allowed value), 'LiDAR (LLS)' (the document never says whether LLS is reflector-based or natural-contour, so it could be Laser Reflector OR Natural Feature (SLAM) - deliberately left unmapped)."
+      },
+      "notes": "lift_height deliberately NULL, not 0: p.3 prints 'Lifting height (mm) —' (no lift unit fitted). Per Blank != Zero I did not write 0, but a reviewer may want an explicit 'no lift' representation - AP0 currently has no way to distinguish 'no lift mechanism' from 'unknown' for AMR lift_height. Optional battery packs (2/3/4) give 2.4/3.5/4.7 h loaded and 30/40/60 min charge (p.3 Optional column)."
+    },
+    {
+      "product_name": "SAFELOG M4 tow",
+      "product_type": "Tugger AGV",
+      "source_file": "SAFELOG_Datasheet_M4-tow_EN.pdf",
+      "db_status": "conflict",
+      "variant_group": "SAFELOG M4 (shared chassis with M4 core and M4 lift)",
+      "fields": {
+        "towing_capacity": 1500,
+        "max_speed": 1.6,
+        "vehicle_length": 1460,
+        "stop_accuracy": 5,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.2,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "ingress_protection_rating": "IP54",
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "turning_radius": 1000,
+        "auto_hitch": true,
+        "coupling_type": [
+          "Automatic"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ]
+      },
+      "field_sources": {
+        "towing_capacity": "p.3, PERFORMANCE, row printed as 'Topload level (kg)' = '1,500' - see conflict note on the row label",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "vehicle_length": "p.2 prose 'a length of 1.46 m' -> 1460 mm; callout '1460' on M4 TOW SIDE VIEW, p.2",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[2.4] 1.2'",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "ingress_protection_rating": "p.3, row 'Conformity' = 'CE, FCC, IP54'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callout 'CONTROL PANEL'",
+        "turning_radius": "p.3 footnote 'Turning radius (m): 1' -> 1000 mm; p.2 prose 'a turning radius of 1 m'",
+        "auto_hitch": "p.2 prose 'Automatic pickup and delivery of the trailer load.'",
+        "coupling_type": "p.2 prose 'a system consisting of an electric lifting bolt and snap latch ... Automatic pickup and delivery of the trailer load'; p.2 drawing callout 'LIFTING BOLT'. Travel of the bolt is 55 mm (p.3 row 'Travel distances (lifting pin) (mm)').",
+        "navigation_type": "p.3, PERFORMANCE, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, '2D camera'->Vision. NOT mapped: RFID and odometry (no AP0 allowed value), 'LiDAR (LLS)' (the document never says whether LLS is reflector-based or natural-contour, so it could be Laser Reflector OR Natural Feature (SLAM) - deliberately left unmapped)."
+      },
+      "conflicts": [
+        {
+          "field": "max_payload",
+          "db_value": 200,
+          "datasheet_value": null,
+          "detail": "DB row 'SAFELOG AGV M4' (Tugger AGV) carries max_payload=200 kg. No SAFELOG M4 datasheet prints 200 kg anywhere: M4 core = 300 kg topload, M4 lift = 1,000 kg topload, M4 tow = 1,500 kg. Source: SAFELOG_Datasheet_M4-core_EN.pdf p.3, SAFELOG_Datasheet_M4-lift_EN.pdf p.3, SAFELOG_Datasheet_M4-tow_EN.pdf p.3. Not resolvable from the datasheets - flagged for manual resolution."
+        },
+        {
+          "field": "towing_capacity",
+          "db_value": 1500,
+          "datasheet_value": 1500,
+          "detail": "Values agree, but the row LABEL is ambiguous: SAFELOG_Datasheet_M4-tow_EN.pdf p.3 prints the 1,500 kg figure under 'Topload level (kg)', whereas the equivalent S3 tow sheet (SAFELOG_Datasheet_S3-tow_EN.pdf p.3) prints its figure under 'Towload level (kg)'. Read together with the M4 tow's footnote 4 ('load of 1,000 kg, 80% driving share') this looks like a datasheet labelling slip on SAFELOG's side. Recorded as towing_capacity (matching the existing DB value), max_payload left null."
+        }
+      ],
+      "notes": "Classified Tugger AGV per industry README step 1 (tows trolleys/trailers, does not carry the load) - consistent with the existing DB classification of 'SAFELOG AGV M4'. Tugger-scope KO fields max_trailers, route_type, min_aisle_width and tugger_min_aisle_width are all NULL: none is stated anywhere in the document. lift_height/min_turning_radius NOT written - they are AMR-scope fields and do not apply to a Tugger AGV; the tugger-scope turning_radius was used instead."
+    },
+    {
+      "product_name": "SAFELOG L2 lift",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_L2-lift_EN.pdf",
+      "db_status": "enrich",
+      "variant_group": "SAFELOG L2 (shared chassis with L2 core: same omnidirectional drive, LiFePO4 2x42 Ah standard, 1 m turning radius, 1,500 kg topload)",
+      "fields": {
+        "max_payload": 1500,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "omnidirectional_movement": true,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.7,
+        "charge_time": 30,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "lift_height": 160,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Lift"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '1,500'; corroborated p.2 prose 'actively lift and transport loads of up to 1,500 kg using a scissor lift table'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "omnidirectional_movement": "p.2 prose 'The omnidirectional travel mode and the ability to turn on the spot guarantee a high level of agility even in confined spaces'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (2)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3,0] 1,7' -> 1.7 h loaded (German decimal comma in the source)",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '30'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callouts '7\" TOUCH DISPLAY' and 'INTELLIAGENT CONTROL PANEL'",
+        "lift_height": "p.3, row 'Lifting height (platform) (mm)' = '160'; corroborated p.2 prose 'The maximum travel of the lift table is 160 mm'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm",
+        "top_module_type": "p.2 drawing callout 'CENTRAL LIFTING UNIT INCL. LIFTING TABLE'; p.2 prose 'scissor lift table'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), inductive sensor' (Standard) / 'grid codes (only with LLS)' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, 'grid codes'->QR/DM Code. 'LiDAR (LLS)' left unmapped (reflector vs. natural-feature not stated)."
+      },
+      "notes": "DB agrees on max_payload (1500), max_speed (1.6) and omnidirectional_movement (true) - this is a pure enrichment. NOT flagged as a conflict but worth a reviewer's eye: the DB carries rotation_capable=true for 'SAFELOG AGV L2', while neither L2 datasheet mentions a rotating platform (that feature is printed only on the X1 spin and GT1 spin sheets). Per Blank != Zero the datasheet's silence is not a contradiction, so I did not write false. load_type left null: p.2 says 'pallets and pallet cages' but names no pallet standard, and 'pallet cage' has no exact AP0 allowed value ('Bulk Bin' is close but not stated). ingress_protection_rating null - p.3 'Conformity' prints only 'CE, FCC'. vehicle_length/width null: the p.2 drawing carries callouts ('1200', '074', '061', '013', '007') but pdfplumber cannot reliably attribute them to a dimension line and no prose figure exists; these are CONTEXT-level fields so I did not spend an image read on them."
+    },
+    {
+      "product_name": "SAFELOG L2 core",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_L2-core_EN.pdf",
+      "db_status": "new",
+      "variant_group": "SAFELOG L2 (shared chassis with L2 lift)",
+      "fields": {
+        "max_payload": 1500,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "omnidirectional_movement": true,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.7,
+        "charge_time": 30,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Custom"
+        ],
+        "workflow_capability": [
+          "Transport",
+          "Goods-to-Person"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '1,500'; p.2 prose 'transporting pallets and pallet cages weighing up to 1,500 kg'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "omnidirectional_movement": "p.2 prose 'The omnidirectional travel mode and the ability to turn on the spot'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (2)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3,0] 1,7'",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '30'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callouts '7\" TOUCH DISPLAY', 'INTELLIAGENT CONTROL PANEL'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm",
+        "top_module_type": "p.2 prose 'or as an assembly platform when outfitted with a custom superstructure'",
+        "workflow_capability": "p.2 prose 'particularly suitable as a transport robot for goods-to-person processes or as an assembly platform'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), inductive sensor' (Standard) / 'grid codes (only with LLS)' (Optional). Mapped: 'Magnetic track'->Magnetic Tape, 'inductive sensor'->Inductive Loop, 'grid codes'->QR/DM Code. 'LiDAR (LLS)' left unmapped (reflector vs. natural-feature not stated)."
+      },
+      "notes": "workflow_capability is the one field where this datasheet is explicit about role ('goods-to-person processes' named verbatim on p.2) - note the AP0 hint's NULL RULE is written for tender extraction, not supplier extraction, so I did record it here from the explicit supplier statement. grid_required left null despite the G2P mention: nothing in the document states a fixed storage grid. lift_height NULL not 0 (p.3 prints 'Lifting height (platform) (mm) —', i.e. no lift fitted)."
+    },
+    {
+      "product_name": "SAFELOG X1 lift 1200",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_X1-lift-1200_EN.pdf",
+      "db_status": "enrich",
+      "variant_group": "SAFELOG X1 (shared differential-drive chassis with X1 core and X1 spin: same 0.02-1.6 m/s band, LiFePO4 21 Ah standard, 1 m turning radius)",
+      "fields": {
+        "max_payload": 1200,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "omnidirectional_movement": false,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.7,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "lift_height": 80,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Lift"
+        ],
+        "workflow_capability": [
+          "Goods-to-Person",
+          "Transport"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision",
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '1,200'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'; p.2 prose 'driving speeds from 0.02 to 1.6 m/s'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "omnidirectional_movement": "p.2 prose 'All variants have a differential drive allowing for turning on the spot' - differential drive can spin on the spot but cannot translate sideways, so not holonomic/omnidirectional per the AP0 hint",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3.5] 1.7' -> 1.7 h loaded",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callout 'CONTROL PANEL'",
+        "lift_height": "p.3, row 'Lifting height (lifting unit) (mm)' = '80'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm",
+        "top_module_type": "p.2 prose 'picks up the load via a central lifting unit, which can be equipped with various attachments'; drawing callout 'CENTRAL LIFTING UNIT INCL. OPTIONAL ADAPTER PLATE'",
+        "workflow_capability": "p.2 prose 'primarily used as a goods-to-person platform in fulfillment centers and on production lines'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera, grid codes' (Optional). 'LiDAR (LLS)' left unmapped."
+      },
+      "notes": "DB agrees on max_payload (1200). SCOPE BUG in existing DB row 'SAFELOG AGV X1': the value 80 is stored in lifting_height, which exists only in scope Logistics:AGV:Forklift, on a Mobile AMR product. The correct AMR-scope field is lift_height (used here). Same row also carries stacking_capability=0 and vna_capable=0, both Forklift-scope. Flagged, not resolved. load_type left null: p.2 mentions 'pallets, shelves or other load carriers' without naming a carrier standard. multi_load_compatibility left null - 'various attachments' implies reconfiguration between carrier types, not mixed carriers in one workflow."
+    },
+    {
+      "product_name": "SAFELOG X1 core",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_X1-core_EN.pdf",
+      "db_status": "new",
+      "variant_group": "SAFELOG X1 (shared chassis with X1 lift 1200 and X1 spin)",
+      "fields": {
+        "max_payload": 1500,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "omnidirectional_movement": false,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.7,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "safety_coverage": "Single plane (2D)",
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Custom"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision",
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '1.500' (German thousands separator) -> 1500 kg",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'; p.2 prose 'driving speeds from 0.02 to 1.6 m/s'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "omnidirectional_movement": "p.2 prose 'All variants have a differential drive allowing for turning on the spot'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3.5] 1.7'",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm",
+        "top_module_type": "p.2 prose 'The focus of the SAFELOG X1 core robot is on its use as an assembly platform. The X1 core can be equipped with optional superstructures.'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera, grid codes' (Optional). 'LiDAR (LLS)' left unmapped."
+      },
+      "notes": "PLAUSIBILITY CHECK worth a second look: the X1 core (no load-handling module) is rated 1,500 kg topload while the lift and spin variants of the same chassis are rated 1,200 kg (p.3 of each sheet). That is internally consistent (a passive deck can carry more than a lift mechanism), but the printed figure '1.500' uses a German thousands separator in an otherwise English sheet, so a reviewer should confirm it is not a typo for 1,500 vs 150. Corroborating evidence for 1,500: footnote 4 on the same page references 'load of 1,000 kg'. lift_height NULL not 0 (p.3 prints 'Lifting height (mm) —'). onboard_ui left null: unlike the other X1 sheets the X1 core drawing shows 'HANDLES', not a control panel."
+    },
+    {
+      "product_name": "SAFELOG X1 spin",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_X1-spin_EN.pdf",
+      "db_status": "new",
+      "variant_group": "SAFELOG X1 (shared chassis with X1 lift 1200 and X1 core)",
+      "fields": {
+        "max_payload": 1200,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "omnidirectional_movement": false,
+        "rotation_capable": true,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.7,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "lift_height": 80,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Lift"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision",
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '1,200'; p.2 prose 'The maximum load capacity is 1,200 kg'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "omnidirectional_movement": "p.2 prose 'All variants have a differential drive allowing for turning on the spot'",
+        "rotation_capable": "p.2 prose 'The special feature of the X1 spin is that the central lifting unit can rotate independently of the robot. This allows the transported goods to be realigned even in confined spaces.'; drawing callout 'ROTATING PLATFORM'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3.5] 1.7'",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callout 'CONTROL PANEL'",
+        "lift_height": "p.3, row 'Lifting height (lifting unit) (mm)' = '80'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm",
+        "top_module_type": "p.2 drawing callouts 'CENTRAL LIFTING UNIT' + 'ROTATING PLATFORM'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera, grid codes' (Optional). 'LiDAR (LLS)' left unmapped."
+      },
+      "notes": "rotation_capable=true is the defining difference vs. X1 lift 1200 and is explicitly stated, matching the AP0 hint exactly ('can rotate the carried rack/pod in place to present a chosen face'). grid_required left null - not stated, so the G2P inference chain in README section 3 is not completed by this document alone."
+    },
+    {
+      "product_name": "SAFELOG S3 core",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_S3-core_EN.pdf",
+      "db_status": "enrich",
+      "variant_group": "SAFELOG S3 (shared differential-drive chassis with S3 tow: same 770 mm dimension callout, 0.8 m turning radius, single LiFePO4 21 Ah battery)",
+      "fields": {
+        "max_payload": 150,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "omnidirectional_movement": false,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.5,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "ingress_protection_rating": "IP54",
+        "safety_coverage": "Single plane (2D)",
+        "min_turning_radius": 800,
+        "top_module_type": [
+          "Conveyor",
+          "Custom"
+        ],
+        "station_applications": [
+          "Conveyor"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload level (kg)' = '150'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "omnidirectional_movement": "p.2 prose 'The S3 can rotate on the spot in a space less than 90cm thanks to a differential drive'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3] 1.5' -> 1.5 h loaded",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'; p.4 'Charging station' / 'Charging plate (inductive charging)'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "ingress_protection_rating": "p.3, row 'Conformity' = 'CE, FCC, IP54'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner'",
+        "min_turning_radius": "p.3 footnote block, label 'Turning radius (m):' value '0.8' -> converted to 800 mm - but see conflict entry, the prose on p.2 gives a contradictory geometry",
+        "top_module_type": "p.2 prose 'can be equipped with variable transport superstructures. Superstructures with conveyor technology are also possible.'",
+        "station_applications": "p.4 image caption 'Conveyor system structure as a use case'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). 'LiDAR (LLS)' left unmapped."
+      },
+      "conflicts": [
+        {
+          "field": "min_turning_radius",
+          "db_value": null,
+          "datasheet_value": 800,
+          "detail": "INTERNAL datasheet inconsistency, not a DB conflict. SAFELOG_Datasheet_S3-core_EN.pdf p.3 footnote block prints 'Turning radius (m): 0.8' while p.2 prose states the robot 'can rotate on the spot in a space less than 90cm' (= 900 mm swing DIAMETER, i.e. ~450 mm radius). The same contradiction appears in SAFELOG_Datasheet_S3-tow_EN.pdf (p.2 'require a diameter of less than 90 cm to do so' vs p.3 'Turning radius (m): 0.8'). SAFELOG's 'Turning radius' row is most likely a swing-circle diameter. I recorded the explicitly labelled 'radius' figure (800 mm) per the safe-mapping rule, but this needs a ruling before import - the two readings differ by ~2x on a KO field."
+        }
+      ],
+      "notes": "DB agrees on max_payload (150) - pure enrichment otherwise. The same radius-vs-diameter ambiguity may also affect the M4/L2/X1/GT1 sheets ('Turning radius (m): 1'), where no contradicting prose exists to expose it. lift_height NULL not 0 (p.3 prints 'Lifting height (mm) —')."
+    },
+    {
+      "product_name": "SAFELOG S3 tow",
+      "product_type": "Tugger AGV",
+      "source_file": "SAFELOG_Datasheet_S3-tow_EN.pdf",
+      "db_status": "new",
+      "variant_group": "SAFELOG S3 (shared chassis with S3 core)",
+      "fields": {
+        "towing_capacity": 500,
+        "max_speed": 1.6,
+        "stop_accuracy": 5,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 1.5,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "max_gradient": 5,
+        "ingress_protection_rating": "IP54",
+        "safety_coverage": "Single plane (2D)",
+        "turning_radius": 800,
+        "auto_hitch": true,
+        "coupling_type": [
+          "Automatic"
+        ],
+        "navigation_type": [
+          "Magnetic Tape",
+          "Inductive Loop",
+          "Vision"
+        ]
+      },
+      "field_sources": {
+        "towing_capacity": "p.3, PERFORMANCE, row 'Towload level (kg)' = '500' - note this sheet uses the correct 'Towload' label, unlike the M4 tow sheet",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.02 - 1/1.6 (w/o load)'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[3] 1.5'",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.4 'Charging station' / 'Charging plate (inductive charging)'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "max_gradient": "p.3, row 'Max. grade (%)' = '5'",
+        "ingress_protection_rating": "p.3, row 'Conformity' = 'CE, FCC, IP54'",
+        "safety_coverage": "p.3, row 'Personnel safety' = 'Safety laser scanner' (single scanner, front only per 'Emergency stop Front' / 'LED-Strip Front')",
+        "turning_radius": "p.3 footnote block 'Turning radius (m): 0.8' -> 800 mm; see the radius/diameter conflict flagged on SAFELOG S3 core",
+        "auto_hitch": "p.2 prose 'The trailer load is picked up and released automatically via an electric lifting bolt.'",
+        "coupling_type": "p.2 prose 'electric lifting bolt', automatic pickup/release; drawing callout 'LIFTING BOLT'; p.3 row 'Travel distances (lifting bolt) (mm)' = '55'",
+        "navigation_type": "p.3, row 'Localization' = 'Magnetic track, RFID, LiDAR (LLS), odometry, inductive sensor' (Standard) / '2D camera' (Optional). 'LiDAR (LLS)' left unmapped."
+      },
+      "notes": "Classified Tugger AGV (tows trolleys/trailers; p.4 use-case image 'Trolley transportation as a use case'). max_payload left null - this variant does not carry a topload. max_trailers, route_type, min_aisle_width, tugger_min_aisle_width, train_configuration, trailer_steering_technology all null (not stated). Same radius/diameter ambiguity as S3 core (p.2 'diameter of less than 90 cm' vs p.3 'Turning radius (m): 0.8')."
+    },
+    {
+      "product_name": "SAFELOG GT1 spin",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datenblatt_GT1-spin_EN.pdf",
+      "db_status": "conflict",
+      "variant_group": "SAFELOG GT1 (only variant documented in this batch; p.4 references an 'extended lifting unit' configuration)",
+      "fields": {
+        "max_payload": 1300,
+        "max_speed": 3.0,
+        "vehicle_length": 1200,
+        "vehicle_width": 830,
+        "stop_accuracy": 5,
+        "rotation_capable": true,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 3.7,
+        "charge_time": 30,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "operating_humidity_max": 90,
+        "max_gradient": 0,
+        "ingress_protection_rating": "IP54",
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "lift_height": 70,
+        "min_ground_clearance": 275,
+        "min_turning_radius": 1000,
+        "top_module_type": [
+          "Lift"
+        ],
+        "workflow_capability": [
+          "Goods-to-Person",
+          "Transport"
+        ],
+        "storage_system_type": [
+          "Shelf-to-Person",
+          "Pallet-to-Person"
+        ],
+        "navigation_type": [
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload (kg)' = '1,300'; p.2 prose 'The maximum top load capacity is 1,300 kg'",
+        "max_speed": "p.3, row 'Speed ([non]safe) (m/s)' = '0.02 - 2.0 [3.0]'; p.2 prose 'Under full load, the robot can reach a top speed of up to 2.0 m/s, while speeds of up to 3 m/s are possible without a payload' -> 3.0 recorded as top speed, 2.0 is the loaded/safety-rated figure",
+        "vehicle_length": "p.2 prose 'compact dimensions of 1200x830 mm (LxW)'; the callout '1200' also appears on the GT1 SPIN TOP VIEW drawing, p.2",
+        "vehicle_width": "p.2 prose 'compact dimensions of 1200x830 mm (LxW)'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "rotation_capable": "p.2 prose 'the GT1 spin variant is equipped with a turntable, allowing the transported goods to be independently adjusted without moving the robot itself'; drawing callout 'ROTATING PLATFORM'",
+        "battery_type": "p.3, row 'Battery type and quantity' = 'LiFePO4 (4)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[6.3] 3.7' -> 3.7 h loaded",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '30'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.2 callout 'INDUCTIVE CHARGING PLATE'; p.4 peripherals 'Charging station*' / 'Charging plate (inductive charging)*'",
+        "operating_temp_min": "p.3, OPERATION DATA, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, OPERATION DATA, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_humidity_max": "p.3, OPERATION DATA, row 'Humidity (% RH)' = '0 to 90 (non-cond.)' -> 90",
+        "max_gradient": "p.4 footnote '* The GT1 cannot drive on inclines and ramps.' (the p.3 'Max. grade (%)' row prints '—')",
+        "ingress_protection_rating": "p.3, row 'Conformity (planned)' = 'CE, FCC, IP54' - note the word '(planned)'",
+        "safety_coverage": "p.3, row 'Personnel safety (optional)' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 drawing callouts '7\" TOUCH DISPLAY' and 'CONTROL PANEL'",
+        "lift_height": "p.3, row 'Lifting height (platform) (mm)' = '70'; p.2 prose 'lift them up to 70 mm using a lifting system'",
+        "min_ground_clearance": "p.2 prose 'With a height of just 275 mm, it can drive under most standard market shelves' -> 275 mm, matching the AP0 hint's definition (robot height / clearance needed to drive UNDER the carrier)",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 1' -> 1000 mm",
+        "top_module_type": "p.2 drawing callouts 'LIFTING SYSTEM' + 'ROTATING PLATFORM'; p.4 'Standard with extended lifting unit'",
+        "workflow_capability": "p.2 prose 'The SAFELOG GT1 is a Goods-to-Person (GTP) solution designed to meet the requirements of pallet and shelf transport (Shelf-to-Person)'",
+        "storage_system_type": "p.2 prose 'pallet and shelf transport (Shelf-to-Person)'; p.4 use case 'Rack transportation as a use case'",
+        "navigation_type": "p.3, row 'Localization' = 'Odometry, grid codes' (Standard) / 'LiDAR (LLS)' (Optional). Only 'grid codes'->QR/DM Code is mappable; odometry has no AP0 value and 'LiDAR (LLS)' is unresolved."
+      },
+      "conflicts": [
+        {
+          "field": "max_speed",
+          "db_value": 2.2,
+          "datasheet_value": 3.0,
+          "detail": "DB 'SAFELOG AGV GT1 spin' carries max_speed=2.2 m/s. SAFELOG_Datenblatt_GT1-spin_EN.pdf p.3 row 'Speed ([non]safe) (m/s)' prints '0.02 - 2.0 [3.0]' and p.2 prose states 2.0 m/s under full load / 3 m/s without payload. 2.2 matches neither figure. Not resolvable from the datasheet - flagged."
+        }
+      ],
+      "notes": "max_gradient=0 is a REAL stated value, not a null placeholder: p.4 explicitly states the GT1 cannot drive on inclines and ramps, while the p.3 table leaves the row blank ('—'). Worth a reviewer check that a 0 here does not get treated as 'unknown' downstream. ingress_protection_rating is printed under 'Conformity (planned)' - the IP54 rating is announced, not yet certified; recorded but flagged. grid_required left null: standard localization is 'Odometry, grid codes' (p.3), i.e. floor codes are used for LOCALIZATION, which is not the same as the AP0 'fixed storage grid' concept (AutoStore-style) - I did not conflate the two. Also note: the DB row already carries grid_required=0. infrastructure_free left NULL although the STANDARD localization ('Odometry, grid codes', p.3) requires permanent floor codes: the optional LiDAR (LLS) configuration might be infrastructure-free and the document does not say. The existing DB value infrastructure_free=true is therefore unsupported by this datasheet but not directly contradicted - flagged in the coverage report rather than raised as a conflict."
+    },
+    {
+      "product_name": "SAFELOG XS1 IntelliCart",
+      "product_type": "Mobile AMR",
+      "source_file": "SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf",
+      "db_status": "conflict",
+      "variant_group": "SAFELOG XS1 (the IntelliCart is the XS1 core chassis plus a shelf/tablet picking superstructure - p.4 image caption 'SAFELOG XS1 core')",
+      "fields": {
+        "max_payload": 50,
+        "max_speed": 3.0,
+        "stop_accuracy": 5,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 4.5,
+        "charge_time": 20,
+        "autonomous_charging": true,
+        "operating_temp_min": 5,
+        "operating_temp_max": 35,
+        "ingress_protection_rating": "IP54",
+        "safety_coverage": "Single plane (2D)",
+        "onboard_ui": true,
+        "min_turning_radius": 800,
+        "top_module_type": [
+          "Shelf Carrier"
+        ],
+        "load_type": [
+          "Tote",
+          "Plastic Bin"
+        ],
+        "onboard_container_type": [
+          "Tote",
+          "Bin"
+        ],
+        "workflow_capability": [
+          "Picking support",
+          "Transport"
+        ],
+        "picking_mechanism": "Human-assisted (cart follower)",
+        "ergonomic_height_adjustable": true,
+        "navigation_type": [
+          "QR/DM Code"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.3, row 'Topload (kg)' = '50'; p.2 prose 'With a load capacity of up to 50 kg'",
+        "max_speed": "p.3, row 'Speed (m/s)' = '0.1 - 3.0'",
+        "stop_accuracy": "p.3, row 'Positioning accuracy (mm)' = '+/- 5'",
+        "battery_type": "p.3, row 'Battery type and (quantity)' = 'LiFePO4 (1)'",
+        "battery_runtime": "p.3, row 'Continous driving (w/[o] load) (h)' = '[6] 4.5' -> 4.5 h loaded",
+        "charge_time": "p.3, row 'Charging time 20-80% (min)' = '20'",
+        "autonomous_charging": "p.3, row 'Charging system' = 'Inductive'; p.4 peripherals 'Charging station*' / 'Charging plate (inductive charging)*'",
+        "operating_temp_min": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "operating_temp_max": "p.3, row 'Temperature (degC)' = '+5 to +35'",
+        "ingress_protection_rating": "p.3, row 'Conformity' = 'CE, FCC, IP54'",
+        "safety_coverage": "p.3, row 'Personnel safety (optional)' = 'Safety laser scanner'",
+        "onboard_ui": "p.2 prose 'A tablet displays all necessary order information to the picker, and the touchscreen also serves for order confirmation'; drawing callout 'DISPLAY (TABLET)'",
+        "min_turning_radius": "p.3 footnote block 'Turning radius (m): 0.8' -> 800 mm (same radius/diameter caveat as the S3 sheets)",
+        "top_module_type": "p.2 drawing callouts 'SHELVES' / 'FLEXIBLE SHELF SUPPORTS'",
+        "load_type": "p.2 prose 'height-adjustable shelves, which are designed to accommodate standard KLTs and boxes' (KLT = Kleinladungstraeger, small load carrier)",
+        "onboard_container_type": "p.2 prose 'standard KLTs and boxes'",
+        "workflow_capability": "p.2 prose 'semi-automated multi-order picking in Person-to-Goods processes'",
+        "picking_mechanism": "p.2 prose 'The mobile robot takes over the transport of goods, allowing warehouse staff to fully focus on the picking or placing process'; p.4 peripheral 'Follow Me mode' -> cart-follower / Person-to-Goods per industry README section 4",
+        "ergonomic_height_adjustable": "p.2 prose 'Maximum flexibility is ensured by height-adjustable shelves'",
+        "navigation_type": "p.3, row 'Localization' = 'Odometry, grid codes' (Standard) / 'LiDAR (LLS)' (Optional)."
+      },
+      "conflicts": [
+        {
+          "field": "max_payload",
+          "db_value": 85,
+          "datasheet_value": 50,
+          "detail": "DB 'SAFELOG AGV XS1' carries max_payload=85 kg. SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf p.3 row 'Topload (kg)' prints '50', corroborated by p.2 prose 'a load capacity of up to 50 kg'. Possible explanation (NOT confirmed by any document in this batch): the DB figure may describe a different XS1 variant (e.g. a bare XS1 core without the IntelliCart shelf superstructure, whose datasheet is not in this corpus). Flagged, not overwritten."
+        },
+        {
+          "field": "max_speed",
+          "db_value": 4.0,
+          "datasheet_value": 3.0,
+          "detail": "DB 'SAFELOG AGV XS1' carries max_speed=4.0 m/s. SAFELOG_Datasheet_XS1-IntelliCart_EN.pdf p.3 row 'Speed (m/s)' prints '0.1 - 3.0'. 4.0 m/s would also be implausibly fast for a human-shared picking aisle (see plausibility guidance: human-shared <=1.5 m/s). Flagged."
+        }
+      ],
+      "notes": "Person-to-Goods picking cart (README section 4), NOT Goods-to-Person - the picker walks the aisles and the robot accompanies them. max_gradient left null: p.3 prints 'tbd'. lift_height NULL not 0 ('Lifting height (mm) —'). Dimension callouts on p.2 ('684', '727', '1821', '617.1') could not be reliably attributed to length/width/height by text extraction and no prose dimensions exist; vehicle_length/vehicle_width are CONTEXT-level so I did not spend an image read on the drawing. infrastructure_free left NULL although the STANDARD localization ('Odometry, grid codes', p.3) requires permanent floor codes: the optional LiDAR (LLS) configuration might be infrastructure-free and the document does not say. The existing DB value infrastructure_free=true is therefore unsupported by this datasheet but not directly contradicted - flagged in the coverage report rather than raised as a conflict."
+    }
+  ]
+}

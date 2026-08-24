@@ -1,0 +1,119 @@
+{
+  "company": "Stäubli",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. Sterimove is a NEW PRODUCT for an existing company (Stäubli already in DB with FL1500, PF280, PF3, PF30, PF6). IMPORTANT FLAG: the datasheet itself is explicitly marked 'Preliminary data' on both the cover page and the dimensions page, and carries a disclaimer 'We reserve the right to modify product specifications without prior notice' -- this is pre-release/subject-to-change data, not a finalized product spec. Recommend the reviewer treat these values as provisional and re-verify before using them as hard K.O. thresholds. The PDF's dimensioned CAD drawing pages (p.2 bottom half) are heavily corrupted/garbled by the text extraction (interleaved German bolt-torque instructions and drawing-frame text merged into one unreadable block) -- only the clean spec table at the top of p.2 was used; no attempt was made to visually re-read the CAD drawing for this calibration run since all KO-relevant values (payload, speed, turning radius) were already legible in the clean table text. ADDENDUM (later in same continuation run): 'Mobile-Robotics-portfolio-EN.pdf' (company-wide product catalog) processed -- surfaced the PF3/PF3 OMNI naming ambiguity noted on the PF3 entry above; no other new numeric fields found (FL1500/PF3/PF6 headline figures all already known). 'Training-brochure-mobile robotics-EN.pdf' (company-wide training-services brochure) processed -- contains no product specifications at all (training curriculum only), moved to Analysed with zero fields extracted.",
+  "products": [
+    {
+      "product_name": "Sterimove",
+      "product_type": "Mobile AMR",
+      "source_file": "Sterimove-datasheet-EN.pdf",
+      "db_status": "new",
+      "fields": {
+        "max_payload": 250,
+        "max_speed": 1.0,
+        "min_turning_radius": 669,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "cleanroom_class": "ISO 1–9",
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "battery_runtime": 8,
+        "autonomous_charging": true,
+        "max_gradient": 1,
+        "operating_temp_min": 5,
+        "operating_temp_max": 25,
+        "ingress_protection_rating": "IP65",
+        "safety_standard": [
+          "ISO 3691-4"
+        ]
+      },
+      "field_sources": {
+        "max_payload": "p.2 spec table, 'Performance' block, 'Payload (kg) 250'",
+        "max_speed": "p.2 spec table, 'Max. speed (m/s) Up to 1'",
+        "min_turning_radius": "p.2 spec table, 'Turning radius (mm) 669 on the spot' -- a second figure '819 mm in motion' is also printed but not used (min_turning_radius is defined as the tightest/on-the-spot figure); the in-motion value is noted here for the reviewer",
+        "navigation_type": "p.2 spec table, 'Navigation: Laser natural feature'",
+        "cleanroom_class": "p.2 spec table, 'Cleanroom compatibility' block: 'Grade Up to grade A', 'ISO class ISO 5' -- AP0's cleanroom_class field only offers a coarse ['None','ISO 1–9'] bucket, so 'ISO 1–9' was used; the exact stated class (ISO 5 / Grade A) is preserved here for the reviewer since the AP0 field itself cannot capture that precision",
+        "battery_type": "p.2 spec table, 'Energy' block, 'Battery technology Li-ion 48V'",
+        "battery_runtime": "p.2 spec table, 'Energy' block, 'Runtime (h) 8'",
+        "autonomous_charging": "p.2 spec table, 'Energy' block, 'Charging system (front) Inductive' -- inductive front charging strongly implies automated dock-based charging rather than manual battery swap/plug-in, but this is an inference from the charging TECHNOLOGY, not an explicit 'autonomous/automatic charging' claim -- flagged as a judgment call, not a directly-stated fact",
+        "max_gradient": "p.2 spec table, 'Battery' block, 'Slope (%) Up to 1'",
+        "operating_temp_min": "p.2 spec table, 'Installation environment' block, 'Working temperature +5°C to 25°C (DIN EN ISO 3691-4)'",
+        "operating_temp_max": "p.2 spec table, 'Installation environment' block, 'Working temperature +5°C to 25°C (DIN EN ISO 3691-4)'",
+        "ingress_protection_rating": "p.2 spec table, 'Installation environment' block, 'Protection class Up to IP65'",
+        "safety_standard": "p.2 spec table, 'Installation environment' block -- the working-temperature line explicitly cites '(DIN EN ISO 3691-4)' as the standard the environment rating is measured against"
+      },
+      "notes": "Position accuracy stated as 'Up to ± 10 mm' but there is no direct AP0 field for generic position accuracy on an AMR (only drop/pick accuracy sub-fields exist, and this datasheet does not distinguish drop vs pick) -- left unmapped rather than force-fit. Dead weight (225 kg) has no matching AP0 field (max_payload already captures the 250kg carry capacity; dead/tare weight is not modeled) -- omitted. Compliance='CE' is stated (p.2, 'Installation environment' block) -- this maps to the COMPANY-level field certifications_generic (scope '*'), not a Base-Model field, so it was not put in this product's 'fields' block; flagging here for the import script to consider adding 'CE' to Stäubli's company-level certifications_generic if not already present. drive_type='Differential' (wheel configuration) has no matching field since drive_type in AP0 is scoped to Forklift AGV only, not AMR -- correctly omitted rather than force-mapped."
+    },
+    {
+      "product_name": "Stäubli FL1500",
+      "product_type": "Forklift AGV",
+      "source_file": "FL1500-data-sheet-EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 1.5,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "max_gradient": 3,
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "ingress_protection_rating": "IP54"
+      },
+      "field_sources": {
+        "max_speed": "p.2 spec table, 'Performance' block, 'Max. speed (m/s) Up to 1.5'",
+        "operating_temp_min": "p.2 spec table, 'Installation environment' block, 'Working temperature +5°C to 40°C (DIN EN ISO 3691-4)'",
+        "operating_temp_max": "p.2 spec table, same row",
+        "max_gradient": "p.2 spec table, 'Energy' block, 'Slope (%) Up to 3'",
+        "battery_type": "p.2 spec table, 'Energy' block, 'Battery technology Li-ion 48V'",
+        "ingress_protection_rating": "p.2 spec table, 'Installation environment' block, 'Protection class IP54'"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Cross-checked already-filled DB fields: max_payload=1500 matches 'Payload (kg) Up to 1 500' exactly, lifting_height=3205 has no directly competing figure in this datasheet (the sheet's only speed-related lift figure is 'Lifting speed 250 mm/s', not a height) -- no conflict, not restated. 'Turning radius (m) 1.5' and 'Ground clearance min. (mm) 30' are both printed but deliberately NOT mapped to any field -- min_turning_radius/min_ground_clearance only exist in AP0 for Mobile AMR scope, and this product is classified Forklift AGV (no equivalent forklift-scope field exists for either quantity), so both are correctly omitted rather than force-mapped. The p.2 dimensioned CAD drawing (mono/duplex mast side view) is present but its extracted text is scrambled (German bolt-torque/title-block text interleaved with drawing labels, same issue as the Sterimove sheet processed earlier) -- not visually re-read since lifting_height is already non-null in the DB and no other KO field was missing that the drawing might carry."
+    },
+    {
+      "product_name": "Stäubli PF3",
+      "product_type": "Mobile AMR",
+      "source_file": "PF3-data-sheet-EN.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "min_turning_radius": 1700,
+        "min_ground_clearance": 30,
+        "operating_temp_min": 5,
+        "operating_temp_max": 40,
+        "max_gradient": 3,
+        "battery_type": [
+          "Li-Ion"
+        ],
+        "battery_runtime": 8,
+        "charge_time": 90,
+        "ingress_protection_rating": "IP54"
+      },
+      "field_sources": {
+        "min_turning_radius": "p.2 spec table, 'Performance' block, 'Turning radius (m) 1.7' -- explicitly labelled 'radius' (not diameter/Wendekreis), so used directly without the radius/diameter ambiguity flagged elsewhere for other suppliers",
+        "min_ground_clearance": "p.2 spec table, 'Performance' block, 'Ground clearance min. (mm) 30'",
+        "operating_temp_min": "p.2 spec table, 'Installation environment' block, 'Working temperature +5°C to 40°C (DIN EN ISO 3691-4)'",
+        "operating_temp_max": "p.2 spec table, same row",
+        "max_gradient": "p.2 spec table, 'Energy' block, 'Slope (%) Up to 3'",
+        "battery_type": "p.2 spec table, 'Energy' block, 'Battery technology Li-ion 48V'",
+        "battery_runtime": "p.2 spec table, 'Battery' block, 'Runtime (h) min. 8'",
+        "charge_time": "p.2 spec table, 'Battery' block, 'Charge time [15% to 90%] (min) 90'",
+        "ingress_protection_rating": "p.2 spec table, 'Installation environment' block, 'Protection class Up to IP54'"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db_value": 2721,
+          "datasheet_value": "3000 (p.2 spec table, 'Performance' block, 'Payload (tons) Up to 3')",
+          "note": "Not overwritten. DB's oddly precise 2721 vs the datasheet's round 'up to 3 t' headline figure -- possibly DB value is a config-specific actual rated payload vs the datasheet's marketing max, but genuinely conflicting numbers, flagged for Tech Lead review."
+        },
+        "max_speed": {
+          "db_value": 1.1,
+          "datasheet_value": "1.5 (p.2 spec table, 'Performance' block, 'Max. speed (m/s) Up to 1.5')",
+          "note": "Not overwritten. Same up-to-headline-vs-precise-DB-value pattern as max_payload above."
+        }
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). This product is classified Mobile AMR in the DB (unlike its sibling FL1500, classified Forklift AGV), so the AMR-scope min_turning_radius/min_ground_clearance KO fields both apply and were filled directly from this datasheet's own explicit 'radius'/'ground clearance' wording -- no ambiguity, unlike the recurring radius-vs-diameter question flagged for other suppliers (see agent memory). 'Lift unit (stroke +100 mm)' is printed under Add-ons/Energy but reads as an optional accessory stroke extension, not a stated total lift_height figure -- not mapped to lift_height to avoid a misleading precise-looking number. Dimensioned drawing on p.2 (350mm/996mm/1750mm) has no clear axis labels in the extracted text -- vehicle_length/vehicle_width left null rather than guessed (both CONTEXT-level, not KO, so no image-based re-read triggered per this agent's own escalation rule). ADDENDUM (later in same continuation run): 'Mobile-Robotics-portfolio-EN.pdf' (Stäubli's own company-wide product catalog, also processed this run) explicitly lists 'PF3' (3t, drive type 'Tricycle') and 'PF3 OMNI' (3t, drive type 'Omnidirectional') as TWO SEPARATE products -- matching this datasheet's own 'Drive type: Tricycle' label for plain PF3. This is a genuine naming-ambiguity FLAG: the DB's existing single 'Stäubli PF3' row already has omnidirectional_movement=1 set (pre-existing, non-null, not touched), which is inconsistent with 'PF3' being the Tricycle variant per both sources -- it's possible the DB row was actually populated from 'PF3 OMNI' data under the 'PF3' name, or that 'PF3 OMNI' is a genuinely separate product missing from the DB entirely. Not resolved here (insufficient additional PF3 OMNI-specific numeric data was found beyond its 3t/Omnidirectional label to justify creating a confident new product row) -- flagged for Tech Lead investigation."
+    }
+  ]
+}

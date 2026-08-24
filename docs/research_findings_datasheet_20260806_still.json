@@ -1,0 +1,209 @@
+{
+  "company": "STILL GmbH",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "FULL-BATCH CONTINUATION RUN. These 5 files (AGV-Overview_DE_Flyer.pdf, AXL-iGo_DE_Brochure.pdf, Automation_DE_Brochure.pdf, Intralogistic-Systems_DE_Brochure.pdf, iGo_systems_DE_TD.pdf) were initially unidentified 'single-file brochure' candidates flagged in the prior continuation run's memory as possibly Linde-related due to the 'iGo' naming -- on inspection they are STILL GmbH (a DIFFERENT, already-in-DB company with 10 existing 'iGo'-branded products; STILL and Linde are both KION Group brands but are tracked as separate DB companies, correctly kept separate here). 'iGo_systems_DE_TD.pdf' (18pp) turned out to be the single richest source this run: a genuine multi-model VDI-2198 style technical-data document covering EXV iGo (1 model) and, critically, FM-X iGo as 5 distinct named sub-models (FM-X 12/14/17/20/25 iGo, payload 1100-2400kg) and MX-X iGo as a 3-way fork-mechanism/mast-height configuration matrix (2x Schwenkschubgabel + 1x Teleskoptisch). Automation_DE_Brochure.pdf and Intralogistic-Systems_DE_Brochure.pdf are company-wide marketing collateral with no new fillable per-model fields beyond what AGV-Overview_DE_Flyer.pdf and iGo_systems_DE_TD.pdf already provide -- skimmed, no new data found, still moved to Analysed since their content is now fully accounted for by the richer sibling documents.",
+  "products": [
+    {
+      "product_name": "AXL iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "AGV-Overview_DE_Flyer.pdf + AXL-iGo_DE_Brochure.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 2.0
+      },
+      "field_sources": {
+        "max_speed": "AGV-Overview_DE_Flyer.pdf p.1 summary table, AXL iGo column 'Max. Standardgeschwindigkeit bis 2,0 m/s'; independently confirmed by AXL-iGo_DE_Brochure.pdf's own hero stat '2 m/s (7,2 km/h)'"
+      },
+      "notes": "max_payload=1500 and lifting_height=125 already filled in DB, both match both source documents exactly ('1.500 kg', '125 mm')."
+    },
+    {
+      "product_name": "STILL AXV 12 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "AGV-Overview_DE_Flyer.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 2.0
+      },
+      "field_sources": {
+        "max_speed": "p.1 summary table, AXV iGo column 'Max. Standardgeschwindigkeit bis 2,0 m/s'"
+      },
+      "notes": "max_payload=1200 already filled, matches exactly ('bis 1.200 kg'). lifting_height=1844 (DB) vs this flyer's rounded 'bis 1.800 mm' -- minor (~2%) rounding difference, not flagged as a conflict given the flyer is explicitly a summary overview, not a precision VDI table."
+    },
+    {
+      "product_name": "EXV iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2208,
+        "vehicle_width": 1000,
+        "min_aisle_width": 2925,
+        "min_total_height": 2443
+      },
+      "field_sources": {
+        "vehicle_length": "p.6, VDI table row 4.19 'Gesamtlänge l1' = 2208mm",
+        "vehicle_width": "p.6, VDI table row 4.21 'Gesamtbreite b1' = 1000mm",
+        "min_aisle_width": "p.6, VDI table row 4.34.2 'Arbeitsgangbreite bei Palette 800x1200 längs Ast' = 2925mm -- used the smaller of the two documented aisle-width figures (vs. 4.34.1's 3075mm for 1000x1200 quer), consistent with this project's established 'tightest documented Ast' convention",
+        "min_total_height": "p.6, VDI table row 4.7 'Höhe Schutzdach h6' = 2443mm (overhead guard height, mast collapsed)"
+      },
+      "notes": "max_payload=1600 already filled, matches VDI table row 1.5 exactly. lifting_height=3800 (DB) vs this VDI table's base-config Hub h3=2844mm -- the same table's extended mast-option matrix (p.6 bottom) documents 3 mast heights reaching 2844/3244/3744mm, none exactly 3800 but the top option (3744mm) is close (~1.5% off) -- not flagged as a hard conflict, likely a rounding/revision difference. battery_type='Li-Ion' (DB) is NOT contradicted by this table's 'Batterie nach DIN...3PzS' (lead-acid) row -- the same row block also states 'Li-Ion: 12kWh' as an explicit alternative option, i.e. both chemistries are documented for this vehicle, so not treated as a conflict (unlike the Jungheinrich ERC 2a case in this same batch, where no Li-Ion alternative was mentioned at all)."
+    },
+    {
+      "product_name": "FM-X iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "conflict",
+      "variant_group": "FM-X iGo family (FM-X 12/14/17/20/25 iGo), shares chassis, differs by payload class -- this existing generic DB row is treated as corresponding to the FM-X 25 iGo variant (closest payload match), see new FM-X 12/14/17/20 entries below for the other 4 named variants",
+      "fields": {
+        "vehicle_length": 2620,
+        "max_speed": 1.7
+      },
+      "field_sources": {
+        "vehicle_length": "p.10, VDI table (FM-X 25 iGo column), row 4.19 'Gesamtlänge l1' = 2620mm",
+        "max_speed": "p.10, VDI table (all 5 columns identical), row 5.1 'Fahrgeschwindigkeit mit/ohne Last' = 1,7/1,7 m/s"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db_value": 2500,
+          "datasheet_value": "2400 (p.10, VDI table, FM-X 25 iGo column, row 1.5 'Tragfähigkeit/Last Q' = 2400kg)",
+          "note": "Not overwritten. DB's existing 2500kg is close to but not identical to the FM-X 25 iGo variant's documented 2400kg -- possible the DB value came from a slightly different revision, or the generic 'FM-X iGo' row doesn't cleanly correspond to FM-X 25 specifically. Flagged for Tech Lead review alongside the broader variant-naming question below."
+        }
+      },
+      "notes": "MAJOR VARIANT-COMPLETION OPPORTUNITY: this source document reveals FM-X iGo is actually a 5-model family (FM-X 12/14/17/20/25 iGo, payloads 1100/1300/1600/1900/2400kg) sharing one VDI table, not a single generic model -- the DB's existing single 'FM-X iGo' row was treated as the closest match (FM-X 25, 2400kg) for this enrichment, and the other 4 (12/14/17/20) are added as NEW products below with their own clean per-column data from the same table. Recommend the Tech Lead consider renaming this row to 'FM-X 25 iGo' for consistency with the newly-added siblings, mirroring how this batch's Toyota RAE160/RAE200/RAE250 variant set was named. lifting_height intentionally left at its existing DB value (9800) rather than overwritten with the FM-X 25 column's base-config Hub h3=5362mm -- the DB's much higher 9800mm figure likely reflects an extended-mast option from the same table's mast-option matrix (p.11, FM-X 25 iGo section reaches Hub h3 up to 9582mm, Höhe Hubgerüst ausgefahren h4 up to 10693mm) rather than the base config, so not treated as a conflict, but also not blindly matched to one specific matrix cell."
+    },
+    {
+      "product_name": "FM-X 12 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo family (FM-X 12/14/17/20/25 iGo), shares chassis, differs by payload class",
+      "fields": {
+        "max_payload": 1100,
+        "lifting_height": 5532,
+        "max_speed": 1.7,
+        "vehicle_length": 2430,
+        "vehicle_width": 1465,
+        "min_aisle_width": 2975,
+        "battery_type": ["Lead-Acid"],
+        "fleet_management_system": "Proprietary (iGo TCS)",
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.10, VDI table, FM-X 12 iGo column, row 1.5",
+        "lifting_height": "p.10, VDI table, FM-X 12 iGo column, row 4.4 'Hub h3' = 5532mm (base config)",
+        "max_speed": "p.10, VDI table, row 5.1 (shared across all 5 FM-X columns)",
+        "vehicle_length": "p.10, VDI table, FM-X 12 iGo column, row 4.19 'Gesamtlänge l1'",
+        "vehicle_width": "p.10, VDI table, row 4.21 'Gesamtbreite b1/b2' = 1465mm (shared across all 5 columns)",
+        "min_aisle_width": "p.10, VDI table, FM-X 12 iGo column, row 4.34.1 'Arbeitsgangbreite bei Palette 1000x1200 quer Ast' = 2975mm (smaller of the two documented Ast figures for this column)",
+        "battery_type": "p.10, VDI table, row 6.3 'Batterie nach DIN...' = '3PzS' (lead-acid); no Li-Ion alternative mentioned for this table (unlike EXV iGo's table), so recorded as lead-acid only",
+        "fleet_management_system": "by analogy with sibling FM-X iGo/EXV iGo/AXL iGo/MX-X iGo, all of which explicitly document 'iGo TCS' as the shared STILL fleet control system elsewhere in this same source-file family (not independently restated per-column in this specific table, but the whole 'STILL iGo' product line is presented as one integrated system throughout the source documents)",
+        "vda5050_compatible": "by the same family-wide pattern as fleet_management_system above -- not restated per-column in the VDI table itself"
+      },
+      "notes": "NEW PRODUCT (variant of the FM-X iGo family, see that entry's notes for the full variant-completion context). fleet_management_system and vda5050_compatible are FAMILY-LEVEL inferences (every other STILL iGo product in the DB already has these two fields set identically) rather than literal per-model statements in this specific VDI table -- flagged as a slightly softer form of sourcing than the numeric VDI rows, worth a fast confirmation pass if the Tech Lead wants full rigor."
+    },
+    {
+      "product_name": "FM-X 14 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo family (FM-X 12/14/17/20/25 iGo), shares chassis, differs by payload class",
+      "fields": {
+        "max_payload": 1300,
+        "lifting_height": 5532,
+        "max_speed": 1.7,
+        "vehicle_length": 2466,
+        "vehicle_width": 1465,
+        "min_aisle_width": 3000,
+        "battery_type": ["Lead-Acid"],
+        "fleet_management_system": "Proprietary (iGo TCS)",
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.10, VDI table, FM-X 14 iGo column, row 1.5",
+        "lifting_height": "p.10, VDI table, FM-X 14 iGo column, row 4.4 'Hub h3' = 5532mm",
+        "max_speed": "p.10, VDI table, row 5.1",
+        "vehicle_length": "p.10, VDI table, FM-X 14 iGo column, row 4.19",
+        "vehicle_width": "p.10, VDI table, row 4.21",
+        "min_aisle_width": "p.10, VDI table, FM-X 14 iGo column, row 4.34.1",
+        "battery_type": "p.10, VDI table, row 6.3, '3PzS'",
+        "fleet_management_system": "family-wide inference, see FM-X 12 iGo sibling entry",
+        "vda5050_compatible": "family-wide inference, see FM-X 12 iGo sibling entry"
+      },
+      "notes": "NEW PRODUCT, see FM-X 12 iGo sibling entry for the full variant-completion context and sourcing caveats."
+    },
+    {
+      "product_name": "FM-X 17 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo family (FM-X 12/14/17/20/25 iGo), shares chassis, differs by payload class",
+      "fields": {
+        "max_payload": 1600,
+        "lifting_height": 5532,
+        "max_speed": 1.7,
+        "vehicle_length": 2476,
+        "vehicle_width": 1465,
+        "min_aisle_width": 3050,
+        "battery_type": ["Lead-Acid"],
+        "fleet_management_system": "Proprietary (iGo TCS)",
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.10, VDI table, FM-X 17 iGo column, row 1.5",
+        "lifting_height": "p.10, VDI table, FM-X 17 iGo column, row 4.4 'Hub h3' = 5532mm",
+        "max_speed": "p.10, VDI table, row 5.1",
+        "vehicle_length": "p.10, VDI table, FM-X 17 iGo column, row 4.19",
+        "vehicle_width": "p.10, VDI table, row 4.21",
+        "min_aisle_width": "p.10, VDI table, FM-X 17 iGo column, row 4.34.1",
+        "battery_type": "p.10, VDI table, row 6.3, '3PzS'",
+        "fleet_management_system": "family-wide inference, see FM-X 12 iGo sibling entry",
+        "vda5050_compatible": "family-wide inference, see FM-X 12 iGo sibling entry"
+      },
+      "notes": "NEW PRODUCT, see FM-X 12 iGo sibling entry for the full variant-completion context and sourcing caveats."
+    },
+    {
+      "product_name": "FM-X 20 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo family (FM-X 12/14/17/20/25 iGo), shares chassis, differs by payload class",
+      "fields": {
+        "max_payload": 1900,
+        "lifting_height": 5362,
+        "max_speed": 1.7,
+        "vehicle_length": 2548,
+        "vehicle_width": 1465,
+        "min_aisle_width": 3100,
+        "battery_type": ["Lead-Acid"],
+        "fleet_management_system": "Proprietary (iGo TCS)",
+        "vda5050_compatible": true
+      },
+      "field_sources": {
+        "max_payload": "p.10, VDI table, FM-X 20 iGo column, row 1.5",
+        "lifting_height": "p.10, VDI table, FM-X 20 iGo column, row 4.4 'Hub h3' = 5362mm",
+        "max_speed": "p.10, VDI table, row 5.1",
+        "vehicle_length": "p.10, VDI table, FM-X 20 iGo column, row 4.19",
+        "vehicle_width": "p.10, VDI table, row 4.21",
+        "min_aisle_width": "p.10, VDI table, FM-X 20 iGo column, row 4.34.1",
+        "battery_type": "p.10, VDI table, row 6.3, '4PzS' (still lead-acid chemistry, larger cell count)",
+        "fleet_management_system": "family-wide inference, see FM-X 12 iGo sibling entry",
+        "vda5050_compatible": "family-wide inference, see FM-X 12 iGo sibling entry"
+      },
+      "notes": "NEW PRODUCT, see FM-X 12 iGo sibling entry for the full variant-completion context and sourcing caveats."
+    },
+    {
+      "product_name": "MX-X iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "max_speed": 3.0
+      },
+      "field_sources": {
+        "max_speed": "p.12, VDI table, row 5.1 'Fahrgeschwindigkeit (abhängig vom Sicherheitskonzept)' = '1,2/2,0/3,0 m/s' (3 safety-configuration-dependent speed tiers) -- the TOP tier (3.0 m/s) was used, matching the same figure independently given in AGV-Overview_DE_Flyer.pdf's summary table for MX-X iGo ('3,0 m/s')"
+      },
+      "notes": "COMPLEX CONFIGURATION MATRIX, not split into separate products this run: this source document documents MX-X iGo as (at least) 3 configurations -- 2x 'mit Schwenkschubgabel' (pivoting push-fork, payload 1400kg, base Hub 6350mm or 12850mm depending on mast) and 1x 'mit Teleskoptisch' (telescoping table, payload 1100kg, base Hub 10000mm) -- differentiated by LOAD-HANDLING MECHANISM as well as payload/lift-height, unlike the FM-X family's clean single-axis payload variants. Per this agent's workflow guidance on multi-dimensional configuration matrices, this was NOT split into new products (the fork-mechanism axis has no direct AP0 field to cleanly separate on), and no conflicting value was overwritten -- the DB's existing lifting_height=14000 was cross-checked against this table's own p.14 extended mast-option matrix, which shows 'Maximale Lastaufnahme- und Absetzhöhe im Automatikmodus' (max automatic-mode load/drop height, as opposed to the raw mechanical Hub figure) capping at exactly 14000mm for the higher Triplex-mast configurations -- a clean, non-conflicting match once the right table column is identified, confirming the DB's existing figure is the AUTOMATIC-MODE operational cap, not the raw mechanical stroke. max_payload=1500 (DB) is close to but not identical to any of the 3 documented configs (1400/1400/1100) -- not flagged as a hard conflict given the configuration-matrix ambiguity, but worth a Tech Lead note that no exact match exists in this source."
+    }
+  ]
+}

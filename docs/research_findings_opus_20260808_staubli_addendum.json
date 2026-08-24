@@ -1,0 +1,24 @@
+{
+  "company": "Stäubli",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Addendum to docs/research_findings_opus_20260808_staubli.json. In the 2026-08-08 session-2 run, Stäubli FL1500's `lifting_height` was recorded as an unrecoverable gap because the value exists ONLY on the CAD side-view drawings on p.2 of FL1500-data-sheet-EN.pdf (it appears in NO spec table on the sheet) and pdftoppm was not installed at the time. poppler is now available, so p.2 was rendered at 200 dpi and the two mast drawings cropped and read. Gap closed. The source PDF is already in `Datasheets/AGV_AMR/Done with Opus/`; nothing was moved for this addendum.",
+  "products": [
+    {
+      "product_name": "Stäubli FL1500",
+      "product_type": "Forklift AGV",
+      "source_file": "FL1500-data-sheet-EN.pdf",
+      "db_status": "enrich",
+      "variant_group": "FL1500 — two mast options drawn side by side on p.2: MONO MAST and DUPLEX MAST. Same chassis, same payload, same drive.",
+      "fields": {
+        "lifting_height": 3205,
+        "mast_type": "Duplex"
+      },
+      "field_sources": {
+        "lifting_height": "p.2, DUPLEX MAST dimension drawing — vertical dimension line from the floor datum to the top face of the raised forks, callout '3205'. Read from a 200 dpi pdftoppm render of p.2, cropped to the drawing. Printed in mm (the drawing's other callouts are explicitly mm, e.g. the '1000 mm' scale bar), AP0 unit mm, no conversion. NOTE: this is a value read off a drawing, not a printed table figure — it deserves a second look at review time",
+        "mast_type": "p.2, drawing captions 'MONO MAST' and 'DUPLEX MAST'. Recorded Duplex as the maximum-capability option consistent with the 3205 mm figure"
+      },
+      "notes": "RESULT: the DB already holds lifting_height = 3205, which matches the DUPLEX MAST drawing EXACTLY. So this closes the gap by independent confirmation rather than by supplying a new value — the existing figure is correct and is now sourced. SECOND FINDING, previously invisible: the MONO MAST option's lift height is 1835 mm (p.2, MONO MAST drawing, vertical dimension line floor-to-fork-top, callout '1835'). That is a materially different machine on a hard K.O. field — 1835 vs 3205 mm — and it is NOT in the DB. Whether it warrants a variant row is the Tech Lead's call; note that unlike the AGILOX ONE scissor variants there is no published payload trade-off (the spec table gives a single 'Payload (kg) Up to 1 500' with no mast qualifier), so the mono mast appears to be a strictly lower-reach, presumably cheaper/lighter option. WHY THIS WAS MISSED BY TEXT EXTRACTION: pdfplumber renders the drawing callouts as fragments interleaved with the CAD frame's row/column letters, e.g. '5381' and '5,4062' and '5 a p5 p0 r7 o x' — none of which is recognisable as 1835 / 3205 / '507 approx' without the image. This is the clearest example so far of a KO-level field living exclusively on a drawing. OTHER DRAWING CALLOUTS, not mapped: '999 approx' (centre-of-gravity height, DUPLEX drawing) and '507 approx' (COG horizontal offset from the wheel centre) — the p.2 text layer confirms the intent with the fragments 'COG approx' and 'wheel center'. No AP0 field for either. VALUES CONFIRMED FROM THE p.2 SPEC TABLES while the sheet was open (all already consistent with the DB or previously captured): 'Payload (kg) Up to 1 500', 'Drive type Tricycle', 'Turning radius (m) 1.5' (an explicit, unambiguous 'Turning radius' label on a Forklift AGV — the recurring AP0 scope gap, 6th instance, still unstorable), 'Ground clearance min. (mm) 30' (NOT written to min_ground_clearance, which is AMR-scope and per its AP0 hint means robot height), 'Max. speed (m/s) Up to 1.5', 'Position accuracy (mm) Up to +/- 10', 'Navigation Laser natural feature', 'Dead weight (kg) 3 500', 'Battery technology Li-ion 48V', 'Protection class IP54', 'Compliance CE', 'Slope (%) Up to 3', 'Working temperature +5 C to 40 C (DIN EN ISO 3691-4)', 'Usable capacity [85% SoC] (kWh) 11.75', 'Lifting speed (mm/s) 250', inductive charging Floor standard / Side, Top optional, charging power 3 kW standard / 6 kW option."
+    }
+  ]
+}

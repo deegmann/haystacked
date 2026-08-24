@@ -1,0 +1,186 @@
+{
+  "company": "KNAPP AG",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Single 34pp German-language product folder covering the full Open Shuttle line (KiSoft FCS fleet software section = company_wide_context). Source file has 2 byte-identical duplicate copies in New/ ('-2-2.pdf', '-2-3.pdf') -- all 3 moved to Analysed/ together, only 1 extraction pass performed. IMPORTANT MAPPING ASSUMPTION: the brochure names five distinct products -- 'Open Shuttle Fork', 'Open Shuttle 50', 'Open Shuttle 100', 'Open Shuttle Boxgrip', 'Open Shuttle 50 ASG' -- and the DB has five rows, but one of them is named plain 'Open Shuttle' (no number) rather than 'Open Shuttle 50'. Assumed DB's 'Open Shuttle' == brochure's 'Open Shuttle 50' (the smaller of the two container-transport variants, since 'Open Shuttle 100' already has its own explicitly-numbered DB row) -- FLAGGED for Tech Lead confirmation, not verified against any other source. All 5 base models had every field NULL before this pass -- pure enrichment, no new products created. Recurring cross-product ambiguity: several sheets state a handover-height RANGE (e.g. '500mm-1.500mm Abgabe- und Aufnahmehöhen') as a headline figure, while the same model's own 'ADD-ON' features page separately describes the mechanism enabling that full range (integrated lift/hub) as OPTIONAL, not standard -- this is an internal inconsistency in the source document itself (not introduced by this agent); the upper-bound figure was used for lift_height in each case with this caveat repeated per-product. No navigation technology keyword (no 'SLAM', 'Laser Reflector', 'Kontur/Contour', etc.) appears anywhere in the 34 pages, so navigation_type is left null for all 5 products despite this being a KiSoft/KNAPP-wide product line. 'CE-zertifiziert' is stated as a STANDARD FEATURES badge on every product page -- this maps to AP0's Company-entity field certifications_generic (not a Base Model field), so it was NOT written into any product's 'fields' dict here; flagging in this note instead for the Tech Lead to apply at the Company level if desired.",
+  "company_wide_context": {
+    "source_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf",
+    "fields": {
+      "fleet_control_architecture": "Centralized",
+      "multi_fleet_capable": true,
+      "modification_process": "Client: All",
+      "installation_process": "Client"
+    },
+    "applies_to": "all base models of this company (KiSoft FCS is KNAPP's shared fleet-control software for the whole Open Shuttle line)",
+    "notes": "p.26-27 'KiSoft FCS' section: 'Sie verwalten, steuern und koordinieren sämtliche Transportaufträge in einem System' (centralized order management) -> fleet_control_architecture=Centralized. 'KiSoft FCS ist ein Flottenkontroll-System für manuell und automatisiert betriebene Flurförderzeuge' (fleet control for BOTH manual and automated vehicles in one system) -> multi_fleet_capable=true. p.5 'NEHMEN SIE SELBSTSTÄNDIG INSTALLATIONEN, WARTUNGEN UND ÄNDERUNGEN AM SYSTEM VOR' + p.27 'Selbstständige Änderungen der Prozesse, Stationen und Fahrwege möglich' (customer independently performs installation/maintenance/changes) -> installation_process=Client, modification_process='Client: All'. p.27 also states 'Einfache Integration in bestehendes System ... Stand-alone-Lösung für Open Shuttles möglich' but names no specific WMS/ERP/MES/REST/OPC-UA system, so integration_capability left null rather than guessed."
+  },
+  "products": [
+    {
+      "product_name": "Open Shuttle Fork",
+      "product_type": "Forklift AGV",
+      "source_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf (pp.6-9)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1835,
+        "vehicle_width": 850,
+        "lifting_height": 1200,
+        "max_payload": 1300,
+        "max_speed": 1.5,
+        "min_aisle_width": 1400,
+        "battery_type": ["LiFePO4"],
+        "charge_time": 60,
+        "battery_runtime": 8,
+        "omnidirectional_movement": true,
+        "load_type": ["Pallet EUR", "Half-Euro", "Custom Carrier"],
+        "barcode_readers": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.6 'Abmessungen Shuttle: 1.835 x 850 x 2.257 mm'",
+        "vehicle_width": "p.6 same row",
+        "lifting_height": "p.6 'Übergabehöhe 0 – 1.200 mm'",
+        "max_payload": "p.6 'Max. Nutzlast 1.300 kg'",
+        "max_speed": "p.6 'Max. Geschwindigkeit 1,5 m/s'",
+        "min_aisle_width": "p.9 'OPEN SHUTTLE FORK: Einbahn (vmin) 1.400 mm' -- the narrowest one-way/minimum-speed corridor figure used as the vehicle's own minimum requirement; wider figures also printed for opposing traffic and max speed (Gegenverkehr vmin 2.700mm, Einbahn vmax 1.950mm, Gegenverkehr vmax 3.500mm, Drehkreis 2.700mm) but not used since min_aisle_width should reflect the narrowest condition the vehicle can actually operate in",
+        "battery_type": "p.7 STANDARD FEATURES badge 'LiFePo4' (battery)",
+        "charge_time": "p.6 'Ladezeit 60 min für 8 Stunden Betrieb'",
+        "battery_runtime": "p.6 same row, '8 Stunden Betrieb'",
+        "omnidirectional_movement": "p.7 STANDARD FEATURES badge 'Omnidirektionaler Antrieb ohne Scherenhub'",
+        "load_type": "p.6 body text 'Paletten (Euro-, Industrie-, Halb- und Chep-Paletten), Gestelle, Regale, Sonderladungsträger' -- Euro-Paletten->Pallet EUR, Halb-Paletten->Half-Euro; Industrie-/Chep-Paletten and racks/shelves have no closer AP0 match than Custom Carrier",
+        "barcode_readers": "p.7 ADD-ON section 'Barcode-Detektion ermöglicht die eindeutige Identifizierung von Paletten' -- listed as an ADD-ON option, not confirmed standard equipment, recorded true with this caveat (same convention as other suppliers' optional-feature handling this run)"
+      },
+      "notes": "Chep-pallet adapter and 3D obstacle detection also listed as ADD-ONs, not written to any field (no clean AP0 match beyond what's already captured). CE certification is a Company-level fact, see researcher_notes."
+    },
+    {
+      "product_name": "Open Shuttle",
+      "product_type": "Mobile AMR",
+      "source_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf (pp.10-13, 'Open Shuttle 50' section -- see mapping assumption in researcher_notes)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 762,
+        "vehicle_width": 752,
+        "lift_height": 1500,
+        "max_payload": 120,
+        "max_speed": 1.5,
+        "battery_type": ["LiFePO4"],
+        "charge_time": 60,
+        "battery_runtime": 7,
+        "onboard_container_type": ["Bin"],
+        "onboard_container_count": 2,
+        "top_module_type": ["Roller"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.10 'Abmessungen Shuttle: 762 x 752 x 1.794 mm'",
+        "vehicle_width": "p.10 same row",
+        "lift_height": "p.10 'Abgabe- und Aufnahmehöhen 500 mm – 1.500 mm' -- upper bound used, see researcher_notes caveat about the optional-hub inconsistency (p.11 ADD-ON 'Integrierter Hub ermöglicht Abgabehöhen von 550 bis 1.500 mm und ist optional verfügbar')",
+        "max_payload": "p.10 'Max. Nutzlast 120 kg'",
+        "max_speed": "p.10 'Max. Geschwindigkeit 1,5 m/s'",
+        "battery_type": "p.11 STANDARD FEATURES badge 'LiFePo4'",
+        "charge_time": "p.10 'Ladezeit 60 min für 7 Stunden Betrieb'",
+        "battery_runtime": "p.10 same row, '7 Stunden Betrieb'",
+        "onboard_container_type": "p.10 'Ladungsträger: Behälter (-Stapel), Kartons, Trays' -- 'Behälter' mapped to AP0's 'Bin'; cartons/trays have no closer AP0 allowed_value",
+        "onboard_container_count": "p.10 'Max. Anzahl Ladungsträger 2 bei 300 x 400 mm'",
+        "top_module_type": "p.11 STANDARD FEATURES badge 'Rollenfördertechnik' (roller conveyor) mapped to AP0's 'Roller'"
+      },
+      "notes": "See researcher_notes for the DB-name mapping assumption ('Open Shuttle' == 'Open Shuttle 50')."
+    },
+    {
+      "product_name": "KNAPP Open Shuttle 100",
+      "product_type": "Mobile AMR",
+      "source_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf (pp.14-17)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 927,
+        "vehicle_width": 918,
+        "lift_height": 1500,
+        "max_payload": 120,
+        "max_speed": 1.5,
+        "battery_type": ["LiFePO4"],
+        "charge_time": 60,
+        "battery_runtime": 7,
+        "onboard_container_type": ["Bin"],
+        "onboard_container_count": 2,
+        "top_module_type": ["Roller"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.14 'Abmessungen Shuttle: 927 x 918 x 1.793 mm'",
+        "vehicle_width": "p.14 same row",
+        "lift_height": "p.14 'Abgabe- und Aufnahmehöhen 500 mm – 1.500 mm' -- same optional-hub caveat as sibling 'Open Shuttle 50'",
+        "max_payload": "p.14 'Max. Nutzlast 120 kg' (same rated payload as Open Shuttle 50, despite larger max carrier size 900x650mm vs 600x400mm)",
+        "max_speed": "p.14 'Max. Geschwindigkeit 1,5 m/s'",
+        "battery_type": "p.15 STANDARD FEATURES badge 'LiFePo4'",
+        "charge_time": "p.14 'Ladezeit 60 min für 7 Stunden Betrieb'",
+        "battery_runtime": "p.14 same row",
+        "onboard_container_type": "p.14 'Ladungsträger: Behälter, Kartons, Trays' -> 'Bin'",
+        "onboard_container_count": "p.14 'Max. Anzahl Ladungsträger 2 bei 650 x 450 mm'",
+        "top_module_type": "p.15 STANDARD FEATURES badge 'Rollenfördertechnik' -> 'Roller'"
+      },
+      "notes": "Distinguished from Open Shuttle 50 primarily by larger max carrier footprint (900x650mm vs 600x400mm) and larger chassis, not by payload (both rated 120kg)."
+    },
+    {
+      "product_name": "KNAPP Open Shuttle Boxgrip",
+      "product_type": "Mobile AMR",
+      "source_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf (pp.18-21)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 998,
+        "vehicle_width": 753,
+        "lift_height": 1000,
+        "max_payload": 25,
+        "max_speed": 1.5,
+        "battery_type": ["LiFePO4"],
+        "charge_time": 60,
+        "battery_runtime": 7,
+        "onboard_container_type": ["Bin"],
+        "onboard_container_count": 2,
+        "picking_mechanism": "Bin-transfer"
+      },
+      "field_sources": {
+        "vehicle_length": "p.18 'Abmessungen Shuttle: 998 x 753 x 1.793 mm'",
+        "vehicle_width": "p.18 same row",
+        "lift_height": "p.19 ADD-ON... actually STANDARD for this model: 'Integrierter Hub ermöglicht Abgabehöhen von 0 bis 1.000 mm (abhängig von der Behälterhöhe) und ist bei diesem Modell im Standard enthalten' -- unlike its siblings, explicitly stated as STANDARD (not optional) for Boxgrip",
+        "max_payload": "p.18 'Max. Nutzlast 25 kg pro Behälter' -- NOTE: this is stated PER CONTAINER ('pro Behälter'), and the same sheet says the vehicle carries up to 2 containers at once (see onboard_container_count) -- recorded as printed (25kg) rather than multiplying by container count, since the source never states a combined/total payload figure",
+        "max_speed": "p.18 'Max. Geschwindigkeit 1,5 m/s'",
+        "battery_type": "p.19 STANDARD FEATURES badge 'LiFePo4'",
+        "charge_time": "p.18 'Ladezeit 60 min für 7 Stunden Betrieb'",
+        "battery_runtime": "p.18 same row",
+        "onboard_container_type": "p.18 'Behälter mit seitlichen Öffnungen zum Greifen' (bins with side openings for gripping) -> 'Bin'",
+        "onboard_container_count": "p.18 'Max. Anzahl Ladungsträger 2'",
+        "picking_mechanism": "p.19 STANDARD FEATURES badge 'Greifer' (gripper) as Lastaufnahmemittel -- mapped to AP0's 'Bin-transfer' (closest allowed_value for a gripper that physically transfers bins on/off the shuttle, as opposed to 'Autonomous arm' which implies a general-purpose robotic arm)"
+      },
+      "notes": "max_payload's per-container basis (rather than total) is worth a reviewer's attention -- may understate this model's effective total capacity if it really does carry 2x25kg simultaneously."
+    },
+    {
+      "product_name": "KNAPP Open Shuttle 50 ASG",
+      "product_type": "Mobile AMR",
+      "source_file": "KNAPP-Folder Open Shuttle Productinfo de-2.pdf (pp.22-26)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 932,
+        "vehicle_width": 800,
+        "lift_height": 1500,
+        "max_payload": 50,
+        "max_speed": 1.5,
+        "battery_type": ["LiFePO4"],
+        "charge_time": 60,
+        "battery_runtime": 7,
+        "onboard_container_type": ["Bin"],
+        "onboard_container_count": 2,
+        "top_module_type": ["Roller"]
+      },
+      "field_sources": {
+        "vehicle_length": "p.22 'Abmessungen Shuttle: 932 x 800 x 1.794 mm'",
+        "vehicle_width": "p.22 same row",
+        "lift_height": "p.22 'Abgabe- und Aufnahmehöhen 500 – 1.500 mm' -- same optional-hub caveat as Open Shuttle 50/100 (p.23 ADD-ON 'Integrierter Hub ermöglicht Abgabehöhen von 550 bis 1.500mm ... ist optional verfügbar')",
+        "max_payload": "p.22 'Max. Nutzlast 50 kg'",
+        "max_speed": "p.22 'Max. Geschwindigkeit 1,5 m/s'",
+        "battery_type": "p.23 STANDARD FEATURES badge 'LiFePo4'",
+        "charge_time": "p.22 'Ladezeit 60 min für 7 Stunden Betrieb'",
+        "battery_runtime": "p.22 same row",
+        "onboard_container_type": "p.22 'Ladungsträger: Leiterplatten-Magazine, Trays, Behälter, Kartons' -- 'Behälter' mapped to 'Bin'; circuit-board magazines have no closer AP0 allowed_value",
+        "onboard_container_count": "p.22 'Max. Anzahl Ladungsträger 2'",
+        "top_module_type": "p.23 STANDARD FEATURES badge 'Rollenfördertechnik' -> 'Roller'"
+      },
+      "notes": "ASG = likely 'Auftrags-/Sonder-Gestell' or similar (magazine-carrier variant name not spelled out in the source); has an 'Integrierte Breitenverstellung' ADD-ON for handling variable-width magazines/containers (mittig bis 310mm), no direct AP0 field for this."
+    }
+  ]
+}

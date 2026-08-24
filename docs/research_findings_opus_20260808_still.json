@@ -1,0 +1,572 @@
+{
+  "company": "STILL GmbH",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus full-redo pass. FIVE source files, all confirmed STILL from the last-page imprint (Berzeliusstraße 10, 22113 Hamburg): (1) `iGo_systems_DE_TD.pdf` — 18 pp, 'STILL iGo Technische Daten', the only file with real VDI 2198 Typenblätter; covers EXV iGo, FM-X iGo (5 variants), MX-X iGo (3 configurations) plus full mast tables. (2) `AXL-iGo_DE_Brochure.pdf` — 8 pp, single-product brochure for the AXL iGo truck loader. (3) `AGV-Overview_DE_Flyer.pdf` — 2 pp, a portfolio comparison MATRIX across 8 model lines (payload / lift height / speed / dual operation) — the single densest page in the group. (4) `Automation_DE_Brochure.pdf` — 15 pp, FTS overview; its p.9 introduces FIVE industry-specific iGo models that exist in none of the other files and in none of the DB. (5) `Intralogistic-Systems_DE_Brochure.pdf` — 15 pp, mostly MANUAL trucks; only its Routenzug/Schmalgang pages are relevant, and its 18 m / 14 km/h MX-X figures describe the MANUAL MX-X, not MX-X iGo — deliberately not mapped. The group's dominant finding is that STILL's own four documents disagree with each other on several headline figures; every such case is recorded with both values and both citations rather than resolved. Nothing written to Airtable.",
+  "company_wide_context": {
+    "source_file": "Automation_DE_Brochure.pdf (primary), iGo_systems_DE_TD.pdf, Intralogistic-Systems_DE_Brochure.pdf",
+    "fields": {
+      "safety_standard": ["ISO 3691-4"],
+      "vda5050_compatible": true,
+      "fleet_management_system": "Proprietary",
+      "integration_capability": ["WMS", "ERP"],
+      "manual_usage": true
+    },
+    "field_sources": {
+      "safety_standard": "Automation_DE_Brochure.pdf p.9, 'BRANCHENSPEZIFISCHE FTS ... reduzieren Fachkräfteengpässe und erfüllen höchste Sicherheitsstandards gemäß ISO 3691-4'",
+      "vda5050_compatible": "Automation_DE_Brochure.pdf p.7, 'DIE AUTOMATISIERUNGSSCHNITTSTELLE VDA 5050 ... [STILL passt sich] konsequent an die VDA-5050-Schnittstelle an. Damit können [wir Fahrzeuge] anbieten, die sich über die VDA 5050 in die Leitsysteme anderer [Hersteller integrieren lassen]'",
+      "fleet_management_system": "Automation_DE_Brochure.pdf p.9, 'STILL WXS – STEUERUNG UND TAKTGEBUNG / iGo flow vereint die Funktionalitäten von WMS, WES und WCS in einem zentralen System ... orchestriert fahrerlose Transportsysteme, stationäre Technik und hybride Systeme – herstellerunabhängig und in Echtzeit'",
+      "integration_capability": "Automation_DE_Brochure.pdf p.9, 'inklusive Anbindung und Integration in bestehende Software- und Warenwirtschaftssysteme'; iGo_systems_DE_TD.pdf p.15, 'Die automatisierten STILL Fahrzeuge lassen sich unkompliziert an eigene Systeme, z. B. für die Lagerverwaltung, anschließen'",
+      "manual_usage": "iGo_systems_DE_TD.pdf p.4, 'alle automatisierten STILL Hybridfahrzeuge lassen sich im Fall der Fälle auch manuell bedienen'; VDI row 1.4 'Bedienung: Manuell/automatisiert' on all three Typenblätter (pp.6, 10, 12)"
+    },
+    "applies_to": "all base models of this company",
+    "notes": "MUST be fanned out per base model at import time. IMPORTANT EXCEPTION to manual_usage: the portfolio matrix in `AGV-Overview_DE_Flyer.pdf` p.1 has an explicit 'Dualer Betrieb' row and marks THREE model lines 'nicht möglich' — AXH/ACH iGo, AXL iGo and AXV iGo — against 'bei Bedarf' for LTX / EXV / EXV-CB / FM-X / MX-X. So manual_usage must NOT be fanned out blindly; the DB currently holds manual_usage=1 on AXL iGo, which that matrix contradicts (see the AXL entry's conflict block). fleet_management_system recorded as 'Proprietary' (iGo flow / STILL WXS) with vda5050_compatible=true alongside — the AP0 single-select still cannot express 'proprietary product implementing an open standard' (recurring). CERTIFICATIONS DELIBERATELY NOT FILLED: the closing imprint of `AXL-iGo_DE_Brochure.pdf` p.8, `Automation_DE_Brochure.pdf` p.15 and `Intralogistic-Systems_DE_Brochure.pdf` p.15 all read 'STILL ist in den Bereichen Qualitätsmanagement, Arbeitssicherheit, Umweltschutz und Energiemanagement zertifiziert' — that names four management-system DOMAINS, not four standards. Inferring ISO 9001 / 45001 / 14001 from it would be exactly the kind of general-knowledge fill this agent must not do, and the fourth domain (Energiemanagement / ISO 50001) has no AP0 allowed value at all."
+  },
+  "products": [
+    {
+      "product_name": "EXV iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "enrich",
+      "variant_group": "EXV iGo — single VDI Typenblatt, three mast options",
+      "fields": {
+        "max_speed": 2.0,
+        "min_aisle_width": 3075,
+        "vehicle_length": 2208,
+        "vehicle_width": 1000,
+        "min_total_height": 1915,
+        "mast_type": "Duplex",
+        "onboard_ui": null
+      },
+      "field_sources": {
+        "max_speed": "iGo_systems_DE_TD.pdf p.6, VDI row '5.1 Fahrgeschwindigkeit mit/ohne Last m/s 2,0/2,0'; corroborated p.9 body 'legt er mit einer Maximalgeschwindigkeit von 2,0 m/s gerne auch mal längere Strecken zurück' and AGV-Overview_DE_Flyer.pdf p.1 matrix ('2,0 m/s') and Automation_DE_Brochure.pdf p.8 ('bis 2,0 m/s') — four independent statements",
+        "min_aisle_width": "iGo_systems_DE_TD.pdf p.6, VDI row '4.34.1 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast mm 3075'",
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.6, VDI row '4.19 Gesamtlänge l1 mm 2208'",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.6, VDI row '4.21 Gesamtbreite b1 mm 1000'",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.6, VDI row '4.2 Höhe Hubgerüst eingefahren h1 mm 1915' (also the lowest 'Bauhöhe h1' in the mast table on the same page)",
+        "mast_type": "iGo_systems_DE_TD.pdf p.6, mast table headed 'Teleskop-Hubgerüst' with a free-lift row ('Freihub h2 mm 150') — a two-stage telescopic mast"
+      },
+      "conflicts": {},
+      "notes": "min_aisle_width: TWO figures are printed — 3075 mm for a 1000×1200 pallet crossways (row 4.34.1) and 2925 mm for 800×1200 lengthways (row 4.34.2). min_aisle_width is a K.O. field, so I took the LARGER (worst-case) 3075. Two further caveats a reviewer must see, both printed as footnotes on p.6: footnote 1 '+75 mm mit 4PzS-Batterie' (so the true worst case is 3150 mm with the larger battery) and footnote 2 'Mindestgangbreite Ast bei reduzierter Geschwindigkeit' — the quoted aisle width is only achievable at REDUCED SPEED, which AP0 has no way to express alongside max_speed. LIFT HEIGHT — no conflict proposed, but three different numbers exist across STILL's own files and the DB holds a fourth-hand version of one of them: `iGo_systems_DE_TD.pdf` p.6 mast table gives 'Hub h3 mm 2844 / 3244 / 3744' with 'Einlagerhöhe 2780 / 3180 / 3680'; `Automation_DE_Brochure.pdf` p.8 says 'bis 3.744 mm'; `AGV-Overview_DE_Flyer.pdf` p.1 and `iGo_systems_DE_TD.pdf` p.9 body both say 3.800 mm / '3,8 Metern'. The DB's 3800 is therefore the rounded marketing figure, and the precise engineering maximum is 3744 mm lift / 3680 mm storage height. Flagged as an ACCURACY note, not a conflict — but if lifting_height is used for K.O. matching, 3800 will admit a tender that the machine cannot actually serve. PAYLOAD DERATING — best artefact in this group: `iGo_systems_DE_TD.pdf` p.7 prints a 'Grundtragfähigkeiten' load chart (payload on the y-axis 0–2000 kg vs. 'Hubhöhe in mm' on the x-axis 0–4000), with TWO curves for fork-tine thickness s = 55 mm and s = 71 mm, and the explicit caption 'Dieses Diagramm gibt an, für welche Lasten und Regalhöhen das automatisierte Fahrzeug zuverlässig, reproduzierbar und sicher Ladungen transportieren und ein- bzw. auslagern kann.' AP0 stores a single max_payload (1600 kg) and cannot express either the height derate or the fork-thickness axis. Recurring finding, now 6+ instances. AP0 SCOPE ASYMMETRY (recurring): p.8 'Großer Touchscreen auf Augenhöhe unterstützt die Nutzenden – für intuitive Bedienung' and p.9 'Benutzerschnittstelle (Display) mit Touchscreen-Bildschirm' — `onboard_ui` is AMR-scope only, so a forklift AGV with a documented operator HMI cannot store it. Left null (not written to an out-of-scope field). AP0 GAP (recurring, now 10+): p.6 row '4.35 Wenderadius im manuellen Modus Wa mm 1744' — an explicit RADIUS label (safe to map under the established rule) but Forklift scope has no turning-radius field. Value recorded here only. Battery: row 6.3 lists '3PzS' (lead-acid) AND row 6.4 adds 'kWh Li-Ion: 12' in the same cell — so BOTH chemistries are documented on one Typenblatt; the DB holds Li-Ion only, so proposed additive union is ['Li-Ion','Lead-Acid']. Not written as a fill since battery_type is non-null. Dead weight 1550 kg (row 2.1) — no AP0 field (recurring). Sound pressure <66 dB(A) (row 8.1/8.4) — no AP0 field."
+    },
+    {
+      "product_name": "FM-X 12 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo reach-truck series — five payload classes sharing one chassis family (b1/b2 1465 mm and h1 2450 mm identical across all five); the existing DB row 'FM-X iGo' corresponds to FM-X 25 iGo",
+      "fields": {
+        "max_payload": 1100.0,
+        "lifting_height": 9450,
+        "min_aisle_width": 3000,
+        "vehicle_length": 2430,
+        "vehicle_width": 1465,
+        "min_total_height": 2475,
+        "max_speed": 1.7,
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "iGo_systems_DE_TD.pdf p.10, VDI row '1.5 Tragfähigkeit/Last Q kg 1100' in the 'FM-X 12 iGo' column (row 1.2 'Typzeichen des Herstellers')",
+        "lifting_height": "iGo_systems_DE_TD.pdf p.11, 'FM-X 12 iGo – FM-X 14 iGo / Dreifach-Hubgerüst' mast table, highest column: 'Einlagerhöhe mm ... 9450' (with 'Hub h3 mm ... 9582')",
+        "min_aisle_width": "iGo_systems_DE_TD.pdf p.10, VDI row '4.34.2 Arbeitsgangbreite bei Palette 800 x 1200 längs Ast mm 3000' (row 4.34.1, 1000×1200 quer, gives 2975 — took the larger)",
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.10, VDI row '4.19 Gesamtlänge l1 mm 2430'",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.10, VDI row '4.21 Gesamtbreite b1/b2 mm 1465'",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.10, VDI row '4.6.1 Höhe Schutzdach inkl. Automatisierung h6.1 mm 2475' — deliberately chosen over row 4.2 'Höhe, Hubgerüst eingefahren h1 mm 2450' because on a man-up-free reach truck the automation-equipped overhead guard is the true tallest fixed point and therefore the door/ceiling constraint",
+        "max_speed": "iGo_systems_DE_TD.pdf p.10, VDI row '5.1 Fahrgeschwindigkeit mit/ohne Last m/s 1,7/1,7' (identical for all five variants); reverse is '5.1.1 ... 0,8/0,8'",
+        "drive_type": "iGo_systems_DE_TD.pdf p.10 title, 'FM-X iGo Automatisierter Schubmaststapler' (Schubmaststapler = reach truck)",
+        "mast_type": "iGo_systems_DE_TD.pdf p.11, mast table headed 'Dreifach-Hubgerüst' (triple-stage)",
+        "stacking_capability": "iGo_systems_DE_TD.pdf p.11, 'Automatisierte Schubmaststapler wie der FM-X iGo sind horizontal wie vertikal in Breitgang- oder Blocklagern ein echter Gewinn' — 'Blocklager' is explicitly block storage, i.e. pallet-on-pallet (README §6a)"
+      },
+      "notes": "Variant completion — the DB holds a single 'FM-X iGo' row. lifting_height: I recorded the MAXIMUM available mast option (9450 mm Einlagerhöhe), not the 5400 mm of the sample configuration on p.10, because p.10 carries the note 'Hinweis: Dies ist eine Musterkonfiguration' and the mast table on p.11 is the exhaustive option list. Reviewer caveat: FOUR different maxima circulate for this model line — 9450 mm (Einlagerhöhe, `iGo_systems_DE_TD.pdf` p.11), 9582 mm (Hub h3, same table), 10 000 mm (`AGV-Overview_DE_Flyer.pdf` p.1 and `Automation_DE_Brochure.pdf` p.7, both 'bis 10.000 mm') and 9800 mm (the current DB value, found in none of the five files). AP0 GAP (recurring): p.10 row '4.35 Wenderadius Wa mm 1702' — explicit radius, no Forklift-scope field. Fork spread: row '4.25 Gabelaußenabstand min./max. b5 mm 520/620' documents an adjustable spread but names no mechanism — the recurring `fork_spread` 'available, mechanism unstated' gap; left null. Dead weight 3340 kg (row 2.1). Battery 3PzS 48/465 (rows 6.3/6.4) — lead-acid only on this Typenblatt, but per the VDI-2198 disclaimer printed on the same page ('Dieses Typenblatt nach VDI-Richtlinie 2198 nennt nur die technischen Werte des Standardgerätes') and p.4's explicit 'Ob Blei-Säure- oder Lithium-Ionen-Batterien', this is NOT evidence against Li-Ion; battery_type left for the reviewer."
+    },
+    {
+      "product_name": "FM-X 14 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo reach-truck series",
+      "fields": {
+        "max_payload": 1300.0,
+        "lifting_height": 9450,
+        "min_aisle_width": 3025,
+        "vehicle_length": 2466,
+        "vehicle_width": 1465,
+        "min_total_height": 2475,
+        "max_speed": 1.7,
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "iGo_systems_DE_TD.pdf p.10, VDI row 1.5, 'FM-X 14 iGo' column: 1300",
+        "lifting_height": "iGo_systems_DE_TD.pdf p.11, 'FM-X 12 iGo – FM-X 14 iGo' mast table, max 'Einlagerhöhe mm 9450'",
+        "min_aisle_width": "iGo_systems_DE_TD.pdf p.10, row 4.34.2 (800×1200 längs) = 3025; row 4.34.1 (1000×1200 quer) = 3000 — larger taken",
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.10, row 4.19 = 2466",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.10, row 4.21 = 1465",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.10, row 4.6.1 = 2475",
+        "max_speed": "iGo_systems_DE_TD.pdf p.10, row 5.1 = 1,7/1,7",
+        "drive_type": "iGo_systems_DE_TD.pdf p.10 title, 'Automatisierter Schubmaststapler'",
+        "mast_type": "iGo_systems_DE_TD.pdf p.11, 'Dreifach-Hubgerüst'",
+        "stacking_capability": "iGo_systems_DE_TD.pdf p.11, 'Breitgang- oder Blocklagern'"
+      },
+      "notes": "Wenderadius Wa 1702→1802 mm (row 4.35) — no Forklift-scope field. Dead weight 3570 kg."
+    },
+    {
+      "product_name": "FM-X 17 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo reach-truck series",
+      "fields": {
+        "max_payload": 1600.0,
+        "lifting_height": 9450,
+        "min_aisle_width": 3050,
+        "vehicle_length": 2476,
+        "vehicle_width": 1465,
+        "min_total_height": 2475,
+        "max_speed": 1.7,
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "iGo_systems_DE_TD.pdf p.10, VDI row 1.5, 'FM-X 17 iGo' column: 1600",
+        "lifting_height": "iGo_systems_DE_TD.pdf p.11 — NOTE: the mast tables on p.11 are headed 'FM-X 12 iGo – FM-X 14 iGo', 'FM-X 20 iGo' and 'FM-X 25 iGo'; there is NO explicit FM-X 17 mast table. 9450 mm is carried over on the basis that all three printed tables end at the same 9450 mm Einlagerhöhe. Weaker evidence than the other four variants — flagged.",
+        "min_aisle_width": "iGo_systems_DE_TD.pdf p.10, rows 4.34.1 and 4.34.2 both = 3050",
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.10, row 4.19 = 2476",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.10, row 4.21 = 1465",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.10, row 4.6.1 = 2475",
+        "max_speed": "iGo_systems_DE_TD.pdf p.10, row 5.1 = 1,7/1,7",
+        "drive_type": "iGo_systems_DE_TD.pdf p.10 title",
+        "mast_type": "iGo_systems_DE_TD.pdf p.11",
+        "stacking_capability": "iGo_systems_DE_TD.pdf p.11"
+      },
+      "notes": "The FM-X 17's lifting_height is the one INFERRED value in this series (see field_sources) — a reviewer who is uncomfortable with it should set it null rather than accept 9450 on my reasoning. Its standard sample-configuration lift is 5532 mm Hub / 5400 mm Einlagerhöhe (p.10 rows 4.4 and 'Maximale Einlagerhöhe'), which IS directly printed. Wenderadius Wa 1872 mm. Dead weight 3570 kg."
+    },
+    {
+      "product_name": "FM-X 20 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "FM-X iGo reach-truck series",
+      "fields": {
+        "max_payload": 1900.0,
+        "lifting_height": 9450,
+        "min_aisle_width": 3100,
+        "vehicle_length": 2548,
+        "vehicle_width": 1465,
+        "min_total_height": 2475,
+        "max_speed": 1.7,
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "stacking_capability": true
+      },
+      "field_sources": {
+        "max_payload": "iGo_systems_DE_TD.pdf p.10, VDI row 1.5, 'FM-X 20 iGo' column: 1900",
+        "lifting_height": "iGo_systems_DE_TD.pdf p.11, 'FM-X 20 iGo / Dreifach-Hubgerüst' mast table, max 'Einlagerhöhe mm 9450' (Hub h3 9582)",
+        "min_aisle_width": "iGo_systems_DE_TD.pdf p.10, rows 4.34.1 and 4.34.2 both = 3100",
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.10, row 4.19 = 2548",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.10, row 4.21 = 1465",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.10, row 4.6.1 = 2475",
+        "max_speed": "iGo_systems_DE_TD.pdf p.10, row 5.1 = 1,7/1,7",
+        "drive_type": "iGo_systems_DE_TD.pdf p.10 title",
+        "mast_type": "iGo_systems_DE_TD.pdf p.11, 'Dreifach-Hubgerüst'",
+        "stacking_capability": "iGo_systems_DE_TD.pdf p.11"
+      },
+      "notes": "Wenderadius Wa 1940 mm. Dead weight 3920 kg. Battery 4PzS 48/620."
+    },
+    {
+      "product_name": "FM-X iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "conflict",
+      "variant_group": "FM-X iGo reach-truck series — this existing DB row (max_payload 2500, min_aisle_width 3000, lifting_height 9800) is matched to the catalogue's FM-X 25 iGo, the top of the series",
+      "fields": {
+        "vehicle_length": 2620,
+        "vehicle_width": 1465,
+        "min_total_height": 2475,
+        "max_speed": 1.7,
+        "mast_type": "Triplex"
+      },
+      "field_sources": {
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.10, VDI row '4.19 Gesamtlänge l1 mm 2620' ('FM-X 25 iGo' column)",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.10, row 4.21 = 1465",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.10, row '4.6.1 Höhe Schutzdach inkl. Automatisierung h6.1 mm 2475'",
+        "max_speed": "iGo_systems_DE_TD.pdf p.10, row 5.1 = 1,7/1,7; also Automation_DE_Brochure.pdf p.7, 'FM-X iGo ... bis 1,7 m/s'",
+        "mast_type": "iGo_systems_DE_TD.pdf p.11, 'FM-X 25 iGo / Dreifach-Hubgerüst'"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db": 2500.0,
+          "datasheet": 2400.0,
+          "source": "iGo_systems_DE_TD.pdf p.10, VDI row '1.5 Tragfähigkeit/Last Q kg ... 2400' in the 'FM-X 25 iGo' column; corroborated by AGV-Overview_DE_Flyer.pdf p.1 matrix, 'Tragfähigkeit ... bis 2.400 kg' for FM-X iGo",
+          "note": "K.O. field. This is the SERIES-WIDE pattern, not a one-off: every automated FM-X is rated 100 kg BELOW its nominal model designation — FM-X 12 iGo = 1100 kg, 14 = 1300, 17 = 1600, 20 = 1900, 25 = 2400. The DB's 2500 is the model NUMBER read as a payload, which the automated Typenblatt contradicts for all five variants. A third STILL figure exists and matches neither: `Automation_DE_Brochure.pdf` p.7 says 'FM-X iGo ... bis 2,3 t'. Three values (2400 / 2300 / 2500) — not resolvable from these documents."
+        },
+        "lifting_height": {
+          "db": 9800,
+          "datasheet": "9450 (Einlagerhöhe) / 9582 (Hub h3) / 10000 (two marketing sheets)",
+          "source": "iGo_systems_DE_TD.pdf p.11, 'FM-X 25 iGo / Dreifach-Hubgerüst' mast table, last column 'Hub h3 mm 9582' / 'Einlagerhöhe mm 9450'; vs AGV-Overview_DE_Flyer.pdf p.1 'Hubhöhe ... bis 10.000 mm' and Automation_DE_Brochure.pdf p.7 'bis 10.000 mm'",
+          "note": "K.O. field. The DB's 9800 appears in NONE of the five source files. The engineering table caps at 9582 mm lift / 9450 mm storage height; STILL's own marketing rounds to 10 000 mm. Recommend adopting the mast-table figure once a reviewer decides whether AP0's lifting_height means Hub or Einlagerhöhe — a question worth settling globally, since it recurs on every VDI-2198 sheet in this corpus."
+        },
+        "min_aisle_width": {
+          "db": 3000,
+          "datasheet": 3200,
+          "source": "iGo_systems_DE_TD.pdf p.10, row '4.34.1 Arbeitsgangbreite bei Palette 1000 x 1200 quer Ast mm ... 3200' ('FM-X 25 iGo' column); row 4.34.2 (800×1200 längs) = 3175",
+          "note": "K.O. field, and the DB value is 200 mm OPTIMISTIC — i.e. the current record would let the FM-X pass a tender with a 3.0 m aisle that it cannot actually work in. 3000 mm is in fact the FM-X 14's figure, so this looks like the series-wide value having been taken from the wrong column."
+        }
+      },
+      "notes": "Wenderadius Wa 2077 mm (p.10 row 4.35) — explicit radius, no Forklift-scope field (recurring gap). Dead weight 4210 kg. Battery 5PzS 48/775. `load_detection`: p.10 caption 'Für präzises und effizientes Palettenhandling auch in den obersten Regalfächern ist der FM-X iGo systems mit einem Pallet Positioning Sensor ausgestattet' — supports Laser/LiDAR profiling or Camera/Vision but does not say which; left null rather than guessed. `autonomous_charging`: p.10 caption 'Automatisches Opportunity Charging über die am Fahrerschutzdach befindlichen Ladekontakte für einen ganzheitlich automatisierten Prozess' — confirms the DB's existing value 1."
+    },
+    {
+      "product_name": "MX-X iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "conflict",
+      "variant_group": "MX-X iGo VNA man-up series — the Typenblatt on p.12 shows THREE columns: two 'mit Schwenkschubgabel' builds (short and tall mast) and one 'mit Teleskoptisch'. This existing DB row is matched to the tall Schwenkschubgabel build (its lifting_height 14000 matches exactly).",
+      "fields": {
+        "vehicle_length": 4185,
+        "vehicle_width": 1600,
+        "min_total_height": 2555,
+        "max_speed": 1.2,
+        "mast_type": "Triplex",
+        "vna_capable": true
+      },
+      "field_sources": {
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.12, VDI row '4.19 Gesamtlänge l1 mm 4185' (2nd 'mit Schwenkschubgabel' column)",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.12, VDI row '4.21 Gesamtbreite b1/b2 mm 1160/1600' — took b2 (1600, over the load) as the wider of the pair",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.12, VDI row '4.7 Höhe über Schutzdach (Kabine) h6 mm 2555' (identical for all three configurations)",
+        "max_speed": "iGo_systems_DE_TD.pdf p.12, VDI row '5.1 Fahrgeschwindigkeit m/s 1,2/2,0/3,0 (abhängig vom Sicherheitskonzept)'",
+        "mast_type": "iGo_systems_DE_TD.pdf p.14, mast tables 'Teleskop-Hubgerüst' and 'Triplex-Hubgerüst'; 14 000 mm is only reachable on the Triplex",
+        "vna_capable": "iGo_systems_DE_TD.pdf p.12 title, 'MX-X iGo Automatisierter Schmalgangstapler (Man-up)'"
+      },
+      "conflicts": {
+        "max_payload": {
+          "db": 1500.0,
+          "datasheet": 1400.0,
+          "source": "iGo_systems_DE_TD.pdf p.12, VDI row '1.5 Tragfähigkeit/Last Q kg 1400 / 1400 / 1100'; corroborated by AGV-Overview_DE_Flyer.pdf p.1 ('bis 1.400 kg'), Automation_DE_Brochure.pdf p.7 ('bis 1,4 t') and iGo_systems_DE_TD.pdf p.15 body ('automatisierte Lastspiele bis 14 Meter Höhe bei 1.400 kg Tragkraft')",
+          "note": "K.O. field, stated FOUR times across three documents as 1400 kg. Note where the DB's 1500 probably comes from: `Intralogistic-Systems_DE_Brochure.pdf` p.7 says of the MANUAL MX-X, 'Die kompakte Schwenkschub- oder Teleskopgabel trägt Lasten von 500 kg bis zu 1.500 kg' — i.e. 1500 kg is the manual truck's rating and 1400 kg is the automated one. Same automation-derating pattern as the FM-X series."
+        },
+        "min_aisle_width": {
+          "db": 1480,
+          "datasheet": "1800 (Schwenkschubgabel) / 1500 (Teleskoptisch)",
+          "source": "iGo_systems_DE_TD.pdf p.12, VDI row '4.34.2 Arbeitsgangbreite bei Palette 800 x 1200 längs Ast mm 1800 / 1800 / 1500'",
+          "note": "K.O. field and the most consequential conflict in this group: 1480 mm is BELOW every figure the manufacturer prints, so the current record would win VNA tenders with aisles the truck physically cannot enter. Even the narrowest documented build (Teleskoptisch) needs 1500 mm. Oddity worth a second look: the DB's LTX 50 iGo row stores turning_radius = 1480 — the same unusual number — which raises the possibility of a cross-row copy rather than an independent measurement."
+        },
+        "special_fork_option": {
+          "db": "Side-Shift (on FM-X) / Telescopic (on MX-X)",
+          "datasheet": "Schwenkschubgabel (swing-reach fork) on two of three builds; Teleskoptisch (telescopic table) on the third",
+          "source": "iGo_systems_DE_TD.pdf p.12, VDI row '1.2 Typzeichen des Herstellers: MX-X iGo mit Schwenkschubgabel / mit Schwenkschubgabel / mit Teleskoptisch'; p.14 caption 'Flexibles Ein- und Auslagern auf beiden Seiten des Regalgangs mithilfe der Schwenkschubgabel'",
+          "note": "NOT a data error — an AP0 gap, recorded as a conflict only so it is not lost. `special_fork_option` allows ['Telescopic','Side-Shift','Clamp'] and has no value for a SWING-REACH fork, which for a VNA buyer is the decisive attachment choice (it determines whether both aisle sides can be served from one pass). The DB's 'Telescopic' is defensible for the Teleskoptisch build and wrong for the two Schwenkschubgabel builds. Second independent instance of this gap in the corpus."
+        }
+      },
+      "notes": "max_speed: the source prints THREE values in one cell — '1,2/2,0/3,0 (abhängig vom Sicherheitskonzept)'. That is a genuine configuration axis with no AP0 counterpart, so per the matrix rule I took the CONSERVATIVE (lowest) 1,2 m/s and record the full range here; `AGV-Overview_DE_Flyer.pdf` p.1 and `Automation_DE_Brochure.pdf` p.7 both headline the top figure (3,0 m/s / 'bis 3 m/s') instead. A reviewer choosing the marketing figure should know it is only available under a particular safety concept. LIFT HEIGHT — the DB's 14000 is CORRECT and worth protecting: `iGo_systems_DE_TD.pdf` p.14 mast tables cap the row 'Maximale Lastaufnahme- und Absetzhöhe im Automatikmodus' at 14000 mm even where the mast itself lifts further ('Hub h3 mm ... 15650'). Two separate mast columns both read 14000, i.e. the automatic-mode ceiling is a deliberate cap, not a mast limit. Do NOT 'correct' it upward from `Intralogistic-Systems_DE_Brochure.pdf` p.7's 'Mit dem MX-X (Man-up) in bis zu 18 Meter Höhe' — that sentence describes the MANUAL MX-X in a manual-truck brochure. `guidance`: p.13 drawings are captioned 'MX-X iGo mit Schwenkschubgabel und induktiver Führung' → inductive wire guidance, consistent with the DB's existing 'Rail|Wire' (the 'Rail' half is not evidenced in these files). AP0 GAP, new: p.12 row '4.42 Umsetzgangbreite min. Au mm 6000' — the TRANSFER aisle (the cross aisle a VNA truck needs to change aisles) is a hard layout constraint with no AP0 field at all, and at 6000 mm it is more than three times the working aisle. Also unstorable: '4.44 Lichte Weite Fahrerplatzeinstieg 412 mm' and '4.45 Lichte Fahrerplatzhöhe innen 2000 mm' (man-up cabin). Dead weight 11 863 kg (row 2.1)."
+    },
+    {
+      "product_name": "MX-X iGo mit Teleskoptisch",
+      "product_type": "Forklift AGV",
+      "source_file": "iGo_systems_DE_TD.pdf",
+      "db_status": "new",
+      "variant_group": "MX-X iGo VNA man-up series — third Typenblatt column; a genuinely different machine (different load handler, lower payload, narrower aisle) rather than a mast option",
+      "fields": {
+        "max_payload": 1100.0,
+        "lifting_height": 11350,
+        "min_aisle_width": 1500,
+        "vehicle_length": 4334,
+        "vehicle_width": 1450,
+        "min_total_height": 2555,
+        "max_speed": 1.2,
+        "vna_capable": true,
+        "special_fork_option": ["Telescopic"],
+        "drive_type": "VNA Turret",
+        "stacking_capability": true,
+        "guidance": ["Wire"]
+      },
+      "field_sources": {
+        "max_payload": "iGo_systems_DE_TD.pdf p.12, VDI row '1.5 Tragfähigkeit/Last Q kg ... 1100' ('MX-X iGo mit Teleskoptisch' column)",
+        "lifting_height": "iGo_systems_DE_TD.pdf p.12, row 'Maximale Einlagerungshöhe mm ... 11350' for the sample configuration (Hub h3 10000)",
+        "min_aisle_width": "iGo_systems_DE_TD.pdf p.12, row '4.34.2 Arbeitsgangbreite bei Palette 800 x 1200 längs Ast mm ... 1500'",
+        "vehicle_length": "iGo_systems_DE_TD.pdf p.12, row '4.19 Gesamtlänge l1 mm ... 4334'",
+        "vehicle_width": "iGo_systems_DE_TD.pdf p.12, row '4.21 Gesamtbreite b1/b2 mm ... 1160/1450' — took b2 = 1450",
+        "min_total_height": "iGo_systems_DE_TD.pdf p.12, row '4.7 Höhe über Schutzdach (Kabine) h6 mm 2555'",
+        "max_speed": "iGo_systems_DE_TD.pdf p.12, row '5.1 ... 1,2/2,0/3,0 (abhängig vom Sicherheitskonzept)' — conservative value taken",
+        "vna_capable": "iGo_systems_DE_TD.pdf p.12 title, 'Automatisierter Schmalgangstapler (Man-up)'; 1500 mm working aisle is inside the VNA band",
+        "special_fork_option": "iGo_systems_DE_TD.pdf p.12, row 1.2 'MX-X iGo mit Teleskoptisch'; p.14 caption 'Für maximale Lagerverdichtung ist der MX-X iGo mit einer Teleskoptisch ausgestattet'",
+        "drive_type": "iGo_systems_DE_TD.pdf p.12, 'Schmalgangstapler' with a side-transfer load handler ('4.29 Schub, seitlich b7 mm 1395')",
+        "stacking_capability": "iGo_systems_DE_TD.pdf p.12 — a 10 m-lift VNA truck placing pallets in racking; block-stacking is implied by capability, not stated. FLAGGED: this is the weakest value in this entry and a reviewer may prefer null (README §6a warns that rack service ≠ block stacking).",
+        "guidance": "iGo_systems_DE_TD.pdf p.13, drawing captions 'mit Schwenkschubgabel und induktiver Führung' (inductive guidance is shown for the series)"
+      },
+      "notes": "Variant completion. Its 1500 mm aisle is 300 mm narrower than the Schwenkschubgabel builds, so for a tight-aisle tender this is the relevant machine and the DB currently has no row for it. Its mast table (p.14, 'MX-X iGo mit Teleskoptisch') also reaches 14000 mm 'im Automatikmodus' with a Triplex — so a higher-lift Teleskoptisch build exists; 11350 recorded here is the sample configuration actually specced in the Typenblatt. Dead weight 10 287 kg. Note `guidance` is proposed from a drawing caption on p.13, i.e. it describes the illustrated build; slightly weaker than a table row."
+    },
+    {
+      "product_name": "AXL iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "AXL-iGo_DE_Brochure.pdf",
+      "db_status": "conflict",
+      "variant_group": "AXL iGo — single model, purpose-built truck loader",
+      "fields": {
+        "max_speed": 2.0,
+        "autonomous_obstacle_bypass": true,
+        "station_applications": ["Floor", "Dock"]
+      },
+      "field_sources": {
+        "max_speed": "AXL-iGo_DE_Brochure.pdf p.4, headline figure block '1.500 kg / 2 m/s (7,2 km/h) / 125 mm' — the printed km/h conversion is internally consistent (2 m/s × 3.6 = 7.2 km/h), which is good evidence against a typo; corroborated by AGV-Overview_DE_Flyer.pdf p.1 ('bis 2,0 m/s') and Automation_DE_Brochure.pdf p.6 ('2 m/s (7,2 km/h)')",
+        "autonomous_obstacle_bypass": "AXL-iGo_DE_Brochure.pdf p.6, 'INTELLIGENTE OBJEKTERKENNUNG / Mehrere Kameras gewährleisten eine effiziente und sichere Objekterkennung und ggf. ein Umfahren von Hindernissen in stark genutzten Bereichen. Beispielsweise bei Mischverkehr aus Personen, manuell gesteuerten Fahrzeugen und FTS.'",
+        "station_applications": "AXL-iGo_DE_Brochure.pdf p.5 diagram, 'BE- UND ENTLADEZONE' + 'LADESTATION'; p.7 'und das ganz ohne stationäre Sicherheitslösungen am Ladedock' (quoted from Automation_DE_Brochure.pdf p.6)"
+      },
+      "conflicts": {
+        "manual_usage": {
+          "db": 1,
+          "datasheet": "contradicted — 'nicht möglich'",
+          "source": "AGV-Overview_DE_Flyer.pdf p.1, portfolio matrix row 'Dualer Betrieb': AXL iGo = 'nicht möglich' (vs 'bei Bedarf' for LTX / EXV / EXV-CB / FM-X / MX-X)",
+          "note": "The other side of the argument, from a DIFFERENT STILL file: `AXL-iGo_DE_Brochure.pdf` p.5 says 'BLEIBEN SIE FLEXIBEL / Manueller Betrieb bleibt möglich, wenn die FTS nicht im Einsatz sind.' Reading them together, the flyer's 'Dualer Betrieb' most likely means dual MODE operation (the same vehicle switching between manual and automatic duty within a shift), while the brochure means the vehicle can be pushed manually when idle. Genuinely ambiguous; the DB value was NOT changed. Note that the flyer marks the same 'nicht möglich' for AXH/ACH iGo and AXV iGo — all three are purpose-built AGVs rather than converted series trucks, which is a coherent pattern and makes the flyer's reading the more likely one."
+        }
+      },
+      "notes": "Catalogue CONFIRMS existing DB values max_payload=1500 (p.4 headline, and Automation_DE_Brochure.pdf p.6 '1,5 t'), lifting_height=125 (p.4 '125 mm', flyer 'bis 125 mm'), infrastructure_free=1 (p.3 'FLEXIBLE EINRICHTUNG / Kompakt und einfach ohne zusätzliche Infrastruktur'; p.6 'ermöglicht eine schnelle Einrichtung und nahtlose Navigation, ohne dass die Infrastruktur angepasst werden muss'), and load_detection (p.7 'Die Palettenerkennung ermöglicht ein einfaches Handling auch von nicht mittig beladenen Paletten und Ausreißern'). navigation_type: DB holds 'Natural Feature (SLAM)' only; p.6 documents TWO stacks — '3D-Visual-SLAM-Technologie' plus 'Im Inneren des Lkw sorgt die LiDAR-Scanner-basierte Navigation für hohe Genauigkeit' — so the proposed additive union is ['Natural Feature (SLAM)','Vision']. Recorded here rather than as a fill because the field is non-null. AP0 GAPS surfaced by this file: (a) THROUGHPUT — p.2 and p.5 both headline '30 Paletten in 35 Minuten' with the footnote '* Zwei FTS, EPAL-Paletten, kurze Seite vorne' (≈26 pallets/h/vehicle); `throughput_picks_per_hour` and `throughput_basis` are AMR-scope only, so a forklift AGV whose entire value proposition is dock throughput cannot store it. (b) WIRELESS INFRASTRUCTURE — p.5's system diagram shows 'WLAN', 'SERVER', 'LADESTATION' and a web UI as required infrastructure; still no AP0 field (5th+ instance). (c) The web-based fleet UI ('VOLLE PROZESSKONTROLLE / Über webbasierte Benutzeroberflächen', p.5) is NOT `onboard_ui` and was deliberately not mapped there."
+    },
+    {
+      "product_name": "LTX 50 iGo",
+      "product_type": "Tugger AGV",
+      "source_file": "AGV-Overview_DE_Flyer.pdf",
+      "db_status": "conflict",
+      "variant_group": "LTX 50 iGo — automated tractor for the LiftRunner train system",
+      "fields": {
+        "load_transfer": ["Automatic roller", "Lift"],
+        "route_type": null
+      },
+      "field_sources": {
+        "load_transfer": "Intralogistic-Systems_DE_Brochure.pdf p.8, 'Flexibel automatisiert / Das Lasthandling. Der automatisierte Rahmen LiftRoller® mit Fördertechnik zur Aufnahme und Abgabe von Paletten erweitert die Transportkapazität auf 1,5 Tonnen pro Anhänger.'; and p.8 'Prinzip des LiftRunner® ist, dass Trolleys in Rahmen eingeschoben, automatisch gesichert und dann mit Betreten des Zugfahrzeuges für den Transport angehoben werden'"
+      },
+      "conflicts": {
+        "max_speed": {
+          "db": 3.9,
+          "datasheet": 1.7,
+          "source": "AGV-Overview_DE_Flyer.pdf p.1 matrix, 'Max. Standardgeschwindigkeit ... 1,7 m/s' in the 'LTX iGo' column; corroborated by Automation_DE_Brochure.pdf p.6, 'LTX 50 iGo / bis 5.000 kg / bis 1,7 m/s'",
+          "note": "K.O.-adjacent SCORING field, and a large discrepancy (3.9 m/s = 14 km/h vs 1.7 m/s = 6.1 km/h). The DB row's own description says 'up to 14 km/h', which is the MANUAL LTX 50's road speed; both automation documents rate the automated LTX 50 iGo at 1.7 m/s. Same automation-derating pattern already found on the FM-X series (payload) and the MX-X (payload). Two independent STILL files agree on 1.7. Strongly recommend the reviewer adopt 1.7, but not applied here."
+        }
+      },
+      "notes": "Catalogue CONFIRMS towing_capacity=5000 (`AGV-Overview_DE_Flyer.pdf` p.1 'bis 5.000 kg'; `Automation_DE_Brochure.pdf` p.6 'bis 5.000 kg'; `Intralogistic-Systems_DE_Brochure.pdf` p.8 'Unterschiedliche LiftRunner® Rahmen können in einem Zug bis zu einem Gesamtgewicht von 5.000 kg mit dem Schlepper LTX 50 kombiniert werden'). trailer_compatibility: the DB holds 'STILL LiftRunner B/C/E frames + trolleys'; `Intralogistic-Systems_DE_Brochure.pdf` p.8 documents SIX frame types with ratings — E-Rahmen 1000 kg (single-side load/unload, 1-axle, particularly manoeuvrable), B-Rahmen 1000 kg (both sides), C-Rahmen 1600 kg (variably adjustable fork tines, indoor+outdoor), BX-Rahmen 1000 kg (folding drawbar, asymmetric, '50% mehr Kapazität', usable as an 8-trailer train), PE-Rahmen 1000 kg (both sides, explicitly 'unkompliziertes Zusammenspiel mit autonomen mobilen Robotern (AMR) möglich'), PH-Rahmen 1600 kg (superelastic tyres + weather protection, outdoor). Proposed extension of the free-text field to name all six. max_trailers: the BX-Rahmen line 'Als 8er Zug möglich' is the only trailer-count figure in the group and it is frame-specific, not tractor-specific — left null rather than attributed to the LTX. ROUTE TYPE — flagged, not changed: the DB holds route_type='Fixed Route|Flexible Route' (two values in a single-select field, itself a data-hygiene issue), while `Intralogistic-Systems_DE_Brochure.pdf` p.8 says 'Der automatisierte Schlepper LTX 50 iGo navigiert fahrerlos auf einer vordefinierten Route' and `Automation_DE_Brochure.pdf` p.6 says 'navigiert den Zug zuverlässig auf einer vordefinierten Strecke' — both point to Fixed Route only. Not asserted as a conflict because route_type is K.O.-level and a marketing sentence describing the typical application is weaker evidence than a spec row. AP0 GAP: `Automation_DE_Brochure.pdf` p.6 mentions the train carries 'mit maximal 1,5 Tonnen Ladegewicht' per trailer — per-trailer capacity has no AP0 field distinct from total towing_capacity."
+    },
+    {
+      "product_name": "STILL AXV 12 iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "AGV-Overview_DE_Flyer.pdf",
+      "db_status": "enrich",
+      "variant_group": "AXV iGo — entry-level automated stacker",
+      "fields": {
+        "max_speed": 2.0,
+        "drive_type": "Straddle Stacker",
+        "station_applications": ["Floor", "Standard rack"]
+      },
+      "field_sources": {
+        "max_speed": "AGV-Overview_DE_Flyer.pdf p.1 matrix, 'Max. Standardgeschwindigkeit ... bis 2,0 m/s' in the 'AXV iGo' column; corroborated by Automation_DE_Brochure.pdf p.8, 'AXV iGo / bis 1.800 mm / bis 1,2 t / bis 2,0 m/s'",
+        "drive_type": "Automation_DE_Brochure.pdf p.8, 'AUTOMATISIERTE HOCHHUBWAGEN / AXV iGo & EXV iGo ... Als Einstiegslösung ist der AXV iGo unschlagbar unkompliziert und kompakt'",
+        "station_applications": "AGV-Overview_DE_Flyer.pdf p.1, 'AXV iGo* / Automatisches Ein- und Auslagern & Horizontaltransport im Breitgang'"
+      },
+      "notes": "Sources CONFIRM the existing DB max_payload=1200 (flyer 'bis 1.200 kg'; Automation brochure 'bis 1,2 t'). lifting_height: DB holds 1844 mm, an oddly precise figure that appears in none of the five files; both marketing sheets round to 'bis 1.800 mm'. NOT flagged as a conflict — 1844 is more precise than 1800 and is plausibly a real Hub figure from a VDI sheet not in this corpus (the false-positive checklist's unit/precision test). max_speed was NULL and is now filled from two independent sources. NOTE for the reviewer: `AGV-Overview_DE_Flyer.pdf` p.1 marks AXV iGo 'Dualer Betrieb: nicht möglich', while the DB holds manual_usage=1 — same ambiguity as the AXL entry, same decision (flag, do not change)."
+    },
+    {
+      "product_name": "STILL AXH 10 iGo",
+      "product_type": "Mobile AMR",
+      "source_file": "AGV-Overview_DE_Flyer.pdf",
+      "db_status": "enrich",
+      "variant_group": "AXH / ACH iGo underride AMR family — the flyer treats 'AXH iGo und ACH iGo' as ONE column",
+      "fields": {
+        "autonomous_obstacle_bypass": true,
+        "infrastructure_free": null
+      },
+      "field_sources": {
+        "autonomous_obstacle_bypass": "Automation_DE_Brochure.pdf p.6, 'AXH iGo ... Er navigiert mit innovativer [Technologie] ... kann er [dank Objekt]erkennung Hindernisse selbstständig umfahren und problemlos [in Lager- und Produktionsbereiche vordringen]'"
+      },
+      "notes": "Thin group for this model — the five files carry almost no AXH-specific specification. The flyer's column is a FAMILY column ('AXH iGo und ACH iGo', 'bis 1.500 kg', 'bis 60 mm', '2,2 m/s') whose figures are family maxima, so they must NOT be written onto the AXH 10 row: 1500 kg belongs to ACH 15 and 60 mm to ACH 10/15, while the DB's AXH 10 correctly holds 1000 kg / 40 mm. `Automation_DE_Brochure.pdf` p.6 confirms 'AXH 10 iGo / bis 1 t / bis 2,2 m/s' — matching the DB exactly on both. WRONG-SCOPE VALUES ON THE EXISTING ROW (flag only, 9th consecutive company): this Mobile AMR row carries `lifting_height` (40) and `min_aisle_width` (2948), both of which are **Forklift-scope** fields; the AMR-scope equivalents are `lift_height` and (for aisle width) nothing at all. The same applies to all three ACH rows. This is the AP0 aisle-width gap for AMRs manifesting as live wrong-scope data, exactly as documented for Toyota RAE250 and Grenzebach FF1200S in the opposite direction."
+    },
+    {
+      "product_name": "STILL ACH 10 iGo",
+      "product_type": "Mobile AMR",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "enrich",
+      "variant_group": "ACH iGo series — the brochure names it as a range, 'ACH 10-15 iGo'",
+      "fields": {
+        "navigation_type": null,
+        "load_type": ["Roll Container", "Custom Carrier"]
+      },
+      "field_sources": {
+        "load_type": "Automation_DE_Brochure.pdf p.6, 'ACH 10-15 iGo / Klein. Wendig. Kraftvoll. Dank intelligenter QR-Code-Navigation transportiert der ACH iGo 1,0 bis 1,5 Tonnen Traglast selbstständig ... kann er tief in Lager- und Produktionsbereiche vordringen' — an underride vehicle moving carts/carriers"
+      },
+      "notes": "CONFIRMS existing DB values: navigation_type='QR/DM Code' (p.6 'Dank intelligenter QR-Code-Navigation'), max_payload=1000 (p.6 'transportiert der ACH iGo 1,0 bis 1,5 Tonnen Traglast', with the model code ACH 10 = 1.0 t), infrastructure_free=0 (QR floor markers ARE infrastructure — consistent). `AGV-Overview_DE_Flyer.pdf` p.1 gives '2,2 m/s' for the combined AXH/ACH column while the DB holds 1.5 m/s for ACH 10; `Automation_DE_Brochure.pdf` p.6 gives 'ACH 10-15 iGo ... bis 2 m/s'. NOT flagged as a conflict — the flyer's 2,2 m/s demonstrably belongs to the AXH half of the shared column (the Automation brochure lists AXH 10 iGo separately at 'bis 2,2 m/s'), and the brochure's 'bis 2 m/s' is a series ceiling that the DB's per-model 1.5 sits under. Textbook case for the sibling-row check. Same wrong-scope observation as AXH 10 (`lifting_height`, `min_aisle_width` on an AMR row)."
+    },
+    {
+      "product_name": "STILL ACH 15 iGo",
+      "product_type": "Mobile AMR",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "enrich",
+      "variant_group": "ACH iGo series",
+      "fields": {
+        "load_type": ["Roll Container", "Custom Carrier"]
+      },
+      "field_sources": {
+        "load_type": "Automation_DE_Brochure.pdf p.6, 'ACH 10-15 iGo ... transportiert der ACH iGo 1,0 bis 1,5 Tonnen Traglast selbstständig'"
+      },
+      "notes": "CONFIRMS max_payload=1500 (the top of the 'ACH 10-15' range, and `AGV-Overview_DE_Flyer.pdf` p.1's family maximum 'bis 1.500 kg') and navigation_type='QR/DM Code'. Nothing else model-specific in these five files. Same wrong-scope observation as the other AMR rows."
+    },
+    {
+      "product_name": "STILL ACH 06 iGo",
+      "product_type": "Mobile AMR",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "enrich",
+      "variant_group": "ACH iGo series",
+      "fields": {},
+      "notes": "NOT documented in any of the five files. `Automation_DE_Brochure.pdf` p.6 and `Intralogistic-Systems_DE_Brochure.pdf` p.13 both name the series as 'ACH 10-15 iGo' with a 1.0–1.5 t range, which EXCLUDES a 0.6 t model; `AGV-Overview_DE_Flyer.pdf` p.1 names only 'AXH iGo und ACH iGo' generically. So the DB's ACH 06 (600 kg) has no support in the current 2026-dated material. Flagged as a possible discontinued/renamed variant for the review list — NOT deactivated, and no fields proposed."
+    },
+    {
+      "product_name": "EXV-CB iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "AGV-Overview_DE_Flyer.pdf",
+      "db_status": "new",
+      "variant_group": "EXV family — counterbalanced ('CB') sibling of the EXV iGo",
+      "fields": {
+        "max_payload": 1400.0,
+        "max_speed": 1.7,
+        "drive_type": "Counterbalanced",
+        "manual_usage": true,
+        "station_applications": ["Floor", "Conveyor", "Standard rack"]
+      },
+      "field_sources": {
+        "max_payload": "AGV-Overview_DE_Flyer.pdf p.1 matrix, 'Tragfähigkeit ... bis 1.400 kg' in the 'EXV-CB iGo*' column; corroborated by Automation_DE_Brochure.pdf p.7, 'EXV-CB iGo / bis 3.800 mm / bis 1,4 t'",
+        "max_speed": "Automation_DE_Brochure.pdf p.7, 'EXV-CB iGo ... bis 1,7 m/s'",
+        "drive_type": "Automation_DE_Brochure.pdf p.7 heading, 'AUTOMATISIERTE SCHUBMASTSTAPLER & GEGENGEWICHTS-HOCHHUBWAGEN' — 'Gegengewichts-' = counterbalanced; the model suffix 'CB' agrees",
+        "manual_usage": "AGV-Overview_DE_Flyer.pdf p.1, matrix row 'Dualer Betrieb ... bei Bedarf' in the EXV-CB column",
+        "station_applications": "Automation_DE_Brochure.pdf p.7, 'Der EXV-CB iGo überzeugt beim Ein- und Auslagern, im Horizontaltransport sowie an Übergabestationen mit hoher Resttragfähigkeit'; AGV-Overview_DE_Flyer.pdf p.1, 'Automatisierte Abgabe und Abholung an Übergabestationen'"
+      },
+      "notes": "NEW PRODUCT — appears in two of the five files and in no DB row. LIFT HEIGHT DELIBERATELY LEFT NULL: STILL's own two documents contradict each other. `AGV-Overview_DE_Flyer.pdf` p.1 gives 'Hubhöhe ... bis 2.800 mm' for EXV-CB (with 3.800 mm in the adjacent EXV column), while `Automation_DE_Brochure.pdf` p.7 gives 'bis 3.800 mm' for EXV-CB in both its spec block AND its body text ('Hubhöhen bis 3,8 Meter'). Since lifting_height is a K.O. field and 3800 is exactly the EXV iGo's figure — i.e. one of the two documents has probably duplicated the neighbouring column — neither value is safe to enter. This needs one supplier datasheet, not a guess. Similarly max_speed: the flyer says 'bis 2,0 m/s' and the Automation brochure says 'bis 1,7 m/s'; I recorded the CONSERVATIVE 1.7. `stacking_capability` also left null (a counterbalanced truck with a ~3 m mast almost certainly block-stacks, but no source says so)."
+    },
+    {
+      "product_name": "Counterbalance iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "new",
+      "variant_group": "Industry-specific iGo range (Automation_DE_Brochure.pdf p.9) — five models presented as one family of 'branchenspezifische FTS'",
+      "fields": {
+        "max_payload": 1800.0,
+        "lifting_height": 3410,
+        "max_speed": 2.0,
+        "drive_type": "Counterbalanced",
+        "safety_standard": ["ISO 3691-4"]
+      },
+      "field_sources": {
+        "max_payload": "Automation_DE_Brochure.pdf p.9, spec block 'Counterbalance iGo / bis 3.410 mm / bis 1,8 t / bis 2,0 m/s'",
+        "lifting_height": "Automation_DE_Brochure.pdf p.9, same block, 'bis 3.410 mm'",
+        "max_speed": "Automation_DE_Brochure.pdf p.9, same block, 'bis 2,0 m/s'",
+        "drive_type": "Automation_DE_Brochure.pdf p.9, 'COUNTERBALANCE iGo & HEAVY COUNTERBALANCE iGo / Die Gegengewichts-FTS übernehmen in der Regel wiederkehrende Aufgaben, die sonst manuell mit Gabelstaplern erledigt werden.'",
+        "safety_standard": "Automation_DE_Brochure.pdf p.9, 'erfüllen höchste Sicherheitsstandards gemäß ISO 3691-4'"
+      },
+      "notes": "NEW PRODUCT. `Automation_DE_Brochure.pdf` p.9 is the only place in the entire five-file group where these five industry-specific models appear, and none of them exists in the DB. Each is documented by exactly three numbers plus a short paragraph — enough for the K.O. fields, nothing more. Recommend importing them as products but expecting most fields to stay null until dedicated datasheets arrive."
+    },
+    {
+      "product_name": "Heavy Counterbalance iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "new",
+      "variant_group": "Industry-specific iGo range",
+      "fields": {
+        "max_payload": 4000.0,
+        "lifting_height": 6880,
+        "max_speed": 2.0,
+        "drive_type": "Counterbalanced",
+        "special_fork_option": ["Clamp"],
+        "safety_standard": ["ISO 3691-4"]
+      },
+      "field_sources": {
+        "max_payload": "Automation_DE_Brochure.pdf p.9, spec block 'Heavy Counterbalance iGo / bis 6.880 mm / bis 4,0 t / bis 2,0 m/s'; corroborated in the adjacent body text, 'Die Schwerlastversion hebt dabei bis zu vier Tonnen'",
+        "lifting_height": "Automation_DE_Brochure.pdf p.9, same block, 'bis 6.880 mm'",
+        "max_speed": "Automation_DE_Brochure.pdf p.9, same block, 'bis 2,0 m/s'",
+        "drive_type": "Automation_DE_Brochure.pdf p.9, 'Die Gegengewichts-FTS ...'",
+        "special_fork_option": "Automation_DE_Brochure.pdf p.9, 'Dank verschiedener Anbaugeräte (z. B. lange Gabeln, Ballenklammer) sind die FTS vielfältig einsetzbar' — 'Ballenklammer' = bale clamp",
+        "safety_standard": "Automation_DE_Brochure.pdf p.9, 'gemäß ISO 3691-4'"
+      },
+      "notes": "NEW PRODUCT and, at 4000 kg, the highest-payload STILL AGV in the corpus — well inside the heavy-duty forklift plausibility band but far above anything currently on a STILL DB row (max 2500). 'lange Gabeln' (long forks) has no `special_fork_option` value; only the bale clamp maps."
+    },
+    {
+      "product_name": "Conveyor Transfer iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "new",
+      "variant_group": "Industry-specific iGo range",
+      "fields": {
+        "max_payload": 3000.0,
+        "lifting_height": 3410,
+        "max_speed": 2.0,
+        "station_applications": ["Conveyor", "Workstation"],
+        "safety_standard": ["ISO 3691-4"]
+      },
+      "field_sources": {
+        "max_payload": "Automation_DE_Brochure.pdf p.9, spec block 'Conveyor Transfer iGo / bis 3.410 mm / bis 3,0 t / bis 2,0 m/s'",
+        "lifting_height": "Automation_DE_Brochure.pdf p.9, same block",
+        "max_speed": "Automation_DE_Brochure.pdf p.9, same block",
+        "station_applications": "Automation_DE_Brochure.pdf p.9, 'Das FTS ist auf den Transport zwischen einzelnen Förderbändern spezialisiert und reduziert den Bedarf an langen, statischen Förderbändern. Es bewegt Lasten zwischen Arbeitsstationen sowie zwischen Lagern und Produktionsbereichen.'",
+        "safety_standard": "Automation_DE_Brochure.pdf p.9"
+      },
+      "notes": "NEW PRODUCT. Classification note: recorded as Forklift AGV on the strength of its published lift height (3410 mm), but the source describes a conveyor-to-conveyor transfer machine and never says 'Stapler' or 'Gabel'. A reviewer may prefer Mobile AMR. Flagged rather than asserted."
+    },
+    {
+      "product_name": "Straddle Stacker iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "new",
+      "variant_group": "Industry-specific iGo range",
+      "fields": {
+        "max_payload": 3000.0,
+        "lifting_height": 6000,
+        "max_speed": 2.0,
+        "drive_type": "Straddle Stacker",
+        "industries_served": ["General Manufacturing"],
+        "safety_standard": ["ISO 3691-4"]
+      },
+      "field_sources": {
+        "max_payload": "Automation_DE_Brochure.pdf p.9, spec block 'Straddle Stacker iGo / bis 6.000 mm / bis 3,0 t / bis 2,0 m/s'",
+        "lifting_height": "Automation_DE_Brochure.pdf p.9, same block",
+        "max_speed": "Automation_DE_Brochure.pdf p.9, same block",
+        "drive_type": "Automation_DE_Brochure.pdf p.9, 'Dank seiner seitlichen Lastarme, seiner schlanken Bauweise und verschiedener Gabelkonstruktionen verfügt der automatisierte Hochhubwagen über eine hohe Resttragfähigkeit'",
+        "industries_served": "Automation_DE_Brochure.pdf p.9, 'Ausgestattet mit einem Rollenzinken, kann er u. a. in der Papierindustrie zum automatisierten Transport von Papierrollen eingesetzt werden'",
+        "safety_standard": "Automation_DE_Brochure.pdf p.9"
+      },
+      "notes": "NEW PRODUCT. AP0 GAP: the named vertical is the PAPER industry, for which `industries_served` has no value — mapped to the nearest available ('General Manufacturing'), which loses the information. Also 'Rollenzinken' (roll prongs, for paper reels) has no `special_fork_option` value; only Telescopic / Side-Shift / Clamp exist."
+    },
+    {
+      "product_name": "Cold Store Stacker iGo",
+      "product_type": "Forklift AGV",
+      "source_file": "Automation_DE_Brochure.pdf",
+      "db_status": "new",
+      "variant_group": "Industry-specific iGo range",
+      "fields": {
+        "max_payload": 1600.0,
+        "lifting_height": 3185,
+        "max_speed": 2.0,
+        "operating_temp_min": -25,
+        "drive_type": "Straddle Stacker",
+        "load_type": ["Pallet EUR", "Tote", "Plastic Bin", "Custom Carrier"],
+        "industries_served": ["F&B"],
+        "safety_standard": ["ISO 3691-4"]
+      },
+      "field_sources": {
+        "max_payload": "Automation_DE_Brochure.pdf p.9, spec block 'Cold Store Stacker iGo / bis 3.185 mm / bis 1,6 t / bis 2,0 m/s'",
+        "lifting_height": "Automation_DE_Brochure.pdf p.9, same block",
+        "max_speed": "Automation_DE_Brochure.pdf p.9, same block",
+        "operating_temp_min": "Automation_DE_Brochure.pdf p.9, spec block line 'Kühl- oder tiefkühlfähig bis –25 °C'; corroborated in the body text, 'Diese automatisierten Hochhubwagen mit Lastarmstütze und kompakter Bauweise sind speziell für den Dauereinsatz in Kühlhäusern mit Temperaturen von bis zu −25 °C konzipiert'. AP0 unit is °C and the source prints °C — no conversion. Sign checked against config/unit_semantics.json (°C has a signed domain): the source's '−25 °C' is unambiguously negative in both occurrences.",
+        "drive_type": "Automation_DE_Brochure.pdf p.9, 'automatisierte Hochhubwagen mit Lastarmstütze'",
+        "load_type": "Automation_DE_Brochure.pdf p.9, 'Sie eignen sich für den Transport verschiedener Arten von Lastenträgern, darunter offene Ladungsträger, Kisten, Behälter und Wannen.'",
+        "industries_served": "Automation_DE_Brochure.pdf p.9, 'Dauereinsatz in Kühlhäusern' + the load types listed (crates, bins, tubs) — cold store operation is characteristically F&B. FLAGGED as the weakest value in this entry: the source does not name a vertical.",
+        "safety_standard": "Automation_DE_Brochure.pdf p.9"
+      },
+      "notes": "NEW PRODUCT and the most K.O.-relevant of the five: −25 °C continuous cold-store capability is a hard qualifier that no existing STILL row carries (`operating_temp_min` is NULL on all ten). Also worth noting for the reviewer: `operating_temp_max` is not stated, and the source's phrasing 'Kühl- oder tiefkühlfähig' distinguishes chill from deep-freeze duty — a distinction AP0's single min-temperature field cannot express."
+    }
+  ],
+  "not_imported_flagged": [
+    {
+      "name": "OPX-L 20 S iGo neo",
+      "source": "Automation_DE_Brochure.pdf p.8, 'AUTOMATISIERTER KOMMISSIONIERER / OPX-L 20 S iGo neo / bis 700 mm / bis 2 t' and 'Der autonome Horizontalkommissionierer folgt den Bedienenden auf Schritt und Tritt'; also Intralogistic-Systems_DE_Brochure.pdf p.13",
+      "recommendation": "Do NOT import as an AGV/AMR product. This is an OPERATOR-FOLLOWING order picker (STILL's 'iGo neo' semi-autonomous line), not a driverless transport vehicle: it requires a human walking alongside and its function is to follow them. Creating a Mobile AMR row for it would let it match driverless-transport tenders it cannot serve. Recorded here so the model is not simply lost. Note the same file also names 'iGo pilot' (assisted driving) and 'iGo cube' (a plug-and-play pallet shuttle store) — neither is a vehicle in the AP0 sense either."
+    }
+  ]
+}

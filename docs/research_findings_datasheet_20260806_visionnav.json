@@ -1,0 +1,724 @@
+{
+  "company": "VisionNav Robotics",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. Single source file '1688618048.pdf' (6pp) is itself a mini-catalog documenting THREE reach-truck payload variants of the VNR family back-to-back: VNR14 (pp.1-2, NOT in DB -- new), VNR16 (pp.3-4, already in DB), VNR20 (pp.5-6, already in DB). All three share the same chassis architecture, options list, and footnote text almost verbatim ('*Customizable 3D SLAM navigation; come with triplex mast option with lifting height 5755mm, 7255mm, 8555mm...'), confirming this is a genuine payload-variant family, not three unrelated products. This calibration run only had time to fully extract VNR14 (new); VNR16/VNR20 were cross-checked against the existing DB rows and TWO conflicts were found on each (lifting_height, min_aisle_width) -- flagged below, not overwritten. Text extraction quality note: this vendor's PDF interleaves the metric and imperial figures character-by-character in a way that pdfplumber's column-merge garbles badly for the 'Vehicle Dimensions (l1/b1/h1)' rows specifically (e.g. 'Mast Retracts (2 645 .18 37 x3x 91 .66 9x3 155 4x .33 3i9 n)20mm') -- these vehicle_length/width/height figures were deliberately left UNFILLED rather than guessed from the garbled text; every other spec table row on these pages extracted cleanly and was used with confidence. Also note: DS Automotion, Toyota and this VisionNav sheet all independently confirmed the same variant-completion pattern this run (a single manufacturer file covering several payload-class siblings of one chassis) -- worth building an explicit checklist item for the full batch: 'does this file contain more than one model number in its own text/table headers?'  ---  ADDENDUM (same-day continuation batch, full-New/-folder run): 7 more individual VisionNav product datasheets processed (1688464515.pdf=VNSL14, 1688613405.pdf=VNP15, 1775592252.pdf=VNKQ20, 1775593635.pdf=VNE40, 1775596770.pdf=VNQ50, 1775597593.pdf=VNK15, 1785316235.pdf+dup-2.pdf=VNE20). ALL SEVEN already exist in the DB as base models with literally every field NULL ('last_updated: unknown') -- pure enrichment, no new products, no variant completion needed (each already has its own base_model row). Existing DB product_type was respected as-is and NOT re-derived from the datasheet content even where it looked debatable (see VNKQ20 note in that product's own notes field). For SCORING-level max_speed, this batch consistently used the LOADED (lower, more conservative) figure from the 'Loaded/Empty' pairs printed in each motion-performance table, whereas the VNR14 entry above (calibration run) had used the marketing headline figure instead -- flagging this inconsistency between the two sub-batches rather than silently harmonizing it; both are grounded in real printed numbers, just a different convention pick. Three deferred full-line VisionNav catalogs (1657089341.pdf EN 18pp, 1685356775.pdf EN 14pp, 1728979799.pdf ES 16pp) were explicitly NOT opened for extraction this run (all listed products already covered by individual datasheets in the DB; catalogs are marketing/company overview, low marginal value for the time cost) -- left in New/, see coverage report.  ---  ADDENDUM (final-8-files run, same calendar day): '1685356775.pdf' turned out NOT to be a generic full-line catalog after all -- it is a dedicated 14-page single-product deck for the VNST20 'All In One Pallet Jack' (model number only visible on the p.1 cover image as large stylized text, not extractable as text -- resolved by rendering p.1 as an image). This RESOLVES the earlier open question (flagged in agent memory) about an 'unassigned 2000kg payload spec block' seen in this file -- it belongs to VisionNav VNST20, an EXISTING DB product, and its 2000kg payload / 1.8 m/s empty-load speed both match the already-stored DB values exactly (confirmed, not new). New enrichment fields added below. '1657089341.pdf' (18pp EN) and '1728979799.pdf' (16pp ES) were both opened and are genuine multi-product full-line catalogs (confirmed via cover-page images -- 'Products Catalog / Full Range of Autonomous Industrial Vehicles' resp. its Spanish equivalent), NOT single-product decks like 1685356775.pdf turned out to be. Text extraction quality on BOTH is clean (unlike prior VisionNav files that needed table-extraction or image fallback), so a full read was practical this run. '1728979799.pdf' (Spanish) was found to be almost entirely CONFIRMATORY of already-DB-covered products (ST/SL/P/E/R/Q series = VNST20, VNSL14, VNP15/20/30, VNR14/16/20, VNE20/30/35/40, VNQ50, all already in the DB with fields substantially filled from earlier individual-datasheet sessions) -- given the low marginal enrichment value and this run's remaining time budget, it was NOT deep-extracted field-by-field; only spot-checked for genuinely new content (none found beyond what English sources already cover). '1657089341.pdf' (English), by contrast, contains THREE genuinely new model families never seen in any prior VisionNav file or DB row: T Series (Pallet Jack AGV, VNT20), L Series (Pallet Stacker Forklift AGV, VNL14/VNL16), and two new Q-series tow-tractor payload classes (VNQ40/VNQ60, distinct from the already-DB VNQ50) -- these WERE fully extracted this run, see new product entries below. The English catalog's R-series pages (VNR14/VNR16/VNR25) were deliberately NOT used to create or update product rows, despite containing real spec tables: they introduce THIRD AND FOURTH sub-variant suffixes (-01 manual-seated-retractable, -07 manual-handheld, -07 manual-seated-tiller, -07 standing-tiller-only-for-VNR25) for model codes that already have open conflicts flagged from the calibration run (VNR16/VNR20 lifting_height + min_aisle_width conflicts) -- and the catalog's own page 13 vs page 15 print TWO DIFFERENT spec sets both labelled 'VNR16(V)-07' (Manual Handheld: 4500kg body weight, 6300mm lift height vs Manual Seated: 3910kg body weight, 7000mm lift height) which is an internal naming collision in the vendor's own document, not just a DB-vs-datasheet conflict. Adding more same-numbered R-series rows right now risks compounding an already-flagged reconciliation problem rather than resolving it -- flagged in the coverage report as a dedicated R-series reconciliation task for the Tech Lead (needs a decision on whether operation-type sub-variants, e.g. '-07 Handheld' vs '-07 Seated', should become separate Product rows with disambiguating names, and how that interacts with the existing VNR16/VNR20 conflict flags). Raw R-series figures from this catalog are recorded in researcher_notes only, not written to any field, so nothing is lost if a later session picks this up.",
+  "products": [
+    {
+      "product_name": "VisionNav VNR14",
+      "product_type": "Forklift AGV",
+      "source_file": "1688618048.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav VNR reach-truck family (VNR14/VNR16/VNR20), same chassis/mast architecture and option list, differs by rated payload and lift-height range",
+      "fields": {
+        "max_payload": 1400,
+        "max_speed": 2.0,
+        "lifting_height": 8555,
+        "min_aisle_width": 3150,
+        "min_turning_radius": 1695,
+        "navigation_type": [
+          "Natural Feature (SLAM)",
+          "Vision"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "max_gradient": 10,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 10,
+        "special_fork_option": [
+          "Side-Shift"
+        ],
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "station_applications": [
+          "Standard rack",
+          "Drive-in rack"
+        ],
+        "autonomous_charging": true,
+        "barcode_readers": true
+      },
+      "field_sources": {
+        "max_payload": "p.1 headline '1.4T Rated Load Capacity' and p.2 table 'Rated Load Capacity 1400kg(3086.47lb)'",
+        "max_speed": "p.1 headline '2.0m/s Max. Safety Driving Speed' and p.2 'MOTION PERFORMANCE' table, straight forward speed 2.0m/s (full/empty load)",
+        "lifting_height": "p.1 headline '8555mm Max. Lifting Height' and p.2 table 'Max. Lifting Height 8555mm(285.63in)'",
+        "min_aisle_width": "p.1 headline '3150mm Min. Stacking Aisle Width' and p.2 'ENVIRONMENTAL REQUIREMENT' table, 'Stacking Aisle ... Width 3150mm' row (distinct from the smaller 'Turning Aisle ... Width 2550mm' row on the same table, which was not used since min_aisle_width should represent the working/stacking aisle, not a transit-only corridor)",
+        "min_turning_radius": "p.2 table 'Min. Turning Radius 1695mm(66.73in)'",
+        "navigation_type": "p.2 table 'Positioning Method Vision-based' + p.2 footnote '*Customizable 3D SLAM navigation'",
+        "battery_type": "p.2 table 'Battery Type Lithiumiron phosphate battery' (= LiFePO4, exact AP0 allowed_value match)",
+        "max_gradient": "p.2 'ENVIRONMENTAL REQUIREMENT' table, 'Max. Load/Empty-Load Capability 10%,10%(6°,6°)' -- both loaded and unloaded state the same 10%",
+        "operating_temp_min": "p.2 table 'Working Temperature -5°C ~ 40°C'",
+        "operating_temp_max": "p.2 table 'Working Temperature -5°C ~ 40°C'",
+        "operating_humidity_max": "p.2 table 'Working Humidity 20%~95%'",
+        "stop_accuracy": "p.2 table 'Stacking Accuracy ±10mm/±0.5°(±0.39in/±0.5°)' -- mm component used",
+        "special_fork_option": "p.2 table 'Side Shift Range ±80mm(±3.15in)'",
+        "drive_type": "p.1 title 'VNR14(V)-01 REACH TRUCK AGF'",
+        "mast_type": "p.2 footnote 'come with triplex mast option with lifting height 5755mm, 7255mm, 8555mm' -- 8555mm matches this model's own headline lift height exactly, confirming the triplex-mast configuration is what is documented",
+        "station_applications": "p.1 body text 'suitable for selective pallet rack, drive-in rack, and other high position storage scenarios' -- 'selective pallet rack' maps to AP0's 'Standard rack'",
+        "autonomous_charging": "p.2 table 'Charging Mode Manual/ Automatic Charging' -- Automatic Charging listed as an available mode",
+        "barcode_readers": "p.2 footnote 'other available options: ... barcode scanner ...' -- listed as an available OPTION, not standard equipment; recorded as true with this caveat noted"
+      },
+      "notes": "Existing sibling entries (VNR16, VNR20) in the DB only record navigation_type=['Natural Feature (SLAM)'] (single value) whereas this sheet also explicitly states 'Positioning Method: Vision-based' for all three models including those siblings -- VNR14 was filled with both values since directly grounded in this document, but this is a slightly richer read than what exists on the sibling rows; not a conflict (siblings' field is non-null and untouched) but worth a reviewer noting the inconsistency in completeness. vehicle_length/vehicle_width/min_total_height intentionally left null due to garbled dimension-row text extraction (see researcher_notes) -- would need a page-image re-read to recover safely. functional_safety_level and safety_standard left null: only generic 'laser safety protection' language is used, no PLd/PLe/SIL rating or named standard (ISO 3691-4 etc.) appears anywhere on this sheet for the VNR series (unlike some other VisionNav sheets which may name one -- not checked in this run)."
+    },
+    {
+      "product_name": "VisionNav VNR16",
+      "product_type": "Forklift AGV",
+      "source_file": "1688618048.pdf",
+      "db_status": "conflict",
+      "variant_group": "VisionNav VNR reach-truck family (VNR14/VNR16/VNR20), same chassis/mast architecture and option list, differs by rated payload and lift-height range",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "lifting_height": {
+          "db_value": 5500,
+          "datasheet_value": "9455mm is this model's own headline/table max lift height; the shared triplex-mast footnote lists available lift-height options as 5755/7255/8555/9455mm -- 5500 does not match any documented option",
+          "note": "Not overwritten. Possibly a different mast configuration or a typo/rounding of 5755 in the original DB entry -- flagged for manual reconciliation."
+        },
+        "min_aisle_width": {
+          "db_value": 3250,
+          "datasheet_value": "3150mm (p.3 headline 'Min. Stacking Aisle Width' and p.4 table 'Stacking Aisle ... Width 3150mm')",
+          "note": "Not overwritten. Close but not identical to the DB value -- flagged for manual reconciliation, possibly a different revision of the datasheet."
+        }
+      },
+      "notes": "This entry exists only to record the two conflicts above; no other fields were re-filled since the rest of the existing DB record was not re-verified in this run."
+    },
+    {
+      "product_name": "VisionNav VNR20",
+      "product_type": "Forklift AGV",
+      "source_file": "1688618048.pdf",
+      "db_status": "conflict",
+      "variant_group": "VisionNav VNR reach-truck family (VNR14/VNR16/VNR20), same chassis/mast architecture and option list, differs by rated payload and lift-height range",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "lifting_height": {
+          "db_value": 7000,
+          "datasheet_value": "11455mm is this model's own headline/table max lift height; does not match any of the triplex-mast footnote options either (5755/7255/8555/9455mm), which is itself an inconsistency IN THE SOURCE DOCUMENT (the footnote text was seemingly not updated for the VNR20 variant) -- flagged for the source document itself, in addition to the DB conflict",
+          "note": "Not overwritten. Recommend treating VNR20's max lift height as uncertain until a cleaner VisionNav VNR20-specific datasheet is found."
+        },
+        "min_aisle_width": {
+          "db_value": 3300,
+          "datasheet_value": "3200mm (p.5 headline 'Min. Stacking Aisle Width' and p.6 table 'Stacking Aisle ... Width 3200mm')",
+          "note": "Not overwritten. Close but not identical to the DB value -- flagged for manual reconciliation."
+        }
+      },
+      "notes": "This entry exists only to record the two conflicts above; no other fields were re-filled since the rest of the existing DB record was not re-verified in this run."
+    },
+    {
+      "product_name": "VisionNav VNSL14",
+      "product_type": "Forklift AGV",
+      "source_file": "1688464515.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1642,
+        "vehicle_width": 994,
+        "lifting_height": 3000,
+        "max_payload": 1400,
+        "min_aisle_width": 2100,
+        "max_speed": 1.0,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 5,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.2 table 'Vehicle Dimensions (l1/b1/h1) 1642x994x2150mm'",
+        "vehicle_width": "p.2 table 'Vehicle Dimensions (l1/b1/h1) 1642x994x2150mm'",
+        "lifting_height": "p.1 headline '3000mm Max. Lifting Height' + p.2 table 'Max. Lifting Height 3000mm'",
+        "max_payload": "p.1 headline '1.4T Rated Load Capacity' + p.2 table 'Rated Load Capacity 1400kg'",
+        "min_aisle_width": "p.1 headline '2100mm Min. Stacking Aisle Width' + p.2 'ENVIRONMENTAL REQUIREMENT' table 'Min. Stacking Aisle Width ... 2100mm' (distinct from the smaller 'Min. Turning Aisle Width 1850mm' row, not used, same rationale as VNR14)",
+        "max_speed": "p.2 'MOTION PERFORMANCE' table, straight forward speed (Full-Load/Empty-Load) '1.0m/s, 1.3m/s' -- loaded (conservative) value used; p.1 headline advertises the empty-load figure '1.3m/s Max. Safety Driving Speed' instead",
+        "operating_temp_min": "p.2 table 'Working Temperature -5°C ~ 40°C'",
+        "operating_temp_max": "p.2 table 'Working Temperature -5°C ~ 40°C'",
+        "operating_humidity_max": "p.2 table 'Working Humidity 20%~95%'",
+        "max_gradient": "p.2 table 'Max. Climbing Ability(Full-Load/Empty-load) 5%,5%(3°,3°)'",
+        "navigation_type": "p.2 table 'Positioning Method 3D SLAM navigation'",
+        "battery_type": "p.2 table 'Battery Type Lithiumiron phosphate battery'",
+        "autonomous_charging": "p.2 table 'Charging Mode Manual/ Automatic Charging'"
+      },
+      "notes": "Body weight (1000kg), fork dimensions, load center distance and min. turning radius (1173mm) are printed but have no corresponding AP0 Forklift-scope field, so not recorded. Footnote states duplex-mast option can also reach 1600mm/2500mm/3000mm -- 3000mm (the top, most-capable option) was used as the headline figure since it matches both the p.1 headline and the p.2 table's own 'Max. Lifting Height' row."
+    },
+    {
+      "product_name": "VisionNav VNP15",
+      "product_type": "Forklift AGV",
+      "source_file": "1688613405.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2543,
+        "vehicle_width": 1344,
+        "lifting_height": 4500,
+        "max_payload": 1500,
+        "min_aisle_width": 3200,
+        "max_speed": 1.3,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 5,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.2 table 'Vehicle Dimensions (l1/b1/h1) 2543x1344x2085mm' (this file's own p.4 table shows a second configuration of the same model code VNP15(L)-07 with 2596x1351x2085mm -- p.2's figures used as primary, p.4's noted here for completeness, not written to fields)",
+        "vehicle_width": "p.2 table, same row as vehicle_length",
+        "lifting_height": "p.1 headline '4500mm Max. Lifting Height' + p.2 and p.4 tables, both configurations agree on 4500mm",
+        "max_payload": "p.1 headline '1.5T Rated Load Capacity' + p.2/p.4 tables, both agree on 1500kg",
+        "min_aisle_width": "CONSERVATIVE (worst-case/largest) value used per K.O.-field variant-matrix policy: p.2 table shows 'Min. Stacking Aisle Width ... 3150mm' for the first configuration (turning radius 1423mm), p.4 table shows 3200mm for the second configuration (turning radius 1529mm, stand-up-manual operation mode) -- 3200mm recorded since a KO_IF_LT-style disqualification check must not understate the aisle width the vehicle actually needs",
+        "max_speed": "p.2/p.4 'MOTION PERFORMANCE' tables, straight forward speed (Full-Load/Empty-Load) '1.3m/s, 1.5m/s' (both configs identical) -- loaded (conservative) value used",
+        "operating_temp_min": "p.2/p.4 tables 'Working Temperature -5°C ~ 40°C'",
+        "operating_temp_max": "p.2/p.4 tables 'Working Temperature -5°C ~ 40°C'",
+        "operating_humidity_max": "p.2/p.4 tables 'Working Humidity 20%~95%'",
+        "max_gradient": "p.2/p.4 tables 'Max. Climbing Capability 5%,5%(3°,3°)'",
+        "navigation_type": "p.2/p.4 tables 'Positioning Method 3D SLAM navigation'",
+        "battery_type": "p.2/p.4 tables 'Battery Type Lithiumiron phosphate battery'",
+        "autonomous_charging": "p.2/p.4 tables 'Charging Mode Manual/ Automatic Charging'"
+      },
+      "notes": "This 4-page PDF documents the SAME model code (VNP15(L)-07) twice with two slightly different physical configurations (different vehicle dimensions, turning radius, min. stacking aisle width, and operation mode -- 'Automatic/Manual Handheld' on p.2 vs 'Automatic/Stand-up Manual' on p.4). Treated as one product entry (matching the single existing DB row) using the conservative min_aisle_width per policy; a reviewer may want to treat these as two separate sub-variants instead if the DB's Entity Model wants that granularity."
+    },
+    {
+      "product_name": "VisionNav VNKQ20",
+      "product_type": "Mobile AMR",
+      "source_file": "1775592252.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2400,
+        "vehicle_width": 500,
+        "min_turning_radius": 1000,
+        "max_speed": 1.5,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 2,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.3 table (extract_tables) 'Overall Dimensions(l1*b1*h1) 2400x500x230mm'",
+        "vehicle_width": "p.3 table, same row",
+        "min_turning_radius": "p.3 table 'Min. Turning Radius 1000mm'",
+        "max_speed": "p.3 table 'Max Forward Speed (Loaded,Empty) 1.5m/s,1.67m/s' -- loaded (conservative) value used",
+        "operating_temp_min": "p.3 table 'Ambient Temperature -5 ~ 40 °C'",
+        "operating_temp_max": "p.3 table 'Ambient Temperature -5 ~ 40 °C'",
+        "operating_humidity_max": "p.3 table 'Ambient Humidity 20%~95%'",
+        "max_gradient": "p.3 table 'Max. Climbing Capability 2%'",
+        "navigation_type": "p.3 table 'Positioning Method 3D SLAM'",
+        "battery_type": "p.3 table 'Battery Type Lithium Iron Phosphate Battery (LFP)'",
+        "autonomous_charging": "p.3 table 'Charging Mode Manual Charging/Automatic Charging'"
+      },
+      "notes": "IMPORTANT classification caveat: this datasheet titles the product 'TUNNELLING AMR' and its own spec table is dominated by tow-type fields -- 'Rated Traction Capacity 2000kg', 'Tow Pin Height 230-270mm', 'Wheelbase 1265mm', 'Drive Direction Bidirectional Travel' -- i.e. structurally a tugger/tow vehicle, not a payload-carrying platform. The DB already classifies this base model as product_type='Mobile AMR' (not re-derived or changed here per this agent's never-overwrite rule), but because of that classification only the Logistics:AGV (shared) + Logistics:AGV:AMR field set was used, which has NO field for towing/traction capacity or tow-pin geometry (those only exist under Logistics:AGV:Tugger). 'Rated Traction Capacity 2000kg' was therefore deliberately NOT written into max_payload (towed load is not the same quantity as onboard payload) -- flagging for the Tech Lead to consider whether this product's product_type should be revisited to Tugger AGV, which would unlock towing_capacity/turning_radius/coupling_type fields that are a much better fit for what this sheet actually documents. min_ground_clearance, lift_height, shelf_height not stated for this model."
+    },
+    {
+      "product_name": "VisionNav VNQ50",
+      "product_type": "Tugger AGV",
+      "source_file": "1775596770.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1560,
+        "vehicle_width": 900,
+        "towing_capacity": 5000,
+        "turning_radius": 1150,
+        "max_speed": 2.0,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 3.5,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.3 table (extract_tables) 'Overall Dimensions(l1*b1*h1) 1560x900x1300mm'",
+        "vehicle_width": "p.3 table, same row",
+        "towing_capacity": "p.3 table 'Rated Traction Capacity 5000kg'",
+        "turning_radius": "p.3 table 'Min. Turning Radius 1150mm'",
+        "max_speed": "p.3 table 'Max Forward Speed (Loaded,Empty) 2.0m/s,2.0m/s' -- identical for both states",
+        "operating_temp_min": "p.3 table 'Ambient Temperature -5 ~ 40 °C'",
+        "operating_temp_max": "p.3 table 'Ambient Temperature -5 ~ 40 °C'",
+        "operating_humidity_max": "p.3 table 'Ambient Humidity 20%~95%'",
+        "max_gradient": "p.3 table 'Max. Climbing Capability 3.5%'",
+        "navigation_type": "p.3 table 'Positioning Method 3D SLAM'",
+        "battery_type": "p.3 table 'Battery Type Lithium Iron Phosphate (LiFePO4)'",
+        "autonomous_charging": "p.3 table 'Charging Mode Manual/Automatic'"
+      },
+      "notes": "coupling_type, train_configuration, max_trailers, route_type, trailer_steering_technology (all Tugger-scope KO/COND_KO/SCORING fields) NOT filled -- datasheet states 'Tow Pin Height 230-270mm' but never uses AP0's exact vocabulary (Automatic/Manual/Pintle Hook/Towbar) for the coupling itself, so left null rather than guessed."
+    },
+    {
+      "product_name": "VisionNav VNK15",
+      "product_type": "Mobile AMR",
+      "source_file": "1775597593.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1150,
+        "vehicle_width": 820,
+        "lift_height": 60,
+        "max_payload": 1500,
+        "min_turning_radius": 1200,
+        "max_speed": 1.5,
+        "operating_temp_min": 0,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 90,
+        "max_gradient": 5,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.3 table (extract_tables) 'Overall Dimensions 1150x820x260mm'",
+        "vehicle_width": "p.3 table, same row",
+        "lift_height": "p.3 table 'Max. Fork Lifting Height 60mm'",
+        "max_payload": "p.3 table 'Rated Load Capacity 1500kg' (note: this is far above the vehicle's own 180kg weight, also printed on the same row set -- plausible for a low-lift shelf/cart-lifting robot where the load rests on a structure the robot only raises a few cm, not a strength-of-materials red flag, but noted for a reviewer)",
+        "min_turning_radius": "p.3 table 'Min Truning Diameter 1200mm' [sic, source's own spelling] -- RECORDED AS-IS, NOT halved. The source explicitly labels this a DIAMETER, not a radius, which is the same radius/diameter ('Wendekreis') terminology ambiguity already flagged as a pending structural AP0 semantics question for Magazino SOTO's min_turning_radius in the 2026-08-06 calibration run coverage report -- do not resolve without a ruling on that open question",
+        "max_speed": "p.3 table 'Max Forward Speed (Loaded/Empty) 1.5m/s, 1.8m/s' -- loaded (conservative) value used",
+        "operating_temp_min": "p.3 table 'Ambient Temperature 0 ~ 40 °C' (also printed redundantly in °F as 32~104°F, consistent, no conversion needed since source already gives °C)",
+        "operating_temp_max": "p.3 table, same row",
+        "operating_humidity_max": "p.3 table 'Ambient Humidity 20%~90%'",
+        "max_gradient": "p.3 table 'Max. Climbing Capability 5%'",
+        "navigation_type": "p.3 table 'Positioning Method 3D SLAM'",
+        "battery_type": "p.3 table 'Battery Type Lithium Iron Phosphate (LiFePO4)'",
+        "autonomous_charging": "p.3 table 'Charging Mode Auto/Manual'"
+      },
+      "notes": "See min_turning_radius source note -- same open radius/diameter question as Magazino SOTO, likely a systemic pattern worth a dedicated AP0 semantics ruling rather than a per-product fix."
+    },
+    {
+      "product_name": "VisionNav VNE40",
+      "product_type": "Forklift AGV",
+      "source_file": "1775593635.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 3790,
+        "vehicle_width": 1402,
+        "lifting_height": 7000,
+        "max_payload": 2800,
+        "min_aisle_width": 4400,
+        "max_speed": 2.0,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 13,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true,
+        "safety_standard": [
+          "ANSI/ITSDF B56.5"
+        ]
+      },
+      "field_sources": {
+        "vehicle_length": "p.3 table 'Overall Dimensions 3790*1402*3800mm'",
+        "vehicle_width": "p.3 table, same row",
+        "lifting_height": "p.3 table 'Max. Fork Lifting Height 7000mm', footnote confirms spec basis is '275-inch (7000mm) triplex mast'",
+        "max_payload": "p.3 table 'Rated Load Capacity 2800kg (4000mm)' -- the bracketed '(4000mm)' qualifies that 2800kg is rated at 4000mm lift height, not the full 7000mm; see Appendix I load chart on p.4 for the full derating curve, not reproduced here",
+        "min_aisle_width": "p.3 table 'Min. Stacking Aisle Width 4400mm' (distinct from 'Min. Turning Aisle Width 2800mm', not used, same rationale as other VisionNav entries)",
+        "max_speed": "p.3 table 'Max Forward Speed (Loaded/Empty) 2.0m/s, 2.5m/s' -- loaded (conservative) value used",
+        "operating_temp_min": "p.3 table 'Ambient Temperature -5 ~ 40 °C'",
+        "operating_temp_max": "p.3 table, same row",
+        "operating_humidity_max": "p.3 table 'Ambient Humidity 20%~95%'",
+        "max_gradient": "p.3 table 'Max. Climbing Capability 13%(7°), 15%(8.5°)' -- lower/loaded value 13% used as conservative",
+        "navigation_type": "p.3 table 'Positioning Method 3D SLAM'",
+        "battery_type": "p.3 table 'Battery Type Lithium Iron Phosphate (LiFePO4)'",
+        "autonomous_charging": "p.3 table 'Charging Mode Auto/Manual'",
+        "safety_standard": "p.1 cover page prints 'B56.5' directly below the model name/type -- exact match to AP0 allowed_value 'ANSI/ITSDF B56.5'"
+      },
+      "notes": "Optional fork lengths, side shifter, and fork positioner mentioned but no corresponding single-value AP0 field to record them against (special_fork_option exists only under Forklift scope for a fixed vocabulary list -- 'Side shifter' would map to 'Side-Shift' if the Tech Lead wants it added; left out here since it's listed as an OPTION not confirmed standard)."
+    },
+    {
+      "product_name": "VisionNav VNE20",
+      "product_type": "Forklift AGV",
+      "source_file": "1785316235.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 3230,
+        "vehicle_width": 1200,
+        "lifting_height": 3000,
+        "max_payload": 2000,
+        "min_aisle_width": 3800,
+        "max_speed": 2.7,
+        "operating_temp_min": -5,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 95,
+        "max_gradient": 13,
+        "navigation_type": [
+          "Natural Feature (SLAM)"
+        ],
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.3 table 'Overall Dimensions 3230x1200x2150mm'",
+        "vehicle_width": "p.3 table, same row",
+        "lifting_height": "CONSERVATIVE value used per K.O.-field matrix policy: p.3 table says 'Max. Fork Lifting Height Up to 3000mm, see Mast Chart'; p.4 Appendix I Mast Chart lists Option 1 (Duplex mast) = 3000mm and Option 2 (Triple mast) = 4500mm -- the lower/base-config figure (3000mm) recorded so a KO_IF_LT check is not overstated; the 4500mm triplex option is a configurable upgrade, noted here",
+        "max_payload": "p.3 table 'Rated Load Capacity 2000kg'",
+        "min_aisle_width": "p.3 table 'Min. Stacking Aisle Width 3800mm' (distinct from 'Min. Turning Aisle Width 2450mm', not used, same rationale as other VisionNav entries)",
+        "max_speed": "p.3 table 'Max Forward Speed (Loaded/Empty) 2.7m/s, 2.7m/s' -- identical for both states",
+        "operating_temp_min": "p.3 table 'Ambient Temperature -5 ~ 40 °C'",
+        "operating_temp_max": "p.3 table, same row",
+        "operating_humidity_max": "p.3 table 'Ambient Humidity 20%~95%'",
+        "max_gradient": "p.3 table 'Max. Climbing Capability 13%(7°), 15%(8.5°)' -- lower/loaded value 13% used as conservative (same footer text as sibling VNE40)",
+        "navigation_type": "p.3 table 'Positioning Method 3D SLAM'",
+        "battery_type": "p.3 table 'Battery Type Lithium Iron Phosphate (LiFePO4)'",
+        "autonomous_charging": "p.3 table 'Charging Mode Auto/Manual'"
+      },
+      "notes": "Unlike sibling VNE40, this sheet's p.1 cover does NOT print a 'B56.5' safety-standard code, so safety_standard intentionally left null rather than assumed shared across the product line. Source file has a byte-identical duplicate '1785316235-2.pdf' in New/, both moved to Analysed/ together (dedupe)."
+    },
+    {
+      "product_name": "VisionNav VNST20",
+      "product_type": "Forklift AGV",
+      "source_file": "1685356775.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1600,
+        "vehicle_width": 815,
+        "min_total_height": 1650,
+        "drop_accuracy_lat": 10,
+        "drop_accuracy_angle": 0.5,
+        "pick_req_accuracy_lat": 100,
+        "pick_req_accuracy_angle": 10,
+        "max_gradient": 6.12
+      },
+      "field_sources": {
+        "vehicle_length": "p.7 spec block, 'Vehicle Dimensions 1600*815*1650mm (L*W*H)' -- L component",
+        "vehicle_width": "p.7 spec block, same row -- W component",
+        "min_total_height": "p.7 spec block, same row -- H component",
+        "drop_accuracy_lat": "p.7 spec block, 'Goods Drop-off ±10mm/±0.5° Self-adaptability' -- lateral component",
+        "drop_accuracy_angle": "p.7 spec block, same row -- angular component",
+        "pick_req_accuracy_lat": "p.7 spec block, 'Goods Pick-up ±100mm/±10° Self-adaptability' -- lateral component",
+        "pick_req_accuracy_angle": "p.7 spec block, same row -- angular component",
+        "max_gradient": "p.7 spec block, 'Climbing Ability 3.5°/8° (Full-Load/Empty-Load)' -- AP0 unit for max_gradient is %, source is degrees; converted the conservative full-load figure 3.5° via tan(3.5°)*100 = 6.12%; empty-load 8° (=14.05%) not used"
+      },
+      "notes": "Model number 'VNST20' only appears as large stylized cover-page text (p.1 image), not extractable as plain text -- resolved by rendering p.1 as an image. This RESOLVES the previously-open question in agent memory about this file's unassigned 2000kg/430kg spec block: it belongs to the EXISTING DB product VisionNav VNST20, not a new/unknown model. Confirmed (not re-filled): max_payload 'Rated Load Capacity 2000kg' matches DB's existing 2000.0 exactly; max_speed 'Straight Forward Speed 1.4/1.8 m/s (Full-Load/Empty-Load)' -- empty-load figure 1.8 m/s matches DB's existing 1.8 exactly (DB's stored value corresponds to the empty-load/marketing headline convention, not the loaded-conservative convention used elsewhere in this file's later addendum). 'Body Weight 430kg' has no AP0 field match (not vehicle_length/width, informational only) -- left unmapped. 'Charging Efficiency 1C Fast Charge' has no clean numeric AP0 field match (no charge-time figure stated) -- left unmapped. No radius/diameter turning figure printed in this deck -- open question does not arise here."
+    },
+    {
+      "product_name": "VisionNav VNT20-01",
+      "product_type": "Forklift AGV",
+      "source_file": "1657089341.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav T Series Pallet Jack AGV (VNT20-01 = Manual Stand-on w/ 125mm low fork lift, VNT20-07 = Manual Stand-on w/ 115mm low fork lift and slightly different footprint/speed) -- both new, 2000kg rated capacity, same product family as existing DB 'VisionNav VNT30-01' but a smaller payload class",
+      "fields": {
+        "max_payload": 2000,
+        "vehicle_length": 2150,
+        "vehicle_width": 1021,
+        "min_total_height": 1965,
+        "lifting_height": 125,
+        "max_speed": 2.0,
+        "max_gradient": 5.24,
+        "min_aisle_width": 2800,
+        "min_turning_radius": 1900,
+        "operating_temp_min": -5,
+        "operating_temp_max": 45,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 20,
+        "drop_accuracy_lat": 20,
+        "drop_accuracy_angle": 1,
+        "pick_req_accuracy_lat": 100,
+        "pick_req_accuracy_angle": 10,
+        "navigation_type": [
+          "Vision"
+        ],
+        "drive_type": "Pallet Mover",
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "max_payload": "p.5 (catalog p.07-08 footer), 'Rated Load Capacity (Q) 2000kg(4409.25lb)' for VNT20(V)-01 column",
+        "vehicle_length": "p.5, 'Overall Length/Width/Height (l1/b1/h1) 2150x1021x1965mm' -- L component",
+        "vehicle_width": "p.5, same row -- W component",
+        "min_total_height": "p.5, same row -- H component",
+        "lifting_height": "p.5, 'Fork Lift Height (h3) 125mm(4.92in)'",
+        "max_speed": "p.5, 'Straight Forward (fork facing backward) Full-Load/Empty-Load 2.0m/s, 2.0m/s' -- equal both conditions",
+        "max_gradient": "p.5, 'Maximum Climbing Ability (Full-Load/Empty-load) 3°，3°' -- AP0 unit % vs source degrees; converted tan(3°)*100=5.24% (both conditions equal, no conservative choice needed)",
+        "min_aisle_width": "p.5, 'Min. Stacking Aisle Width (Pallet Size L*W:1200*1000mm, Across Forks Widthwise) 2800mm' -- used the stacking (operational, wider/more conservative) figure over the narrower 'Min. Turning Aisle Width 2300mm', per this run's convention of picking the binding/worst-case constraint for a KO field",
+        "min_turning_radius": "p.5, 'Minimum Turning Radius(Wa) 1900mm (74.8in)' -- explicit 'Radius' label, safe to map per established rule",
+        "operating_temp_min": "p.5, 'Working Temperature -5℃-45℃'",
+        "operating_temp_max": "p.5, same row",
+        "operating_humidity_max": "p.5, 'Working Humidity 20-95%' -- max component",
+        "stop_accuracy": "p.5, 'Stacking Accuracy ±20mm/±1°(±0.79in/±1°)' -- lateral/mm component",
+        "drop_accuracy_lat": "p.5, 'Goods Drop-off Self-adaptability ±20mm/±1°(±0.79in/±1°)' -- lateral component",
+        "drop_accuracy_angle": "p.5, same row -- angular component",
+        "pick_req_accuracy_lat": "p.5, 'Goods Pick-up Self-adaptability ±100mm/±10°(±3.94in/±10°)' -- lateral component",
+        "pick_req_accuracy_angle": "p.5, same row -- angular component",
+        "navigation_type": "p.5, 'Positioning Method Vision-based Navigation' under Navigation Type heading",
+        "drive_type": "p.5 series header 'T Series / PALLET JACK AGV' -- pallet-jack class fits AP0 'Pallet Mover' allowed value",
+        "autonomous_charging": "p.5, 'Charging Mode Manual Charging/ Automatic Charging' -- Automatic Charging explicitly listed as a supported mode"
+      },
+      "notes": "Brand/catalog confirmed VisionNav Robotics (cover page 'Products Catalog', p.3 model-family comparison table). VNT20-01 and VNT20-07 share the T-Series family and 2000kg rated capacity but have materially different weight/footprint/lift-height/speed -- treated as two separate product rows per this run's variant-completion rule (see VNT20-07 entry immediately following). 'Battery Type' row header printed with no adjacent chemistry text visible in extraction (only 'Voltage/Capacity 24V/200Ah' resolved cleanly) -- battery_type left null rather than guessed. Fork/carriage dimensions (Fork Dimensions l/e/s, Width over/between Forks) have no clean single-value AP0 field match -- left unmapped. towing/lift-speed figures (mm/s fork raise/lower speed) also have no AP0 field match -- left unmapped."
+    },
+    {
+      "product_name": "VisionNav VNT20-07",
+      "product_type": "Forklift AGV",
+      "source_file": "1657089341.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav T Series Pallet Jack AGV (see VNT20-01 entry for shared family context)",
+      "fields": {
+        "max_payload": 2000,
+        "vehicle_length": 2000,
+        "vehicle_width": 1050,
+        "min_total_height": 2100,
+        "lifting_height": 115,
+        "max_speed": 1.6,
+        "max_gradient": 5.24,
+        "min_aisle_width": 2700,
+        "min_turning_radius": 1700,
+        "operating_temp_min": -5,
+        "operating_temp_max": 45,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 20,
+        "drop_accuracy_lat": 20,
+        "drop_accuracy_angle": 1,
+        "pick_req_accuracy_lat": 100,
+        "pick_req_accuracy_angle": 10,
+        "navigation_type": [
+          "Vision"
+        ],
+        "drive_type": "Pallet Mover",
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "max_payload": "p.6 (catalog p.09-10 footer), 'Rated Load Capacity (Q) 2000kg(4409.25lb)' for VNT20(V)-07 column",
+        "vehicle_length": "p.6, 'Overall Length/Width/Height (l1/b1/h1) 2000x1050x2100mm' -- L component",
+        "vehicle_width": "p.6, same row -- W component",
+        "min_total_height": "p.6, same row -- H component",
+        "lifting_height": "p.6, 'Fork Lift Height (h3) 115mm(4.53in)'",
+        "max_speed": "p.6, 'Straight Forward (fork facing backward) Full-Load/Empty-Load 1.6m/s, 1.6m/s' -- equal both conditions",
+        "max_gradient": "p.6, 'Maximum Climbing Ability (Full-Load/Empty-load) 3°，3°' -- converted tan(3°)*100=5.24%, same as VNT20-01",
+        "min_aisle_width": "p.6, 'Min. Stacking Aisle Width ... 2700mm (106.30in)' -- stacking (wider/conservative) figure used over 'Min. Turning Aisle Width 2100mm'",
+        "min_turning_radius": "p.6, 'Minimum Turning Radius(Wa) 1700mm(66.93in)'",
+        "operating_temp_min": "p.6, 'Working Temperature -5℃-45℃'",
+        "operating_temp_max": "p.6, same row",
+        "operating_humidity_max": "p.6, 'Working Humidity 20-95%'",
+        "stop_accuracy": "p.6, 'Stacking Accuracy ±20mm/±1°(±0.79in/±1°)'",
+        "drop_accuracy_lat": "p.6, 'Goods Drop-off Self-adaptability ±20mm/±1°(±0.79in/±1°)'",
+        "drop_accuracy_angle": "p.6, same row",
+        "pick_req_accuracy_lat": "p.6, 'Goods Pick-up Self-adaptability ±100mm/±10°(±3.94in/±10°)'",
+        "pick_req_accuracy_angle": "p.6, same row",
+        "navigation_type": "p.6, 'Positioning Method Vision-based Navigation'",
+        "drive_type": "p.6 series header 'T Series / PALLET JACK AGV'",
+        "autonomous_charging": "p.6, 'Charging Mode Manual Charging/ Automatic Charging'"
+      },
+      "notes": "See VNT20-01 entry for shared family/brand context and deliberately-unmapped fields (fork/carriage dimensions, lift/lower speed, battery chemistry)."
+    },
+    {
+      "product_name": "VisionNav VNL14-01",
+      "product_type": "Forklift AGV",
+      "source_file": "1657089341.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav L Series Pallet Stacker Forklift AGV (VNL14-01 = 1400kg class, VNL16-01 = 1600kg class; share identical chassis/footprint/speed/aisle-width, differ only in rated load and fork lift height per the catalog's shared two-column spec table)",
+      "fields": {
+        "max_payload": 1400,
+        "vehicle_length": 2148,
+        "vehicle_width": 1134,
+        "min_total_height": 1921,
+        "lifting_height": 2924,
+        "max_speed": 1.6,
+        "max_gradient": 5.24,
+        "min_aisle_width": 2847,
+        "min_turning_radius": 1788,
+        "operating_temp_min": -5,
+        "operating_temp_max": 45,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 20,
+        "drop_accuracy_lat": 20,
+        "drop_accuracy_angle": 1,
+        "pick_req_accuracy_lat": 100,
+        "pick_req_accuracy_angle": 10,
+        "navigation_type": [
+          "Vision"
+        ],
+        "drive_type": "Straddle Stacker",
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "max_payload": "p.7 (catalog p.11-12 footer), 'Rated Load Capacity (Q) 1400kg(3086.47lb)' -- VNL14(V)-01 column",
+        "vehicle_length": "p.7, 'Overall Length/Width/Height (l1/b1/h1) 2148x1134x1921mm' -- shared single row for both VNL14/VNL16 -- L component",
+        "vehicle_width": "p.7, same row -- W component",
+        "min_total_height": "p.7, same row -- H component",
+        "lifting_height": "p.7, 'Fork Lift Height (h3) 2924mm(115.12in)' -- VNL14(V)-01 column",
+        "max_speed": "p.7, 'Straight Forward (fork facing backward) 1.6m/s, 1.6m/s(3.58mph)' -- shared row, both models",
+        "max_gradient": "p.7, 'Maximum Climbing Ability (Full-Load/Empty-load) 3°，3°' -- converted tan(3°)*100=5.24%, shared row",
+        "min_aisle_width": "p.7, 'Min. Stacking Aisle Width ... 2847mm(112.09in)' -- shared row; the paired 'Min. Turning Aisle Width' row for this model is badly garbled by column-merge in text extraction ('2188mm(86.14in)' recoverable but label scrambled) -- used the more clearly-labeled stacking figure only",
+        "min_turning_radius": "p.7, 'Minimum Turning Radius(Wa) 1788mm(70.39in)' -- shared row",
+        "operating_temp_min": "p.7, 'Working Temperature -5℃-45℃'",
+        "operating_temp_max": "p.7, same row",
+        "operating_humidity_max": "p.7, 'Working Humidity 20-95%'",
+        "stop_accuracy": "p.7, 'Stacking Accuracy ±20mm/±1°(±0.79in/±1°)'",
+        "drop_accuracy_lat": "p.7, 'Goods Drop-off Self-adaptability ±20mm/±1°(±0.79in/±1°)'",
+        "drop_accuracy_angle": "p.7, same row",
+        "pick_req_accuracy_lat": "p.7, 'Goods Pick-up Self-adaptability ±100mm/±10°(±3.94in/±10°)'",
+        "pick_req_accuracy_angle": "p.7, same row",
+        "navigation_type": "p.7, 'Positioning Method Vision-based Navigation'",
+        "drive_type": "p.7 series header 'L Series / PALLET STACKER FORKLIFT AGV' -- stacker-with-legs class fits AP0 'Straddle Stacker' allowed value",
+        "autonomous_charging": "p.7, 'Charging Mode Manual Charging/ Automatic Charging'"
+      },
+      "notes": "Brand/catalog confirmed VisionNav Robotics. Entirely new product family (L Series) not previously seen in any DB row or prior VisionNav datasheet session. Footnote on this page states mast is optional (Duplex 2910/4230mm) and fork length is customizable -- base configuration values used, not the optional-mast variant. 'Load Center (C) 600mm' (rated-load reference distance, not a vehicle dimension) has no AP0 field match -- left unmapped."
+    },
+    {
+      "product_name": "VisionNav VNL16-01",
+      "product_type": "Forklift AGV",
+      "source_file": "1657089341.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav L Series Pallet Stacker Forklift AGV (see VNL14-01 entry for shared family context)",
+      "fields": {
+        "max_payload": 1600,
+        "vehicle_length": 2148,
+        "vehicle_width": 1134,
+        "min_total_height": 1921,
+        "lifting_height": 2844,
+        "max_speed": 1.6,
+        "max_gradient": 5.24,
+        "min_aisle_width": 2847,
+        "min_turning_radius": 1788,
+        "operating_temp_min": -5,
+        "operating_temp_max": 45,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 20,
+        "drop_accuracy_lat": 20,
+        "drop_accuracy_angle": 1,
+        "pick_req_accuracy_lat": 100,
+        "pick_req_accuracy_angle": 10,
+        "navigation_type": [
+          "Vision"
+        ],
+        "drive_type": "Straddle Stacker",
+        "autonomous_charging": true
+      },
+      "field_sources": {
+        "max_payload": "p.7, 'Rated Load Capacity (Q) 1600kg(3527.34lb)' -- VNL16(V)-01 column",
+        "vehicle_length": "p.7, shared row with VNL14-01 -- see that entry",
+        "vehicle_width": "p.7, shared row",
+        "min_total_height": "p.7, shared row",
+        "lifting_height": "p.7, 'Fork Lift Height (h3) ... 2844mm(111.96in)' -- VNL16(V)-01 column",
+        "max_speed": "p.7, shared row with VNL14-01",
+        "max_gradient": "p.7, shared row, converted tan(3°)*100=5.24%",
+        "min_aisle_width": "p.7, shared 'Min. Stacking Aisle Width 2847mm' row (single value printed for both models)",
+        "min_turning_radius": "p.7, shared 'Minimum Turning Radius(Wa) 1788mm' row",
+        "operating_temp_min": "p.7, shared row",
+        "operating_temp_max": "p.7, shared row",
+        "operating_humidity_max": "p.7, shared row",
+        "stop_accuracy": "p.7, shared row",
+        "drop_accuracy_lat": "p.7, shared row",
+        "drop_accuracy_angle": "p.7, shared row",
+        "pick_req_accuracy_lat": "p.7, shared row",
+        "pick_req_accuracy_angle": "p.7, shared row",
+        "navigation_type": "p.7, shared row",
+        "drive_type": "p.7 series header, shared with VNL14-01",
+        "autonomous_charging": "p.7, shared row"
+      },
+      "notes": "Same source page as VNL14-01 -- see that entry for full brand/catalog context. Only max_payload and lifting_height are genuinely per-model in this table; all other fields are printed as a single shared value for both VNL14-01 and VNL16-01 in the catalog's two-column layout."
+    },
+    {
+      "product_name": "VisionNav VNQ40-07",
+      "product_type": "Tugger AGV",
+      "source_file": "1657089341.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav Q Series Autonomous Tow Tractor (VNQ40-07 = 4000kg towing class, VNQ60-07 = 6000kg towing class; share identical chassis/footprint/aisle-width/radius, differ in rated towing capacity and battery voltage/capacity -- both distinct from the already-DB VisionNav VNQ50, a different payload class of the same Q-series concept)",
+      "fields": {
+        "towing_capacity": 4000,
+        "vehicle_length": 2040,
+        "vehicle_width": 1330,
+        "max_speed": 1.3,
+        "max_gradient": 3.49,
+        "tugger_min_aisle_width": 2100,
+        "turning_radius": 1681,
+        "operating_temp_min": -5,
+        "operating_temp_max": 45,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 50,
+        "navigation_type": [
+          "Vision",
+          "Magnetic Tape"
+        ],
+        "battery_type": [
+          "Lead-Acid"
+        ]
+      },
+      "field_sources": {
+        "towing_capacity": "p.17 (catalog p.31-32 footer), 'Rated Load Capacity (Q) 4000kg(8818.5lb)' -- VNQ40(VM)-07 column; mapped to towing_capacity (Tugger-scope KO field) since this is an autonomous tow tractor, not a load-carrying forklift",
+        "vehicle_length": "p.17, 'Overall Length/Width/Height (l1/b1/h1) 2040x1330x2400mm' -- shared row, both models -- L component",
+        "vehicle_width": "p.17, same row -- W component",
+        "max_speed": "p.17, 'Straight Forward (Head Direction) Full-Load/Empty-Load 1.3m/s, 1.5m/s' -- conservative (loaded) figure used, per this batch's established convention",
+        "max_gradient": "p.17, 'Maximum Climbing Ability (Full-Load/Empty-load) 2°，5°' -- AP0 unit % vs source degrees; converted the conservative full-load figure tan(2°)*100=3.49% (empty-load 5°=8.75% not used)",
+        "tugger_min_aisle_width": "p.17, 'Min. Turning Aisle Width 2100mm(82.28in)' -- shared row",
+        "turning_radius": "p.17, 'Minimum Turning Radius(Wa) 1681mm (66.18in)' -- explicit 'Radius' label, safe to map",
+        "operating_temp_min": "p.17, 'Working Temperature -5℃-45℃'",
+        "operating_temp_max": "p.17, same row",
+        "operating_humidity_max": "p.17, 'Working Humidity 20-95%'",
+        "stop_accuracy": "p.17, 'Stacking Accuracy ±50mm/±1°(±1.97in/±1°)'",
+        "navigation_type": "p.17, 'Positioning Method Vision-based Navigation+Magnetic' -- mapped to Vision + Magnetic Tape",
+        "battery_type": "p.17, 'Type Lead-acid Battery'"
+      },
+      "notes": "Brand/catalog confirmed VisionNav Robotics. Entirely new Q-series payload class not previously seen (existing DB 'VisionNav VNQ50' is a 5000kg-class tow tractor from a separate individual datasheet session; VNQ40/VNQ60 are smaller/larger siblings from this catalog only). Fork-related fields (Fork Dimensions, Width over/between Forks) are all printed as '/' (not applicable -- tow tractor has no forks) -- correctly left null, not zero, per Blank≠Zero. lifting_height/min_aisle_width (Forklift-scope fields) intentionally NOT set since this is a Tugger AGV -- used the Tugger-scope equivalents (tugger_min_aisle_width, turning_radius) instead. Goods Drop-off/Pick-up Self-adaptability rows both printed '/' -- correctly left null. auto_hitch/coupling_type/max_trailers not stated in this catalog page -- left null. autonomous_charging deliberately left null (only 'Manual Charging' is stated for this series, no automatic-charging option printed, unlike the T/L-series pages) -- not set to False, per Blank≠Zero, but also not set True since no automatic option is claimed."
+    },
+    {
+      "product_name": "VisionNav VNQ60-07",
+      "product_type": "Tugger AGV",
+      "source_file": "1657089341.pdf",
+      "db_status": "new",
+      "variant_group": "VisionNav Q Series Autonomous Tow Tractor (see VNQ40-07 entry for shared family context)",
+      "fields": {
+        "towing_capacity": 6000,
+        "vehicle_length": 2040,
+        "vehicle_width": 1330,
+        "max_speed": 1.3,
+        "max_gradient": 3.49,
+        "tugger_min_aisle_width": 2100,
+        "turning_radius": 1681,
+        "operating_temp_min": -5,
+        "operating_temp_max": 45,
+        "operating_humidity_max": 95,
+        "stop_accuracy": 50,
+        "navigation_type": [
+          "Vision",
+          "Magnetic Tape"
+        ],
+        "battery_type": [
+          "Lead-Acid"
+        ]
+      },
+      "field_sources": {
+        "towing_capacity": "p.17, 'Rated Load Capacity (Q) ... 6000kg (13227.74lb)' -- VNQ60(VM)-07 column",
+        "vehicle_length": "p.17, shared row with VNQ40-07",
+        "vehicle_width": "p.17, shared row",
+        "max_speed": "p.17, shared row (conservative loaded figure 1.3 m/s)",
+        "max_gradient": "p.17, shared row, converted tan(2°)*100=3.49%",
+        "tugger_min_aisle_width": "p.17, shared row",
+        "turning_radius": "p.17, shared row",
+        "operating_temp_min": "p.17, shared row",
+        "operating_temp_max": "p.17, shared row",
+        "operating_humidity_max": "p.17, shared row",
+        "stop_accuracy": "p.17, shared row",
+        "navigation_type": "p.17, shared row",
+        "battery_type": "p.17, shared row -- note battery Voltage/Capacity differs per model (24V/420Ah for VNQ40 vs 48V/270Ah for VNQ60) though chemistry (Lead-Acid) is the same; voltage/capacity has no AP0 field match, left unmapped"
+      },
+      "notes": "Same source page as VNQ40-07 -- see that entry for full brand/catalog context and deliberately-unmapped fields."
+    }
+  ]
+}

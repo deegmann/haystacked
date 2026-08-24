@@ -1,0 +1,78 @@
+{
+  "company": "Balyo",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus redo pass, session 4 — addendum to research_findings_opus_20260808_balyo.json. One Balyo file remained in Analysed/ after session 3: 'Reach Truck Gen 2-Black Truck-Datasheet-EN.pdf' (2 pp., dated 01/2020 in both page footers), the datasheet for REACHY, the Gen-2 autonomous reach truck 'Driven by BALYO'.\n\nEXTRACTION NOTE — the PDF's bold spec-table rows render each glyph twice with a small offset, so pdfplumber's extract_text() returns interleaved strings such as 'MaxMMimaaxxuiimmm uusmmta sscttkaaiccnkkgii nnhgge hhigeehiiggthh tt mmmmm m/ / i nin 111411514545 5/5 54 /5 4151'. Every value below was de-interleaved and then CROSS-VALIDATED against its printed imperial twin, which the sheet gives for every metric figure (11455 mm / 451 in; 1600 kg / 3527 lbs; 1100 kg / 2425 lbs; 2475 mm / 97,44 in; 2495 mm / 98,23 in; 1270 mm / 50 in; 2690 mm / 105,91 in; 4205 kg / 9270 lbs; 2,0 m/s / 4,47 mph; 0,45 m/s / 1,00 mph; 0,8 m/s / 1,79 mph). All eleven conversions check out to within rounding, so the de-interleaving is verified rather than guessed. No image render was needed.\n\nPAYLOAD DERATING — 5th independent instance in this redo pass, and the most explicit one yet: the sheet publishes the derated figure as its OWN TABLE ROW rather than as a matrix. 'Maximum weight 1600 kg' and, directly beneath it, 'Maximum weight at maximum stacking height 1100 kg'. A single-number max_payload of 1600 kg therefore silently overstates capacity by 45% at the 11455 mm lift height that the same sheet advertises as its headline capability. Both fields are hard K.O.",
+  "company_wide_context": {
+    "source_file": "Reach Truck Gen 2-Black Truck-Datasheet-EN.pdf",
+    "fields": {
+      "reference_count": 200
+    },
+    "applies_to": "Balyo company-wide install base as of 01/2020 — NOT specific to REACHY",
+    "notes": "p.2 'INSTALLATIONS DRIVEN BY BALYO': '600+ Robots Worldwide', '130+ Sites', '200+ Projects', '30+ Countries'. reference_count is a Product-entity field in AP0 but this figure is a company-level claim, so it is staged here rather than written onto the REACHY product row; an importer must decide whether to fan it out. The figures are 6 years old (01/2020) and should be treated as a floor, not a current value. The '30+ Countries' claim is too unspecific to populate service_coverage (which needs ISO 3166 codes)."
+  },
+  "products": [
+    {
+      "product_name": "REACHY",
+      "product_type": "Forklift AGV",
+      "source_file": "Reach Truck Gen 2-Black Truck-Datasheet-EN.pdf",
+      "db_status": "conflict",
+      "variant_group": "Single product — no variants published on this sheet.",
+      "fields": {
+        "product_type": "Forklift AGV",
+        "drive_type": "Reach Truck",
+        "max_payload": 1600,
+        "lifting_height": 11455,
+        "min_aisle_width": 2900,
+        "max_speed": 2.0,
+        "vehicle_width": 1270,
+        "vehicle_length": 2690,
+        "min_total_height": 2495,
+        "battery_type": ["Lead-Acid"],
+        "autonomous_charging": true,
+        "infrastructure_free": true,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "functional_safety_level": "PLd",
+        "safety_coverage": "Full 3D",
+        "stacking_capability": true,
+        "barcode_readers": true,
+        "load_detection": ["Camera/Vision", "Laser/LiDAR profiling", "Barcode/DataMatrix"],
+        "special_fork_option": ["Side-Shift"],
+        "multi_load_compatibility": true,
+        "manual_usage": true,
+        "drop_accuracy_lat": 10,
+        "station_applications": ["Conveyor", "Gravity rack", "Mobile rack"],
+        "integration_capability": ["WMS", "ERP"],
+        "load_type": ["Pallet EUR"]
+      },
+      "field_sources": {
+        "product_type": "p.1 title 'Reach Truck — REACHY, the Reach Truck Driven by BALYO'",
+        "drive_type": "p.1 'The autonomous reach truck Driven by BALYO'",
+        "max_payload": "p.1 spec table row 'Maximum weight kg / lbs 1600 / 3527'. DERATED — the very next row reads 'Maximum weight at maximum stacking height kg / lbs 1100 / 2425'.",
+        "lifting_height": "p.1 spec table row 'Maximum stacking height mm / in 11455 / 451'; independently restated in the p.1 prose: 'It can execute operations up to 11 455 mm / 451 in'. Two independent occurrences plus a self-consistent imperial conversion (11455 mm = 450.98 in) — very strong evidence against a source-side typo.",
+        "min_aisle_width": "p.1 'FEATURES & DATA': 'Aisle Width : 2900 mm (800 x 1200 mm pallet) / 114.17 in (31.5 X 41.2 in pallet)'; restated p.1 prose 'Able to fit in 2900 mm / 114,2 in, aisle width' and p.2 'the minimum aisle space requirement is just 2900 mm / 114,2 in'. Stated THREE times.",
+        "max_speed": "p.1 spec table row 'Forward speed (with Side Safety) m/s / mph 2,0 / 4,47'. Also published: lateral 0,45 m/s and backward 0,8 m/s.",
+        "vehicle_width": "p.1 row 'Overall width mm / in 1270 / 50'",
+        "vehicle_length": "p.1 row 'Overall length mm / in 2690 / 105,91'",
+        "min_total_height": "p.1 row 'Overall height (except mast) mm / in 2495 / 98,23'. Note this EXCLUDES the mast, so it is the chassis height, not a true mast-collapsed overall height — the navigation laser sits at 2475 mm (row 'Navigation laser height'), just below it.",
+        "battery_type": "p.1 'Energy : lead-acid or TPPL auto charging (2020)'; p.2 'Energy options : standard lead-acid or TPPL opportunity fast charging technology'. TPPL (Thin Plate Pure Lead) is a lead-acid chemistry, so both options map to 'Lead-Acid'.",
+        "autonomous_charging": "p.1 'lead-acid or TPPL auto charging'; p.2 'TPPL opportunity fast charging technology'",
+        "infrastructure_free": "p.1 'embeds our unique infrastructure-free navigation technology, the result of 10 years of research & development'",
+        "navigation_type": "p.1 'infrastructure-free navigation technology' — maps to 'Natural Feature (SLAM)' under the AP0 mapping rule ('free navigation' / 'marker-free' -> Natural Feature (SLAM)). The 3D cameras described on p.2 are used for pallet pick/drop perception, not stated as the navigation source, so 'Vision' is NOT proposed from this document.",
+        "functional_safety_level": "p.1 'Safety : 360° smart safety with PL-d level lasers'",
+        "safety_coverage": "p.1 '360° smart safety'; p.2 'NEW 3D PERCEPTION', 'Lower 3D camera : analyses the environment', 'Curtain laser : dynamically detects obstacle at ground or at height'",
+        "stacking_capability": "p.1 rows 'Maximum stacking height' / 'Maximum weight at maximum stacking height'",
+        "barcode_readers": "p.1 'Load Identification : barcode reader 2D'; p.2 '2D barcode reader : triggers custom actions upon scanning barcode and also ensures product traceability'",
+        "load_detection": "p.2 'Recognition based on the 3D shape of the pallet' + 'Lower 3D camera' (Camera/Vision); 'Curtain laser : dynamically detects obstacle at ground or at height' + 'Anti-drag and push monitoring : … 2 telemeters continuously verifying the distance between the load and the backrest' (Laser/LiDAR profiling); '2D barcode reader' (Barcode/DataMatrix)",
+        "special_fork_option": "p.1 rows 'Side shift range +/- mm / in (+/-) 53 / 2,09' and 'Side shift range (off center) mm / in (+/-) 80 / 3,14'",
+        "multi_load_compatibility": "p.2 'Recognizes and works with all your pallet types' — MARKETING PHRASING, not a spec row. Recorded true but a reviewer should downgrade it if 'all your pallet types' is read as a sales claim rather than a no-reconfiguration guarantee.",
+        "manual_usage": "p.1 'WHY DRIVEN BY BALYO' point 4: 'Dual Driving Modes'",
+        "drop_accuracy_lat": "p.2 'NEW 3D PERCEPTION — 20-30 times more data than 2D perception, offering higher pick/drop accuracy (+/-10mm)'. CAUTION: the source says 'pick/drop accuracy' without naming an axis, so this ±10 mm could equally belong in drop_accuracy_dep, pick_req_accuracy_lat or pick_req_accuracy_dep. Recorded on the lateral drop field only, deliberately not fanned out to the other three.",
+        "station_applications": "p.1 'Pick & drop from conveyors /gravity racks / mobile racks and a host of other application possibilities'",
+        "integration_capability": "p.1 'can interface with your machines, conveyors, WMS or ERP softwares for a full integration within your existing operations'",
+        "load_type": "p.1 'Aisle Width : 2900 mm (800 x 1200 mm pallet)' — the 1200x800 reference load is a Euro pallet"
+      },
+      "notes": "CONFLICT 1 — lifting_height: DB holds 11000 mm, the sheet states 11455 mm THREE times over (headline prose p.1, spec-table row p.1) with a self-consistent imperial twin (451 in). 11000 looks like a rounded-down web figure. Flagged, not corrected.\nCONFLICT 2 — battery_type: DB holds 'Li-Ion'; this sheet's energy line offers only 'lead-acid or TPPL'. Per the false-positive checklist this is an explicit OPTIONS list (not a VDI standard-configuration row), so it is reasonably exhaustive AND therefore genuinely contradicts Li-Ion — BUT the document is dated 01/2020 and even labels the energy row '(2020)', so a later Li-Ion option is entirely plausible. Flagged for manual resolution with that caveat; do not overwrite Li-Ion on the strength of a six-year-old sheet.\nCONFIRMED against DB (no change needed): max_payload 1600, min_aisle_width 2900, infrastructure_free true, functional_safety_level PLd, safety_coverage 'Full 3D', drive_type 'Reach Truck', stacking_capability true, autonomous_charging true, manual_usage true, special_fork_option 'Side-Shift', navigation_type includes Natural Feature (SLAM), load_detection includes Camera/Vision and Laser/LiDAR profiling. integration_capability and station_applications in the DB are proper supersets of what this sheet supports — no contradiction.\nENRICH (currently NULL in the DB): max_speed 2.0, vehicle_width 1270, vehicle_length 2690, min_total_height 2495, barcode_readers true, multi_load_compatibility true, drop_accuracy_lat 10, max_payload derating note.\nNOT CONFIRMABLE from this sheet: the DB's mast_type 'Triplex' and fork_spread 'Manual' appear nowhere in the document — neither confirmed nor contradicted.\nPRE-EXISTING non-conforming DB value (flag only, 5th company): safety_standard = 'ISO 3691-4 (verify)' carries a '(verify)' suffix that is not an AP0 allowed value. This sheet does not mention ISO 3691-4 at all, so the '(verify)' cannot be cleared from here.\nWRONG-SCOPE value on the existing DB row (flag only): grid_required = 0 is a Logistics:AGV:AMR field sitting on a Forklift AGV row.\nAP0 GAP — no field for any of: 'Navigation laser height 2475 mm', the three published safety-field heights (front 177 mm, rear 103 mm, side 98 mm), 'Weight (without battery) 4205 kg', or the lateral (0,45 m/s) and reverse (0,8 m/s) travel speeds. The safety-field heights in particular are the kind of figure a buyer with low conveyor undersides would want, and there is nowhere to put them."
+    }
+  ]
+}

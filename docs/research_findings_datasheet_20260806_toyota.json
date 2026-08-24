@@ -1,0 +1,160 @@
+{
+  "company": "Toyota Material Handling Europe",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "CALIBRATION RUN. Single file '747505-040.pdf' ('BT reflex Autopilot' reach truck line, brand note: the document's own footer states 'TOYOTA MATERIAL HANDLING IN EUROPE, MANAGING THE TOYOTA AND BT MATERIALS HANDLING BRANDS IN EUROPE' -- BT is a Toyota-owned brand, same company) is a genuine VARIANT-COMPLETION case: it documents 3 payload variants sharing one physical chassis family (RAE160=1600kg, RAE200=2000kg, RAE250=2500kg). RAE160 and RAE250 already exist in the DB; RAE200 does NOT exist and is added as a new product. NAMING INCONSISTENCY FLAG: the existing DB entry for RAE160 is named 'Toyota RAE160 Autopilot' (no 'Reflex') while the existing RAE250 entry is named 'Toyota Reflex RAE250 Autopilot' (with 'Reflex') even though both come from the exact same product line/brand ('BT reflex'). I named the new RAE200 entry 'Toyota RAE200 Autopilot' to match its closer sibling RAE160's existing convention, but flag this pre-existing DB naming inconsistency (RAE160 vs RAE250) for a human to reconcile -- ideally all three should use the same naming pattern. METHODOLOGY NOTE on min_aisle_width (KO field, high-stakes): this datasheet's aisle-width table (p.4) is a matrix of Model x Mast type x Battery compartment (mm) x Rotation mode ('Rotate on point' vs 'Rotate with radius 400mm') x Load dimensions (800x1200 / 1000x1200 / 1200x800 / 1200x1000mm), i.e. NOT a single number per model. I used the smallest 'Rotate on point' value at the smallest available battery compartment for each model (the industry-standard Ast/right-angle-stack convention, consistent with the Jungheinrich EKS 215a spec sheet's own 'Arbeitsgangbreite' convention processed in the same session) -- RAE160=2694mm (275mm battery compartment, load 800x1200), RAE200=2801mm (347mm compartment), RAE250=2886mm (419mm compartment, smallest available for that model). This is a reasonable, defensible reading but the true minimum achievable aisle for a specific buyer configuration could differ; flag for review before treating as a hard KO cutoff. CONFLICT FOUND: existing DB value for RAE250's min_aisle_width (3071mm) does not match ANY cell in this datasheet's aisle-width table for RAE250 (closest values range 2876-3336mm across all documented configs, but 3071 itself does not appear) -- likely sourced from a different config or a different document originally; flagged, not overwritten. SECOND CONFLICT: existing DB value for RAE160's lifting_height is 11000mm, but this datasheet's own footnote (p.3, 'Max lift height 9500mm' for the 347/419/491mm battery compartments; 7500mm for the base 275mm compartment) never states a lift height above 9500mm for RAE160 -- even though the printed Mast Dimensions table (p.3) has a column going up to 10000mm, which is itself inconsistent with the document's own footnote and may be a documentation artifact in Toyota's own PDF. Neither reading reaches 11000mm. Flagged as a conflict, not overwritten -- the existing DB value may originate from a different/newer Toyota datasheet not in this batch. max_gradient convention: used the WITH-LOAD figure (loaded vehicle climbing capability), consistent with the AP0 field hint ('the loaded unit') and with the existing RAE250 DB value (7.0, which matches the with-load column '7/12' exactly, confirming this is the correct convention to use for RAE160/RAE200 too).",
+  "products": [
+    {
+      "product_name": "Toyota RAE160 Autopilot",
+      "product_type": "Forklift AGV",
+      "source_file": "747505-040.pdf",
+      "db_status": "conflict",
+      "variant_group": "BT reflex Autopilot reach truck family (RAE160/RAE200/RAE250), shares chassis/mast architecture, differs by payload class",
+      "fields": {
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "barcode_readers": true,
+        "load_detection": ["Mechanical/Tactile", "Camera/Vision"],
+        "max_gradient": 10,
+        "min_aisle_width": 2694
+      },
+      "field_sources": {
+        "drive_type": "p.1 title 'Autopilot reach truck'",
+        "mast_type": "p.3 battery-dependent-dimensions table, 'Mast type: Triplex Hi-Lo - B' for RAE160",
+        "battery_type": "p.3 battery table lists both 'Lead-acid' and 'Li-Ion' capacity rows for RAE160; p.5 feature list 'Auto charging Lithium Ion battery (optional)'",
+        "barcode_readers": "p.5 feature list 'Barcode scanner (optional)'",
+        "load_detection": "p.5 feature list 'Load presence and push detection' (Mechanical/Tactile) + 'Advanced vision aided load handling (optional)' (Camera/Vision)",
+        "max_gradient": "p.2 VDI table row 5.8 'Max. gradeability, with/without load %' RAE160 column = '10/15' -- used with-load value (10)",
+        "min_aisle_width": "p.4 'Aisle width Auto mode' table, RAE160 row, 'Rotate on point' mode, 275mm battery compartment, load 800(length)x1200(width)mm = 2694mm (smallest documented figure for this model)"
+      },
+      "conflicts": {
+        "lifting_height": {
+          "db_value": 11000,
+          "datasheet_value": "9500 (per explicit footnote 'Max lift height 9500mm'); note the printed Mast Dimensions table itself shows a column up to 10000mm, inconsistent with its own footnote -- neither reading reaches 11000",
+          "note": "Not overwritten. DB value may originate from a newer/different Toyota datasheet not present in this batch."
+        }
+      },
+      "notes": "max_payload=1600, max_speed=2.0 m/s (7.2 km/h / 3.6, matches existing DB value exactly, no conflict, not restated), autonomous_charging=true already set in DB (matches 'Auto charging Lithium Ion battery (optional)', note it is an optional feature not standard). vehicle_length/vehicle_width intentionally left null: both are battery-compartment-configuration-dependent in this datasheet (multiple values per model) and no single canonical figure could be confidently picked without risking a wrong precise-looking number; existing sibling RAE250 has these filled (2755/1270) but the exact table cell that reproduces 2755 for RAE250 could not be identified from this document, so the same methodology was not extrapolated to RAE160."
+    },
+    {
+      "product_name": "Toyota RAE200 Autopilot",
+      "product_type": "Forklift AGV",
+      "source_file": "747505-040.pdf",
+      "db_status": "new",
+      "variant_group": "BT reflex Autopilot reach truck family (RAE160/RAE200/RAE250), shares chassis/mast architecture, differs by payload class",
+      "fields": {
+        "max_payload": 2000,
+        "drive_type": "Reach Truck",
+        "mast_type": "Triplex",
+        "lifting_height": 9500,
+        "min_aisle_width": 2801,
+        "max_gradient": 10,
+        "max_speed": 2.0,
+        "battery_type": ["Lead-Acid", "Li-Ion"],
+        "autonomous_charging": true,
+        "barcode_readers": true,
+        "load_detection": ["Mechanical/Tactile", "Camera/Vision"]
+      },
+      "field_sources": {
+        "max_payload": "p.2 VDI table row 1.5 'Load capacity/rated load Q kg' RAE200 = 2000",
+        "drive_type": "p.1 title 'Autopilot reach truck'",
+        "mast_type": "p.3 'Mast type: Triplex Hi-Lo - B / Triplex Hi-Lo - C' for RAE200",
+        "lifting_height": "p.3 footnote 'Max lift height 9500mm' (applies to the 347/419/491mm battery compartments used by RAE200); the printed Mast Dimensions table itself extends to 10000mm, an inconsistency with the footnote, flagged in researcher_notes",
+        "min_aisle_width": "p.4 aisle-width table, RAE200 row, 'Rotate on point' mode, smallest available (347mm) battery compartment, load 800x1200mm = 2801mm",
+        "max_gradient": "p.2 VDI table row 5.8, RAE200 column '10/15' -- with-load value",
+        "max_speed": "p.2 VDI table row 5.1a 'Travel speed, with/without load Auto mode' = 7,2/7,2 km/h -> 2.0 m/s (7.2/3.6)",
+        "battery_type": "p.3 battery table (Lead-acid and Li-Ion rows) + p.5 feature list",
+        "autonomous_charging": "p.5 feature list 'Auto charging Lithium Ion battery (optional)'",
+        "barcode_readers": "p.5 feature list 'Barcode scanner (optional)'",
+        "load_detection": "p.5 feature list 'Load presence and push detection' + 'Advanced vision aided load handling (optional)'"
+      },
+      "notes": "New product, not previously in DB. Same source document and same variant family as RAE160/RAE250. navigation_type intentionally left null -- p.5 states only 'Laser precision navigation' without an explicit 'reflector' or 'SLAM' qualifier, which does not map unambiguously onto any single AP0 allowed_value (Laser Reflector / Natural Feature (SLAM) / etc.); left blank rather than guessed. vehicle_length/vehicle_width intentionally left null for the same battery-compartment-dependent-figure reason as RAE160."
+    },
+    {
+      "product_name": "Toyota Reflex RAE250 Autopilot",
+      "product_type": "Forklift AGV",
+      "source_file": "747505-040.pdf",
+      "db_status": "conflict",
+      "variant_group": "BT reflex Autopilot reach truck family (RAE160/RAE200/RAE250), shares chassis/mast architecture, differs by payload class",
+      "fields": {},
+      "field_sources": {},
+      "conflicts": {
+        "min_aisle_width": {
+          "db_value": 3071,
+          "datasheet_value": "no exact match found; closest documented values for RAE250 across all mast/battery/rotation-mode/load-size combinations range 2876mm (best case) to 3336mm (worst case), smallest 'Rotate on point' figure is 2886mm",
+          "note": "Not overwritten. All other already-filled RAE250 fields (max_payload=2500, drive_type=Reach Truck, mast_type=Triplex, battery_type, barcode_readers, load_detection, max_gradient=7.0 with-load) were re-checked against this datasheet and match exactly -- no other conflicts found, and nothing else was re-filled since already non-null."
+        }
+      },
+      "notes": "This product entry exists only to record the single min_aisle_width conflict found above; no new fields were added since RAE250 was already comprehensively filled in a prior research batch and all other values cross-checked cleanly against this datasheet."
+    },
+    {
+      "product_name": "BT Levio LAE250 Autopilot",
+      "product_type": "Forklift AGV",
+      "source_file": "lae250-technicky-list.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "min_total_height": 2381
+      },
+      "field_sources": {
+        "min_total_height": "p.2, VDI table row 4.9/h14 area 'Total height with scanner' = 2381mm (lowered forks, large-battery/FL1200 config -- same config that matches the DB's existing vehicle_length=2227 and min_aisle_width=2660)"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Cross-checked all already-filled DB fields against this datasheet: max_payload=2500, vehicle_length=2227, vehicle_width=930, lifting_height=120, min_aisle_width=2660, max_gradient=6.0 all match exactly (large-battery/FL1200 configuration) -- no conflicts, nothing re-filled. Datasheet documents a 3-way battery-compartment/fork-length dependent dimensions table (FL1200/1600/2400 x Small/Large battery); only the config matching the DB's existing filled values was used for the one new field to avoid mixing configs."
+    },
+    {
+      "product_name": "Toyota Staxio SAE160 Autopilot",
+      "product_type": "Forklift AGV",
+      "source_file": "sae160-technicky-list.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "min_total_height": 2381
+      },
+      "field_sources": {
+        "min_total_height": "p.2, VDI table row 'Height with scanner' = 2381mm (lowered), a row not split by mast-type column so applies to both DX Tele and TX Hi-Lo variants"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Datasheet covers 2 mast variants (SAE160 Duplex Tele / SAE160 Triplex Hi-Lo) in one table -- not treated as separate products since it's the same model number 'SAE160' with a mast-config choice, unlike the RAE160/200/250 case which used distinct model numbers. Cross-checked already-filled DB fields: max_payload=1600, vehicle_length=2261 (matches DX Tele/FL1200 config exactly), vehicle_width=930, max_gradient=6.0, lifting_height=4700 (matches TX Hi-Lo config -- i.e. DB mixes configs across two fields, a pre-existing state not introduced or fixed by this run), min_aisle_width=2686 (matches DX Tele config) -- all match, no conflicts."
+    },
+    {
+      "product_name": "Toyota Movit TAE500 Autopilot",
+      "product_type": "Tugger AGV",
+      "source_file": "tae500-technicky-list-003.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "turning_radius": 1597,
+        "vehicle_length": 1757,
+        "vehicle_width": 950,
+        "max_gradient": 3
+      },
+      "field_sources": {
+        "turning_radius": "p.2, VDI table row 4.35 'Turning radius Wa' = 1597mm",
+        "vehicle_length": "p.2, VDI table row 4.19 'Overall length l1' = 1757mm",
+        "vehicle_width": "p.2, VDI table row 4.21 'Overall width b1/b2' = 950/800mm -- used the larger (b1=950mm, over the drive unit) as the overall vehicle width",
+        "max_gradient": "p.2, VDI table row 5.7 'Gradeability, with/without load %' = 3/13 -- used the with-load (loaded) figure per this company's established max_gradient convention (see RAE250/RAE160 notes in this same file)"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Cross-checked already-filled DB fields: towing_capacity=5000 matches 'Rated capacity/rated load 5000/5000 kg' exactly; coupling_type=Automatic|Manual and auto_hitch=true both match the datasheet's towing-pin-auto/manual and towing-ball options and the feature-list 'Automatic tow coupling device (optional)'; max_speed=2.22 m/s matches 'Auto mode Towing pin, auto 8,0 km/h' (8.0/3.6=2.22) exactly. min_aisle_width intentionally left null -- this Tugger-scope datasheet gives no aisle-width figure at all (it's a towing tractor, not a load-picking forklift), consistent with Blank≠Zero rather than an omission on this agent's part."
+    },
+    {
+      "product_name": "Toyota Autopilot SAI125CB",
+      "product_type": "Forklift AGV",
+      "source_file": "tmha_sai125cb_brochure.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 2621,
+        "vehicle_width": 969,
+        "max_gradient": 2,
+        "mast_type": "Triplex",
+        "load_detection": "Mechanical/Tactile",
+        "barcode_readers": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.2, VDI table row 4.19 'Overall length l1' = 2621mm (standard fork length 1250mm, both mast-height columns share this value)",
+        "vehicle_width": "p.2, VDI table row 4.21 'Overall width b1' = 969mm",
+        "max_gradient": "p.2, VDI table row 5.8 'Max. gradeability, with/without load %' = 2/5 -- with-load value, consistent with this company's max_gradient convention",
+        "mast_type": "p.1/p.2 column header '5.4 m Triplex Hi-Lo' -- matches the DB's existing lifting_height=5400, i.e. this is the configuration already recorded in the DB (the datasheet also documents a smaller '3.7 m Triplex Hi-Lo' variant, not separately entered -- see notes)",
+        "load_detection": "p.4 feature list 'Load detection & fork tip sensors'",
+        "barcode_readers": "p.4 feature list 'Barcode scanner (optional)' -- optional feature, recorded as capability present per Blank≠Zero"
+      },
+      "notes": "ADDENDUM (continuation run, same calendar day). Source document (Toyota Material Handling Australia variant of the same SAI125CB model) prints TWO mast-height configurations side by side: '3.7 m Triplex Hi-Lo' (lifting_height=3700mm) and '5.4 m Triplex Hi-Lo' (lifting_height=5400mm). The DB's existing single row already has lifting_height=5400 filled, so this run treated it as the 5.4m config and did not create a second '3.7m' variant product -- same reasoning as the SAE160 mast-option case above (one model number, a mast-height choice, not a genuinely separate SKU per this document's own presentation). If the Tech Lead judges the 3.7m/5.4m split should be a real variant pair (cf. the RAE160/200/250 precedent), the 3.7m figures are: vehicle_length=2021mm (fork 650mm) up to 2771mm (fork 1400mm) depending on fork length, min_aisle_width varies 2404-3032mm depending on load size/PPS config -- not filled here, flagged for a possible future variant-completion pass. min_total_height intentionally left null: the datasheet's 'Height with scanner' row gives THREE values (2430/2750/2970mm) without a clear single-column mapping to either mast-height variant, so no confident single figure could be picked."
+    }
+  ]
+}

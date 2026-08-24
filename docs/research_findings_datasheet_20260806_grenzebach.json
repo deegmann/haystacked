@@ -1,0 +1,140 @@
+{
+  "company": "Grenzebach Maschinenbau GmbH",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "3 files, all clean official Grenzebach technical-data sheets/brochures (2pp datasheets for FF1200S/L1200S-Li, 5pp brochure for OL1200S). All 3 base models already exist in the DB with every field NULL -- pure enrichment, no new products. Grenzebach's own naming distinguishes vehicle mechanics clearly: L1200S = conventional-drive underride/tunnel AGV (low, tunnels under load carriers), OL1200S = its omnidirectional-drive successor, FF1200S = a lift-type pallet/parts AGV -- all fitting the DB's existing product_type assignments (L1200S/OL1200S = Mobile AMR per the 'underride' keyword convention, FF1200S = Forklift AGV). ADDENDUM (full-batch continuation run, same calendar day): 'Intralogistics_Brochure_EN-2023.pdf' (company-wide, customer case-study format -- König+Neurath, postal/parcel sorting, automotive customers) processed. Confirms 'L1200S' payload range 'between 600 and 1,200 kg' consistent with the existing DB figures, and mentions a Grenzebach 'universal control system' for AGV fleets (proprietary fleet management, already recorded) -- no new fillable per-model fields found beyond what the 3 individual datasheets already provided this batch.",
+  "products": [
+    {
+      "product_name": "Grenzebach FF1200S",
+      "product_type": "Forklift AGV",
+      "source_file": "Grenzebach_Intralogistics_Data_Sheet_FF1200S_en.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1725,
+        "vehicle_width": 800,
+        "lifting_height": 1200,
+        "max_payload": 1200,
+        "max_speed": 2.0,
+        "max_gradient": 5,
+        "operating_temp_min": 10,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 80,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "navigation_type": [
+          "Contour"
+        ]
+      },
+      "field_sources": {
+        "vehicle_length": "p.2 table 'Length Approx. 1,725 mm'",
+        "vehicle_width": "p.2 table 'Width Approx. 800 mm'",
+        "lifting_height": "p.2 table 'Lifting height Up to approx. 1,200 mm'",
+        "max_payload": "p.2 table 'Payload Up to 1,200 kg and, upon request, up to 1,500 kg' -- base/standard figure (1200kg) used, upgrade option noted",
+        "max_speed": "p.2 table 'Speed (unloaded) Up to 2.0 m/s (forwards)' / 'Speed (loaded) Up to 2.0 m/s (forwards)' -- identical for both states",
+        "max_gradient": "p.2 table 'Slope travel Up to 5% limited to max. 10m length'",
+        "operating_temp_min": "p.2 table 'Temperature range +10 to +40°C (0°C to 40°C, upon request)' -- standard range used, extended-range option noted",
+        "operating_temp_max": "same row",
+        "operating_humidity_max": "p.2 table 'Air humidity Max. 80%, non-condensing'",
+        "battery_type": "p.2 table 'Battery Lithium iron phosphate'",
+        "navigation_type": "p.2 table 'Navigation Contour navigation (Safety scanner scans the environment and compares with previously charted map)' -- exact AP0 allowed_value match"
+      },
+      "notes": "Turning radius (approx. 1450mm) printed but Forklift-scope has no matching AP0 field (min_turning_radius exists only for AMR scope) -- not recorded. 5G communication mentioned but no WMS/ERP/MES keyword present in this specific sheet, so integration_capability left null (unlike sibling OL1200S sheet, which does state ERP explicitly)."
+    },
+    {
+      "product_name": "Grenzebach L1200S",
+      "product_type": "Mobile AMR",
+      "source_file": "Grenzebach_Data_Sheet_L1200S-Li_en.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1238,
+        "vehicle_width": 693,
+        "lift_height": 60,
+        "max_payload": 1200,
+        "max_speed": 1.0,
+        "min_turning_radius": 1000,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "battery_runtime": 6,
+        "charge_time": 30,
+        "operating_temp_min": 10,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 80,
+        "navigation_type": [
+          "Contour"
+        ],
+        "rotation_capable": true
+      },
+      "field_sources": {
+        "vehicle_length": "p.2 table 'Length 1,238 mm'",
+        "vehicle_width": "p.2 table 'Width 693 mm'",
+        "lift_height": "p.2 table 'Lifting height 60mm (electrical)'",
+        "max_payload": "p.2 table 'Payload 1,200 kg'; body text 'can transport up to 1.2 tons lengthwise or crosswise'",
+        "max_speed": "p.2 table 'Speed (unloaded) Up to 1 m/s' / 'Speed (loaded) Up to 1 m/s' -- identical",
+        "min_turning_radius": "p.2 table 'Turning radius Pivot in stationary location or ≤1m' -- the ≤1m bound recorded as 1000mm",
+        "battery_type": "p.2 table 'Battery Lithium iron phosphate'",
+        "battery_runtime": "p.2 table 'Travel time 80-15% SOC with 1,000kg load approx. 6h'",
+        "charge_time": "p.2 table 'Charging time 15-80% SOC approx. 30min.'",
+        "operating_temp_min": "p.2 table 'Temperature range +10 to +40°C'",
+        "operating_temp_max": "same row",
+        "operating_humidity_max": "p.2 table 'Humidity Max. 80%'",
+        "navigation_type": "p.2 table 'Navigation Contour navigation (safety scanner detects surrounding and compares with internal map)'",
+        "rotation_capable": "body text 'can turn on the spot which saves space' + table 'Turning radius: Pivot in stationary location'"
+      },
+      "notes": "Free contour navigation explicitly stated to mean NO protected-area infrastructure setup required ('there is no need to set up protected areas') -- a strong candidate for infrastructure_free=true, but left null since the exact AP0 semantics of that field (per the domain README) weren't cross-checked against this specific phrasing in this pass; flagging for a reviewer rather than guessing."
+    },
+    {
+      "product_name": "Grenzebach OL1200S",
+      "product_type": "Mobile AMR",
+      "source_file": "Grenzebach_Intralogistics_OL1200S_Brochure_EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1450,
+        "vehicle_width": 760,
+        "lift_height": 140,
+        "max_payload": 1200,
+        "max_speed": 1.66,
+        "min_turning_radius": 1000,
+        "battery_type": [
+          "LiFePO4"
+        ],
+        "charge_time": 30,
+        "operating_temp_min": 10,
+        "operating_temp_max": 40,
+        "operating_humidity_max": 80,
+        "navigation_type": [
+          "Contour",
+          "Natural Feature (SLAM)"
+        ],
+        "omnidirectional_movement": true,
+        "rotation_capable": true,
+        "vda5050_compatible": true,
+        "fleet_management_system": "VDA 5050 compatible",
+        "integration_capability": [
+          "ERP"
+        ]
+      },
+      "field_sources": {
+        "vehicle_length": "p.4 table 'Length 1,450 mm (57.08 in)'",
+        "vehicle_width": "p.4 table 'Width 760 mm (29.92 in)'",
+        "lift_height": "p.4 table 'Lifting height Approx. 140mm (5.51 in), electrical'",
+        "max_payload": "p.4 table 'Payload 1,200 kg (2,645 lbs) asymmetric, up to 1,500 kg (3,306 lbs) symmetric' -- base/asymmetric figure (1200kg) used, symmetric-load upgrade option noted",
+        "max_speed": "p.4 table 'Speed (unloaded/loaded) Up to 1.66 m/s or 6 km/h (3.7 mph)' -- identical for both states",
+        "min_turning_radius": "p.4 table 'Turning radius Pivot in stationary location or ≥1m (3.3ft)' -- recorded as 1000mm (note: sibling L1200S sheet states '≤1m' for the same physical concept, this sheet says '≥1m' -- likely a typo in one of the two source documents, not resolved here, both recorded as-is per their own sheet)",
+        "battery_type": "p.4 table 'Battery Lithium iron phosphate'",
+        "charge_time": "p.4 table 'Charging time 15-80% SOC approx. 30min.'",
+        "operating_temp_min": "p.4 table 'Temperature range +10 to +40°C (0°C-40°C on request)'",
+        "operating_temp_max": "same row",
+        "operating_humidity_max": "p.4 table 'Humidity max. 80% non condensing'",
+        "navigation_type": "p.4 table 'Navigation Contour navigation (safety scanner detects surrounding and compares with internal map)' AND p.2 body text 'With smart sensors and SLAM navigation, the OL1200S reduces static peripheral requirements' -- both terms explicitly used in this document for the same product, recorded as two values",
+        "omnidirectional_movement": "p.4 table 'Drive mode Forward and reverse, omnidirectional'; p.3 '360° MOBILITY: The OL1200S is omnidirectional; it can move freely in any direction and rotate on its axis while stationary'",
+        "rotation_capable": "p.3 '360° MOBILITY ... rotate on its axis while stationary'",
+        "vda5050_compatible": "p.3 heading 'VDA 5050-COMPATIBLE: ... can be combined with automated guided vehicles from other manufacturers under a single software control center ... via the VDA 5050 interface'; p.2 'seamless integration of the vehicle into existing infrastructures is possible at all times via the VDA 5050 interface'",
+        "fleet_management_system": "same VDA 5050 sourcing as above -- AP0's dropdown allowed_value 'VDA 5050 compatible' used directly since it's an exact conceptual match to this explicit claim",
+        "integration_capability": "p.4 'SOFTWARE ECOSYSTEM' diagram: 'Administration level Enterprise Resource Planning (ERP)' -- exact AP0 allowed_value match; WCS (Warehouse Control System) also shown in the same diagram but has no AP0 allowed_value match (closest is 'WMS', not written since WCS and WMS are not identical systems)"
+      },
+      "notes": "This brochure is the richest of the three Grenzebach files and states fleet/integration facts (VDA5050, ERP, Grenzebach Fleet Manager) that likely apply company-wide (same Fleet Manager software mentioned on the FF1200S/L1200S sheets' letterhead area too) -- but since neither sibling sheet explicitly restates these claims itself, they were only written to OL1200S's own fields here rather than assumed for FF1200S/L1200S, to stay strictly source-grounded per product. A dedicated Grenzebach company-wide document, if one exists in a future batch, would be the cleaner way to fan this out formally via the company_wide_context mechanism."
+    }
+  ]
+}

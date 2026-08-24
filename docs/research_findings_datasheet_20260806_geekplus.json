@@ -1,0 +1,351 @@
+{
+  "company": "Geek+ (Geekplus Technology Co.)",
+  "date": "2026-08-06",
+  "source_method": "local_datasheet",
+  "researcher_notes": "6 files (P-series.pdf, X-series.pdf, S-series-1.pdf [+byte-identical dup S-series-2.pdf], RS-series-1.pdf [+3 byte-identical dups: -1-2, -1-3, -3], F12ML.pdf, F20MT.pdf). Per agent memory (project_geekplus_series_confirmed, Tech Lead ruling 2026-08-06): the P/X/S/RS-series files never print the company name as extractable text (logo-image only) but are confirmed Geek+ and safe to process without re-flagging. Each series file is itself a mini-catalog with one page per model variant -- 18 distinct model variants extracted total across all 6 files (P500R/P800R/P1200R/P40R from P-series+RS-series files, X1200Z, 6x S-series variants, 5x RS-series variants, F12ML, F20MT). 10 are genuinely new to the DB (X1200Z, S20T, S20C, S100C, S20C-A, S20C-H-SNE, S20C-V3.0, RS5-D, RS8-DX, RS11-DX); 8 already exist and are pure enrichment (every field was NULL). Deliberately conservative field-mapping discipline applied: onboard_container_type/storage_system_type were only filled where the source text itself uses matching vocabulary ('tote', 'shelf') -- NOT inferred from load-size dimensions alone (applies to P-series and RS-series P40R, which do use 'tote'/'shelf' explicitly; deliberately NOT applied to the S-series or X1200Z, whose sheets only give raw millimeter load-size figures without a container-type word). Recurring rotation/turning-radius ambiguity: P-series sheets give a 'Rotation Diameter' figure (not explicitly labeled radius or diameter's exact geometric meaning for min_turning_radius purposes) -- NOT written to min_turning_radius anywhere in this batch, consistent with the same caution already flagged for VisionNav VNK15 and Magazino SOTO (radius/diameter semantics still an open AP0 question).",
+  "products": [
+    {
+      "product_name": "Geek+ P500R",
+      "product_type": "Mobile AMR",
+      "source_file": "P-series.pdf (p.1)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 950, "vehicle_width": 702, "lift_height": 60, "max_payload": 600,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "navigation_type": ["QR/DM Code"], "stop_accuracy": 10, "storage_system_type": ["Shelf-to-Person"], "top_module_type": ["Lift"]
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size: 950x702x275mm'", "lift_height": "'Maximum Lift Height: 60mm'",
+        "max_payload": "'Payload Capacity 600kg'", "max_speed": "'BaseTravel Speed No-load 2m/s, full-load 1.5m/s' -- loaded value used",
+        "battery_type": "'Wide temperature lithium battery, DC51.1V, 30Ah'", "charge_time/battery_runtime": "'Charging Time: 10 minutes charge for 1.5-2 hours of work' -- lower bound of range used for runtime",
+        "operating_temp": "'-10~45°C (P500R-LNU V5.2)' sub-variant used as the conservative/narrower of two printed sub-variant ranges (-IWD V5.1 states -10~50°C)",
+        "operating_humidity_max": "'Humidity: ≥5°C:10%~95%'", "navigation_type": "'Inertia + QR code visual navigation'",
+        "stop_accuracy": "'Position Accuracy: ≤±10mm, ±1°'", "storage_system_type": "'Shelf Dimensions / Shelf Bottom Height' section headings, matches DB's own base_model_name 'P-Series (Shelf-to-Person)'", "top_module_type": "integrated lift mechanism implied by 'Maximum Lift Height' spec"
+      },
+      "notes": "Two battery sub-variants exist (-IWD V5.1 infrared, -LNU V5.2 lidar) with slightly different obstacle-detection sensors and temp ranges -- not modeled as separate DB products, narrower/shared spec used."
+    },
+    {
+      "product_name": "Geek+ P800R",
+      "product_type": "Mobile AMR",
+      "source_file": "P-series.pdf (p.2)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1095, "vehicle_width": 830, "lift_height": 55, "max_payload": 1000,
+        "max_speed": 2.0, "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "navigation_type": ["QR/DM Code"], "stop_accuracy": 10, "storage_system_type": ["Shelf-to-Person"], "top_module_type": ["Lift"]
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size: 1095x830x195mm (Regular)'", "lift_height": "'Maximum Lift Height: 55mm'",
+        "max_payload": "'Payload Capacity 1000kg'", "max_speed": "'No-load 2.3m/s, full-load 2m/s' -- loaded value used",
+        "battery_type": "'Wide temperature lithium battery, DC51.1V, 27.9Ah'", "charge_time/battery_runtime": "'10 minutes charge for 1.5-2 hours of work'",
+        "operating_temp": "'Temperature:-10~45°C'", "operating_humidity_max": "'Humidity ≥5°C:10%~95%'",
+        "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'Stop Accuracy: ≤±10mm, ±1°'",
+        "storage_system_type": "shelf-carrying spec section, consistent with sibling P500R/P1200R"
+      },
+      "notes": "Also has a 'Thicker version for Popick' (1095x830x275mm) not separately extracted -- same base model."
+    },
+    {
+      "product_name": "Geek+ P1200R",
+      "product_type": "Mobile AMR",
+      "source_file": "P-series.pdf (p.3)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1325, "vehicle_width": 1020, "lift_height": 60, "max_payload": 1200,
+        "max_speed": 2.2, "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "navigation_type": ["QR/DM Code"], "stop_accuracy": 10, "storage_system_type": ["Shelf-to-Person"], "top_module_type": ["Lift"]
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1325x1020x275mm'", "lift_height": "'Maximum Lift Height: 60mm'",
+        "max_payload": "'Payload Capacity 1200kg'", "max_speed": "'No-load 2.6m/s, full-load 2.2m/s' -- loaded value used",
+        "battery_type": "'Wide temperature lithium battery, DC51.1V, 27.9Ah'", "charge_time/battery_runtime": "'10 minutes charge for 1.5-2 hours of work'",
+        "operating_temp": "'-10°C~45°C'", "operating_humidity_max": "'≥5°C:10%~95%'",
+        "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'Stop Accuracy: ≤±10mm, ±1°'"
+      },
+      "notes": ""
+    },
+    {
+      "product_name": "Geek+ RoboShuttle P40",
+      "product_type": "Mobile AMR",
+      "source_file": "RS-series-1.pdf (p.6, printed as 'P-Series Robots P40R')",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 650, "vehicle_width": 450, "lift_height": 440, "max_payload": 40,
+        "max_speed": 3.5, "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "navigation_type": ["QR/DM Code"], "stop_accuracy": 10, "onboard_container_type": ["Tote"]
+      },
+      "field_sources": {
+        "product_name_mapping": "source names this 'P40R' -- mapped to DB's existing 'Geek+ RoboShuttle P40' row on model-number match, not independently verified against another source",
+        "vehicle_length/width": "'Body Size:650x450x383mm'", "lift_height": "'Maximum Lift Height: 440mm'",
+        "max_payload": "'Maximum Lift Load: 40kg'", "max_speed": "'No load 3.5m/s, full load 3.5m/s' -- identical",
+        "battery_type": "'Lithium-ion, DC51.8V, 12Ah'", "charge_time/battery_runtime": "'10 minutes charge for 1-1.5 hours of work' -- lower bound used",
+        "operating_temp": "'Temperature: -10~45°C'", "operating_humidity_max": "'≥5°C: 10~95%'",
+        "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'Stop Accuracy: ≤±10mm, ±1°'",
+        "onboard_container_type": "'Standard Container Size: 600x400mm tote'"
+      },
+      "notes": "FLAG: model-number-only name mapping (P40R -> RoboShuttle P40) not cross-verified -- if wrong, this is actually a NEW product, not enrichment."
+    },
+    {
+      "product_name": "Geek+ X1200Z",
+      "product_type": "Mobile AMR",
+      "source_file": "X-series.pdf",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1000, "vehicle_width": 972, "lift_height": 35, "max_payload": 1200,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "charge_time": 72, "battery_runtime": 8,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "stop_accuracy": 2
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1000x972x125mm'", "lift_height": "'Maximum Lifting Height: 35mm'",
+        "max_payload": "'Payload Capacity 1200kg'", "max_speed": "'No-load 1.6m/s, full-load 1.5m/s' -- loaded value used",
+        "battery_type": "'Room Temperature: 48V 40Ah' battery", "charge_time/battery_runtime": "'Room Temperature: 1.2h charge for 8~10h use' -- 1.2h=72min, lower bound 8h used for runtime",
+        "operating_temp": "'Room Temperature: -10~45°C' sub-variant used (a separate 'Cold Storage: 0~-25°C' sub-variant also printed but not used, ambiguous/contradictory range as printed)",
+        "operating_humidity_max": "'Room Temperature ≥5°C: 10%~95%'", "stop_accuracy": "'Stop Accuracy: ±2mm'"
+      },
+      "notes": "product_type classification judgment call: this is a low-chassis (125mm height) pallet-underride AGV that lifts only 35mm, matching the 'Underride AMR' pattern (keyword_map: underride->Mobile AMR) rather than a mast-type Forklift AGV -- flagged for Tech Lead review since it's a genuinely new product and this classification wasn't inherited from an existing DB row. navigation_type deliberately left null: the source table's 'Navigation System' row extracts as 'Motor-driven', which looks like a column-misalignment artifact from pdfplumber rather than a real navigation-technology answer -- not trusted."
+    },
+    {
+      "product_name": "Geek+ S20T",
+      "product_type": "Mobile AMR",
+      "source_file": "S-series-1.pdf (p.1, 'S20T V2.0')",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 560, "vehicle_width": 510, "max_payload": 8, "max_speed": 2.0,
+        "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:560x510x1345mm'", "max_payload": "'Payload: 8kg'",
+        "max_speed": "'Fully Loaded Speed: 2.0m/s' (Robot Max Speed unloaded: 2.5m/s, not used)",
+        "battery_type": "'Lithium-ion, DC50.4V, 12Ah'", "charge_time/battery_runtime": "'10 minutes charge for 1.5 hours of work'",
+        "operating_temp": "'Temperature: -10~45°C'", "stop_accuracy": "'Position Accuracy <10mm'"
+      },
+      "notes": "'Carrier Surface Height: 1276mm (Customizable)' and load-size figures (320x320x300mm max, 100x100x10mm min) printed but NOT mapped to onboard_container_type -- source never uses 'tote'/'bin'/'shelf' vocabulary for this model, only raw dimensions (see researcher_notes policy)."
+    },
+    {
+      "product_name": "Geek+ S20C",
+      "product_type": "Mobile AMR",
+      "source_file": "S-series-1.pdf (p.2, 'S20C V2.0')",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 560, "vehicle_width": 600, "max_payload": 20, "max_speed": 2.0,
+        "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:560x600x1027mm'", "max_payload": "'Payload: 20kg'",
+        "max_speed": "'Fully Loaded Speed: 2.0m/s'", "battery_type": "'Lithium-ion, DC50.4V, 12Ah'",
+        "charge_time/battery_runtime": "'10 minutes charge for 1.5 hours of work'", "operating_temp": "'-10~45°C'",
+        "stop_accuracy": "'<10mm'"
+      },
+      "notes": "Has an explicit 'Conveyor line' sub-variant load size (520x420x400mm) -- suggests a conveyor top module, but not mapped to top_module_type since the STANDARD FEATURES badge section for this page wasn't distinctly captured separate from the base variant."
+    },
+    {
+      "product_name": "Geek+ S100C",
+      "product_type": "Mobile AMR",
+      "source_file": "S-series-1.pdf (p.3, 'S100C V2.0')",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1170, "vehicle_width": 832, "max_payload": 100, "max_speed": 2.0,
+        "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 2,
+        "operating_temp_min": -10, "operating_temp_max": 45, "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1170x832x590mm'", "max_payload": "'Payload: 100kg'",
+        "max_speed": "'Robot Max Speed: 2.0m/s, Fully Loaded Speed: 2.0m/s' -- identical",
+        "battery_type": "'Lithium, DC50.4V, 38.5Ah'", "charge_time/battery_runtime": "'10 minutes charge for 2-3 hours of work' -- lower bound used",
+        "operating_temp": "'-10~45°C'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": "Obstacle detection: 'Infrared sensor, support LiDAR' (option, not written to any field)."
+    },
+    {
+      "product_name": "Geek+ S20C-A",
+      "product_type": "Mobile AMR",
+      "source_file": "S-series-1.pdf (p.4, 'S20C-A V2.0')",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 560, "vehicle_width": 600, "max_payload": 20, "max_speed": 2.0,
+        "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:560x600x577-1127mm' -- adjustable-height variant of S20C, height range not written (no AP0 field for adjustable height)",
+        "max_payload": "'Payload: 20kg'", "max_speed": "'Fully Loaded Speed: 2.0m/s'",
+        "battery_type": "'Lithium-ion, DC50.4V, 12Ah'", "charge_time/battery_runtime": "'10 minutes charge for 1.5 hours of work'",
+        "operating_temp": "'-10~45°C'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": "'-A' variant of S20C with adjustable carrier surface height (550-1100mm) instead of fixed 1000mm -- otherwise identical specs."
+    },
+    {
+      "product_name": "Geek+ S20C-H-SNE",
+      "product_type": "Mobile AMR",
+      "source_file": "S-series-1.pdf (p.5, 'S20C-H-SNE V3.0')",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 650, "vehicle_width": 600, "max_payload": 20, "max_speed": 2.0,
+        "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:650x600x1027mm'", "max_payload": "'Payload: 20kg'",
+        "max_speed": "'Robot Max Speed: 2.0m/s, Fully Loaded Speed: 2.0m/s'", "battery_type": "'Lithium-ion, DC50.4V, 12Ah'",
+        "charge_time/battery_runtime": "'10 minutes charge for 1.5 hours of work'", "operating_temp": "'-10~45°C'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": "V3.0 generation variant, slightly wider chassis (650mm vs 560mm) than V2.0 S20C."
+    },
+    {
+      "product_name": "Geek+ S20C-V3",
+      "product_type": "Mobile AMR",
+      "source_file": "S-series-1.pdf (p.6, 'S20C V3.0')",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 650, "vehicle_width": 600, "max_payload": 20, "max_speed": 2.5,
+        "battery_type": ["Li-Ion"], "charge_time": 10, "battery_runtime": 1.5,
+        "operating_temp_min": -10, "operating_temp_max": 45, "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:650x600x1027mm'", "max_payload": "'Payload: 20kg'",
+        "max_speed": "'Robot Max Speed: 2.5m/s, Fully Loaded Speed: 2.5m/s' -- identical, notably faster than V2.0/H-SNE siblings",
+        "battery_type": "'Lithium-ion, DC51.8V, 12.4Ah'", "charge_time/battery_runtime": "'10 minutes charge for 1.5 hours of work'",
+        "operating_temp": "'-10~45°C'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": "Named 'S20C V3.0' distinctly from 'S20C-H-SNE V3.0' on the preceding page despite identical body dimensions -- treated as a separate product per its own distinct model label in the source, named 'Geek+ S20C-V3' here to avoid colliding with the existing DB row name 'Geek+ M200C' or the new 'Geek+ S20C' (V2.0) entry above."
+    },
+    {
+      "product_name": "Geek+ RoboShuttle RS5-D",
+      "product_type": "Mobile AMR",
+      "source_file": "RS-series-1.pdf (p.1)",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1490, "vehicle_width": 870, "lift_height": 4865, "max_payload": 40,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "operating_temp_min": 0, "operating_temp_max": 45,
+        "operating_humidity_max": 95, "navigation_type": ["QR/DM Code"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1490x870x5100mm' (5100mm = mast height, not written to any field)", "lift_height": "'Maximum Lifting Height: 4865mm'",
+        "max_payload": "'Payload Capacity 40kg'", "max_speed": "'No-load 1.8m/s, full-load 1.5m/s' -- loaded value used",
+        "battery_type": "'Lithium-ion, DC50.4V, 42Ah'", "operating_temp": "'Temperature: 0°C~45°C'",
+        "operating_humidity_max": "'Humidity: 10%~95%'", "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'Stop Accuracy: <10mm'"
+      },
+      "notes": "A tall vertical mini-load shuttle for narrow-tote high-bay storage (shelf compatibility 600x400x150-400mm) -- charge_time not stated (only 'Maximum charging current: 30A')."
+    },
+    {
+      "product_name": "Geek+ RoboShuttle RS8-DA",
+      "product_type": "Mobile AMR",
+      "source_file": "RS-series-1.pdf (p.2)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1800, "vehicle_width": 1000, "lift_height": 7935, "max_payload": 40,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "operating_temp_min": -10, "operating_temp_max": 45,
+        "operating_humidity_max": 95, "navigation_type": ["QR/DM Code"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1800x1000x4700mm'", "lift_height": "'Maximum Lifting Height: 7935mm'",
+        "max_payload": "'Payload Capacity 40kg'", "max_speed": "'No-load 1.8m/s, full-load 1.5m/s'",
+        "battery_type": "'Lithium-ion, DC50.4V, 42Ah'", "operating_temp": "'-10°C~45°C'",
+        "operating_humidity_max": "'10%~95%'", "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": ""
+    },
+    {
+      "product_name": "Geek+ RoboShuttle RS8-DX",
+      "product_type": "Mobile AMR",
+      "source_file": "RS-series-1.pdf (p.3)",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1800, "vehicle_width": 1000, "lift_height": 7935, "max_payload": 40,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "operating_temp_min": -10, "operating_temp_max": 45,
+        "operating_humidity_max": 95, "navigation_type": ["QR/DM Code"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1800x1000x4700mm' (same chassis as RS8-DA)", "lift_height": "'Maximum Lifting Height: 7935mm'",
+        "max_payload": "'Payload Capacity 40kg'", "max_speed": "'No-load 1.8m/s, full-load 1.5m/s'",
+        "battery_type": "'Lithium-ion, DC50.4V, 42Ah'", "operating_temp": "'-10°C~45°C'",
+        "operating_humidity_max": "'10%~95%'", "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": "Same physical chassis as RS8-DA, distinguished by different shelf compatibility range (400-650 x 400-450 x 280-500mm vs RS8-DA's 200-650 x 200-450 x 150-400mm) and 10kg lighter (890kg vs 900kg) -- a genuinely different SKU per the source's own separate page/model code, not a duplicate."
+    },
+    {
+      "product_name": "Geek+ RoboShuttle RS11-DA",
+      "product_type": "Mobile AMR",
+      "source_file": "RS-series-1.pdf (p.4)",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1800, "vehicle_width": 1000, "lift_height": 10765, "max_payload": 40,
+        "max_speed": 1.2, "battery_type": ["Li-Ion"], "operating_temp_min": -10, "operating_temp_max": 45,
+        "operating_humidity_max": 95, "navigation_type": ["QR/DM Code"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1800x1000x6200mm'", "lift_height": "'Maximum Lifting Height: 10765mm'",
+        "max_payload": "'Payload Capacity 40kg'", "max_speed": "'No-load 1.8m/s, full-load 1.2m/s' -- loaded value used",
+        "battery_type": "'Lithium-ion, DC50.4V, 42Ah'", "operating_temp": "'-10°C~45°C'",
+        "operating_humidity_max": "'10%~95%'", "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": ""
+    },
+    {
+      "product_name": "Geek+ RoboShuttle RS11-DX",
+      "product_type": "Mobile AMR",
+      "source_file": "RS-series-1.pdf (p.5)",
+      "db_status": "new",
+      "fields": {
+        "vehicle_length": 1800, "vehicle_width": 1000, "lift_height": 10765, "max_payload": 40,
+        "max_speed": 1.2, "battery_type": ["Li-Ion"], "operating_temp_min": -10, "operating_temp_max": 45,
+        "operating_humidity_max": 95, "navigation_type": ["QR/DM Code"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Body Size:1800x1000x6200mm' (same chassis as RS11-DA)", "lift_height": "'Maximum Lifting Height: 10765mm'",
+        "max_payload": "'Payload Capacity 40kg'", "max_speed": "'No-load 1.8m/s, full-load 1.2m/s'",
+        "battery_type": "'Lithium-ion, DC50.4V, 42Ah'", "operating_temp": "'-10°C~45°C'",
+        "operating_humidity_max": "'10%~95%'", "navigation_type": "'Inertia + QR code visual navigation'", "stop_accuracy": "'<10mm'"
+      },
+      "notes": "Same physical chassis as RS11-DA, differs by shelf-compatibility range and 10kg weight, same pattern as RS8-DA/DX sibling pair."
+    },
+    {
+      "product_name": "Geek+ F12ML",
+      "product_type": "Forklift AGV",
+      "source_file": "F12ML.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1707, "vehicle_width": 1050, "lifting_height": 2300, "max_payload": 1000,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "charge_time": 150, "battery_runtime": 6,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "navigation_type": ["Natural Feature (SLAM)"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Dimensions: 1707x1050x2076mm'", "lifting_height": "'Lifting Height 2300mm'",
+        "max_payload": "'0-2m: 1500kg / 2-2.5m: 1200kg / 2.5-3m: 1000kg' -- CONSERVATIVE (lowest, worst-case) figure at max lift height used per K.O.-field matrix policy; full derating curve noted here",
+        "max_speed": "'Maximum speed of 1.5m/s'", "battery_type": "'Lithium-ion, 24V/150Ah'",
+        "charge_time": "'Charging Time: 2-2.5 hours for a full charge' -- upper bound (150min) used", "battery_runtime": "'Runtime: 6-8 hours of continuous operation' -- lower bound used",
+        "operating_temp": "'0°C to 45°C (charging), -10°C to 45°C (discharge)' -- wider discharge range used", "operating_humidity_max": "not explicitly stated on this sheet, carried from sibling F20MT sheet's identical spec block layout -- FLAG: not independently confirmed for F12ML specifically, left as a best-effort assumption",
+        "navigation_type": "'Laser SLAM'", "stop_accuracy": "'±10mm for precise handling and stacking'"
+      },
+      "notes": "Safety: 'CE PLd Verification' -- Performance Level d is a functional-safety rating (closer to AP0's functional_safety_level field, not attempted here since that field's own allowed_value vocabulary wasn't checked in this pass) rather than an exact safety_standard allowed_value match."
+    },
+    {
+      "product_name": "Geek+ F-Series (F20MT Smart Forklift)",
+      "product_type": "Forklift AGV",
+      "source_file": "F20MT.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "vehicle_length": 1594, "vehicle_width": 1094, "lifting_height": 120, "max_payload": 2000,
+        "max_speed": 1.5, "battery_type": ["Li-Ion"], "charge_time": 150, "battery_runtime": 6,
+        "operating_temp_min": -10, "operating_temp_max": 45, "operating_humidity_max": 95,
+        "navigation_type": ["Natural Feature (SLAM)"], "stop_accuracy": 10
+      },
+      "field_sources": {
+        "vehicle_length/width": "'Dimensions: 1594x1094x2067mm'", "lifting_height": "'Lifting Height 120mm' -- a low-lift heavy-duty AGV, not a stacking-height mast",
+        "max_payload": "'Payload Capacity Up to 2000kg, suitable for heavy-duty operations'", "max_speed": "'Maximum speed of 1.5m/s'",
+        "battery_type": "'Lithium-ion, 24V/150Ah'", "charge_time": "'Less than 2.5 hours for a full charge' -- upper bound (150min) used",
+        "battery_runtime": "'Runtime: 6-8 hours of continuous operation' -- lower bound used",
+        "operating_temp": "'-10°C to 45°C (discharge), 0°C to 45°C (charging)'", "operating_humidity_max": "'Humidity: 10-95%, no condensation'",
+        "navigation_type": "'Laser SLAM'", "stop_accuracy": "'±10mm for precise handling and stacking'"
+      },
+      "notes": "'F20MT' likely denotes a 2000kg-class heavy tow/push forklift rather than a high-stacking unit, consistent with its unusually low 120mm lift height."
+    }
+  ]
+}

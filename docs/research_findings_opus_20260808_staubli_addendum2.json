@@ -1,0 +1,133 @@
+{
+  "company": "Stäubli",
+  "date": "2026-08-08",
+  "source_method": "local_datasheet",
+  "researcher_notes": "Opus redo pass, session 4 — SECOND Stäubli addendum (after research_findings_opus_20260808_staubli.json and _staubli_addendum.json). Three Stäubli files were still in Analysed/, none of them recognisable as Stäubli from the filename:\n  1. 'Sterimove-datasheet-EN.pdf' (3 pp., '© Stäubli 02/2026 - V1', doc 40729181D) — a full product datasheet for a cleanroom mobile robot that does NOT exist in the DB at all.\n  2. 'Mobile-Robotics-portfolio-EN.pdf' (4 pp., '© Stäubli 03/2026 - V15', doc 40978181D) — a five-product range overview.\n  3. 'Training-brochure-mobile robotics-EN.pdf' (6 pp., '© Stäubli 02/2025 - V2', doc 40749181D) — the Stäubli Academy course catalogue; company-wide, no vehicle specs.\nAll three identify the manufacturer only in the last page's legal footer ('Staubli is a trademark of Stäubli International AG'), which is why they read as orphans.\n\nThe Sterimove sheet is stamped 'Preliminary data' on both p.1 and p.2 — every value below inherits that caveat and should be re-verified before it becomes a live K.O. figure.\n\nEXTRACTION NOTE: the Sterimove p.2 spec block is a four-panel two-column layout that extract_text() linearises into wrong label/value pairs (e.g. it welds 'Hygienic design ac. to EHEDG guideline' onto '819 in motion' onto 'Turning radius (mm)'). extract_tables() reconstructed the true pairs cleanly — the same failure/rescue pattern as the VisionNav two-column sheets. No image render needed.\n\nDIMENSIONS NOT RECORDED: Sterimove p.2 carries a CAD dimension drawing with the callouts 582 mm, 286 mm, 695 mm and 769 mm, but the drawing frame's row/column letters interleave with them in the text layer and no callout is unambiguously attributable to length, width or height. vehicle_length / vehicle_width / min_ground_clearance are therefore left NULL rather than guessed. Both are CONTEXT-level fields, so this was judged not worth an image render; a reviewer wanting them should render p.2 at ~200 dpi.",
+  "company_wide_context": {
+    "source_file": "Training-brochure-mobile robotics-EN.pdf",
+    "fields": {
+      "installation_process": ["Supplier only", "Client"],
+      "modification_process": ["Client: All"],
+      "integration_capability": ["MES"]
+    },
+    "applies_to": "all Stäubli Mobile Robotics base models (FL1500, Sterimove, PF3, PF3 OMNI, PF6, PF30, PF280)",
+    "notes": "Evidence is a TRAINING CATALOGUE, not a capability spec — it shows what a customer CAN be certified to do, which is the best available proxy for installation_process / modification_process but is one inferential step removed from a direct claim. Sources: p.2 'Commissioning — For the development and implementation of end applications with Stäubli Mobile Robotics' and 'Troubleshooting & Maintenance — For the independent performance of certain maintenance work and repairs'; p.4 course COM 3.0 'enables the participant to develop and parameterize end applications with our Stäubli Mobile Robotics independently', content list including 'Navigation of a mobile robot (creating maps and routes)', 'Configuration of scanner fields', 'Customer interface connections (mechanical & electrical)', 'Fleet management of several mobile robots'. Because a customer can be trained to create maps and routes, modification_process 'Client: All' is proposed; installation_process keeps 'Supplier only' alongside 'Client' since the catalogue never says a customer may commission unaided without the course. integration_capability 'MES' comes from p.4 course FCL 4.1 content 'MES interface' (also 'MES interface' in the FCL headline). NOTE the AP0 schema stores all three at Base-Model granularity, so this must be fanned out per base model at import time, not written once at company level."
+  },
+  "products": [
+    {
+      "product_name": "Stäubli Sterimove",
+      "product_type": "Mobile AMR",
+      "source_file": "Sterimove-datasheet-EN.pdf; Mobile-Robotics-portfolio-EN.pdf",
+      "db_status": "new",
+      "variant_group": "Standalone cleanroom model — no variants published. Shares the Stäubli Mobile Robotics 'top module interface' platform concept with PF3/PF6 but is a distinct differential-drive chassis.",
+      "fields": {
+        "product_type": "Mobile AMR",
+        "max_payload": 250,
+        "max_speed": 1.0,
+        "navigation_type": ["Natural Feature (SLAM)"],
+        "min_turning_radius": 669,
+        "stop_accuracy": 10,
+        "cleanroom_class": "ISO 1–9",
+        "ingress_protection_rating": "IP65",
+        "operating_temp_min": 5,
+        "operating_temp_max": 25,
+        "battery_type": ["Li-Ion"],
+        "battery_runtime": 8,
+        "max_gradient": 1,
+        "outdoor_capable": false,
+        "omnidirectional_movement": false,
+        "onboard_ui": true,
+        "safety_standard": ["ISO 3691-4"],
+        "certifications_generic": ["CE"],
+        "industries_served": ["Pharma"]
+      },
+      "field_sources": {
+        "product_type": "Sterimove-datasheet-EN.pdf p.2 header 'CLEANROOM MOBILE ROBOT'; Mobile-Robotics-portfolio-EN.pdf p.2 'Aseptic Mobile Pharma Robot'",
+        "max_payload": "Sterimove-datasheet-EN.pdf p.2, Performance panel, row 'Payload (kg) 250'. Independently confirmed by Mobile-Robotics-portfolio-EN.pdf p.2 'Sterimove — 250 kg Differential'.",
+        "max_speed": "Sterimove-datasheet-EN.pdf p.2, Performance panel, row 'Max. speed (m/s) Up to 1' — already in AP0's unit (m/s), no conversion",
+        "navigation_type": "Sterimove-datasheet-EN.pdf p.2, Performance panel, row 'Navigation — Laser natural feature' -> 'Natural Feature (SLAM)' per the AP0 mapping rule ('natural feature' -> Natural Feature (SLAM))",
+        "min_turning_radius": "Sterimove-datasheet-EN.pdf p.2, Performance panel, row 'Turning radius (mm) — 819 in motion / 669 on the spot'. 669 recorded (the field is a MINIMUM). Explicit English 'Turning radius' label in millimetres, so this is a safe map under the established radius-vs-diameter rule — no 'Drehkreis'/'rotation diameter' ambiguity. The 819 mm in-motion figure has no AP0 home.",
+        "stop_accuracy": "Sterimove-datasheet-EN.pdf p.2, Performance panel, row 'Position accuracy (mm) Up to ± 10' -> recorded as 10 (AP0 stores a single ± magnitude)",
+        "cleanroom_class": "Sterimove-datasheet-EN.pdf p.2, Cleanroom compatibility panel, row 'ISO class — ISO 5' and row 'Grade — Up to grade A'. AP0's allowed value is the literal string 'ISO 1–9' (a single catch-all), so the actual class (ISO 5) and GMP grade (A) can only live in this note. Mobile-Robotics-portfolio-EN.pdf p.2 adds 'tasks in grade A, B, C and D environments can be automated' and 'meets the stringent requirements of the EU GMP Annex 1 guideline for sterile manufacturing'.",
+        "ingress_protection_rating": "Sterimove-datasheet-EN.pdf p.2, Installation environment panel, row 'Protection class — Up to IP65'. 'Up to' is a hedge; recorded as IP65 because that is the only code printed.",
+        "operating_temp_min": "Sterimove-datasheet-EN.pdf p.2, Installation environment panel, row 'Working temperature +5°C to 25°C (DIN EN ISO 3691-4)' — lower bound. Unit already °C, matches AP0; checked against config/unit_semantics.json, no sign issue (both bounds positive).",
+        "operating_temp_max": "same row, upper bound 25°C",
+        "battery_type": "Sterimove-datasheet-EN.pdf p.2, Energy panel, row 'Battery technology — Li-ion 48V'",
+        "battery_runtime": "Sterimove-datasheet-EN.pdf p.2, Battery panel, row 'Runtime (h) 8'. Same panel: 'Capacity (Ah) 51' (no AP0 field).",
+        "max_gradient": "Sterimove-datasheet-EN.pdf p.2, Installation environment panel, row 'Slope (%) Up to 1'. IMPLAUSIBLY LOW at first glance — 1% is far below the 10-15% typical of the corpus — but it is inside config/plausibility.json's max_gradient range [0, 30] and is entirely consistent with a grade-A cleanroom machine that will never see a ramp. Recorded as printed; flagged for a second look.",
+        "outdoor_capable": "Sterimove-datasheet-EN.pdf p.2, Installation environment panel, row 'Indoor' (with no outdoor counterpart)",
+        "omnidirectional_movement": "false — Sterimove-datasheet-EN.pdf p.2 row 'Drive type — Differential', confirmed by Mobile-Robotics-portfolio-EN.pdf p.2 'Sterimove 250 kg Differential'. Differential drive spins on the spot but cannot translate sideways, so it fails the AP0 hint's 'holonomic drive — sideways + spin on the spot' test. The non-zero 669 mm on-the-spot turning radius corroborates.",
+        "onboard_ui": "Sterimove-datasheet-EN.pdf p.2, Communication / Software panel, row '10\" touch display'",
+        "safety_standard": "Sterimove-datasheet-EN.pdf p.2, Installation environment panel: the working-temperature row is qualified '(DIN EN ISO 3691-4)'. CAUTION — this is the ONLY appearance of ISO 3691-4 on the sheet and it appears as a qualifier on a temperature figure, i.e. 'the range is stated per that standard's method', not a standalone compliance claim. Recorded, but with lower confidence than a certification-section citation would carry.",
+        "certifications_generic": "Sterimove-datasheet-EN.pdf p.2, Installation environment panel, row 'Compliance — CE'. Deliberately routed to the Company-level certifications_generic, NOT to safety_standard — 'CE' is not an allowed value of safety_standard (recurring finding #5 of this redo pass).",
+        "industries_served": "Mobile-Robotics-portfolio-EN.pdf p.2 'Aseptic Mobile Pharma Robot', 'Mobile pharma robot compliant with strict cleanroom hygienic requirements', 'EU GMP Annex 1 guideline for sterile manufacturing'. Explicitly pharma in the portfolio's own words, so this is a stated value rather than an inference from the cleanroom rating."
+      },
+      "notes": "NEW PRODUCT — the DB holds five Stäubli products (PF3, PF6, PF30, PF280, FL1500) and no Sterimove, despite a full dedicated datasheet AND a dedicated column in the range portfolio.\n'Preliminary data' is stamped on both p.1 and p.2 — treat every figure as provisional.\nWRONG-SCOPE TRAP AVOIDED: 'Drive type — Differential' (p.2) was NOT written to AP0's drive_type, which is Logistics:AGV:Forklift scope with allowed values Counterbalanced / Reach Truck / Straddle Stacker / Pallet Mover / VNA Turret. 'Differential' is a wheel-arrangement term, not a forklift build category, and this is a Mobile AMR. It is recorded only in omnidirectional_movement's justification.\nNOT RECORDED, deliberately: autonomous_charging. p.2 row 'Charging system (front) — Inductive' makes automatic docking very likely, but the sheet never says the charging happens without an operator, and Blank != Zero cuts both ways. Strong enrichment candidate if a reviewer accepts inductive-front-charging as sufficient evidence.\nNOT RECORDED, deliberately: autonomous_obstacle_bypass. p.2 Safety panel says 'Collision avoidance', which the AP0 hint explicitly distinguishes from re-routing ('Re-routes AROUND obstacles autonomously vs. only stopping & waiting'). Ambiguous, left null.\nNOT RECORDED, deliberately: top_module_type. p.2 'Top module interface' and Mobile-Robotics-portfolio-EN.pdf p.2 'Built-in top module interface to cover multiple applications' / 'The Sterimove top module is engineered to suit requested applications such as environmental monitoring, material handling or glove integrity check' establish that modules exist, but none of the named applications maps onto the allowed values (None / Lift / Hook / Shelf Carrier / Conveyor / Roller / Cobot arm / Custom). 'Custom' is arguably right; left null for a reviewer.\nAP0 GAP — nothing can hold: the 819 mm in-motion turning radius; 'Dead weight (kg) 225'; 'Capacity (Ah) 51'; 'Hygienic design ac. to EHEDG guideline'; 'VHP decontamination resistance'; 'Easy to clean with easy access to the wheel'; the LED-strip visual safety signalling; or the two-plus-one emergency-stop arrangement ('x2 on the Sterimove, x1 on the remote control'). For a pharma/aseptic buyer the EHEDG and VHP rows are decision-grade criteria, and the DB cannot express either.\nAP0 INTERNAL INCONSISTENCY worth a Tech Lead ruling: min_turning_radius's own AP0 hint says '(0 if omnidirectional)', but config/plausibility.json sets required_min_turning_radius.min = 100 mm. A legitimately omnidirectional AMR entered as 0 would be rejected as implausible. Not triggered by Sterimove (669 mm) but it WILL be triggered by PF3 OMNI / PF6 / the AGILOX and Geek+ machines flagged earlier in this redo pass."
+    },
+    {
+      "product_name": "Stäubli PF3 OMNI",
+      "product_type": "Mobile AMR",
+      "source_file": "Mobile-Robotics-portfolio-EN.pdf",
+      "db_status": "new",
+      "variant_group": "PF3 family — the portfolio presents 'PF3 (3 t Tricycle)' and 'PF3 OMNI (3 t Omnidirectional)' as TWO distinct entries with the same payload but different drive kinematics. Very likely a shared chassis with a different drive unit; base-model grouping left to the importer.",
+      "fields": {
+        "product_type": "Mobile AMR",
+        "omnidirectional_movement": true
+      },
+      "field_sources": {
+        "product_type": "Mobile-Robotics-portfolio-EN.pdf p.3, section header 'MOBILE ROBOT PLATFORM — Flexible Material Flow on your Factory Floor'",
+        "omnidirectional_movement": "Mobile-Robotics-portfolio-EN.pdf p.3, product tile 'PF3 OMNI — 3 t Omnidirectional', supported by the adjacent bullet 'Improve your operations with our omnidirectional motion offering highest agility and precision.'"
+      },
+      "notes": "NEW PRODUCT CANDIDATE, low-content — this 4-page portfolio is the only source and it publishes almost nothing beyond payload class and drive kinematics. Flagged rather than richly extracted; a dedicated PF3 OMNI datasheet should be sought before import.\nWHY IT MATTERS ANYWAY: the DB's existing 'Stäubli PF3' row carries omnidirectional_movement = 1 and rotation_capable = 1, but this portfolio says PF3 is a TRICYCLE and reserves omnidirectional motion for the separate PF3 OMNI. So the DB's single PF3 row appears to be a MERGE of two distinct products, with the OMNI's kinematics attached to the tricycle's name. That is the sort of silent conflation the redo pass exists to catch — see the conflict entry on Stäubli PF3 below.\nPayload deliberately NOT recorded here: the portfolio says '3 t' but the DB's PF3 holds 2721 kg (= exactly 6000 lb). Entering 3000 kg for the OMNI while the sibling holds 2721 would manufacture an inconsistency; see the PF3 conflict note for the market-variant explanation."
+    },
+    {
+      "product_name": "Stäubli PF3",
+      "product_type": "Mobile AMR",
+      "source_file": "Mobile-Robotics-portfolio-EN.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "omnidirectional_movement": false
+      },
+      "field_sources": {
+        "omnidirectional_movement": "Mobile-Robotics-portfolio-EN.pdf p.3, product tile 'PF3 — 3 t Tricycle'. A tricycle layout (one steered/driven wheel plus two fixed) is non-holonomic by construction and is presented by Stäubli itself in explicit contrast to the 'PF3 OMNI — 3 t Omnidirectional' tile immediately above it on the same page."
+      },
+      "notes": "CONFLICT 1 — omnidirectional_movement: DB holds 1 (true) for 'Stäubli PF3'; Mobile-Robotics-portfolio-EN.pdf p.3 labels PF3 a TRICYCLE and puts omnidirectional motion on a separate PF3 OMNI tile on the same page. Either the DB row is really PF3 OMNI mis-named, or a genuine error. DO NOT silently flip the boolean — the right resolution is probably to split the row into PF3 and PF3 OMNI. Same question hangs over the DB's rotation_capable = 1 on that row.\nCONFLICT 2 (soft) — max_payload: DB holds 2721 kg; the portfolio says '3 t'. Per the established unit-forensics check, 2721 kg is EXACTLY 6000 lb (6000 x 0.45359237 = 2721.55), i.e. a US-market rating, while this EU portfolio publishes the metric 3 t rating. Both are probably true for different markets rather than one being wrong. Flagged as a market-variant divergence, not a data error; a Tech Lead should decide which figure the DB is supposed to carry. Identical situation on PF6 (DB 5443 kg = exactly 12000 lb, portfolio '6 t')."
+    },
+    {
+      "product_name": "Stäubli PF6",
+      "product_type": "Mobile AMR",
+      "source_file": "Mobile-Robotics-portfolio-EN.pdf",
+      "db_status": "conflict",
+      "fields": {
+        "omnidirectional_movement": true
+      },
+      "field_sources": {
+        "omnidirectional_movement": "Mobile-Robotics-portfolio-EN.pdf p.3, product tile 'PF6 — 6 t Omnidirectional' — CONFIRMS the DB's existing value of 1."
+      },
+      "notes": "CONFLICT (soft) — max_payload: DB 5443 kg vs portfolio '6 t'. 5443 kg is exactly 12000 lb (12000 x 0.45359237 = 5443.1), the same imperial-market pattern as PF3. Not treated as an error; flagged for the same Tech Lead ruling on which market's rating the DB should carry.\nomnidirectional_movement CONFIRMED, no change."
+    },
+    {
+      "product_name": "Stäubli FL1500",
+      "product_type": "Forklift AGV",
+      "source_file": "Mobile-Robotics-portfolio-EN.pdf",
+      "db_status": "enrich",
+      "fields": {
+        "battery_runtime": 24,
+        "forks_free_floating": true,
+        "multi_load_compatibility": true,
+        "stacking_capability": true,
+        "drive_type": "Counterbalanced",
+        "max_payload": 1500
+      },
+      "field_sources": {
+        "battery_runtime": "Mobile-Robotics-portfolio-EN.pdf p.2, FL1500 bullet 'Increase your productivity with battery autonomy up to 24 hours.' — 'up to' is a hedge; recorded at face value but it is a marketing bullet, not a spec row.",
+        "forks_free_floating": "Mobile-Robotics-portfolio-EN.pdf p.2, FL1500 application benefit 'Handle any load carrier — Thanks to its counterbalanced design, both open and closed load carriers can be transported easily.' Closed-bottom capability from a counterbalanced build is exactly the AP0 hint's definition.",
+        "multi_load_compatibility": "same passage — 'FL1500 is a master of versatility, capable of handling any load carrier'",
+        "stacking_capability": "Mobile-Robotics-portfolio-EN.pdf p.2, 'Serve various applications — Effortlessly switch between applications, whether it's floor transport, stacking, or shelf picking.' CONFIRMS the DB's existing value of 1.",
+        "drive_type": "Mobile-Robotics-portfolio-EN.pdf p.2, 'FL1500 — 1.5 t Tricycle' plus 'Benefit from an ultra-compact counterbalanced design, ideal for tight spaces.'",
+        "max_payload": "Mobile-Robotics-portfolio-EN.pdf p.2, 'FL1500 — 1.5 t Tricycle' -> 1500 kg. CONFIRMS the DB's existing value of 1500."
+      },
+      "notes": "ENRICH — battery_runtime, forks_free_floating, multi_load_compatibility and drive_type are all currently NULL on the DB's FL1500 row. drive_type = 'Counterbalanced' is the notable one: it is a hard-KO-adjacent Forklift-scope field and the portfolio states the build category outright.\nCONFIRMED (no change): max_payload 1500, stacking_capability true, product_type Forklift AGV.\nWRONG-SCOPE value on the existing DB row (flag only): grid_required = 0 is a Logistics:AGV:AMR field on a Forklift AGV row.\nNo conflict with the FL1500 lifting_height (3205 mm) settled in the previous addendum — this portfolio publishes no lift height at all.\nNOTE ON EVIDENCE QUALITY: everything here comes from marketing bullets in a range overview, not from a spec table. Lower confidence than the FL1500-data-sheet-EN.pdf values recorded in earlier sessions; a reviewer may prefer to hold battery_runtime until a spec row confirms it."
+    }
+  ]
+}
