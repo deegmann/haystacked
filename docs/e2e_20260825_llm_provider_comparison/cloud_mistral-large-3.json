@@ -1,0 +1,143 @@
+{
+  "model_id_requested": "openrouter-mistral-large",
+  "started_at": "2026-08-25T20:53:18",
+  "tenders": {
+    "Beispielausschreibung_AGV_Nordlicht.pdf": {
+      "elapsed_s": 130.8,
+      "analysis_id": "d4344de3-645a-4d06-b62d-e201c424b025",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 22,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "CompanyX.pdf": {
+      "elapsed_s": 136.8,
+      "analysis_id": "2298ecea-b5a3-4d72-b9a4-f7cc54eb2adf",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 14,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "Dragonfly.pdf": {
+      "elapsed_s": 168.8,
+      "analysis_id": "b0308448-b2fb-4e39-a3eb-3f39b66eba0e",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 11,
+      "top_match": {
+        "product": "MX-X iGo mit Teleskoptisch",
+        "score": 0
+      }
+    },
+    "Mama.pdf": {
+      "elapsed_s": 178.0,
+      "analysis_id": "ac862139-25c4-49fb-952c-aad8db612144",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 15,
+      "top_match": {
+        "product": "Balyo TRUCKY",
+        "score": 27
+      }
+    },
+    "OeA-199-25 Leistungsbeschreibung.pdf": {
+      "elapsed_s": 217.9,
+      "analysis_id": "7032c9da-ec51-496d-9db2-7346dbcd2184",
+      "vehicle_type": null,
+      "in_scope": false,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 0
+      },
+      "non_null_field_count": 0,
+      "top_match": null
+    },
+    "tender_ik_cold_store.pdf": {
+      "elapsed_s": 68.2,
+      "analysis_id": "2aede54f-e0a5-45d8-aadf-4263d3c68b08",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 11,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    },
+    "tender_ik_deep_freeze.pdf": {
+      "elapsed_s": 61.8,
+      "analysis_id": "79edd42a-f698-434a-837f-678b5abb2724",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 8,
+      "top_match": {
+        "product": "BITZER COSS Deep-Freeze System",
+        "score": 0
+      }
+    },
+    "tender_ik_process_cooling.pdf": {
+      "elapsed_s": 58.1,
+      "analysis_id": "980affa2-2b7f-4039-8685-fd85e89e4cc8",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-mistral-large",
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 9,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    }
+  },
+  "finished_at": "2026-08-25T21:17:13"
+}

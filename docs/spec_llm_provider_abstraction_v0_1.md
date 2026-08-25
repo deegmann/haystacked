@@ -1,7 +1,7 @@
 # Spec: LLM Provider Abstraction (Ollama lokal + OpenRouter Cloud) + Modellauswahl
 **Version:** v0.2
 **Datum:** 2026-08-25
-**Status:** IMPLEMENTIERT + POST-IMPLEMENTATION-REVIEW ABGESCHLOSSEN (senior-architect + ap0-architecture-guardian + reference-integrity-guardian, alle drei "approve as shippable"). Ein vom SA gefundener Blocker (Provider-Fehler wurden bei 4a/4b/4c verschluckt statt laut zu scheitern — bei 4c landete das sogar als Halluzinations-Beweis im Guard) wurde direkt vom Tech Lead gefixt und verifiziert. **Lokaler Pfad (Default) ist produktionsreif und identisch zum bisherigen Verhalten. Der reale Cloud-Vergleichslauf (DoD #4/R6) ist für `openrouter-qwen3.8-27b` UND `openrouter-deepseek-v4-flash` abgeschlossen** — siehe `docs/e2e_20260825_llm_provider_comparison/REPORT.md` bzw. `REPORT_deepseek_v4_flash.md` — **und wartet für die beiden übrigen Cloud-Modelle (Llama 3.3 70B, Mistral Large 3) noch auf explizite Freigabe.** DeepSeek-Test fand + fixte einen echten R3-Robustheitsfall (Whitespace-only-Response wurde nicht als leer erkannt — jetzt providerübergreifend gefixt, `src/llm_client.py`).
+**Status:** IMPLEMENTIERT + POST-IMPLEMENTATION-REVIEW ABGESCHLOSSEN (senior-architect + ap0-architecture-guardian + reference-integrity-guardian, alle drei "approve as shippable"). Ein vom SA gefundener Blocker (Provider-Fehler wurden bei 4a/4b/4c verschluckt statt laut zu scheitern — bei 4c landete das sogar als Halluzinations-Beweis im Guard) wurde direkt vom Tech Lead gefixt und verifiziert. **Lokaler Pfad (Default) ist produktionsreif und identisch zum bisherigen Verhalten. Der reale Cloud-Vergleichslauf (DoD #4/R6) ist für ALLE DREI ursprünglich registrierten Cloud-Modelle abgeschlossen** (`openrouter-qwen3.8-27b`, `openrouter-deepseek-v4-flash`, `openrouter-mistral-large`) — siehe `docs/e2e_20260825_llm_provider_comparison/REPORT.md`, `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`. DeepSeek-Test fand + fixte einen echten R3-Robustheitsfall (Whitespace-only-Response wurde nicht als leer erkannt — jetzt providerübergreifend gefixt). Mistral-Test validierte denselben Fix + die frühere SA-Pflichtkorrektur live gegen eine echte, unangekündigte Netzwerkstörung (lauter Abbruch statt stillem Teilergebnis — genau wie designed) UND widerlegte den schwachen generischen Benchmark-Wert (15,9) für unsere konkrete Extraktionsaufgabe: höchste Feldzahl aller vier Konfigurationen auf 6 von 7 Ausschreibungen. **Einziges noch nicht real getestetes registriertes Modell: Llama 3.3 70B** — wartet weiter auf explizite Freigabe.
 
 Reviews (Plan): senior-architect APPROVE WITH REQUIRED CHANGES (Ruling:
 `.claude/agent-memory/senior-architect/decision_llm_provider_abstraction.md`) → ap0-architecture-guardian APPROVE AS-IS → reference-integrity-guardian APPROVE WITH REQUIRED ADDITIONS. Alle Auflagen eingearbeitet.
@@ -385,7 +385,8 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
    per `/analyze` request from the submitted `model_id`, not from a module-level global.
 3. No `model_id` submitted → identical behaviour to today (local `qwen2.5:7b`, same URL, same
    payload) — zero-config regression safety.
-4. **STATUS 2026-08-25: DONE for two models (openrouter-qwen3.8-27b, openrouter-deepseek-v4-flash).** User-authorized live
+4. **STATUS 2026-08-25: DONE for all three registered cloud models** (openrouter-qwen3.8-27b,
+   openrouter-deepseek-v4-flash, openrouter-mistral-large). User-authorized live
    comparison run executed against the full 8-tender corpus, local `qwen2.5:7b` baseline vs.
    `openrouter-qwen3.8-27b`, with per-layer guard null counts (L1/L0/L2/L2_RESCUED) captured for
    both and compared side by side. Full methodology, results table, and findings:
@@ -428,9 +429,9 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
    direction from the earlier Qwen-vs-local delta (DeepSeek=True, both others=False) — a third
    data point confirming domain classification is inconsistent across models on IK tenders,
    not yet root-caused.
-   **Still open:** Llama 3.3 70B and Mistral Large 3 (the other two registered cloud entries)
-   have not yet been run through this same comparison — same manual-run, explicit-authorization
-   gate applies before spending money on them.
+   **Still open:** Llama 3.3 70B is now the only registered cloud entry not yet run through this
+   comparison (Mistral Large 3 completed 2026-08-25, see `REPORT_mistral_large_3.md`) — same
+   manual-run, explicit-authorization gate applies before spending money on it.
 5. Frontend shows a model picker before upload; unavailable models are visibly disabled with a
    reason, not silently broken; a paid/cloud selection is never silently remembered as the
    next-session default (§2.3).
@@ -518,15 +519,25 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
 implementation was resolved above before the developer started. Post-implementation, three
 concrete backlog items remain — deliberately deferred, not forgotten (senior-architect
 post-implementation follow-up #1, 2026-08-25):
-1. **DoD #4 / R6's live cloud comparison run — DONE for `openrouter-qwen3.8-27b` and
-   `openrouter-deepseek-v4-flash`, 2026-08-25** (see the STATUS line on DoD #4 in §3,
-   `docs/e2e_20260825_llm_provider_comparison/REPORT.md`, and `REPORT_deepseek_v4_flash.md`).
-   The DeepSeek run found and fixed a real gap in R3: a whitespace-only OpenRouter response
-   (`content=" "`) was not caught by `if not content` (non-empty Python string), which on Pass
-   4b (unlike "basic") would have silently degraded into an empty result instead of aborting
-   loudly — fixed with `.strip()`, regression-tested, applies to every OpenRouter model, not
-   just DeepSeek. Still needed: the same run for `openrouter-llama3.3-70b` and
-   `openrouter-mistral-large` — same explicit-authorization-to-spend-money gate applies.
+1. **DoD #4 / R6's live cloud comparison run — DONE for all three registered cloud models,
+   2026-08-25** (see the STATUS line on DoD #4 in §3; `docs/e2e_20260825_llm_provider_comparison/REPORT.md`,
+   `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`). The DeepSeek run found and fixed
+   a real gap in R3: a whitespace-only OpenRouter response (`content=" "`) was not caught by
+   `if not content` (non-empty Python string), which on Pass 4b (unlike "basic") would have
+   silently degraded into an empty result instead of aborting loudly — fixed with `.strip()`,
+   regression-tested, applies to every OpenRouter model, not just DeepSeek. The Mistral Large 3
+   run then live-validated that same-day fix (plus the earlier SA-required
+   LLMProviderError/httpx.HTTPError handling) against a real, unplanned network outage
+   mid-comparison: a genuine `httpx.ConnectError` after 220s on CompanyX aborted the run loudly
+   as designed, rather than producing a silent partial result; the affected tenders were
+   confirmed-connectivity-restored and retried successfully. Headline finding: Mistral Large 3's
+   much weaker generic benchmark score (15.9 vs. ~52 for Qwen/DeepSeek on OpenRouter's own
+   Artificial Analysis intelligence index) did **not** predict its performance on this specific
+   structured-extraction task — it produced the highest non-null field count of all four tested
+   configurations on 6 of 7 in-scope tenders, and correctly resolved the Dragonfly VNA
+   requirement like both other cloud models. Of the 4 cloud entries now in `AVAILABLE_MODELS`
+   (the original 3 plus DeepSeek, added this session), 3 have real comparison data on record —
+   only `openrouter-llama3.3-70b` remains untested.
 2. **`scripts/test_pipeline.py` migration** to `src.llm_client.call_llm` — still has its own
    independent, non-breaking `httpx` call (verified working as-is post-implementation).
 3. **`start.sh` / `setup.sh`'s Ollama-liveness hard-gate** — cosmetic only (a cloud-only user
