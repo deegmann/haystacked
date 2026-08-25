@@ -159,7 +159,29 @@ async def call_llm(system: str, user: str, label: str, model: LLMModelChoice) ->
         raise ValueError(f"Unknown provider: {model.provider!r} for model {model.id!r}")
     elapsed = (datetime.now() - t0).total_seconds()
     log.info("LLM [%s]: %.1fs, %d Z. Antwort", label, elapsed, len(raw))
+    _debug_log_raw(label, model, raw)
     return raw
+
+
+_RAW_LOG_PATH = os.environ.get("HAYSTACKED_LLM_RAW_LOG")
+
+
+def _debug_log_raw(label: str, model: LLMModelChoice, raw: str) -> None:
+    """Opt-in raw-completion logging for manual output-quality inspection (e.g.
+    comparing a new cloud model's raw text against the local baseline). No-op unless
+    HAYSTACKED_LLM_RAW_LOG points to a file. Never allowed to break a real analysis
+    run — any failure here is swallowed, not raised. No domain logic: writes the raw
+    string verbatim, does not parse or interpret it."""
+    if not _RAW_LOG_PATH:
+        return
+    try:
+        with open(_RAW_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(f"\n{'=' * 80}\n[{datetime.now().isoformat(timespec='seconds')}] "
+                     f"label={label} model={model.id} ({model.provider})\n{'-' * 80}\n")
+            f.write(raw)
+            f.write("\n")
+    except Exception:
+        pass
 
 
 async def _call_ollama(system: str, user: str, model: LLMModelChoice) -> str:

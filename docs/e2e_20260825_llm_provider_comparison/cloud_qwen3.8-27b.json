@@ -1,0 +1,150 @@
+{
+  "model_id_requested": "openrouter-qwen3.8-27b",
+  "started_at": "2026-08-25T11:51:02",
+  "tenders": {
+    "Beispielausschreibung_AGV_Nordlicht.pdf": {
+      "elapsed_s": 83.4,
+      "analysis_id": "f620b6f0-5694-4d02-9cf4-80d033ed09d7",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 27,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "CompanyX.pdf": {
+      "elapsed_s": 66.9,
+      "analysis_id": "8c208a5f-5d43-4694-bde3-233799f0edda",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 10,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "Dragonfly.pdf": {
+      "elapsed_s": 87.2,
+      "analysis_id": "f82521d5-e949-4b5e-b24f-3d37aa992847",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 10,
+      "top_match": {
+        "product": "EKX 516ka",
+        "score": 17
+      }
+    },
+    "Mama.pdf": {
+      "elapsed_s": 80.9,
+      "analysis_id": "60ec46b7-823d-44de-a2a9-e5c932b07418",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 14,
+      "top_match": {
+        "product": "ek robotics COMPACT MOVE CB 25",
+        "score": 27
+      }
+    },
+    "OeA-199-25 Leistungsbeschreibung.pdf": {
+      "elapsed_s": 34.8,
+      "analysis_id": "154772da-2bed-4002-bd85-b721465d97f8",
+      "vehicle_type": null,
+      "in_scope": false,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": null,
+      "layer_counts": {
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 0
+      },
+      "non_null_field_count": 0,
+      "top_match": null
+    },
+    "tender_ik_cold_store.pdf": {
+      "elapsed_s": 31.4,
+      "analysis_id": "18e32419-572b-4abf-a2fd-c7424843ea97",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": false,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": null,
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 10,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    },
+    "tender_ik_deep_freeze.pdf": {
+      "elapsed_s": 45.1,
+      "analysis_id": "597ac450-5917-4ac9-82d9-06ccb153b9e6",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": "43.22",
+      "layer_counts": {
+        "not_nulled": 132,
+        "L0": 1,
+        "plausibility": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 7,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    },
+    "tender_ik_process_cooling.pdf": {
+      "elapsed_s": 63.8,
+      "analysis_id": "eabafa06-7d58-490b-8d97-1d07fb4dbaa9",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-qwen3.8-27b",
+      "nace_tender": "33.20",
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 8,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    }
+  },
+  "finished_at": "2026-08-25T11:59:15"
+}

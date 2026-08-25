@@ -1,7 +1,7 @@
 # Spec: LLM Provider Abstraction (Ollama lokal + OpenRouter Cloud) + Modellauswahl
 **Version:** v0.2
 **Datum:** 2026-08-25
-**Status:** IMPLEMENTIERT + POST-IMPLEMENTATION-REVIEW ABGESCHLOSSEN (senior-architect + ap0-architecture-guardian + reference-integrity-guardian, alle drei "approve as shippable"). Ein vom SA gefundener Blocker (Provider-Fehler wurden bei 4a/4b/4c verschluckt statt laut zu scheitern — bei 4c landete das sogar als Halluzinations-Beweis im Guard) wurde direkt vom Tech Lead gefixt und verifiziert. **Lokaler Pfad (Default) ist produktionsreif und identisch zum bisherigen Verhalten. Der reale Cloud-Vergleichslauf (DoD #4/R6) steht noch aus — braucht einen echten `OPENROUTER_API_KEY` und explizite Freigabe, bevor Geld ausgegeben wird.**
+**Status:** IMPLEMENTIERT + POST-IMPLEMENTATION-REVIEW ABGESCHLOSSEN (senior-architect + ap0-architecture-guardian + reference-integrity-guardian, alle drei "approve as shippable"). Ein vom SA gefundener Blocker (Provider-Fehler wurden bei 4a/4b/4c verschluckt statt laut zu scheitern — bei 4c landete das sogar als Halluzinations-Beweis im Guard) wurde direkt vom Tech Lead gefixt und verifiziert. **Lokaler Pfad (Default) ist produktionsreif und identisch zum bisherigen Verhalten. Der reale Cloud-Vergleichslauf (DoD #4/R6) ist für `openrouter-qwen3.8-27b` abgeschlossen — siehe `docs/e2e_20260825_llm_provider_comparison/REPORT.md` — und wartet für die beiden übrigen Cloud-Modelle (Llama 3.3 70B, Mistral Large 3) noch auf explizite Freigabe.**
 
 Reviews (Plan): senior-architect APPROVE WITH REQUIRED CHANGES (Ruling:
 `.claude/agent-memory/senior-architect/decision_llm_provider_abstraction.md`) → ap0-architecture-guardian APPROVE AS-IS → reference-integrity-guardian APPROVE WITH REQUIRED ADDITIONS. Alle Auflagen eingearbeitet.
@@ -371,16 +371,21 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
    per `/analyze` request from the submitted `model_id`, not from a module-level global.
 3. No `model_id` submitted → identical behaviour to today (local `qwen2.5:7b`, same URL, same
    payload) — zero-config regression safety.
-4. **STATUS 2026-08-25: NOT YET DONE — outstanding, requires explicit authorization.** At least
-   one OpenRouter cloud model runs the full existing tender corpus end-to-end (all 11 call sites)
-   with a valid `OPENROUTER_API_KEY`, **with per-layer guard null counts (L1/L0/L2/L2_RESCUED)
-   captured and compared against the local baseline** (R6) — not just "it ran without crashing."
-   **This is a manual, explicitly-run validation step, captured as a dated artifact — it must NOT
-   become part of `pytest tests/`** (cost-safety rule, §2.5). Blocked on: (a) a real
-   `OPENROUTER_API_KEY`, (b) explicit Tech Lead/user authorization to spend real money, (c) —
-   now satisfied — the provider-error-swallowing fix at the 4a/4b/4c handlers, without which this
-   comparison's L2 numbers would have been untrustworthy in exactly the direction R6 exists to
-   detect (senior-architect post-implementation finding, 2026-08-25).
+4. **STATUS 2026-08-25: DONE for one model (openrouter-qwen3.8-27b).** User-authorized live
+   comparison run executed against the full 8-tender corpus, local `qwen2.5:7b` baseline vs.
+   `openrouter-qwen3.8-27b`, with per-layer guard null counts (L1/L0/L2/L2_RESCUED) captured for
+   both and compared side by side. Full methodology, results table, and findings:
+   `docs/e2e_20260825_llm_provider_comparison/REPORT.md`. Reusable orchestration tool:
+   `scripts/e2e_cross_model_comparison.py` (queries `tender_extraction_values.nulled_by` per
+   run_id — no new instrumentation needed, R6's own suggested approach). Headline results: total
+   guard nullings identical (3 vs. 3 across all 8 tenders) — **no evidence of the feared "stronger
+   model triggers more Layer-0 nulls" pattern**; cloud model extracted substantially more fields
+   on every AGV tender (e.g. CompanyX 1→10, Dragonfly 2→10) in ~3.5× less wall time; raw output
+   (`qwen3.8-27b_raw_output.txt`) contains zero reasoning/`<think>` leakage, confirming the
+   `reasoning: {"enabled": false}` request-level fix works; cost was $0.28 for the full run.
+   **Still open:** Llama 3.3 70B and Mistral Large 3 (the other two registered cloud entries)
+   have not yet been run through this same comparison — same manual-run, explicit-authorization
+   gate applies before spending money on them.
 5. Frontend shows a model picker before upload; unavailable models are visibly disabled with a
    reason, not silently broken; a paid/cloud selection is never silently remembered as the
    next-session default (§2.3).
@@ -467,8 +472,10 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
 implementation was resolved above before the developer started. Post-implementation, three
 concrete backlog items remain — deliberately deferred, not forgotten (senior-architect
 post-implementation follow-up #1, 2026-08-25):
-1. **DoD #4 / R6's live cloud comparison run** — see the STATUS line on DoD #4 in §3. Needs a
-   real `OPENROUTER_API_KEY` + explicit authorization to spend money.
+1. **DoD #4 / R6's live cloud comparison run — DONE for `openrouter-qwen3.8-27b`, 2026-08-25**
+   (see the STATUS line on DoD #4 in §3 and `docs/e2e_20260825_llm_provider_comparison/REPORT.md`).
+   Still needed: the same run for `openrouter-llama3.3-70b` and `openrouter-mistral-large` — same
+   explicit-authorization-to-spend-money gate applies.
 2. **`scripts/test_pipeline.py` migration** to `src.llm_client.call_llm` — still has its own
    independent, non-breaking `httpx` call (verified working as-is post-implementation).
 3. **`start.sh` / `setup.sh`'s Ollama-liveness hard-gate** — cosmetic only (a cloud-only user

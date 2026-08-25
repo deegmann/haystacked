@@ -1,0 +1,150 @@
+{
+  "model_id_requested": "local-default",
+  "started_at": "2026-08-25T11:21:04",
+  "tenders": {
+    "Beispielausschreibung_AGV_Nordlicht.pdf": {
+      "elapsed_s": 400.1,
+      "analysis_id": "3c461ce5-6fab-4e9f-a097-72d2b0c29b5a",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 17,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "CompanyX.pdf": {
+      "elapsed_s": 320.9,
+      "analysis_id": "6ce18a7c-9c2c-4ca7-ac3a-50bacffa9f70",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 1,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "Dragonfly.pdf": {
+      "elapsed_s": 280.1,
+      "analysis_id": "dc97698a-d145-497a-ae0e-9b89ff68d8d6",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 2,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "Mama.pdf": {
+      "elapsed_s": 337.7,
+      "analysis_id": "e6d1f916-07db-4ace-afc7-3f5a47b7cadb",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 5,
+      "top_match": {
+        "product": "AMADEUS Classic",
+        "score": 31
+      }
+    },
+    "OeA-199-25 Leistungsbeschreibung.pdf": {
+      "elapsed_s": 13.3,
+      "analysis_id": "62f969e5-b408-4751-a96c-a8b0ec145cc8",
+      "vehicle_type": null,
+      "in_scope": false,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": null,
+      "layer_counts": {
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 0
+      },
+      "non_null_field_count": 0,
+      "top_match": null
+    },
+    "tender_ik_cold_store.pdf": {
+      "elapsed_s": 108.3,
+      "analysis_id": "e0c4f10a-bcc1-4cd2-80ad-9efa8b0691bf",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": false,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": null,
+      "layer_counts": {
+        "not_nulled": 133,
+        "L1": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 7,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    },
+    "tender_ik_deep_freeze.pdf": {
+      "elapsed_s": 132.2,
+      "analysis_id": "c0c3a13e-03bb-4c02-83da-839ffe8441e8",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": false,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": null,
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 7,
+      "top_match": {
+        "product": "BITZER COSS Deep-Freeze System",
+        "score": 0
+      }
+    },
+    "tender_ik_process_cooling.pdf": {
+      "elapsed_s": 119.7,
+      "analysis_id": "eca479ed-6805-483b-96a8-7447587b3bf3",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": false,
+      "actual_model_id": "local-qwen2.5-7b",
+      "nace_tender": null,
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 5,
+      "top_match": {
+        "product": "GEA BluAstrum Ammonia Chiller",
+        "score": 0
+      }
+    }
+  },
+  "finished_at": "2026-08-25T11:49:36"
+}
