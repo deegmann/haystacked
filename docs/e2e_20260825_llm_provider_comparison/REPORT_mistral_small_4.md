@@ -75,3 +75,84 @@ aber dieser eine Fund ist ernst genug, um Mistral Small 4 nicht ungeprüft zu em
 Käufer-vs-Lieferant-Verwechslungsfehler nicht entweder gezielt nachgetestet (mehr Tender mit
 prominenter Käufer-Selbstvorstellung) oder mit einem AP0-Hint-Zusatz ("only extract requirements
 about the SUPPLIER, never facts about the BUYER stated in the introduction") entschärft wurde.
+
+---
+
+## Session-Gesamtübersicht: LLM Provider Abstraction (2026-08-25, vollständig)
+
+*Diese Sektion fasst den gesamten Feature-Sprint zusammen (nicht nur diesen Modelltest), damit
+dieser Report als eigenständiger Wissensspeicher dient, falls der Gesprächskontext gelöscht wird.
+Kanonische Quellen bleiben `docs/spec_llm_provider_abstraction_v0_1.md` (lebende Spec, alle
+Nachträge) und die Memory-Datei `project_llm_provider_abstraction_20260825.md` — dieser Abschnitt
+ist eine Kopie zum schnellen Wiedereinstieg, kein Ersatz.*
+
+**Was gebaut wurde:** `src/llm_client.py` — `call_llm(system, user, label, model)` ist die EINE
+Funktion, die alle 11 Pipeline-Call-Sites in `app.py` (Pass 1–4c) für LLM-Aufrufe nutzen, kein
+Default für `model` (ein vergessener Call-Site ist ein `TypeError`, kein stiller Fallback auf
+lokal). `LLMModelChoice`-Dataclass + `AVAILABLE_MODELS`-Registry (lokal Ollama + kuratierte
+OpenRouter-Cloud-Modelle, jedes zwingend `weights_open=True`), `resolve_model()`,
+`_call_ollama()`/`_call_openrouter()`, `LLMProviderError`. Frontend-Dropdown zur Modellwahl vor
+jeder Analyse. Kostenschutz: `pytest tests/` löst NIE einen echten Cloud-Call aus (`conftest.py`
+`cloud`-Marker, braucht `HAYSTACKED_RUN_CLOUD_TESTS=1` + `OPENROUTER_API_KEY`). Vollständiger
+Review-Zyklus (senior-architect, ap0-architecture-guardian, reference-integrity-guardian) auf
+Plan- und Implementierungsebene; ein SA-Pflichtfix (Provider-Fehler wurden bei 4a/4b/4c
+verschluckt statt laut abzubrechen) direkt umgesetzt und verifiziert.
+
+**Modell-Registry, Stand Ende dieser Session (`src/llm_client.py`, 5 Cloud-Modelle + 1 lokal):**
+- `local-qwen2.5-7b` (Default, lokal, Ollama) — Produktions-Baseline, ~71% Ground-Truth-Trefferquote
+- `openrouter-qwen3.8-27b` — erstes Cloud-Modell, ~99% Ground-Truth-Trefferquote, reasoning
+  standardmäßig AN (deshalb unconditional `"reasoning": {"enabled": false}` bei JEDEM
+  OpenRouter-Call, providerweit, nicht modellspezifisch)
+- `openrouter-deepseek-v4-flash` — matchte/übertraf Qwen auf allen geprüften Kernfeldern; fand
+  live einen echten R3-Robustheitsfall (Whitespace-only-Response `" "` wurde vom alten
+  `if not content`-Check nicht erkannt — gefixt mit `.strip()`, providerweit, regressionsgetestet)
+- `openrouter-mistral-large` (Mistral Large 3, EU/Apache-2.0, 675B) — trotz schwachem generischem
+  Benchmark (15,9 vs. ~52) höchste Feldzahl auf 6/7 Tendern; validierte live eine echte,
+  unangekündigte Netzwerkstörung (`httpx.ConnectError`) — Fehlerbehandlung griff korrekt, lauter
+  Abbruch statt stillem Teilergebnis
+- `openrouter-mistral-small` (Mistral Small 4, EU/Apache-2.0, 119B trotz "Small"-Namen) — dieser
+  Report: schnellstes+günstigstes Cloud-Modell, höchste Feldzahl auf 6/7 Tendern, ABER echter
+  Käufer/Lieferant-Halluzinationsfund bei Nordlicht (negativer Score -15)
+- **Noch nie real getestet:** `openrouter-llama3.3-70b` — einziges verbleibendes registriertes
+  Modell ohne Live-Vergleichslauf
+
+**Übergreifende Lehren aus allen 5 Vergleichsläufen:**
+1. Feldzahl (Fill-Rate) ist KEIN verlässlicher alleiniger Qualitätsindikator — zweimal in dieser
+   Session bestätigt (Layer-0-Zitat-Abweichungs-Sorge vor dem ersten Test; Mistral Small 4s
+   Käufer/Lieferant-Verwechslung danach). Jedes neue Modell muss stichprobenartig gegen die
+   Rohdaten geprüft werden, insbesondere auf den Tendern, wo es die meisten Felder beansprucht.
+2. Generische Benchmark-Indizes (OpenRouters Artificial-Analysis-Werte) sagen wenig über
+   Performance auf dieser konkreten strukturierten Extraktionsaufgabe aus (Mistral Large 3: 15,9
+   Benchmark, aber Spitzenreiter bei Feldzahl).
+3. Der bestehende 3-Layer-Halluzinationsguard deckt nur numerische K.O.-Felder mit Zitatpflicht
+   ab — kategoriale/textuelle Felder ohne `_source`-Zwang (wie `required_founding_year`,
+   `required_hq_city`) sind strukturell ungeschützt. Das ist keine neue Erkenntnis (D4(b) im
+   Backlog war bereits als "wird von größeren Modellen gelöst" geparkt) — Mistral Small 4 zeigt,
+   dass größere/bessere Modelle diese Lücke NICHT automatisch schließen, sondern neue,
+   plausiblere Instanzen derselben Lücke produzieren können.
+4. Alle Cloud-Modelle lösen die Dragonfly-VNA-Anforderung korrekt (`required_vna_capable=true`,
+   `required_min_aisle_width=1900`, `required_drive_type="VNA Turret"`) — das lokale 7B-Modell
+   historisch nicht (OI-117).
+5. Die SA-Pflichtkorrektur zur Provider-Fehlerbehandlung (`LLMProviderError`/`httpx.HTTPError`
+   bei 4a/4b/4c) wurde live gegen eine echte Netzwerkstörung bewährt (Mistral-Large-3-Lauf) —
+   kein theoretischer Fix mehr, sondern produktionsbestätigt.
+
+**Bestehende Backlog-Punkte, auf die sich diese Session bezieht (nicht verändert, nur eingeordnet):**
+OI-113 (Temperatur-Vorzeichenfehler), OI-117 (VNA-Erkennung, 7B-Limitierung), OI-118 (echtes
+Zitat, falsche Frage — jetzt auch Mistral-Small-4-Käufer/Lieferant-Fund zugeordnet), OI-122
+(ausgeschriebene deutsche Zahlwörter, von DeepSeek korrekt gelöst), OI-123 (Kühlleistungs-
+Mehrdeutigkeit 280 vs. 340 kW), D4(b) (kein Guard für kategoriale Felder, weiterhin "geparkt").
+
+**Was NICHT gemacht wurde (bewusst offen gelassen, nicht vergessen):**
+- Llama 3.3 70B nie real getestet (wartet auf Freigabe)
+- `scripts/test_pipeline.py`-Migration auf `call_llm()` (eigener, unabhängiger `httpx`-Call,
+  funktioniert, aber nicht auf die neue Abstraktion migriert)
+- `start.sh`/`setup.sh`-Ollama-Liveness-Hard-Gate (kosmetisch, kein Korrektheits-/Kostenproblem)
+- Kein Code-Fix für den Käufer/Lieferant-Halluzinationsfund (Tech-Lead-Entscheidung: erst mehr
+  Daten sammeln, dann ggf. AP0-Hint-Ergänzung "nur Lieferanten-Fakten extrahieren, nie
+  Käufer-Fakten aus der Dokument-Einleitung" erwägen)
+
+**Alle Reports dieser Session:** `REPORT.md` (Qwen 3.8 27B), `GROUND_TRUTH_ANALYSIS.md` (manuelle
+Referenz, 36 kritische Felder), `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`,
+`REPORT_mistral_small_4.md` (dieser). Alle Commits: `003e567` bis `c3f6809` (siehe `git log`).
+Tests: 389 grün / 1 übersprungen (Cloud-Marker) nach jedem Modelltest bestätigt.
