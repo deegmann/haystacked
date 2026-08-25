@@ -1,0 +1,480 @@
+
+================================================================================
+[2026-08-25T21:33:15] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Nordlicht Kaffeemanufaktur GmbH","project_name":"Automatisiertes Transportsystem (AGV/AMR) für Logistikzentrum","project_location":"Bremen-Hemelingen, Bremen, Deutschland","tender_date":"Juni 2026","deadline":"28.08.2026","contact_name":["Dipl.-Ing. Annika Brandt","Markus Vollmer"],"contact_email":["a.brandt@nordlicht-kaffee.example","m.vollmer@nordlicht-kaffee.example"],"contact_phone":["+49 421 5550-214","+49 421 5550-188"],"buyer_industry":"Food & Beverage Manufacturing","tender_category":"Automated Pallet Transport System","summary":"Planung, Lieferung, Installation und Inbetriebnahme eines fahrerlosen Transportsystems (AGV/AMR) für ein neues Logistikzentrum mit Integration in WMS, inkl. Peripherie, Sicherheitstechnik und Schulungen. System muss 1.000 Paletten/Tag mit 30% Reservekapazität bewältigen.","missing_info":[]}
+
+================================================================================
+[2026-08-25T21:33:15] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender":"28.99","nace_tender_name":"Manufacture of other special-purpose machinery n.e.c.","nace_buyer":null,"priority":"TOP","confidence":"HOCH","in_scope":true}
+
+================================================================================
+[2026-08-25T21:33:16] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T21:33:18] label=agv_4a model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_product_type": "Forklift AGV"}
+
+================================================================================
+[2026-08-25T21:33:26] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":null,"required_lead_time_weeks":null,"required_service_coverage":"DE","required_distribution_model":null,"required_country":"DE","required_employee_count_range":null,"required_certifications_generic":null,"required_languages_spoken":"DE","required_hq_city":"Bremen","required_founding_year":1968,"required_navigation_type":"Natural Feature (SLAM)","required_infrastructure_free":false,"required_outdoor_capable":false,"required_autonomous_obstacle_bypass":true,"required_omnidirectional_movement":null,"required_max_payload":1200,"required_max_payload_source":"Maximale Traglast ≥ 1.200 kg","required_load_type":"Europalette, Industriepalette","required_multi_load_compatibility":true,"required_max_speed":null,"required_vehicle_length":null,"required_vehicle_width":null,"required_operating_temp_min":10,"required_operating_temp_min_source":"Umgebungstemperatur 10 – 30 °C (Innenbereich)","required_operating_temp_max":30,"required_operating_temp_max_source":"Umgebungstemperatur 10 – 30 °C (Innenbereich)","required_operating_humidity_max":null,"required_operating_humidity_max_source":null,"required_ingress_protection_rating":"IP20","required_cleanroom_class":"None","required_max_gradient":1.5,"required_max_gradient_source":"Gefälle (Bereich Tore) ca. 1,5 %","required_floor_flatness_req":"DIN 18202, Tabelle 3, Zeile 4","required_stop_accuracy":null,"required_battery_type":"Lithium-Ionen","required_battery_runtime":null,"required_charge_time":null,"required_autonomous_charging":true,"required_battery_swap_capable":false,"required_safety_standard":"EN ISO 3691-4","required_functional_safety_level":null,"required_safety_coverage":null,"required_fleet_management_system":"VDA 5050 compatible","required_fleet_control_architecture":null,"required_vda5050_compatible":true,"required_max_fleet_size":null,"required_multi_fleet_capable":true,"required_integration_capability":"WMS, REST, OPC-UA","required_installation_process":null,"required_modification_process":null,"required_station_applications":"Floor, Conveyor, Machine cell, Gravity rack","required_min_fleet_size":null,"required_typical_project_value":null,"required_manual_usage":true,"required_industries_served":null,"required_lifting_height":10000,"required_lifting_height_source":"Hubhöhe ≥ 10 m (für Hochregaleinsatz)","required_min_total_height":null,"required_min_total_height_source":null,"required_special_fork_option":null,"required_fork_spread":"Auto","required_mast_type":null,"required_min_aisle_width":3400,"required_min_aisle_width_source":"Regalbreite (Gassenbreite) 3,4 m","required_vna_capable":false,"required_drive_type":"Counterbalanced","required_drop_accuracy_lat":null,"required_drop_accuracy_dep":null,"required_drop_accuracy_angle":null,"required_pick_req_accuracy_lat":null,"required_pick_req_accuracy_dep":null,"required_pick_req_accuracy_angle":null,"required_forks_free_floating":true,"required_stacking_capability":false,"required_load_detection":"Umgebungsscanner zur Erkennung von Einfahröffnungen, Ausgleich verdrehter Paletten","required_barcode_readers":null,"required_stock_line_scanning":null,"required_trailer_loading":null,"required_trailer_unloading":null,"required_guidance":null,"required_busbar_compatible":null}
+
+================================================================================
+[2026-08-25T21:33:27] label=agv_4b_correction1 model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_load_type": "Pallet EUR", "required_floor_flatness_req": "Standard (FM2)", "required_battery_type": "Li-Ion", "required_load_detection": "None"}
+
+================================================================================
+[2026-08-25T21:33:28] label=agv_4c_required_max_payload model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_payload": 1200, "required_max_payload_source": "Max. Gewicht 1.200 kg (Industriepalette 1.200 × 1.000 mm)"}
+
+================================================================================
+[2026-08-25T21:33:30] label=agv_4c_required_max_gradient model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T21:33:31] label=agv_4c_required_operating_humidity_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T21:33:32] label=agv_4c_required_min_total_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T21:33:33] label=agv_4c_required_operating_temp_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": 10, "required_operating_temp_min_source": "Umgebungstemperatur 10 – 30 °C (Innenbereich)"}
+
+================================================================================
+[2026-08-25T21:33:35] label=agv_4c_required_operating_temp_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": 30, "required_operating_temp_max_source": "Umgebungstemperatur 10 – 30 °C (Innenbereich)"}
+
+================================================================================
+[2026-08-25T21:33:36] label=agv_4c_required_min_aisle_width model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": 3.4, "required_min_aisle_width_source": "Regalbreite (Gassenbreite) 3,4 m"}
+
+================================================================================
+[2026-08-25T21:33:38] label=agv_4c_required_lifting_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_lifting_height": 10, "required_lifting_height_source": "Hubhöhe ≥ 10 m (für Hochregaleinsatz)"}
+
+================================================================================
+[2026-08-25T21:33:44] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"CompanyX","project_name":"Automated Guided Vehicle System Implementation","project_location":"X-Stadt, X-Straße 4, 12345","tender_date":null,"deadline":null,"contact_name":null,"contact_email":null,"contact_phone":null,"buyer_industry":"Logistics","tender_category":"AGV Logistics System Implementation","summary":"CompanyX seeks a partner for planning, implementation, and commissioning of an automated guided vehicle (AGV) system at a new logistics site in X-Stadt. The project includes AGVs, peripherals, control software, training, and maintenance. Two concept variants proposed: ground transport (196 source/76 sink transfer points) and cantilever stations (294 source/96 sink transfer points). System must handle 16-hour pallet transport cycles with 98.5% availability. Includes trial operation, acceptance testing, and 10-year spare parts availability.","missing_info":["tender_date","deadline","contact_name","contact_email","contact_phone"]}
+
+================================================================================
+[2026-08-25T21:33:45] label=contact model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"contact_name":null,"contact_email":null,"contact_phone":null,"deadline":null,"tender_date":null}
+
+================================================================================
+[2026-08-25T21:33:46] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": "28.99", "nace_tender_name": "Manufacture of other special-purpose machinery n.e.c.", "nace_buyer": null, "priority": "TOP", "confidence": "HOCH", "in_scope": true}
+
+================================================================================
+[2026-08-25T21:33:46] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T21:33:48] label=agv_4a model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_product_type": "Forklift AGV"}
+
+================================================================================
+[2026-08-25T21:33:52] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":null,"required_lead_time_weeks":null,"required_service_coverage":"DE","required_distribution_model":null,"required_country":null,"required_employee_count_range":null,"required_certifications_generic":null,"required_languages_spoken":"DE","required_hq_city":null,"required_founding_year":null,"required_navigation_type":null,"required_infrastructure_free":null,"required_outdoor_capable":false,"required_autonomous_obstacle_bypass":null,"required_omnidirectional_movement":null,"required_max_payload":1000,"required_max_payload_source":"Most pallet weights are less than 500 kg, with a maximum of 1,000 kg","required_load_type":"Pallet","required_multi_load_compatibility":null,"required_max_speed":null,"required_vehicle_length":null,"required_vehicle_width":null,"required_operating_temp_min":null,"required_operating_temp_min_source":null,"required_operating_temp_max":null,"required_operating_temp_max_source":null,"required_operating_humidity_max":null,"required_operating_humidity_max_source":null,"required_ingress_protection_rating":null,"required_cleanroom_class":"None","required_max_gradient":1.5,"required_max_gradient_source":"A gradient of approximately 1.5% must be taken into account near the loading gates","required_floor_flatness_req":"DIN 18202","required_stop_accuracy":null,"required_battery_type":null,"required_battery_runtime":null,"required_charge_time":null,"required_autonomous_charging":null,"required_battery_swap_capable":null,"required_safety_standard":null,"required_functional_safety_level":null,"required_safety_coverage":null,"required_fleet_management_system":null,"required_fleet_control_architecture":null,"required_vda5050_compatible":null,"required_max_fleet_size":null,"required_multi_fleet_capable":null,"required_integration_capability":"WMS","required_installation_process":null,"required_modification_process":null,"required_station_applications":"Floor,Conveyor","required_min_fleet_size":null,"required_typical_project_value":null,"required_manual_usage":null,"required_industries_served":null,"required_lifting_height":null,"required_lifting_height_source":null,"required_min_total_height":null,"required_min_total_height_source":null,"required_special_fork_option":null,"required_fork_spread":null,"required_mast_type":null,"required_min_aisle_width":4000,"required_min_aisle_width_source":"The main track (yellow), which is 4m wide","required_vna_capable":false,"required_drive_type":null,"required_drop_accuracy_lat":null,"required_drop_accuracy_dep":null,"required_drop_accuracy_angle":null,"required_pick_req_accuracy_lat":null,"required_pick_req_accuracy_dep":null,"required_pick_req_accuracy_angle":null,"required_forks_free_floating":true,"required_stacking_capability":null,"required_load_detection":null,"required_barcode_readers":null,"required_stock_line_scanning":null,"required_trailer_loading":null,"required_trailer_unloading":null,"required_guidance":null,"required_busbar_compatible":null}
+
+================================================================================
+[2026-08-25T21:33:52] label=agv_4b_correction1 model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_floor_flatness_req": null}
+
+================================================================================
+[2026-08-25T21:33:53] label=agv_4c_required_max_payload model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_payload": 1000, "required_max_payload_source": "Most pallet weights are less than 500 kg, with a maximum of 1,000 kg."}
+
+================================================================================
+[2026-08-25T21:33:54] label=agv_4c_required_max_gradient model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_gradient": 1.5, "required_max_gradient_source": "The concrete floor slab is designed for logistics operations with flatness according to DIN 18202. A gradient of approximately 1.5% must be taken into account near the loading gates."}
+
+================================================================================
+[2026-08-25T21:33:55] label=agv_4c_required_operating_humidity_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T21:33:56] label=agv_4c_required_min_total_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T21:33:56] label=agv_4c_required_operating_temp_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": null, "required_operating_temp_min_source": null}
+
+================================================================================
+[2026-08-25T21:33:57] label=agv_4c_required_operating_temp_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": null, "required_operating_temp_max_source": null}
+
+================================================================================
+[2026-08-25T21:33:59] label=agv_4c_required_min_aisle_width model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": 4, "required_min_aisle_width_source": "The AGVs will operate on the main track (yellow), which is 4m wide and will have occasional forklift and intersection traffic."}
+
+================================================================================
+[2026-08-25T21:34:00] label=agv_4c_required_lifting_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T21:34:09] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Firefly","project_name":"Firefly AGV and VNA User Requirement Specification (URS) for the XYZ facility","project_location":"XYZ facility","tender_date":"22.07.2024","deadline":"27.09.2024","contact_name":null,"contact_email":null,"contact_phone":null,"buyer_industry":"Warehousing and Logistics","tender_category":"Warehouse Automation System","summary":"Tender for automation of warehouse operations including AGV and VNA systems to reduce operational costs and improve resilience. Includes phased implementation (Phase 1: unloading/loading, transport to/from marshalling to P&D; Phase 2: VNA storing and picking). Requires turnkey solution with full life cycle costs for 10 years, maintenance packages, and integration with existing WMS (Reflex).","missing_info":["Specific contact details (name, email, phone) not provided in the document."]}
+
+================================================================================
+[2026-08-25T21:34:10] label=contact model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"contact_name":null,"contact_email":null,"contact_phone":null,"deadline":null,"tender_date":null}
+
+================================================================================
+[2026-08-25T21:34:11] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": "28.99", "nace_tender_name": "Manufacture of other special-purpose machinery n.e.c.", "nace_buyer": null, "priority": "TOP", "confidence": "HOCH", "in_scope": true}
+
+================================================================================
+[2026-08-25T21:34:12] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T21:34:13] label=agv_4a model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_product_type": "Forklift AGV"}
+
+================================================================================
+[2026-08-25T21:34:17] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":null,"required_lead_time_weeks":null,"required_service_coverage":null,"required_distribution_model":null,"required_country":null,"required_employee_count_range":null,"required_certifications_generic":["CA"],"required_languages_spoken":null,"required_hq_city":null,"required_founding_year":null,"required_navigation_type":null,"required_infrastructure_free":false,"required_outdoor_capable":false,"required_autonomous_obstacle_bypass":null,"required_omnidirectional_movement":null,"required_max_payload":1000,"required_max_payload_source":"Max Loaded weight (KG) (Footprint) 1000","required_load_type":"Pallet","required_multi_load_compatibility":null,"required_max_speed":null,"required_vehicle_length":null,"required_vehicle_width":null,"required_operating_temp_min":null,"required_operating_temp_min_source":null,"required_operating_temp_max":null,"required_operating_temp_max_source":null,"required_operating_humidity_max":null,"required_operating_humidity_max_source":null,"required_ingress_protection_rating":null,"required_cleanroom_class":"None","required_max_gradient":null,"required_max_gradient_source":null,"required_floor_flatness_req":null,"required_stop_accuracy":null,"required_battery_type":null,"required_battery_runtime":null,"required_charge_time":null,"required_autonomous_charging":null,"required_battery_swap_capable":null,"required_safety_standard":["ISO 3691-4:2023"],"required_functional_safety_level":null,"required_safety_coverage":null,"required_fleet_management_system":null,"required_fleet_control_architecture":null,"required_vda5050_compatible":null,"required_max_fleet_size":null,"required_multi_fleet_capable":null,"required_integration_capability":["WMS"],"required_installation_process":null,"required_modification_process":null,"required_station_applications":["Floor","Conveyor","Machine cell","Gravity rack","Pushback rack","Drive-in rack"],"required_min_fleet_size":null,"required_typical_project_value":null,"required_manual_usage":null,"required_industries_served":null,"required_lifting_height":null,"required_lifting_height_source":null,"required_min_total_height":null,"required_min_total_height_source":null,"required_special_fork_option":null,"required_fork_spread":null,"required_mast_type":null,"required_min_aisle_width":1900,"required_min_aisle_width_source":"aisle width is 2000 mm rack-to-rack, with a minimum of 1900 mm pallet-to-pallet","required_vna_capable":true,"required_drive_type":"VNA Turret","required_drop_accuracy_lat":null,"required_drop_accuracy_dep":null,"required_drop_accuracy_angle":null,"required_pick_req_accuracy_lat":null,"required_pick_req_accuracy_dep":null,"required_pick_req_accuracy_angle":null,"required_forks_free_floating":true,"required_stacking_capability":null,"required_load_detection":null,"required_barcode_readers":null,"required_stock_line_scanning":null,"required_trailer_loading":null,"required_trailer_unloading":null,"required_guidance":"Laser Reflector","required_busbar_compatible":null}
+
+================================================================================
+[2026-08-25T21:34:19] label=agv_4b_correction1 model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_certifications_generic": "ISO 9001", "required_guidance": null}
+
+================================================================================
+[2026-08-25T21:34:19] label=agv_4c_required_max_payload model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_payload": 1000, "required_max_payload_source": "Max Loaded weight (KG) (Footprint) 1000"}
+
+================================================================================
+[2026-08-25T21:34:21] label=agv_4c_required_max_gradient model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T21:34:21] label=agv_4c_required_operating_humidity_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T21:34:22] label=agv_4c_required_min_total_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T21:34:23] label=agv_4c_required_operating_temp_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": null, "required_operating_temp_min_source": null}
+
+================================================================================
+[2026-08-25T21:34:24] label=agv_4c_required_operating_temp_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": null, "required_operating_temp_max_source": null}
+
+================================================================================
+[2026-08-25T21:34:25] label=agv_4c_required_min_aisle_width model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": 1900, "required_min_aisle_width_source": "The aisle width is 2000 mm rack-to-rack, with a minimum of 1900 mm pallet-to-pallet."}
+
+================================================================================
+[2026-08-25T21:34:26] label=agv_4c_required_lifting_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T21:34:33] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Mama","project_name":"Automated Guided Vehicle System (AGVS) for New Production Site","project_location":null,"tender_date":null,"deadline":null,"contact_name":"Contact Person","contact_email":"contact@mama.com","contact_phone":"(XXX) XXX-XXXX","buyer_industry":"Manufacturing","tender_category":"Automated Pallet Transport System","summary":"Mama is procuring a flexible automated guided vehicle system (AGVS) to transport palletized finished products and packaging materials between warehouses, filling lines, and a central storage location in a new production site. The system must operate up to 3 shifts daily, 7 days a week, with specific performance, availability, and reliability requirements. The AGVS must integrate with an MES system and comply with EN 1525, EN ISO 3691-4, and 2006/42/EG standards.","missing_info":[]}
+
+================================================================================
+[2026-08-25T21:34:34] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": "28.99", "nace_tender_name": "Manufacture of other special-purpose machinery n.e.c.", "nace_buyer": null, "priority": "TOP", "confidence": "HOCH", "in_scope": true}
+
+================================================================================
+[2026-08-25T21:34:35] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T21:34:35] label=agv_4a model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_product_type": "Forklift AGV"}
+
+================================================================================
+[2026-08-25T21:34:40] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":null,"required_lead_time_weeks":null,"required_service_coverage":null,"required_distribution_model":null,"required_country":null,"required_employee_count_range":null,"required_certifications_generic":null,"required_languages_spoken":"EN,TR","required_hq_city":null,"required_founding_year":null,"required_navigation_type":null,"required_infrastructure_free":null,"required_outdoor_capable":false,"required_autonomous_obstacle_bypass":null,"required_omnidirectional_movement":null,"required_max_payload":2000,"required_max_payload_source":"The AGV must handle three different pallet sizes with a maximum load of 2000 kg","required_load_type":"Pallet","required_multi_load_compatibility":null,"required_max_speed":null,"required_vehicle_length":null,"required_vehicle_width":null,"required_operating_temp_min":10,"required_operating_temp_min_source":"The AGVS must be able to operate in ambient temperatures ranging from 10–30°C indoors","required_operating_temp_max":30,"required_operating_temp_max_source":"The AGVS must be able to operate in ambient temperatures ranging from 10–30°C indoors","required_operating_humidity_max":null,"required_operating_humidity_max_source":null,"required_ingress_protection_rating":null,"required_cleanroom_class":"None","required_max_gradient":null,"required_max_gradient_source":null,"required_floor_flatness_req":null,"required_stop_accuracy":null,"required_battery_type":null,"required_battery_runtime":null,"required_charge_time":null,"required_autonomous_charging":null,"required_battery_swap_capable":null,"required_safety_standard":null,"required_functional_safety_level":null,"required_safety_coverage":null,"required_fleet_management_system":null,"required_fleet_control_architecture":null,"required_vda5050_compatible":null,"required_max_fleet_size":null,"required_multi_fleet_capable":null,"required_integration_capability":"MES,OPC-UA","required_installation_process":null,"required_modification_process":"Client: All","required_station_applications":"Floor,Conveyor","required_min_fleet_size":null,"required_typical_project_value":null,"required_manual_usage":true,"required_industries_served":null,"required_lifting_height":null,"required_lifting_height_source":null,"required_min_total_height":null,"required_min_total_height_source":null,"required_special_fork_option":null,"required_fork_spread":null,"required_mast_type":null,"required_min_aisle_width":null,"required_min_aisle_width_source":null,"required_vna_capable":false,"required_drive_type":null,"required_drop_accuracy_lat":null,"required_drop_accuracy_dep":null,"required_drop_accuracy_angle":null,"required_pick_req_accuracy_lat":null,"required_pick_req_accuracy_dep":null,"required_pick_req_accuracy_angle":null,"required_forks_free_floating":true,"required_stacking_capability":null,"required_load_detection":null,"required_barcode_readers":null,"required_stock_line_scanning":null,"required_trailer_loading":null,"required_trailer_unloading":null,"required_guidance":null,"required_busbar_compatible":null}
+
+================================================================================
+[2026-08-25T21:34:41] label=agv_4b_correction1 model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_languages_spoken": null}
+
+================================================================================
+[2026-08-25T21:34:41] label=agv_4c_required_max_payload model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_payload": 2000, "required_max_payload_source": "The AGV must handle three different pallet sizes with a maximum load of 2000 kg"}
+
+================================================================================
+[2026-08-25T21:34:43] label=agv_4c_required_max_gradient model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T21:34:43] label=agv_4c_required_operating_humidity_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T21:34:45] label=agv_4c_required_min_total_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T21:34:46] label=agv_4c_required_operating_temp_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": 10, "required_operating_temp_min_source": "The AGVS must be able to operate in ambient temperatures ranging from 10–30°C indoors."}
+
+================================================================================
+[2026-08-25T21:34:47] label=agv_4c_required_operating_temp_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": 30, "required_operating_temp_max_source": "The AGVS must be able to operate in ambient temperatures ranging from 10–30°C indoors."}
+
+================================================================================
+[2026-08-25T21:34:48] label=agv_4c_required_min_aisle_width model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": null, "required_min_aisle_width_source": null}
+
+================================================================================
+[2026-08-25T21:34:49] label=agv_4c_required_lifting_height model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T21:35:07] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Technische Universität Berlin","project_name":"Überarbeitung einer vorhandenen Website","project_location":"Technische Universität Berlin, Wilhelmstraße 67, 10117 Berlin","tender_date":null,"deadline":null,"contact_name":null,"contact_email":null,"contact_phone":null,"buyer_industry":"Higher Education","tender_category":"Website Redesign and CMS Modernization","summary":{"project_description":"Überarbeitung der bestehenden Website der Forschungseinrichtung Einstein Center Digital Future (ECDF) mit Fokus auf Performance, Barrierefreiheit, Wartbarkeit, Navigation und UI-Feinschliff. Beibehaltung der URL (www.digital-future.berlin) und Aktualisierung des CMS (TYPO3 v8 auf v13 oder neues CMS).","project_scope":["Analyse der bestehenden Website (Informationsarchitektur, Navigation, Design, Usability, Barrierefreiheit, Performance, CMS, Plugins, Schnittstellen, SEO-Status)","Backend/CMS: Überführung auf neuen Server, Aktualisierung auf TYPO3 v13 oder Einrichtung eines neuen CMS mit Anforderungen wie Open Source, RBAC, TLS 1.3+, Selbsthosting, Mehrsprachigkeit, API-Schnittstellen, Versionierung, Suchfunktion","Frontend: Modernes Framework (React/Vue/Svelte), Responsives Design, Barrierefreiheit (WCAG 2.2 AA), DSGVO-Konformität, Social Media Integration, Newsletter-Anmeldung, Kalenderintegration, Suchfunktion, schnelle Ladezeiten, SEO, interaktive Elemente","Hosting: EU-Server (vorzugsweise Deutschland), 99,5% Verfügbarkeit, tägliche Backups (14 Tage), SSL/TLS-Verschlüsselung, GreenIT","Wartung: Sicherheits- und CMS-Updates (mindestens monatlich) bis März 2028","Support: Rollenbasierter Zugriff für Projektteam, 24/7 Notfallkontakt, Reaktionszeiten max. 24 Stunden","Monitoring: Nutzungsstatistiken, Uptime-Monitoring","Schulung: Einweisung für 3 Mitarbeiter, Schulungsunterlagen, Aufzeichnung","Dokumentation: Digitale Dokumentation in Deutsch und Englisch, Quellcode-Kommentierung","SLA: Verfügbarkeitsgarantie, Reaktionszeiten, Eskalationsstufen, transparente Berichterstattung"],"project_timeline":{"start_date":"01.11.2025","concept_workshops":"KW 45 oder 46 2025 (mindestens zwei Workshops, erster vor Ort)","design_presentation":"KW 47 oder 48 2025","programming_start":"spätestens KW 49 2025","cms_training":"KW 51 2025","go_live":"30.12.2025","maintenance_until":"31.03.2028"},"budget":{"max_price_net":"23290.08","max_price_gross":"27715.20","payment_conditions":[{"milestone":"Präsentation Design neuer Komponenten inkl. Änderungsschleifen vor Ort","completion":"Nach Abnahme durch die AG (voraussichtlich KW 47/48 2025)","payment_percentage":"30%"},{"milestone":"Abschluss Gesamtleistung inkl. Go-Life der Website und Wartung/Support/Monitoring bis 2028","completion":"Nach Abnahme durch die AG (voraussichtlich 30.12.2025)","payment_percentage":"70%"}]},"requirements":{"team":{"webdesigners_required":2,"webdesigner_with_reference":1,"reference_requirements":"Mindestens eine der eingereichten Referenzen muss inhaltlich begleitet worden sein"},"cms_options":["Option 1: Überführung des aktuellen TYPO3-Systems auf neuen Server, Aktualisierung auf v13, Update aller Extensions, Anpassung von Templates","Option 2: Einrichtung eines neuen, modernen CMS mit Trennung von Content- und Präsentationsebene, Übernahme aller Inhalte"],"frontend_requirements":["Modernes Frontend-Framework (React/Vue/Svelte)","Responsives Design","Barrierefreiheit (WCAG 2.2 AA, EN 301 549/BITV 2.0)","DSGVO-Konformität (Cookie-Consent, Datenschutzerklärung)","Social Media Integration (LinkedIn Posts)","Newsletter-Anmeldung","Kalenderintegration (iCal)","Zentrale Suchfunktion","Schnelle Ladezeiten (unter 1 Sekunde)","Mehrsprachigkeit (Deutsch/Englisch)","Interaktive Elemente (Karten, Diagramme, Zeitleisten)","SEO (saubere URL-Struktur, Meta-Daten, strukturierte Daten, Sitemap, robots.txt)","Clusterung, Filterung und Tags für Inhaltsbereiche"],"hosting_requirements":["EU-Server (vorzugsweise Deutschland)","99,5% Verfügbarkeit","Tägliche Backups (14 Tage)","SSL/TLS-Verschlüsselung","GreenIT (energieeffiziente Infrastruktur, erneuerbare Energien)"],"support_requirements":["Rollenbasierter Zugriff für Projektteam (mindestens 18 Zugriffe)","Support während Bürozeiten (9-18 Uhr)","24/7 Notfallkontakt","Reaktionszeiten max. 24 Stunden (E-Mail)","Kostenfreie deutsche Ortsnetz- oder kostenfreie Rufnummer für TU Berlin"],"documentation_requirements":["Digitale Dokumentation in Deutsch und Englisch","Quellcode-Kommentierung","Programmierung des CMS nachvollziehbar festgehalten"],"sla_requirements":["Verfügbarkeitsgarantie","Klare Reaktionszeiten im Support","Definierte Eskalationsstufen","Transparente Berichterstattung"]},"evaluation_criteria":{"net_price_weight":"35%","quality_weight":"65%","quality_subcriteria":[{"name":"Gesamteindruck Agentur und Angebotskonzept","weight":"31.84%","max_points":24},{"name":"Referenzprojekt","weight":"33.16%","max_points":25}]},"additional_requirements":{"referenzen":["Mindestens drei Nachweise zu durchgeführten Leistungen ähnlicher Art und ähnlichen Umfangs innerhalb der letzten 3 Jahre in Deutschland, Österreich oder der Schweiz","Mindestens eine Referenz muss sich auf eine vergleichbare Institution (Universität/Forschungsinstitut/Öffentliche Einrichtung/NGO/Verein) beziehen","Referenzprojekt muss vergleichbares Leistungsspektrum umfassen (Überarbeitung bestehender Website oder Web(re)launch inkl. struktureller und inhaltlicher Konzeption sowie technischer Entwicklung)","Referenzen müssen enthalten: Firma/Behörde, Art und Umfang der Leistung, Leistungszeitraum, URL, Ansprechpartner mit Kontaktdaten"],"zusicherung":"Bestätigung, dass alle Forderungen im angegebenen Zeitplan umgesetzt werden und Angabe des gewählten CMS (Option 1 oder 2)"}}}
+
+================================================================================
+[2026-08-25T21:35:07] label=contact model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"contact_name":null,"contact_email":null,"contact_phone":null,"deadline":null,"tender_date":"OeA-199-25"}
+
+================================================================================
+[2026-08-25T21:35:08] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": null, "nace_tender_name": null, "nace_buyer": null, "priority": "UNBEKANNT", "confidence": "NIEDRIG", "in_scope": false}
+
+================================================================================
+[2026-08-25T21:35:09] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": null}
+
+================================================================================
+[2026-08-25T21:35:14] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Frischlogistik Rhein-Ruhr GmbH","project_name":"Refrigeration System for New Cold Store","project_location":"Mülheim an der Ruhr","tender_date":"14.01.2025","deadline":"15.04.2025","contact_name":"Markus Findeisen","contact_email":"tender@fr-rheinruhr.de","contact_phone":"+49 208 309 44-17","buyer_industry":"Logistics","tender_category":"Cold Storage Refrigeration System","summary":{"facility_description":{"zones":[{"name":"Zone A - Frischebereich (Hauptlager)","volume":"3.800 m³","dimensions":"58 m × 32 m × 7 m","operating_temperature":"+2 °C bis +6 °C (Sollwert +4 °C)","humidity":"80–90 % (aktiv geregelt)","operating_hours":"24 h / Tag, 365 Tage"},{"name":"Zone B - Obst & Gemüse","volume":"820 m³","operating_temperature":"+2 °C","requirements":"Thermische Entkopplung von Zone A, enge Temperaturtoleranz für bestimmte Waren"}],"total_cooling_capacity":"110 kW (Richtwert)","commissioning":"Q3 2026"},"refrigerant_requirements":{"acceptable_refrigerants":["CO2 (R744)","Propane (R290)","Ammonia (R717)"],"excluded_refrigerants":["HFC-Blends wie R404A oder R507","R134a (nur mit Lebenszyklusanalyse bis 2040)"],"current_system":"R404A (Legacy)"},"technical_specifications":{"zone_a":{"design_temperature":"+4 °C","temperature_tolerance":"±0.5 K","humidity":"80–90 % (aktiv geregelt)","operating_hours":"24 h / Tag, 365 Tage","refrigerant":"R744, R290 oder R717","certifications":["PED","EN 378","F-Gas-konform"]},"zone_b":{"design_temperature":"+2 °C","requirements":"Thermische Entkopplung von Zone A, enge Temperaturtoleranz für bestimmte Waren"}},"submission_requirements":{"deadline":"15.04.2025","required_documents":["Technisches Datenblatt","R&I-Vorentwurf","Auslegungsberechnung","Referenzliste (mind. 3 vergleichbare Objekte in Betrieb seit mind. 2 Jahren)","Festpreis ohne MwSt."],"contact_for_queries":{"name":"Markus Findeisen","email":"m.findeisen@fr-rheinruhr.de","phone":"+49 208 309 44-17"}}}}
+
+================================================================================
+[2026-08-25T21:35:15] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": "28.99", "nace_tender_name": "Manufacture of other special-purpose machinery n.e.c.", "nace_buyer": null, "priority": "TOP", "confidence": "HOCH", "in_scope": true}
+
+================================================================================
+[2026-08-25T21:35:16] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "FoodBev:Refrigeration"}
+
+================================================================================
+[2026-08-25T21:35:19] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":3,"required_lead_time_weeks":null,"required_service_coverage":"DE","required_distribution_model":null,"required_country":"DE","required_employee_count_range":null,"required_certifications_generic":null,"required_languages_spoken":"DE","required_hq_city":null,"required_founding_year":null,"required_served_categories":"Cold Store","required_cooling_capacity":110,"required_cooling_capacity_source":"Die Gesamtkälteleistung für beide Zonen zusammen beläuft sich nach Vorabschätzung unseres Ingenieurbüros (Planungsstand Dezember 2024) auf rund 110 kW.","required_temperature_min":2,"required_temperature_min_source":"Betriebstemperatur +2 °C bis +6 °C, Sollwert +4 °C (Zone A) / +2 °C (Zone B)","required_refrigerant_types":["R744","R290","R717"],"required_certifications_ik":["PED","EN 378","F-Gas-konform"],"required_cop_efficiency":null,"required_cop_efficiency_source":null,"required_cooling_medium":null,"required_temperature_stability":0.5,"required_temperature_stability_source":"Zulässige Temperaturschwankung ±0,5 K","required_room_volume_max":3800,"required_room_volume_max_source":"Nettoraumvolumen ca. 3.800 m³ (LxBxH: 58 m × 32 m × 7 m lichte Höhe)","required_humidity_control_capable":true,"required_blast_freeze_capacity":null,"required_blast_freeze_capacity_source":null,"required_pulldown_time":null,"required_pulldown_time_source":null}
+
+================================================================================
+[2026-08-25T21:35:20] label=agv_4c_required_pulldown_time model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_pulldown_time": null, "required_pulldown_time_source": null}
+
+================================================================================
+[2026-08-25T21:35:21] label=agv_4c_required_blast_freeze_capacity model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_blast_freeze_capacity": null, "required_blast_freeze_capacity_source": null}
+
+================================================================================
+[2026-08-25T21:35:23] label=agv_4c_required_temperature_stability model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_temperature_stability": 0.5, "required_temperature_stability_source": "Zulässige Temperaturschwankung ±0,5 K"}
+
+================================================================================
+[2026-08-25T21:35:23] label=agv_4c_required_cop_efficiency model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_cop_efficiency": null, "required_cop_efficiency_source": null}
+
+================================================================================
+[2026-08-25T21:35:24] label=agv_4c_required_cooling_capacity model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_cooling_capacity": 110, "required_cooling_capacity_source": "Die Gesamtkälteleistung für beide Zonen zusammen beläuft sich nach Vorabschätzung unseres Ingenieurbüros (Planungsstand Dezember 2024) auf rund 110 kW."}
+
+================================================================================
+[2026-08-25T21:35:25] label=agv_4c_required_room_volume_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_room_volume_max": 3800, "required_room_volume_max_source": "Nettoraumvolumen ca. 3.800 m³ (LxBxH: 58 m × 32 m × 7 m lichte Höhe)"}
+
+================================================================================
+[2026-08-25T21:35:26] label=agv_4c_required_temperature_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_temperature_min": 2, "required_temperature_min_source": "Betriebstemperatur +2 °C bis +6 °C, Sollwert +4 °C."}
+
+================================================================================
+[2026-08-25T21:35:30] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Tiefkühlkost Franken AG","project_name":"Schockfroster und Tiefkühlanlage Werkserweiterung Erlangen-Süd, Produktionslinie PL-7","project_location":"Erlangen-Süd, Erlangen","tender_date":"17.02.2025","deadline":"31.03.2025","contact_name":"Dipl.-Ing. Bernd Raupach","contact_email":"b.raupach@tkf-ag.de","contact_phone":null,"buyer_industry":"Food Manufacturing","tender_category":"Industrial Freezing Equipment","summary":"Ausschreibung für Schockfroster und Tiefkühlanlage zur Erweiterung der Produktionslinie PL-7 für tiefgekühlte Fertiggerichte mit spezifischen technischen Anforderungen, Kältemittelvorgaben und Energieeffizienzkriterien.","missing_info":[]}
+
+================================================================================
+[2026-08-25T21:35:31] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": "28.99", "nace_tender_name": "Manufacture of other special-purpose machinery n.e.c.", "nace_buyer": null, "priority": "TOP", "confidence": "HOCH", "in_scope": true}
+
+================================================================================
+[2026-08-25T21:35:31] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "FoodBev:Refrigeration"}
+
+================================================================================
+[2026-08-25T21:35:34] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":null,"required_lead_time_weeks":null,"required_service_coverage":null,"required_distribution_model":null,"required_country":null,"required_employee_count_range":null,"required_certifications_generic":null,"required_languages_spoken":null,"required_hq_city":null,"required_founding_year":null,"required_served_categories":"Deep Freeze","required_cooling_capacity":340,"required_cooling_capacity_source":"Die Gesamtanlage einschließlich Verlustkälte und Systemreserven wird auf ca. 340 kW geschätzt.","required_temperature_min":-22,"required_temperature_min_source":"Als Auslegungstemperatur für den Verdampfer ist -22 °C zu verwenden","required_refrigerant_types":["R744","R290"],"required_certifications_ik":["EN 378-2","PED 2014/68/EU","CE-Kennzeichnung"],"required_cop_efficiency":2.3,"required_cop_efficiency_source":"Wir fordern eine Mindest-Leistungszahl von 2,3 im Schockfrosterbetrieb bei -22 °C Verdampfungstemperatur und +35 °C Verflüssigungstemperatur.","required_cooling_medium":null,"required_temperature_stability":null,"required_temperature_stability_source":null,"required_room_volume_max":null,"required_room_volume_max_source":null,"required_humidity_control_capable":null,"required_blast_freeze_capacity":650,"required_blast_freeze_capacity_source":"Der Schockfroster muss einen Durchsatz von 0,65 t/h (sechshundertfünfzig Kilogramm pro Stunde) bei einem Produktgewicht von 350–600 g je Portion gewährleisten.","required_pulldown_time":4,"required_pulldown_time_source":"Die Kerntemperatur der Produkte muss innerhalb einer Absenkzeit von vier Stunden ab Einlauf sicher auf -18 °C oder kälter gebracht werden."}
+
+================================================================================
+[2026-08-25T21:35:35] label=agv_4b_correction1 model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_certifications_ik": "PED"}
+
+================================================================================
+[2026-08-25T21:35:36] label=agv_4c_required_pulldown_time model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_pulldown_time": 4, "required_pulldown_time_source": "Die Kerntemperatur der Produkte muss innerhalb einer Absenkzeit von vier Stunden ab Einlauf sicher auf -18 °C oder kälter gebracht werden."}
+
+================================================================================
+[2026-08-25T21:35:37] label=agv_4c_required_blast_freeze_capacity model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_blast_freeze_capacity": 650, "required_blast_freeze_capacity_source": "Der Schockfroster muss einen Durchsatz von 0,65 t/h (sechshundertfünfzig Kilogramm pro Stunde) bei einem Produktgewicht von 350–600 g je Portion gewährleisten."}
+
+================================================================================
+[2026-08-25T21:35:38] label=agv_4c_required_temperature_stability model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_temperature_stability": null, "required_temperature_stability_source": null}
+
+================================================================================
+[2026-08-25T21:35:40] label=agv_4c_required_cop_efficiency model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_cop_efficiency": 2.3, "required_cop_efficiency_source": "Wir erwarten daher die Angabe der Leistungszahl (COP) der Anlage am Auslegungspunkt und fordern eine Mindest-Leistungszahl von 2,3 im Schockfrosterbetrieb bei -22 °C Verdampfungstemperatur und +35 °C Verflüssigungstemperatur."}
+
+================================================================================
+[2026-08-25T21:35:41] label=agv_4c_required_cooling_capacity model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_cooling_capacity": 340, "required_cooling_capacity_source": "Die Gesamtanlage einschließlich Verlustkälte und Systemreserven wird auf ca. 340 kW geschätzt."}
+
+================================================================================
+[2026-08-25T21:35:42] label=agv_4c_required_room_volume_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_room_volume_max": null, "required_room_volume_max_source": null}
+
+================================================================================
+[2026-08-25T21:35:43] label=agv_4c_required_temperature_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_temperature_min": -22, "required_temperature_min_source": "Als Auslegungstemperatur für den Verdampfer ist -22 °C zu verwenden, um ausreichende Sicherheitsreserven gegenüber der Kerntemperaturanforderung zu gewährleisten."}
+
+================================================================================
+[2026-08-25T21:35:46] label=basic model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"buyer":"Molkerei Nordrhein eG","project_name":"Prozesskühlung Molkereianlage Jüchen (Erweiterung)","project_location":"Jüchen","tender_date":"22.03.2025","deadline":"30.04.2025","contact_name":"Petra Schönfeld","contact_email":"einkauf@molkerei-nordrhein.de","contact_phone":"+49 2165 94870-0","buyer_industry":"Food & Beverage Manufacturing","tender_category":"Process Cooling System Upgrade","summary":"Erweiterung der Prozesskühlung für eine Molkereianlage mit Lieferung und Inbetriebnahme einer neuen Kälteanlage (mind. 420 kW Kälteleistung) unter Verwendung von Ammoniak (R717) oder Alternativkältemitteln, inkl. Planungsleistung, Montage und Wartungsoptionen.","missing_info":[]}
+
+================================================================================
+[2026-08-25T21:35:47] label=nace model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"nace_tender": "33.20", "nace_tender_name": "Installation of industrial machinery and equipment", "nace_buyer": null, "priority": "TOP", "confidence": "HOCH", "in_scope": true}
+
+================================================================================
+[2026-08-25T21:35:48] label=domain_detect model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"detected_domain": "FoodBev:Refrigeration"}
+
+================================================================================
+[2026-08-25T21:35:51] label=agv_4b model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_reference_count":2,"required_lead_time_weeks":null,"required_service_coverage":"DE","required_distribution_model":null,"required_country":"DE","required_employee_count_range":null,"required_certifications_generic":null,"required_languages_spoken":"DE","required_hq_city":null,"required_founding_year":null,"required_served_categories":"Process Cooling","required_cooling_capacity":420,"required_cooling_capacity_source":"eine Nettokälteleistung von mindestens vierhundertzwanzig Kilowatt","required_temperature_min":2,"required_temperature_min_source":"Der Vorlauftemperatur auf der Primärseite muss bis auf +4 °C abgesenkt werden können, da die Pasteurisierungsstrecke eine stabile Eingangstemperatur von +6 °C verlangt und Verluste in der Leitung eingerechnet werden müssen. Eine Unterschreitung von +2 °C ist nicht zulässig","required_refrigerant_types":["R717"],"required_certifications_ik":["EN 378","PED"],"required_cop_efficiency":4.2,"required_cop_efficiency_source":"eine Leistungszahl (COP) von mindestens 4,2","required_cooling_medium":"glycol circuit","required_temperature_stability":null,"required_temperature_stability_source":null,"required_room_volume_max":null,"required_room_volume_max_source":null,"required_humidity_control_capable":null,"required_blast_freeze_capacity":null,"required_blast_freeze_capacity_source":null,"required_pulldown_time":null,"required_pulldown_time_source":null}
+
+================================================================================
+[2026-08-25T21:35:51] label=agv_4c_required_pulldown_time model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_pulldown_time": null, "required_pulldown_time_source": null}
+
+================================================================================
+[2026-08-25T21:35:52] label=agv_4c_required_blast_freeze_capacity model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_blast_freeze_capacity": null, "required_blast_freeze_capacity_source": null}
+
+================================================================================
+[2026-08-25T21:35:53] label=agv_4c_required_temperature_stability model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_temperature_stability": null, "required_temperature_stability_source": null}
+
+================================================================================
+[2026-08-25T21:35:53] label=agv_4c_required_cop_efficiency model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_cop_efficiency": 4.2, "required_cop_efficiency_source": "Hinsichtlich der Energieeffizienz erwarten wir eine Leistungszahl (COP) von mindestens 4,2 bei den oben genannten Betriebspunkten und einer Außentemperatur von +32 °C (Auslegungssommer)."}
+
+================================================================================
+[2026-08-25T21:35:54] label=agv_4c_required_cooling_capacity model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_cooling_capacity": 420, "required_cooling_capacity_source": "Wir benötigen daher eine neue Kälteanlage, die eine Nettokälteleistung von mindestens vierhundertzwanzig Kilowatt bereitstellt."}
+
+================================================================================
+[2026-08-25T21:35:55] label=agv_4c_required_room_volume_max model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_room_volume_max": null, "required_room_volume_max_source": null}
+
+================================================================================
+[2026-08-25T21:35:56] label=agv_4c_required_temperature_min model=openrouter-mistral-small (openrouter)
+--------------------------------------------------------------------------------
+{"required_temperature_min": 2, "required_temperature_min_source": "Eine Unterschreitung von +2 °C ist nicht zulässig, da sonst Vereisung im Glykol-Wärmetauscher auftreten kann."}

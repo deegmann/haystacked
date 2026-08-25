@@ -138,6 +138,21 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
     # independently verified — see note above). A model that emits a wrapper object instead of
     # a <think> block, or whose reasoning cannot be disabled via this switch at all, still needs
     # its own repair_and_parse() handling and remains explicitly OUT of scope here.
+    LLMModelChoice("openrouter-mistral-small", "openrouter", "mistralai/mistral-small-2603",
+                    "Mistral Small 4 (Cloud, OpenRouter)", is_local=False,
+                    is_reasoning_model=False, context_tokens=262_144, max_output_tokens=4096,
+                    weights_open=True),
+    # Mistral Small 4 (2603) added 2026-08-25 (user request, after Mistral Large 3's real
+    # test outperformed its own weak benchmark score): despite "Small" branding, its
+    # hugging_face_id is "mistralai/Mistral-Small-4-119B-2603" — 119B parameters, not small
+    # in absolute terms, just smaller than Mistral's own Large tier (675B). Notably: this is
+    # the FIRST OpenRouter cloud entry in this registry whose reasoning is genuinely
+    # default-OFF at the provider level (`reasoning.default_enabled: false`,
+    # `mandatory: false`) — every other cloud entry needed the request-level
+    # `"reasoning": {"enabled": false}` override to force this; here it's redundant but
+    # harmless (still sent unconditionally by _call_openrouter(), no special-casing).
+    # Scored higher than the registered Mistral Large 3 on OpenRouter's own intelligence
+    # (19.7 vs. 15.9) and coding (26.6 vs. 20.1) indices — the motivating reason to add it.
 ]
 
 DEFAULT_MODEL_ID = "local-qwen2.5-7b"   # preserves today's zero-config behaviour

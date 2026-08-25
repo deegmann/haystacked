@@ -1,7 +1,7 @@
 # Spec: LLM Provider Abstraction (Ollama lokal + OpenRouter Cloud) + Modellauswahl
 **Version:** v0.2
 **Datum:** 2026-08-25
-**Status:** IMPLEMENTIERT + POST-IMPLEMENTATION-REVIEW ABGESCHLOSSEN (senior-architect + ap0-architecture-guardian + reference-integrity-guardian, alle drei "approve as shippable"). Ein vom SA gefundener Blocker (Provider-Fehler wurden bei 4a/4b/4c verschluckt statt laut zu scheitern — bei 4c landete das sogar als Halluzinations-Beweis im Guard) wurde direkt vom Tech Lead gefixt und verifiziert. **Lokaler Pfad (Default) ist produktionsreif und identisch zum bisherigen Verhalten. Der reale Cloud-Vergleichslauf (DoD #4/R6) ist für ALLE DREI ursprünglich registrierten Cloud-Modelle abgeschlossen** (`openrouter-qwen3.8-27b`, `openrouter-deepseek-v4-flash`, `openrouter-mistral-large`) — siehe `docs/e2e_20260825_llm_provider_comparison/REPORT.md`, `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`. DeepSeek-Test fand + fixte einen echten R3-Robustheitsfall (Whitespace-only-Response wurde nicht als leer erkannt — jetzt providerübergreifend gefixt). Mistral-Test validierte denselben Fix + die frühere SA-Pflichtkorrektur live gegen eine echte, unangekündigte Netzwerkstörung (lauter Abbruch statt stillem Teilergebnis — genau wie designed) UND widerlegte den schwachen generischen Benchmark-Wert (15,9) für unsere konkrete Extraktionsaufgabe: höchste Feldzahl aller vier Konfigurationen auf 6 von 7 Ausschreibungen. **Einziges noch nicht real getestetes registriertes Modell: Llama 3.3 70B** — wartet weiter auf explizite Freigabe.
+**Status:** IMPLEMENTIERT + POST-IMPLEMENTATION-REVIEW ABGESCHLOSSEN (senior-architect + ap0-architecture-guardian + reference-integrity-guardian, alle drei "approve as shippable"). Ein vom SA gefundener Blocker (Provider-Fehler wurden bei 4a/4b/4c verschluckt statt laut zu scheitern — bei 4c landete das sogar als Halluzinations-Beweis im Guard) wurde direkt vom Tech Lead gefixt und verifiziert. **Lokaler Pfad (Default) ist produktionsreif und identisch zum bisherigen Verhalten. Der reale Cloud-Vergleichslauf (DoD #4/R6) ist für VIER Cloud-Modelle abgeschlossen** (`openrouter-qwen3.8-27b`, `openrouter-deepseek-v4-flash`, `openrouter-mistral-large`, `openrouter-mistral-small`) — siehe `docs/e2e_20260825_llm_provider_comparison/REPORT.md`, `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`, `REPORT_mistral_small_4.md`. DeepSeek-Test fand + fixte einen echten R3-Robustheitsfall (Whitespace-only-Response wurde nicht als leer erkannt — jetzt providerübergreifend gefixt). Mistral-Large-Test validierte denselben Fix + die frühere SA-Pflichtkorrektur live gegen eine echte, unangekündigte Netzwerkstörung (lauter Abbruch statt stillem Teilergebnis — genau wie designed) UND widerlegte den schwachen generischen Benchmark-Wert (15,9) für unsere konkrete Extraktionsaufgabe: höchste Feldzahl aller vier Konfigurationen auf 6 von 7 Ausschreibungen. **Mistral-Small-4-Test (schnellstes+günstigstes Cloud-Modell) fand einen echten, dokumentspezifischen Halluzinationsfehler: Käufer-Firmendaten (Gründungsjahr, HQ-Stadt aus der Selbstvorstellung des Dokuments) wurden als Lieferanten-Anforderungen extrahiert, was den Nordlicht-Top-Match auf einen negativen Score (-15) drückte — nicht reproduzierbar bei CompanyX/Dragonfly, siehe `REPORT_mistral_small_4.md`. Hohe Feldzahl bleibt damit erneut kein verlässlicher alleiniger Qualitätsindikator.** **Einziges noch nicht real getestetes registriertes Modell: Llama 3.3 70B** — wartet weiter auf explizite Freigabe.
 
 Reviews (Plan): senior-architect APPROVE WITH REQUIRED CHANGES (Ruling:
 `.claude/agent-memory/senior-architect/decision_llm_provider_abstraction.md`) → ap0-architecture-guardian APPROVE AS-IS → reference-integrity-guardian APPROVE WITH REQUIRED ADDITIONS. Alle Auflagen eingearbeitet.
@@ -24,6 +24,23 @@ bleibt `is_reasoning_model=False` für diesen Eintrag eine Aussage über unsere 
 Nutzung, nicht über die Modell-Fähigkeit selbst — das Modell kann reasoning, wir schalten es
 immer ab. **Nicht live verifiziert** (bräuchte einen bezahlten Aufruf + Freigabe, gleiches Gate
 wie DoD #4/R6) — bis dahin gilt: konfiguriert-aber-unbestätigt, nicht bewiesen.
+
+**Nachtrag 3 2026-08-25 (User-Wunsch: kleineres Mistral-Modell nach dem Large-3-Test):** Mistral
+Small 4 (`mistralai/mistral-small-2603`) als fünfter Registry-Eintrag `openrouter-mistral-small`
+hinzugefügt (offene Gewichte, Apache 2.0; laut `hugging_face_id` real 119B Parameter trotz
+"Small"-Branding — kleiner als Large 3s 675B, aber nicht klein absolut). Erstes Cloud-Modell mit
+Reasoning laut Metadaten standardmäßig **aus** (`default_enabled: false`) — der unconditional
+`"reasoning": {"enabled": false}`-Schalter aus Nachtrag 2 bleibt trotzdem unverändert für alle
+Modelle aktiv (keine modellspezifische Verzweigung). Live getestet (siehe DoD #4 unten): schnellste
+und günstigste Cloud-Konfiguration bisher (2m46s/8 Tender, ~$0,08), höchste Feldzahl auf 6 von 7
+Ausschreibungen — **aber** ein echter, dokumentspezifischer Halluzinationsfund bei Nordlicht
+(Käufer-Selbstvorstellung im Dokument als Lieferanten-Anforderung fehlinterpretiert:
+`required_founding_year`, `required_hq_city`), der den Top-Match auf Score -15 drückt. Details:
+`docs/e2e_20260825_llm_provider_comparison/REPORT_mistral_small_4.md`. Betroffene Felder haben
+keine Guard-Abdeckung (kein `_source`-Zitatpflicht-Feld) — struktureller blinder Fleck des
+bestehenden 3-Layer-Guards, der nur numerische K.O.-Felder mit Zitatpflicht abdeckt. Kein
+Code-Fix vorgenommen (Tech-Lead-Entscheidung: erst mehr Daten/AP0-Hint-Diskussion, siehe
+Backlog-Punkt unten), Modell bleibt registriert und wählbar.
 
 Key finding (senior-architect): **ein stärkeres Modell kann durch Layer 0 des Halluzinations-Guards SCHLECHTER abschneiden**, weil die Guard-Annahme des wörtlichen Zitierens im Prompt verankert ist, nicht im Code — stärkere Modelle weichen häufiger vom wörtlichen Zitat ab (Whitespace-/Bindestrich-Normalisierung, Tabelle→Prosa-Umformulierung, gelegentlich englische Antworten auf deutschen Ausschreibungen) als das 7B-Modell. Jedes neue Modell muss über Layer-Null-Zählungen bewertet werden (R6), nie über reine Füllquote. Falls ein Modell Layer 0 in die Höhe treibt: Fix liegt im Prompt via AP0 — niemals eine Guard-Lockerung, niemals modellspezifische Logik in `src/json_repair.py`.
 
@@ -519,9 +536,9 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
 implementation was resolved above before the developer started. Post-implementation, three
 concrete backlog items remain — deliberately deferred, not forgotten (senior-architect
 post-implementation follow-up #1, 2026-08-25):
-1. **DoD #4 / R6's live cloud comparison run — DONE for all three registered cloud models,
+1. **DoD #4 / R6's live cloud comparison run — DONE for four registered cloud models,
    2026-08-25** (see the STATUS line on DoD #4 in §3; `docs/e2e_20260825_llm_provider_comparison/REPORT.md`,
-   `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`). The DeepSeek run found and fixed
+   `REPORT_deepseek_v4_flash.md`, `REPORT_mistral_large_3.md`, `REPORT_mistral_small_4.md`). The DeepSeek run found and fixed
    a real gap in R3: a whitespace-only OpenRouter response (`content=" "`) was not caught by
    `if not content` (non-empty Python string), which on Pass 4b (unlike "basic") would have
    silently degraded into an empty result instead of aborting loudly — fixed with `.strip()`,
@@ -535,9 +552,22 @@ post-implementation follow-up #1, 2026-08-25):
    Artificial Analysis intelligence index) did **not** predict its performance on this specific
    structured-extraction task — it produced the highest non-null field count of all four tested
    configurations on 6 of 7 in-scope tenders, and correctly resolved the Dragonfly VNA
-   requirement like both other cloud models. Of the 4 cloud entries now in `AVAILABLE_MODELS`
-   (the original 3 plus DeepSeek, added this session), 3 have real comparison data on record —
-   only `openrouter-llama3.3-70b` remains untested.
+   requirement like both other cloud models. The Mistral Small 4 run (fastest + cheapest cloud
+   configuration tested, ~2m46s/8 tenders) again produced the highest field count on 6 of 7
+   tenders, but surfaced a genuine, document-specific hallucination: buyer self-introduction facts
+   (founding year, HQ city, stated in the document's opening paragraph) were extracted as
+   *supplier* requirement fields on the Nordlicht tender, dragging its top match to a **negative
+   score (-15)** — confirmed non-reproduced on CompanyX/Dragonfly despite similar buyer-intro
+   patterns in those documents. The affected fields (`required_founding_year`, `required_hq_city`)
+   have no `_source` citation requirement and are therefore structurally invisible to the existing
+   3-layer hallucination guard, which only covers numeric K.O. fields with a citation obligation —
+   this is a new instance of the same "real citation, wrong question" failure class as OI-118, not
+   a new failure class. Of the 5 cloud entries now in `AVAILABLE_MODELS` (the original 3 plus
+   DeepSeek and Mistral Small 4, added this session), 4 have real comparison data on record — only
+   `openrouter-llama3.3-70b` remains untested. High field-fill count has now been shown twice this
+   session (Layer-0-trap concern pre-test, then this buyer/supplier confusion) to be an unreliable
+   standalone quality proxy — every new model must be checked against ground truth on at least the
+   documents where it claims the most fields, not just counted.
 2. **`scripts/test_pipeline.py` migration** to `src.llm_client.call_llm` — still has its own
    independent, non-breaking `httpx` call (verified working as-is post-implementation).
 3. **`start.sh` / `setup.sh`'s Ollama-liveness hard-gate** — cosmetic only (a cloud-only user
