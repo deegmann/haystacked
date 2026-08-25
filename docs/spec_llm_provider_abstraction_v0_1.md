@@ -8,6 +8,8 @@ Reviews (Plan): senior-architect APPROVE WITH REQUIRED CHANGES (Ruling:
 
 Reviews (Implementierung, post-impl. 2026-08-25): ap0-architecture-guardian **APPROVE AS SHIPPABLE** (keine Einwände) → reference-integrity-guardian **APPROVE AS SHIPPABLE** (alle 4 Auflagen korrekt gelandet, kein neuer Fund) → senior-architect **SIGN OFF WITH ONE REQUIRED FIX** (Ruling: `.claude/agent-memory/senior-architect/audit_llm_provider_abstraction_post_impl.md`) — Fix seither vom Tech Lead angewendet: `LLMProviderError` in `src/llm_client.py` eingeführt, an den 4a/4b/4c-Handlern in `app.py` ein früheres `except (LLMProviderError, httpx.HTTPError)` ergänzt, das den Lauf sauber mit einem SSE-`error`-Event abbricht statt ihn verschluckt fortzusetzen; bei 4c wird ein Provider-Fehler jetzt NIE mehr in `_4c_abstained` aufgenommen. Zusätzlich behoben: irreführende "Ollama not reachable"-Meldung bei Cloud-Verbindungsfehlern (Pass 1), ein Selbsttest (`test_cloud_marker_never_executes_without_explicit_opt_in`) macht die Kostenschutz-Marker-Mechanik strukturell statt nur angenommen.
 
+**Nachtrag 2026-08-25 (nach Commit, echter API-Key erstmals verfügbar):** kostenloser Key-Check (`GET /api/v1/auth/key`, kein Token-Verbrauch) bestätigte einen gültigen, aktiven Key. Ein anschließender kostenloser Abgleich gegen `GET /api/v1/models` (ebenfalls kein Token-Verbrauch) deckte auf, dass der registrierte Slug `qwen/qwen2.5-72b-instruct` bei OpenRouter **nicht existiert** — korrekt ist `qwen/qwen-2.5-72b-instruct` (Bindestrich vor "2.5"), vermutlich ein Rechercheversehen aus der ursprünglichen Planungsphase. Vor jeglichem bezahlten Aufruf korrigiert und live gegengeprüft. Lehre: jeder neu registrierte Modell-Slug sollte künftig direkt gegen `GET /api/v1/models` verifiziert werden, nicht nur gegen eine Websuche.
+
 Key finding (senior-architect): **ein stärkeres Modell kann durch Layer 0 des Halluzinations-Guards SCHLECHTER abschneiden**, weil die Guard-Annahme des wörtlichen Zitierens im Prompt verankert ist, nicht im Code — stärkere Modelle weichen häufiger vom wörtlichen Zitat ab (Whitespace-/Bindestrich-Normalisierung, Tabelle→Prosa-Umformulierung, gelegentlich englische Antworten auf deutschen Ausschreibungen) als das 7B-Modell. Jedes neue Modell muss über Layer-Null-Zählungen bewertet werden (R6), nie über reine Füllquote. Falls ein Modell Layer 0 in die Höhe treibt: Fix liegt im Prompt via AP0 — niemals eine Guard-Lockerung, niemals modellspezifische Logik in `src/json_repair.py`.
 
 ## 0. Problem / Goal
@@ -76,7 +78,7 @@ and this is a brand-new file with no institutional scar tissue yet to lean on ot
 class LLMModelChoice:
     id: str               # stable selector, e.g. "local-qwen2.5-7b", "openrouter-qwen2.5-72b"
     provider: str          # "ollama" | "openrouter"
-    model_name: str        # provider-native model string, e.g. "qwen2.5:7b" / "qwen/qwen2.5-72b-instruct"
+    model_name: str        # provider-native model string, e.g. "qwen2.5:7b" / "qwen/qwen-2.5-72b-instruct"
     display_name: str      # UI label, e.g. "Qwen 2.5 7B (lokal, Ollama)"
     is_local: bool
     is_reasoning_model: bool  # R4 — see below; must be False for every entry at launch
@@ -92,7 +94,7 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
                     "Qwen 2.5 7B (lokal, Ollama)", is_local=True,
                     is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
                     weights_open=True),
-    LLMModelChoice("openrouter-qwen2.5-72b", "openrouter", "qwen/qwen2.5-72b-instruct",
+    LLMModelChoice("openrouter-qwen2.5-72b", "openrouter", "qwen/qwen-2.5-72b-instruct",
                     "Qwen 2.5 72B (Cloud, OpenRouter)", is_local=False,
                     is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
                     weights_open=True),
@@ -415,7 +417,7 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
 ## 4. Open questions / explicit non-decisions (flagged, not silently resolved)
 
 **Resolved by Tech Lead, 2026-08-25:**
-- Starter `AVAILABLE_MODELS` set: **3 cloud entries** — `qwen/qwen2.5-72b-instruct`,
+- Starter `AVAILABLE_MODELS` set: **3 cloud entries** — `qwen/qwen-2.5-72b-instruct`,
   `meta-llama/llama-3.3-70b-instruct`, `mistralai/mistral-large-2512` — spanning three model
   families, all confirmed non-reasoning instruct models (R4). See §2.1 for the full registry
   and the reasoning behind spanning families rather than seeding one.

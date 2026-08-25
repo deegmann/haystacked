@@ -56,7 +56,7 @@ _OPENROUTER_TIMEOUT_S = 300.0
 class LLMModelChoice:
     id: str                    # stable selector, e.g. "local-qwen2.5-7b", "openrouter-qwen2.5-72b"
     provider: str               # "ollama" | "openrouter"
-    model_name: str             # provider-native model string, e.g. "qwen2.5:7b" / "qwen/qwen2.5-72b-instruct"
+    model_name: str             # provider-native model string, e.g. "qwen2.5:7b" / "qwen/qwen-2.5-72b-instruct"
     display_name: str           # UI label, e.g. "Qwen 2.5 7B (lokal, Ollama)"
     is_local: bool
     is_reasoning_model: bool    # R4 — must be False for every entry at launch
@@ -73,10 +73,14 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
                     "Qwen 2.5 7B (lokal, Ollama)", is_local=True,
                     is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
                     weights_open=True),
-    LLMModelChoice("openrouter-qwen2.5-72b", "openrouter", "qwen/qwen2.5-72b-instruct",
+    LLMModelChoice("openrouter-qwen2.5-72b", "openrouter", "qwen/qwen-2.5-72b-instruct",
                     "Qwen 2.5 72B (Cloud, OpenRouter)", is_local=False,
                     is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
                     weights_open=True),
+    # model_name corrected 2026-08-25: OpenRouter's live slug is "qwen/qwen-2.5-72b-instruct"
+    # (hyphen before "2.5") — the originally-planned "qwen/qwen2.5-72b-instruct" (no hyphen)
+    # does not exist on OpenRouter and would 404. Caught by a free GET /api/v1/models check
+    # before any paid call was made; verify any newly-added entry's exact slug the same way.
     LLMModelChoice("openrouter-llama3.3-70b", "openrouter", "meta-llama/llama-3.3-70b-instruct",
                     "Llama 3.3 70B (Cloud, OpenRouter)", is_local=False,
                     is_reasoning_model=False, context_tokens=131_072, max_output_tokens=4096,
