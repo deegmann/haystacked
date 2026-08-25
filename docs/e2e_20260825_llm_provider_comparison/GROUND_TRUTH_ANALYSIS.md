@@ -27,11 +27,20 @@ können: **war das, was beide Modelle extrahiert haben, tatsächlich richtig?**
   Extraktion auf den kritischen Feldern fast komplett weg (0/3 bzw. 1/4 gefunden).
 - **Zwei echte lokale Halluzinationen gefunden**, eine davon vom Source-Span-Guard live
   abgefangen — ein konkreter Beleg, dass der Guard funktioniert, nicht nur in der Theorie.
-- **Ein systematisches Muster entdeckt, das noch nicht dokumentiert war:** Pass 4c
-  (fokussierte Einzelfeld-Nachfrage) liefert beim lokalen 7b-Modell auffällig oft `null`, obwohl
-  Pass 4b (Batch-Extraktion) denselben Wert kurz zuvor korrekt gefunden hatte — das Modell
-  "vergisst" bei der gezielten Nachfrage, was es im Batch-Durchlauf schon wusste. Bei Cloud tritt
-  dieses Muster nicht auf.
+- **Korrektur (nach Doku-Review, 2026-08-25):** die beiden folgenden Muster waren **keine
+  Neuentdeckungen** — beide stehen bereits in `docs/architecture.md` §5.4 bzw. §5.6, datiert
+  31.07., einen knappen Monat vor dieser Analyse. Was hier tatsächlich neu ist: eine frische,
+  konkrete Bestätigung an zusätzlichen Feldern/Tendern, plus der direkte Cloud-Vergleich, den es
+  vorher nicht gab.
+  - **Pass-4c-Vergessens-Muster** (§5.4 in architecture.md, dort bereits für `max_payload`
+    dokumentiert): heute bestätigt an mehreren weiteren Feldern (Hubhöhe, Gassenbreite, Gefälle,
+    Temperatur) auf Nordlicht — und neu: bei Cloud tritt das Muster **nicht** auf, was vorher
+    nicht verglichen werden konnte, da es kein zweites Modell gab.
+  - **Temperatur-Vorzeichenfehler** (§5.6 in architecture.md, dort bereits für zwei
+    IK-Tender dokumentiert, exakt dasselbe Beispiel +2°C→-2°C): heute zwei weitere Instanzen
+    gefunden, davon eine mit einer neuen Nuance — komplett ohne Quellenangabe (statt einer
+    falschen-aber-begründeten Zitation wie in den ursprünglich dokumentierten Fällen), wodurch
+    der Guard sie diesmal tatsächlich abfangen konnte.
 
 ## Pro-Ausschreibung-Detailbefunde
 
@@ -72,7 +81,11 @@ Kühlleistung (110 kW), Kältemittel-Liste und Temperaturschwankung (±0,5K) kor
 Das ist exakt der Fall, für den Layer 1 des Halluzinations-Guards existiert ("keine Zitation = 
 Vermutung → nullen") — und er hat ihn auch tatsächlich gegriffen: der Layer-Zähler dieses Laufs
 zeigt L1=1, passend zu diesem Fund. Der halluzinierte Wert hat es nie bis zum Endergebnis
-geschafft. Cloud extrahiert +2°C korrekt mit echtem Zitat.
+geschafft. Cloud extrahiert +2°C korrekt mit echtem Zitat. Der Vorzeichenfehler selbst ist kein
+neuer Bug — `docs/architecture.md` §5.6 dokumentiert ihn bereits seit 31.07. an zwei anderen
+IK-Tendern; neu ist hier die Variante ganz ohne Zitation, wodurch der Guard ihn diesmal fangen
+konnte (die ursprünglich dokumentierten Fälle hatten eine falsche, aber begründete Zitation und
+kamen am Guard vorbei).
 
 ### IK Deep Freeze — die härteste Ausschreibung: zwei bewusste Mehrdeutigkeits-Fallen
 Das Dokument nennt drei Kälteleistungswerte (280 kW nur für den Schockfroster, 340 kW für die
@@ -96,17 +109,21 @@ korrekt bei beiden, COP 4,2 korrekt bei beiden. **Aber:** lokal liefert bei der 
 sagt. Das Modell hat also richtig zitiert, aber beim Umwandeln in eine Zahl das Vorzeichen
 verdreht. Cloud liefert korrekt +4°C.
 
-## Das 4c-Vergessens-Muster (neuer Befund)
+## Das 4c-Vergessens-Muster (bereits bekannt — §5.4 in architecture.md; heute erweitert bestätigt)
 
 Bei Nordlicht lieferte Pass 4b für lokal korrekt: Hubhöhe 10000, Gassenbreite 3400,
 Gefälle 1,5, Temperatur 10/30. Die anschließenden gezielten 4c-Einzelabfragen für exakt
 dieselben Felder lieferten **alle `null`** — trotz identischem Modell, identischem Dokument,
-nur Sekunden später. Da im Pipeline-Design ein `null`-Ergebnis von 4c den 4b-Wert nicht
-überschreibt (nur "abstained"), hat dies das Endergebnis hier nicht beschädigt — aber es zeigt,
-dass das lokale 7B-Modell bei der fokussierten Einzelfeld-Frage deutlich unzuverlässiger ist als
-im Batch-Modus. Bei Cloud tritt dieses Muster nicht auf: Cloud lieferte in praktisch jedem
-beobachteten 4c-Aufruf denselben Wert wie in 4b. **Nicht weiter untersucht, aber als konkreter
-Hinweis für eine mögliche zukünftige Prompt-Überarbeitung von Pass 4c wert.**
+nur Sekunden später. `docs/architecture.md` §5.4 dokumentiert dieses Muster bereits seit dem
+31.07. für `max_payload`; neu ist heute die Bestätigung an mehreren weiteren Feldern in einem
+Lauf sowie der direkte Vergleich mit Cloud. Da im Pipeline-Design ein `null`-Ergebnis von 4c den
+4b-Wert nicht überschreibt (nur "abstained"), hat dies das Endergebnis hier nicht beschädigt —
+aber es zeigt, dass das lokale 7B-Modell bei der fokussierten Einzelfeld-Frage deutlich
+unzuverlässiger ist als im Batch-Modus. Bei Cloud tritt dieses Muster nicht auf: Cloud lieferte
+in praktisch jedem beobachteten 4c-Aufruf denselben Wert wie in 4b — das ist der neue Datenpunkt,
+den es vor dem heutigen Vergleich noch nicht geben konnte. **Nicht weiter untersucht, aber als
+konkreter Hinweis für eine mögliche zukünftige Prompt-Überarbeitung von Pass 4c wert** (bereits
+so in architecture.md §5.4 vermerkt).
 
 ## Gesamt-Score (36 manuell verifizierte kritische Feld-Extraktionen, 7 Ausschreibungen)
 

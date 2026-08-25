@@ -88,12 +88,18 @@ domain/industry logic here. No field names, no AP0 values, no per-model prompt v
 CLAUDE.md / R4). This module knows how to talk to an LLM provider, never what to ask it.` Cheap,
 and this is a brand-new file with no institutional scar tissue yet to lean on otherwise.
 
+**STATUS 2026-08-25: the block below is the AS-BUILT registry** (kept in sync after the
+Qwen-3.8-27B swap in "Nachtrag 2" above and the reasoning-off enforcement it required — see
+`src/llm_client.py` for the authoritative, currently-running version; this copy is updated
+whenever that file changes materially, but treat the source file as ground truth if they ever
+drift).
+
 ```python
 @dataclass(frozen=True)
 class LLMModelChoice:
-    id: str               # stable selector, e.g. "local-qwen2.5-7b", "openrouter-qwen2.5-72b"
+    id: str               # stable selector, e.g. "local-qwen2.5-7b", "openrouter-qwen3.8-27b"
     provider: str          # "ollama" | "openrouter"
-    model_name: str        # provider-native model string, e.g. "qwen2.5:7b" / "qwen/qwen-2.5-72b-instruct"
+    model_name: str        # provider-native model string, e.g. "qwen2.5:7b" / "qwen/qwen3.8-27b"
     display_name: str      # UI label, e.g. "Qwen 2.5 7B (lokal, Ollama)"
     is_local: bool
     is_reasoning_model: bool  # R4 — see below; must be False for every entry at launch
@@ -109,9 +115,9 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
                     "Qwen 2.5 7B (lokal, Ollama)", is_local=True,
                     is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
                     weights_open=True),
-    LLMModelChoice("openrouter-qwen2.5-72b", "openrouter", "qwen/qwen-2.5-72b-instruct",
-                    "Qwen 2.5 72B (Cloud, OpenRouter)", is_local=False,
-                    is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
+    LLMModelChoice("openrouter-qwen3.8-27b", "openrouter", "qwen/qwen3.8-27b",
+                    "Qwen 3.8 27B (Cloud, OpenRouter)", is_local=False,
+                    is_reasoning_model=False, context_tokens=1_000_000, max_output_tokens=4096,
                     weights_open=True),
     LLMModelChoice("openrouter-llama3.3-70b", "openrouter", "meta-llama/llama-3.3-70b-instruct",
                     "Llama 3.3 70B (Cloud, OpenRouter)", is_local=False,
@@ -124,15 +130,18 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
     # User decision 2026-08-25: seed with 3 cloud entries spanning different model families
     # (Qwen/Llama/Mistral) rather than just the one confirmed slug — lets the guard-layer
     # comparison (R6) distinguish "qwen-family quirk" from "generic stronger-model behavior".
-    # All three slugs verified live against OpenRouter's own model pages 2026-08-25.
     #
     # CURATION RULE (user requirement, 2026-08-25): every AVAILABLE_MODELS entry must be an
     # open-weight model — one that could, with the right hardware, also run as a local Ollama
     # entry. No closed/API-only proprietary model (GPT-*, Claude, Gemini, etc.) is ever added,
-    # regardless of quality, because it can NEVER satisfy that condition. Verified for the three
-    # entries above (2026-08-25):
-    #   - Qwen 2.5 72B Instruct: open weights (Qwen License, permits local use), in Ollama's
-    #     library today (`ollama pull qwen2.5:72b`).
+    # regardless of quality, because it can NEVER satisfy that condition. Verified 2026-08-25:
+    #   - Qwen 3.8 27B: open weights (hugging_face_id "Qwen/Qwen3.8-27B" per OpenRouter's own
+    #     model metadata), dense 27B, 1M-token context. Reasoning-capable and defaults to
+    #     reasoning ENABLED on OpenRouter (default_effort "xhigh") — handled by sending
+    #     `"reasoning": {"enabled": false}` unconditionally on every OpenRouter call (see
+    #     `_call_openrouter()`), not by excluding the model. Live-verified 2026-08-25 against a
+    #     real 8-tender comparison run: zero reasoning/`<think>` leakage in the raw output —
+    #     see `docs/e2e_20260825_llm_provider_comparison/`.
     #   - Llama 3.3 70B Instruct: open weights (Meta Llama 3.3 Community License, permits local
     #     use), in Ollama's library today (`ollama pull llama3.3:70b-instruct-q4_K_M`).
     #   - Mistral Large 3 (2512): open weights, Apache 2.0 (mistralai/Mistral-Large-3-675B-
@@ -140,17 +149,22 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
     #     library as of 2026-08-25 (new, Dec-2025-era release); would need a manual GGUF
     #     import via a custom Modelfile to actually run locally today. Passes the open-weight
     #     test; local *convenience* lags the other two.
-    # Practical hardware note: Qwen/Llama here are 70-72B — already a meaningfully bigger local
-    # footprint than the 7B default, but within reach of a serious single-workstation GPU setup.
-    # Mistral Large 3 is a 675B-parameter MoE (41B active) — open-weight in principle, but "the
-    # right hardware" for it in practice means a multi-GPU server, not a single machine. Flagged
-    # so the choice is informed, not a surprise later; not a reason to drop it from the registry.
-    # Further entries go here only — but see R4: non-reasoning instruct models only at launch;
-    # a reasoning/CoT model (e.g. anything emitting a <think> preamble or a wrapper object,
-    # DeepSeek's current V4 family among them) needs its own repair_and_parse() handling and
-    # is explicitly OUT of scope here. Gemini 2.5 Flash was considered and deliberately excluded
-    # at launch both for its configurable thinking budget AND because it is closed-weight (fails
-    # the curation rule above on its own, independent of the reasoning-model concern).
+    # Practical hardware note: Qwen 3.8 27B needs roughly 14-17GB at 4-bit quantization (fits a
+    # single 24GB consumer GPU); Llama 3.3 70B is a meaningfully bigger local footprint than the
+    # 7B default but within reach of a serious single-workstation GPU setup. Mistral Large 3 is
+    # a 675B-parameter MoE (41B active) — open-weight in principle, but "the right hardware" for
+    # it in practice means a multi-GPU server, not a single machine. Flagged so the choice is
+    # informed, not a surprise later; not a reason to drop it from the registry.
+    # Further entries go here only — but see R4: non-reasoning-CAPABLE-by-default models only
+    # at launch (see Qwen 3.8 27B note above: reasoning-*capable* is fine now that the
+    # request-level reasoning-off enforcement is proven; a model whose reasoning cannot be
+    # disabled via this switch, or one that emits a wrapper object instead of a think block,
+    # still needs its own repair_and_parse() handling and is explicitly OUT of scope here.
+    # DeepSeek's V4 family was specifically flagged during earlier research as having its own
+    # reasoning quirks — treat as unverified for the reasoning-off switch until checked the same
+    # way Qwen 3.8 27B was). Gemini 2.5 Flash was considered and deliberately excluded at launch
+    # both for its configurable thinking budget AND because it is closed-weight (fails the
+    # curation rule above on its own, independent of the reasoning-model concern).
 ]
 DEFAULT_MODEL_ID = "local-qwen2.5-7b"   # preserves today's zero-config behaviour
 
@@ -383,6 +397,18 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
    on every AGV tender (e.g. CompanyX 1→10, Dragonfly 2→10) in ~3.5× less wall time; raw output
    (`qwen3.8-27b_raw_output.txt`) contains zero reasoning/`<think>` leakage, confirming the
    `reasoning: {"enabled": false}` request-level fix works; cost was $0.28 for the full run.
+   **Follow-up 2026-08-25:** a second, deeper pass manually re-derived ground truth by reading
+   all 8 source PDFs by hand and checking both models' raw completions against it — see
+   `docs/e2e_20260825_llm_provider_comparison/GROUND_TRUTH_ANALYSIS.md`. Across 36 manually
+   verified critical fields: cloud ≈99% correct, local ≈71%, including 2 confirmed local
+   hallucinations (one caught live by the guard's Layer 1, a concrete real-world demonstration
+   of it working) and fresh confirmation of two **already-documented, pre-existing** local-model
+   issues from `docs/architecture.md` — §5.4 (Pass 4c's high abstention rate, now confirmed on
+   more fields than originally documented, and confirmed absent on the cloud model in this run)
+   and §5.6 (the temperature sign-flip bug, now with a documented no-citation sub-case caught by
+   Layer 1). Corrected 2026-08-25: an earlier draft of this note mischaracterized both as new
+   findings — they were not; only the specific fresh instances and the cloud-vs-local delta are
+   new.
    **Still open:** Llama 3.3 70B and Mistral Large 3 (the other two registered cloud entries)
    have not yet been run through this same comparison — same manual-run, explicit-authorization
    gate applies before spending money on them.
@@ -437,10 +463,11 @@ burn money just by being run in CI or by a developer typing `pytest tests/`. Con
 ## 4. Open questions / explicit non-decisions (flagged, not silently resolved)
 
 **Resolved by Tech Lead, 2026-08-25:**
-- Starter `AVAILABLE_MODELS` set: **3 cloud entries** — `qwen/qwen-2.5-72b-instruct`,
+- Starter `AVAILABLE_MODELS` set: **3 cloud entries** — `qwen/qwen3.8-27b` (swapped in for the
+  originally-planned `qwen/qwen-2.5-72b-instruct` per "Nachtrag 2" above, user decision),
   `meta-llama/llama-3.3-70b-instruct`, `mistralai/mistral-large-2512` — spanning three model
-  families, all confirmed non-reasoning instruct models (R4). See §2.1 for the full registry
-  and the reasoning behind spanning families rather than seeding one.
+  families. See §2.1 for the full, currently-accurate registry and the reasoning behind
+  spanning families rather than seeding one.
 - `scripts/test_pipeline.py` migration: deferred to a separate follow-up task, explicitly tracked
   rather than silently dropped. `benchmark_models.py` and `test_llm_preflight.py` remain
   mandatory in this sprint's DoD (R5 reclassification) since they hard-break once `OLLAMA_MODEL`
