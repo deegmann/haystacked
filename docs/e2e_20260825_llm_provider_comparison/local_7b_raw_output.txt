@@ -1,0 +1,1021 @@
+
+================================================================================
+[2026-08-25T12:26:31] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Nordlicht Kaffeemanufaktur GmbH",
+  "project_name": "Automatisiertes Transportsystem (AGV / AMR) für das neue Logistikzentrum",
+  "project_location": "Bremen-Hemelingen, Bremen, Deutschland",
+  "tender_date": "2026-06-26",
+  "deadline": "2026-08-28",
+  "contact_name": "Dipl.-Ing. Annika Brandt, Markus Vollmer",
+  "contact_email": "a.brandt@nordlicht-kaffee.example, m.vollmer@nordlicht-kaffee.example",
+  "contact_phone": "+49 421 5550-214, +49 421 5550-188",
+  "buyer_industry": "Food and Beverage",
+  "tender_category": "Automated Guided Vehicle (AGV) and Autonomous Mobile Robot (AMR) System",
+  "summary": "Nordlicht Kaffeemanufaktur GmbH is seeking a partner to plan, deliver, install, and commission an automated transport system (AGV/AMR) for their new logistics center in Bremen-Hemelingen. The system will connect production, storage, and shipping areas and is expected to handle up to 1,000 pallets per day.",
+  "missing_info": []
+}
+
+================================================================================
+[2026-08-25T12:26:41] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":"28.99","nace_tender_name":"Manufacture of other special-purpose machinery n.e.c. | Sondermaschinen: Engineering-Ausschreibungen","nace_buyer":null,"priority":"GUT","confidence":"HOCH","in_scope":true}
+
+================================================================================
+[2026-08-25T12:26:42] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T12:27:33] label=agv_4a model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{"required_product_type":"Forklift AGV"}
+```
+
+================================================================================
+[2026-08-25T12:29:11] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_navigation_type": "Natural Feature (SLAM)",
+  "required_infrastructure_free": false,
+  "required_outdoor_capable": false,
+  "required_autonomous_obstacle_bypass": true,
+  "required_omnidirectional_movement": false,
+  "required_max_payload": 1200,
+  "required_max_payload_source": "Maximale Traglast ≥ 1.200 kg",
+  "required_load_type": "Europalette, Industriepalette",
+  "required_multi_load_compatibility": null,
+  "required_max_speed": null,
+  "required_vehicle_length": null,
+  "required_vehicle_width": null,
+  "required_operating_temp_min": 10,
+  "required_operating_temp_min_source": "Umgebungstemperatur 10 – 30 °C (Innenbereich)",
+  "required_operating_temp_max": 30,
+  "required_operating_temp_max_source": "Umgebungstemperatur 10 – 30 °C (Innenbereich)",
+  "required_operating_humidity_max": null,
+  "required_operating_humidity_max_source": null,
+  "required_ingress_protection_rating": null,
+  "required_cleanroom_class": null,
+  "required_max_gradient": 1.5,
+  "required_max_gradient_source": "Bodenebenheit nach DIN 18202, Tabelle 3, Zeile 4\nGefälle (Bereich Tore) ca. 1,5 %",
+  "required_floor_flatness_req": null,
+  "required_stop_accuracy": null,
+  "required_battery_type": "Lithium-Ionen",
+  "required_battery_runtime": null,
+  "required_charge_time": null,
+  "required_autonomous_charging": null,
+  "required_battery_swap_capable": null,
+  "required_safety_standard": "EN ISO 3691-4, EN 1525",
+  "required_functional_safety_level": null,
+  "required_safety_coverage": null,
+  "required_fleet_management_system": "VDA 5050-kompatibel",
+  "required_fleet_control_architecture": null,
+  "required_vda5050_compatible": true,
+  "required_max_fleet_size": null,
+  "required_multi_fleet_capable": null,
+  "required_integration_capability": "REST / OPC UA",
+  "required_installation_process": null,
+  "required_modification_process": null,
+  "required_station_applications": "Floor, Conveyor",
+  "required_min_fleet_size": null,
+  "required_typical_project_value": null,
+  "required_manual_usage": true,
+  "required_industries_served": "Food & Beverage",
+  "required_lifting_height": 10000,
+  "required_lifting_height_source": "Hubhöhe ≥ 10 m (für Hochregaleinsatz)",
+  "required_min_total_height": null,
+  "required_min_total_height_source": null,
+  "required_special_fork_option": null,
+  "required_fork_spread": null,
+  "required_mast_type": null,
+  "required_min_aisle_width": 3400,
+  "required_min_aisle_width_source": "Regalbreite (Gassenbreite) 3,4 m",
+  "required_vna_capable": false,
+  "required_drive_type": null,
+  "required_drop_accuracy_lat": null,
+  "required_drop_accuracy_dep": null,
+  "required_drop_accuracy_angle": null,
+  "required_pick_req_accuracy_lat": null,
+  "required_pick_req_accuracy_dep": null,
+  "required_pick_req_accuracy_angle": null,
+  "required_forks_free_floating": null,
+  "required_stacking_capability": null,
+  "required_load_detection": null,
+  "required_barcode_readers": null,
+  "required_stock_line_scanning": null,
+  "required_trailer_loading": null,
+  "required_trailer_unloading": null,
+  "required_guidance": null,
+  "required_busbar_compatible": null
+}
+```
+
+================================================================================
+[2026-08-25T12:29:19] label=agv_4b_correction1 model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "required_load_type": null,
+  "required_battery_type": null,
+  "required_fleet_management_system": null,
+  "required_integration_capability": null,
+  "required_industries_served": null
+}
+
+================================================================================
+[2026-08-25T12:29:44] label=agv_4c_required_min_total_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T12:30:09] label=agv_4c_required_max_payload model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_payload": 1200, "required_max_payload_source": "Maximale Traglast ≥ 1.200 kg"}
+
+================================================================================
+[2026-08-25T12:30:33] label=agv_4c_required_lifting_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T12:30:58] label=agv_4c_required_operating_temp_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": null, "required_operating_temp_max_source": null}
+
+================================================================================
+[2026-08-25T12:31:23] label=agv_4c_required_min_aisle_width model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": null, "required_min_aisle_width_source": null}
+
+================================================================================
+[2026-08-25T12:31:48] label=agv_4c_required_operating_humidity_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T12:32:12] label=agv_4c_required_max_gradient model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T12:32:37] label=agv_4c_required_operating_temp_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": null, "required_operating_temp_min_source": null}
+
+================================================================================
+[2026-08-25T12:33:07] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "CompanyX",
+  "project_name": "Automated Guided Vehicle (AGV) System",
+  "project_location": "XStr. 4, 12345 XStadt",
+  "tender_date": null,
+  "deadline": null,
+  "contact_name": null,
+  "contact_email": null,
+  "contact_phone": null,
+  "buyer_industry": "Logistics",
+  "tender_category": "Automated Guided Vehicle System",
+  "summary": "CompanyX is seeking a partner for the planning and commissioning of an AGV system at a newly built logistics site. The project covers AGVs, operationally relevant peripherals, and control/management software. The tender includes project planning, implementation, production, delivery, assembly, commissioning, testing, and operational handover, including training and maintenance.",
+  "missing_info": [
+    "Tender date",
+    "Deadline",
+    "Contact name",
+    "Contact email",
+    "Contact phone"
+  ]
+}
+
+================================================================================
+[2026-08-25T12:33:11] label=contact model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"contact_name":null,"contact_email":null,"contact_phone":null,"deadline":null,"tender_date":null}
+
+================================================================================
+[2026-08-25T12:33:21] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":"28.99","nace_tender_name":"Manufacture of other special-purpose machinery n.e.c. | Sondermaschinen: Engineering-Ausschreibungen","nace_buyer":null,"priority":"GUT","confidence":"HOCH","in_scope":true}
+
+================================================================================
+[2026-08-25T12:33:22] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T12:33:45] label=agv_4a model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{"required_product_type":"Forklift AGV"}
+```
+
+================================================================================
+[2026-08-25T12:35:11] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_navigation_type": null,
+  "required_infrastructure_free": null,
+  "required_outdoor_capable": null,
+  "required_autonomous_obstacle_bypass": null,
+  "required_omnidirectional_movement": null,
+  "required_max_payload": null,
+  "required_max_payload_source": null,
+  "required_load_type": null,
+  "required_multi_load_compatibility": null,
+  "required_max_speed": null,
+  "required_vehicle_length": null,
+  "required_vehicle_width": null,
+  "required_operating_temp_min": null,
+  "required_operating_temp_min_source": null,
+  "required_operating_temp_max": null,
+  "required_operating_temp_max_source": null,
+  "required_operating_humidity_max": null,
+  "required_operating_humidity_max_source": null,
+  "required_ingress_protection_rating": null,
+  "required_cleanroom_class": null,
+  "required_max_gradient": null,
+  "required_max_gradient_source": null,
+  "required_floor_flatness_req": null,
+  "required_stop_accuracy": null,
+  "required_battery_type": null,
+  "required_battery_runtime": null,
+  "required_charge_time": null,
+  "required_autonomous_charging": null,
+  "required_battery_swap_capable": null,
+  "required_safety_standard": null,
+  "required_functional_safety_level": null,
+  "required_safety_coverage": null,
+  "required_fleet_management_system": null,
+  "required_fleet_control_architecture": null,
+  "required_vda5050_compatible": null,
+  "required_max_fleet_size": null,
+  "required_multi_fleet_capable": null,
+  "required_integration_capability": null,
+  "required_installation_process": null,
+  "required_modification_process": null,
+  "required_station_applications": null,
+  "required_min_fleet_size": null,
+  "required_typical_project_value": null,
+  "required_manual_usage": null,
+  "required_industries_served": null,
+  "required_lifting_height": null,
+  "required_lifting_height_source": null,
+  "required_min_total_height": null,
+  "required_min_total_height_source": null,
+  "required_special_fork_option": null,
+  "required_fork_spread": null,
+  "required_mast_type": null,
+  "required_min_aisle_width": null,
+  "required_min_aisle_width_source": null,
+  "required_vna_capable": null,
+  "required_drive_type": null,
+  "required_drop_accuracy_lat": null,
+  "required_drop_accuracy_dep": null,
+  "required_drop_accuracy_angle": null,
+  "required_pick_req_accuracy_lat": null,
+  "required_pick_req_accuracy_dep": null,
+  "required_pick_req_accuracy_angle": null,
+  "required_forks_free_floating": null,
+  "required_stacking_capability": null,
+  "required_load_detection": null,
+  "required_barcode_readers": null,
+  "required_stock_line_scanning": null,
+  "required_trailer_loading": null,
+  "required_trailer_unloading": null,
+  "required_guidance": null,
+  "required_busbar_compatible": null
+}
+```
+
+================================================================================
+[2026-08-25T12:35:32] label=agv_4c_required_min_total_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T12:35:52] label=agv_4c_required_max_payload model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_payload": null, "required_max_payload_source": null}
+
+================================================================================
+[2026-08-25T12:36:13] label=agv_4c_required_lifting_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T12:36:33] label=agv_4c_required_operating_temp_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": null, "required_operating_temp_max_source": null}
+
+================================================================================
+[2026-08-25T12:36:54] label=agv_4c_required_min_aisle_width model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": null, "required_min_aisle_width_source": null}
+
+================================================================================
+[2026-08-25T12:37:14] label=agv_4c_required_operating_humidity_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T12:37:35] label=agv_4c_required_max_gradient model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T12:37:55] label=agv_4c_required_operating_temp_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": null, "required_operating_temp_min_source": null}
+
+================================================================================
+[2026-08-25T12:38:27] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Firefly AGV and VNA",
+  "project_name": "Automation at XYZ Facility",
+  "project_location": "43,860 m² warehouse",
+  "tender_date": "22.07.2024",
+  "deadline": "27.09.2024",
+  "contact_name": null,
+  "contact_email": null,
+  "contact_phone": null,
+  "buyer_industry": "Manufacturing",
+  "tender_category": "Warehouse Automation System",
+  "summary": "The tender concerns the installation of automation at a warehouse operated by Firefly for its customer. The aim is to reduce operational costs and provide a resilient solution for pallet movements.",
+  "missing_info": []
+}
+
+================================================================================
+[2026-08-25T12:38:32] label=contact model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"contact_name":null,"contact_email":null,"contact_phone":null,"deadline":null,"tender_date":null}
+
+================================================================================
+[2026-08-25T12:38:42] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":"28.99","nace_tender_name":"Manufacture of other special-purpose machinery n.e.c. | Sondermaschinen: Engineering-Ausschreibungen","nace_buyer":null,"priority":"GUT","confidence":"HOCH","in_scope":true}
+
+================================================================================
+[2026-08-25T12:38:43] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T12:39:02] label=agv_4a model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{"required_product_type": "Forklift AGV"}
+```
+
+================================================================================
+[2026-08-25T12:40:24] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_navigation_type": null,
+  "required_infrastructure_free": null,
+  "required_outdoor_capable": null,
+  "required_autonomous_obstacle_bypass": null,
+  "required_omnidirectional_movement": null,
+  "required_max_payload": null,
+  "required_max_payload_source": null,
+  "required_load_type": null,
+  "required_multi_load_compatibility": null,
+  "required_max_speed": null,
+  "required_vehicle_length": null,
+  "required_vehicle_width": null,
+  "required_operating_temp_min": null,
+  "required_operating_temp_min_source": null,
+  "required_operating_temp_max": null,
+  "required_operating_temp_max_source": null,
+  "required_operating_humidity_max": null,
+  "required_operating_humidity_max_source": null,
+  "required_ingress_protection_rating": null,
+  "required_cleanroom_class": null,
+  "required_max_gradient": null,
+  "required_max_gradient_source": null,
+  "required_floor_flatness_req": null,
+  "required_stop_accuracy": null,
+  "required_battery_type": null,
+  "required_battery_runtime": null,
+  "required_charge_time": null,
+  "required_autonomous_charging": null,
+  "required_battery_swap_capable": null,
+  "required_safety_standard": null,
+  "required_functional_safety_level": null,
+  "required_safety_coverage": null,
+  "required_fleet_management_system": null,
+  "required_fleet_control_architecture": null,
+  "required_vda5050_compatible": null,
+  "required_max_fleet_size": null,
+  "required_multi_fleet_capable": null,
+  "required_integration_capability": null,
+  "required_installation_process": null,
+  "required_modification_process": null,
+  "required_station_applications": null,
+  "required_min_fleet_size": null,
+  "required_typical_project_value": null,
+  "required_manual_usage": null,
+  "required_industries_served": null,
+  "required_lifting_height": null,
+  "required_lifting_height_source": null,
+  "required_min_total_height": null,
+  "required_min_total_height_source": null,
+  "required_special_fork_option": null,
+  "required_fork_spread": null,
+  "required_mast_type": null,
+  "required_min_aisle_width": null,
+  "required_min_aisle_width_source": null,
+  "required_vna_capable": null,
+  "required_drive_type": null,
+  "required_drop_accuracy_lat": null,
+  "required_drop_accuracy_dep": null,
+  "required_drop_accuracy_angle": null,
+  "required_pick_req_accuracy_lat": null,
+  "required_pick_req_accuracy_dep": null,
+  "required_pick_req_accuracy_angle": null,
+  "required_forks_free_floating": null,
+  "required_stacking_capability": null,
+  "required_load_detection": null,
+  "required_barcode_readers": null,
+  "required_stock_line_scanning": null,
+  "required_trailer_loading": null,
+  "required_trailer_unloading": null,
+  "required_guidance": null,
+  "required_busbar_compatible": null
+}
+```
+
+================================================================================
+[2026-08-25T12:40:42] label=agv_4c_required_min_total_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T12:41:00] label=agv_4c_required_max_payload model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_payload": 1000, "required_max_payload_source": "Max Loaded weight (KG) (Footprint) 1000"}
+
+================================================================================
+[2026-08-25T12:41:16] label=agv_4c_required_lifting_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T12:41:33] label=agv_4c_required_operating_temp_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": null, "required_operating_temp_max_source": null}
+
+================================================================================
+[2026-08-25T12:41:50] label=agv_4c_required_min_aisle_width model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": null, "required_min_aisle_width_source": null}
+
+================================================================================
+[2026-08-25T12:42:07] label=agv_4c_required_operating_humidity_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T12:42:24] label=agv_4c_required_max_gradient model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T12:42:40] label=agv_4c_required_operating_temp_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": null, "required_operating_temp_min_source": null}
+
+================================================================================
+[2026-08-25T12:43:17] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Mama",
+  "project_name": "AGV System for Production Site",
+  "project_location": null,
+  "tender_date": null,
+  "deadline": null,
+  "contact_name": "Contact Person",
+  "contact_email": "contact@mama.com",
+  "contact_phone": "(XXX) XXX-XXXX",
+  "buyer_industry": "Manufacturing",
+  "tender_category": "Automated Guided Vehicle System",
+  "summary": "Mama is building a new production site and requires an AGV system to transport palletized finished products from the filling area to the dispatch area, as well as supply packaging material from the warehouse to the filling line. The system must operate in a non-Ex atmosphere and have a 30% spare capacity to cover future volume increases.",
+  "missing_info": ["project_location", "tender_date", "deadline"]
+}
+
+================================================================================
+[2026-08-25T12:43:20] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":"28.99","nace_tender_name":"Manufacture of other special-purpose machinery n.e.c. | Sondermaschinen: Engineering-Ausschreibungen","nace_buyer":null,"priority":"GUT","confidence":"HOCH","in_scope":true}
+
+================================================================================
+[2026-08-25T12:43:21] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "Logistics:AGV"}
+
+================================================================================
+[2026-08-25T12:43:46] label=agv_4a model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{"required_product_type":"Forklift AGV"}
+```
+
+================================================================================
+[2026-08-25T12:45:18] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_navigation_type": null,
+  "required_infrastructure_free": null,
+  "required_outdoor_capable": null,
+  "required_autonomous_obstacle_bypass": null,
+  "required_omnidirectional_movement": null,
+  "required_max_payload": 2000,
+  "required_max_payload_source": "The AGV must handle three different pallet sizes with a maximum load of 2000 kg.",
+  "required_load_type": null,
+  "required_multi_load_compatibility": null,
+  "required_max_speed": null,
+  "required_vehicle_length": null,
+  "required_vehicle_width": null,
+  "required_operating_temp_min": 10,
+  "required_operating_temp_min_source": "The AGVS must be able to operate in ambient temperatures ranging from 1030°C indoors.",
+  "required_operating_temp_max": 30,
+  "required_operating_temp_max_source": "The AGVS must be able to operate in ambient temperatures ranging from 1030°C indoors.",
+  "required_operating_humidity_max": null,
+  "required_operating_humidity_max_source": null,
+  "required_ingress_protection_rating": null,
+  "required_cleanroom_class": null,
+  "required_max_gradient": null,
+  "required_max_gradient_source": null,
+  "required_floor_flatness_req": null,
+  "required_stop_accuracy": null,
+  "required_battery_type": null,
+  "required_battery_runtime": null,
+  "required_charge_time": null,
+  "required_autonomous_charging": null,
+  "required_battery_swap_capable": null,
+  "required_safety_standard": null,
+  "required_functional_safety_level": null,
+  "required_safety_coverage": null,
+  "required_fleet_management_system": null,
+  "required_fleet_control_architecture": null,
+  "required_vda5050_compatible": null,
+  "required_max_fleet_size": null,
+  "required_multi_fleet_capable": null,
+  "required_integration_capability": "OPC UA",
+  "required_installation_process": null,
+  "required_modification_process": null,
+  "required_station_applications": "Floor, Conveyor",
+  "required_min_fleet_size": null,
+  "required_typical_project_value": null,
+  "required_manual_usage": null,
+  "required_industries_served": null,
+  "required_lifting_height": null,
+  "required_lifting_height_source": null,
+  "required_min_total_height": null,
+  "required_min_total_height_source": null,
+  "required_special_fork_option": null,
+  "required_fork_spread": null,
+  "required_mast_type": null,
+  "required_min_aisle_width": null,
+  "required_min_aisle_width_source": null,
+  "required_vna_capable": null,
+  "required_drive_type": null,
+  "required_drop_accuracy_lat": null,
+  "required_drop_accuracy_dep": null,
+  "required_drop_accuracy_angle": null,
+  "required_pick_req_accuracy_lat": null,
+  "required_pick_req_accuracy_dep": null,
+  "required_pick_req_accuracy_angle": null,
+  "required_forks_free_floating": null,
+  "required_stacking_capability": null,
+  "required_load_detection": null,
+  "required_barcode_readers": null,
+  "required_stock_line_scanning": null,
+  "required_trailer_loading": null,
+  "required_trailer_unloading": null,
+  "required_guidance": null,
+  "required_busbar_compatible": null
+}
+```
+
+================================================================================
+[2026-08-25T12:45:22] label=agv_4b_correction1 model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "required_integration_capability": null
+}
+
+================================================================================
+[2026-08-25T12:45:45] label=agv_4c_required_min_total_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_total_height": null, "required_min_total_height_source": null}
+
+================================================================================
+[2026-08-25T12:46:10] label=agv_4c_required_max_payload model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_payload": 2000, "required_max_payload_source": "The AGV must handle three different pallet sizes with a maximum load of 2000 kg: ● 800×1200 ● 1000×1200 ● 1200×1200"}
+
+================================================================================
+[2026-08-25T12:46:33] label=agv_4c_required_lifting_height model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_lifting_height": null, "required_lifting_height_source": null}
+
+================================================================================
+[2026-08-25T12:46:57] label=agv_4c_required_operating_temp_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_max": 30, "required_operating_temp_max_source": "The AGV must be able to operate in ambient temperatures ranging from 10 to 30°C indoors."}
+
+================================================================================
+[2026-08-25T12:47:20] label=agv_4c_required_min_aisle_width model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_min_aisle_width": null, "required_min_aisle_width_source": null}
+
+================================================================================
+[2026-08-25T12:47:43] label=agv_4c_required_operating_humidity_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_humidity_max": null, "required_operating_humidity_max_source": null}
+
+================================================================================
+[2026-08-25T12:48:06] label=agv_4c_required_max_gradient model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_max_gradient": null, "required_max_gradient_source": null}
+
+================================================================================
+[2026-08-25T12:48:29] label=agv_4c_required_operating_temp_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_operating_temp_min": null, "required_operating_temp_min_source": null}
+
+================================================================================
+[2026-08-25T12:49:23] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Technische Universität Berlin",
+  "project_name": "Überarbeitung einer vorhandenen Website",
+  "project_location": "Technische Universität Berlin, Wilhelmstraße 67, 10117 Berlin",
+  "tender_date": null,
+  "deadline": "30. Dezember 2025",
+  "contact_name": "Die Präsidentin",
+  "contact_email": null,
+  "contact_phone": null,
+  "buyer_industry": "Higher Education",
+  "tender_category": "Website Redesign",
+  "summary": "The Technical University of Berlin (TU Berlin) is seeking to redesign and modernize an existing website of the Einstein Center Digital Future (ECDF) to improve performance, accessibility, and user experience. The project includes backend and frontend development, CMS migration or setup, content migration, and ongoing support and maintenance.",
+  "missing_info": []
+}
+
+================================================================================
+[2026-08-25T12:49:32] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":null,"nace_tender_name":null,"nace_buyer":null,"priority":"UNBEKANNT","confidence":"NIEDRIG","in_scope":false}
+
+================================================================================
+[2026-08-25T12:49:33] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": null}
+
+================================================================================
+[2026-08-25T12:49:47] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Frischlogistik Rhein-Ruhr GmbH",
+  "project_name": "Refrigeration System for New Cold Store",
+  "project_location": "Mülheim an der Ruhr",
+  "tender_date": "2025-01-14",
+  "deadline": "15.04.2025",
+  "contact_name": "Markus Findeisen",
+  "contact_email": "tender@fr-rheinruhr.de",
+  "contact_phone": "+49 208 309 44-17",
+  "buyer_industry": "Logistics",
+  "tender_category": "Refrigeration Plant Supply",
+  "summary": "Frischlogistik Rhein-Ruhr GmbH is building a new distribution centre (DC-North) for the chilled distribution of fresh produce, dairy, and convenience food. The tender covers the supply, installation, and commissioning of the complete refrigeration plant for DC-North, including a maintenance contract for at least five years post-commissioning.",
+  "missing_info": []
+}
+
+================================================================================
+[2026-08-25T12:49:56] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":null,"nace_tender_name":null,"nace_buyer":null,"priority":"UNBEKANNT","confidence":"NIEDRIG","in_scope":false}
+
+================================================================================
+[2026-08-25T12:49:57] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "FoodBev:Refrigeration"}
+
+================================================================================
+[2026-08-25T12:50:34] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+```json
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_served_categories": null,
+  "required_cooling_capacity": 110,
+  "required_cooling_capacity_source": "Die Gesamtkälteleistung für beide Zonen zusammen beläuft sich nach Vorabschätzung unseres Ingenieurbüros (Planungsstand Dezember 2024) auf rund 110 kW. Dieser Wert ist als Richtwert anzusehen; wir erwarten von den Bietern eine eigene Auslegungsberechnung.",
+  "required_temperature_min": null,
+  "required_temperature_min_source": null,
+  "required_refrigerant_types": "R744, R290, R717",
+  "required_certifications_ik": "PED, EN 378, F-Gas-konform",
+  "required_cop_efficiency": null,
+  "required_cop_efficiency_source": null,
+  "required_cooling_medium": null,
+  "required_temperature_stability": 0.5,
+  "required_temperature_stability_source": "Zulässige Temperaturschwankung ±0,5 K",
+  "required_room_volume_max": 4620,
+  "required_room_volume_max_source": "Zone A – Frischebereich (Hauptlager): Nettoraumvolumen ca. 3.800 m³ (LxBxH: 58 m × 32 m × 7 m lichte Höhe). Zone B – Obst & Gemüse (separate Kammer): Nettoraumvolumen ca. 820 m³.",
+  "required_humidity_control_capable": true,
+  "required_blast_freeze_capacity": null,
+  "required_blast_freeze_capacity_source": null,
+  "required_pulldown_time": null,
+  "required_pulldown_time_source": null
+}
+```
+
+================================================================================
+[2026-08-25T12:50:40] label=agv_4c_required_blast_freeze_capacity model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_blast_freeze_capacity": null, "required_blast_freeze_capacity_source": null}
+
+================================================================================
+[2026-08-25T12:50:45] label=agv_4c_required_pulldown_time model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_pulldown_time": null, "required_pulldown_time_source": null}
+
+================================================================================
+[2026-08-25T12:50:51] label=agv_4c_required_temperature_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_temperature_min": -2, "required_temperature_min_source": null}
+
+================================================================================
+[2026-08-25T12:50:57] label=agv_4c_required_cop_efficiency model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_cop_efficiency": null, "required_cop_efficiency_source": null}
+
+================================================================================
+[2026-08-25T12:51:04] label=agv_4c_required_room_volume_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_room_volume_max": 3800, "required_room_volume_max_source": "Nettoraumvolumen ca. 3.800 m³ (LxBxH: 58 m × 32 m × 7 m lichte Höhe)."}
+
+================================================================================
+[2026-08-25T12:51:12] label=agv_4c_required_cooling_capacity model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_cooling_capacity": 110, "required_cooling_capacity_source": "Die Gesamtkälteleistung für beide Zonen zusammen beläuft sich nach Vorabschätzung unseres Ingenieurbüros (Planungsstand Dezember 2024) auf rund 110 kW."}
+
+================================================================================
+[2026-08-25T12:51:18] label=agv_4c_required_temperature_stability model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_temperature_stability": 0.5, "required_temperature_stability_source": "Zulässige Temperaturschwankung ±0,5 K"}
+
+================================================================================
+[2026-08-25T12:51:35] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Food Production",
+  "project_name": "Schockfroster and Tiefkühlanlage Werkserweiterung Erlangen-Süd",
+  "project_location": "Erlangen-Süd, 91058 Erlangen, Germany",
+  "tender_date": "17.02.2025",
+  "deadline": "31.05.2025",
+  "contact_name": "Dipl.-Ing. Bernd Raupach",
+  "contact_email": "b.raupach@tkf-ag.de",
+  "contact_phone": null,
+  "buyer_industry": "Food Production",
+  "tender_category": "Schockfroster and Tiefkühlanlage",
+  "summary": "Tiefkühlkost Franken AG is procuring a shock freezer and refrigeration system for a new production line (PL-7) to meet EU and internal quality standards.",
+  "missing_info": []
+}
+
+================================================================================
+[2026-08-25T12:51:44] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":null,"nace_tender_name":null,"nace_buyer":null,"priority":"UNBEKANNT","confidence":"NIEDRIG","in_scope":false}
+
+================================================================================
+[2026-08-25T12:51:45] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "FoodBev:Refrigeration"}
+
+================================================================================
+[2026-08-25T12:52:20] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_served_categories": "Deep Freeze",
+  "required_cooling_capacity": 280,
+  "required_cooling_capacity_source": "Eine Vorauslegung unseres externen Ingenieurbüros (Büro für Kältetechnik Dr. Vogt, Nürnberg) hat eine erforderliche installierte Kälteleistung von ca. 280 kW für den Schockfroster ergeben. Diese Zahl gilt nur für den Schockfroster.",
+  "required_temperature_min": -22,
+  "required_temperature_min_source": "Als Auslegungstemperatur für den Verdampfer ist -22 °C zu verwenden, um ausreichende Sicherheitsreserven gegenüber der Kerntemperaturanforderung zu gewährleisten. Die gewählte Auslegungstemperatur -22 °C ist damit der verbindliche Temperatursollwert der Kälteanlage auf der Niederdruckseite.",
+  "required_refrigerant_types": "R744",
+  "required_certifications_ik": null,
+  "required_cop_efficiency": 2.3,
+  "required_cop_efficiency_source": "Die Anlage soll über ein GLT-fähiges Steuerungssystem verfügen, das eine Einbindung in unser bestehendes Siemens Desigo-Gebäudeleitsystem ermöglicht. Die Datenübertragung kann über Modbus TCP oder BACnet IP erfolgen. Die Energiekosten am Standort Erlangen-Süd machen einen wesentlichen Teil der Betriebskosten aus. Wir erwarten daher die Angabe der Leistungszahl (COP) der Anlage am Auslegungspunkt und fordern eine Mindest-Leistungszahl von 2,3 im Schockfrosterbetrieb bei -22 °C Verdampfungstemperatur und +35 °C Verflüssigungstemperatur.",
+  "required_cooling_medium": null,
+  "required_temperature_stability": null,
+  "required_temperature_stability_source": null,
+  "required_room_volume_max": null,
+  "required_room_volume_max_source": null,
+  "required_humidity_control_capable": null,
+  "required_blast_freeze_capacity": 650,
+  "required_blast_freeze_capacity_source": "Der Schockfroster muss einen Durchsatz von 0,65 t/h (sechshundertfünfzig Kilogramm pro Stunde) bei einem Produktgewicht von 350–600 g je Portion gewährleisten.",
+  "required_pulldown_time": 4,
+  "required_pulldown_time_source": "Die Kerntemperatur der Produkte muss innerhalb einer Absenkzeit von vier Stunden ab Einlauf sicher auf -18 °C oder kälter gebracht werden."
+}
+
+================================================================================
+[2026-08-25T12:52:28] label=agv_4c_required_blast_freeze_capacity model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_blast_freeze_capacity": null, "required_blast_freeze_capacity_source": null}
+
+================================================================================
+[2026-08-25T12:52:41] label=agv_4c_required_pulldown_time model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_pulldown_time": 4, "required_pulldown_time_source": "Der Schockfroster muss einen Durchsatz von 0,65 t/h (sechshundertfünfzig Kilogramm pro Stunde) bei einem Produktgewicht von 350–600 g je Portion gewährleisten. Der Froster ist als Spiralfroster oder Tunnelfroster auszuführen; ein Plattenfroster scheidet aufgrund der Produktgeometrie aus. Die Kerntemperatur der Produkte muss innerhalb einer Absenkzeit von vier Stunden ab Einlauf sicher auf -18 °C oder kälter gebracht werden."}
+
+================================================================================
+[2026-08-25T12:52:52] label=agv_4c_required_temperature_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_temperature_min": -22, "required_temperature_min_source": "\"Als Auslegungstemperatur für den Verdampfer ist -22 °C zu verwenden, um ausreichende Sicherheitsreserven gegenüber der Kerntemperaturanforderung zu gewährleisten. Die gewählte Auslegungstemperatur -22 °C ist damit der verbindliche Temperatursollwert der Kälteanlage auf der Niederdruckseite.\""}
+
+================================================================================
+[2026-08-25T12:53:06] label=agv_4c_required_cop_efficiency model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_cop_efficiency": 2.3, "required_cop_efficiency_source": "Die Anlage soll über ein GLT-fähiges Steuerungssystem verfügen, das eine Einbindung in unser bestehendes Siemens Desigo-Gebäudeleitsystem ermöglicht. Die Datenübertragung kann über Modbus TCP oder BACnet IP erfolgen. Die Energiekosten am Standort Erlangen-Süd machen einen wesentlichen Teil der Betriebskosten aus. Wir erwarten daher die Angabe der Leistungszahl (COP) der Anlage am Auslegungspunkt und fordern eine Mindest-Leistungszahl von 2,3 im Schockfrosterbetrieb bei -22 °C Verdampfungstemperatur und +35 °C Verflüssigungstemperatur."}
+
+================================================================================
+[2026-08-25T12:53:13] label=agv_4c_required_room_volume_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_room_volume_max": null, "required_room_volume_max_source": null}
+
+================================================================================
+[2026-08-25T12:53:23] label=agv_4c_required_cooling_capacity model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_cooling_capacity": 280, "required_cooling_capacity_source": "Eine Vorauslegung unseres externen Ingenieurbüros (Büro für Kältetechnik Dr. Vogt, Nürnberg) hat eine erforderliche installierte Kälteleistung von ca. 280 kW für den Schockfroster ergeben."}
+
+================================================================================
+[2026-08-25T12:53:30] label=agv_4c_required_temperature_stability model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_temperature_stability": null, "required_temperature_stability_source": null}
+
+================================================================================
+[2026-08-25T12:53:48] label=basic model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "buyer": "Molkerei Nordrhein eG",
+  "project_name": "Erweiterung der Prozesskühlung",
+  "project_location": "Jüchen",
+  "tender_date": "22.03.2025",
+  "deadline": "30.04.2025",
+  "contact_name": "Herr Dipl.-Ing. Ralf Heckmann",
+  "contact_email": "einkauf@molkerei-nordrhein.de",
+  "contact_phone": "+49 2165 94870-23",
+  "buyer_industry": "Food Production",
+  "tender_category": "Kühlanlage Erweiterung",
+  "summary": "Molkerei Nordrhein eG plant die Erweiterung ihrer bestehenden Prozesskühlung am Standort Jüchen. Die neue Kälteanlage soll eine Nettokälteleistung von mindestens 420 kW bereitstellen und die bestehende Kälteversorgung ergänzen.",
+  "missing_info": []
+}
+
+================================================================================
+[2026-08-25T12:53:57] label=nace model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"nace_tender":null,"nace_tender_name":null,"nace_buyer":null,"priority":"UNBEKANNT","confidence":"NIEDRIG","in_scope":false}
+
+================================================================================
+[2026-08-25T12:53:58] label=domain_detect model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"detected_domain": "FoodBev:Refrigeration"}
+
+================================================================================
+[2026-08-25T12:54:28] label=agv_4b model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "required_reference_count": null,
+  "required_lead_time_weeks": null,
+  "required_service_coverage": null,
+  "required_distribution_model": null,
+  "required_country": null,
+  "required_employee_count_range": null,
+  "required_certifications_generic": null,
+  "required_languages_spoken": null,
+  "required_hq_city": null,
+  "required_founding_year": null,
+  "required_served_categories": "Process Cooling",
+  "required_cooling_capacity": 420,
+  "required_cooling_capacity_source": "Die neue Anlage muss eine Nettokälteleistung von mindestens vierhundertzwanzig Kilowatt bereitstellen.",
+  "required_temperature_min": -4,
+  "required_temperature_min_source": "Der Vorlauftemperatur auf der Primärseite muss bis auf +4 °C abgesenkt werden können, da die Pasteurisierungsstrecke eine stabile Eingangstemperatur von +6 °C verlangt und Verluste in der Leitung eingerechnet werden müssen. Eine Unterschreitung von +2 °C ist nicht zulässig, da sonst Vereisung im Glykol-Wärmetauscher auftreten kann.",
+  "required_refrigerant_types": "R717",
+  "required_certifications_ik": null,
+  "required_cop_efficiency": 4.2,
+  "required_cop_efficiency_source": "Hinsichtlich der Energieeffizienz erwarten wir eine Leistungszahl (COP) von mindestens 4,2 bei den oben genannten Betriebspunkten und einer Außentemperatur von +32 °C (Auslegungssommer). Bitte legen Sie im Angebot auch den COP für einen typischen Wintertag (+5 °C Außentemperatur) dar – erfahrungsgemäß liegt dieser deutlich höher, was für unsere Vollkostenrechnung relevant ist.",
+  "required_cooling_medium": "Propylenglykol/Wasser",
+  "required_temperature_stability": null,
+  "required_temperature_stability_source": null,
+  "required_room_volume_max": null,
+  "required_room_volume_max_source": null,
+  "required_humidity_control_capable": null,
+  "required_blast_freeze_capacity": null,
+  "required_blast_freeze_capacity_source": null,
+  "required_pulldown_time": null,
+  "required_pulldown_time_source": null
+}
+
+================================================================================
+[2026-08-25T12:54:33] label=agv_4b_correction1 model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{
+  "required_cooling_medium": null
+}
+
+================================================================================
+[2026-08-25T12:54:40] label=agv_4c_required_blast_freeze_capacity model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_blast_freeze_capacity": null, "required_blast_freeze_capacity_source": null}
+
+================================================================================
+[2026-08-25T12:54:47] label=agv_4c_required_pulldown_time model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_pulldown_time": null, "required_pulldown_time_source": null}
+
+================================================================================
+[2026-08-25T12:54:58] label=agv_4c_required_temperature_min model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_temperature_min": -4, "required_temperature_min_source": "Hinsichtlich der Energieeffizienz erwarten wir eine Leistungszahl (COP) von mindestens 4,2 bei den oben genannten Betriebspunkten und einer Außentemperatur von +32 °C (Auslegungssommer). Bitte legen Sie im Angebot auch den COP für einen typischen Wintertag (+5 °C Außentemperatur) dar – erfahrungsgemäß liegt dieser deutlich höher, was für unsere Vollkostenrechnung relevant ist."}
+
+================================================================================
+[2026-08-25T12:55:08] label=agv_4c_required_cop_efficiency model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_cop_efficiency": 4.2, "required_cop_efficiency_source": "Hinsichtlich der Energieeffizienz erwarten wir eine Leistungszahl (COP) von mindestens 4,2 bei den oben genannten Betriebspunkten und einer Außentemperatur von +32 °C (Auslegungssommer)."}
+
+================================================================================
+[2026-08-25T12:55:14] label=agv_4c_required_room_volume_max model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_room_volume_max": null, "required_room_volume_max_source": null}
+
+================================================================================
+[2026-08-25T12:55:22] label=agv_4c_required_cooling_capacity model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_cooling_capacity": 420, "required_cooling_capacity_source": "mindestens vierhundertzwanzig Kilowatt"}
+
+================================================================================
+[2026-08-25T12:55:28] label=agv_4c_required_temperature_stability model=local-qwen2.5-7b (ollama)
+--------------------------------------------------------------------------------
+{"required_temperature_stability": null, "required_temperature_stability_source": null}
