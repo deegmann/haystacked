@@ -17,7 +17,7 @@ The two live product domains today are **Logistics:AGV** (forklift AGVs, tugger/
 
 A few terms used throughout this document:
 
-- **LLM** — Large Language Model. Here it's `qwen2.5:7b`, running locally via **Ollama** (no data leaves the machine). "7b" means 7 billion parameters — a small model by industry standards, chosen because it runs on a laptop, but this smallness is the root cause of most of the risks in §8.
+- **LLM** — Large Language Model. The default is `qwen2.5:7b`, running locally via **Ollama** (no data leaves the machine). "7b" means 7 billion parameters — a small model by industry standards, chosen because it runs on a laptop, but this smallness is the root cause of most of the risks in §8. Since the LLM Provider Abstraction change (`docs/spec_llm_provider_abstraction_v0_1.md`), a model is selectable per request — local Ollama remains the zero-config default, but a stronger cloud model (via OpenRouter) can be chosen explicitly per analysis run. See `src/llm_client.py`.
 - **Pass** — one LLM call with a specific, narrow job (e.g. "extract the buyer's contact info"). The pipeline chains 6-9 passes together per tender.
 - **K.O.** ("Knock-Out") — a hard requirement. If a supplier fails a K.O. criterion, they are excluded entirely, no matter how well they score elsewhere.
 - **AP0** — the master specification spreadsheet (`Spec/haystacked_AP0_field_spec_v0_10.xlsx`) that defines every field, rule, and prompt hint in the system. Explained in full in §3.
@@ -77,13 +77,13 @@ Matching engine — score every supplier in the database against the extracted r
 Result streamed live to the browser (Server-Sent Events)
 ```
 
-**Typical AGV tender: roughly 14-17 LLM calls, several minutes of wall-clock time** (the 7B model is not fast; this is the tradeoff for running fully locally with no cloud API cost or data-sharing).
+**Typical AGV tender: roughly 14-17 LLM calls, several minutes of wall-clock time** (the local 7B model is not fast; that used to be the unavoidable tradeoff for running fully locally with no cloud API cost or data-sharing — a faster/stronger cloud model can now be selected explicitly per run instead, at the cost of leaving the local-only, no-data-leaves-the-machine guarantee for that run; see the LLM Provider Abstraction note above).
 
 > **Note on this diagram vs. `CLAUDE.md`:** `CLAUDE.md`'s "Data Flow" section (the repo's canonical architecture doc) still describes an older, AGV-only version of this flow, keyed off a boolean `is_agv_amr` flag. That flag has been superseded by the domain-detection pass described below, and a second domain (industrial refrigeration) now exists in production. This document reflects the current code (`app.py`, verified 2026-07-31); `CLAUDE.md`'s Data Flow section is a known-stale item worth refreshing separately (see §9).
 
 ### Stage by stage
 
-**PDF text extraction.** `extract_text_from_pdf()` in `app.py` uses the `pdfplumber` library to pull raw text out of the PDF (no OCR — scanned image-only PDFs will fail here with an explicit error). Text is capped at 50,000 characters (roughly 14,000 "tokens," the unit the LLM actually reads in) because the model's context window is 32,768 tokens and needs headroom for the prompt itself.
+**PDF text extraction.** `extract_text_from_pdf()` in `app.py` uses the `pdfplumber` library to pull raw text out of the PDF (no OCR — scanned image-only PDFs will fail here with an explicit error). Text is capped at 50,000 characters (roughly 14,000 "tokens," the unit the LLM actually reads in). This cap is a flat constant for every model today — the local default's context window is 32,768 tokens and needs headroom for the prompt itself, and context window is now a per-model property (`LLMModelChoice.context_tokens` in `src/llm_client.py`) rather than a single global constant, but the 50,000-char truncation deliberately has not been made per-model yet (see `docs/spec_llm_provider_abstraction_v0_1.md` §4) — a larger-context cloud model's quality upside from a higher cap is not yet measured.
 
 **Pass 1 — basic extraction (always runs).** One LLM call extracts buyer name, project name, contact details, tender category, and a short summary. Uses `config/prompts/basic_system.txt` + `basic_template.txt`.
 

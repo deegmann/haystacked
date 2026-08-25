@@ -30,6 +30,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.tender_store import read_run_criteria
+from src.llm_client import DEFAULT_MODEL_ID
 
 _TENDER_DIR = Path(__file__).parent.parent / "tenders"
 
@@ -93,6 +94,17 @@ def test_golden_extraction(fixture_path: Path):
         )
 
     golden_run = _load_json(golden_run_path)
+
+    # R5 (senior-architect, required): a golden accidentally captured on a cloud model
+    # must never silently become the committed local baseline. Absent model_id means
+    # the capture predates this field (implicitly local, since no other option existed
+    # at capture time) — that is NOT a mismatch. A present-but-wrong model_id fails loudly.
+    golden_model_id = golden_run.get("model_id")
+    assert golden_model_id is None or golden_model_id == DEFAULT_MODEL_ID, (
+        f"{tender_id}: golden run was captured with model_id={golden_model_id!r}, "
+        f"expected {DEFAULT_MODEL_ID!r} (or absent, for pre-migration captures) — "
+        f"a cloud-captured run must never silently become the committed local baseline"
+    )
 
     # Out-of-scope path: pipeline must produce no AGV extraction and no matches.
     # vehicle_type must be present (positive sign the pipeline ran to completion)

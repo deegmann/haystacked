@@ -36,6 +36,10 @@
     <p class="upload-eyebrow">Intralogistik · Kältetechnik</p>
     <h1 class="upload-heading">From haystack to <em>shortlist.</em></h1>
     <p class="upload-sub">Lade eine Ausschreibung hoch — wir analysieren automatisch und liefern die passende Supplier-Shortlist.</p>
+    <div class="model-select-row">
+      <label for="modelSelect">LLM-Modell:</label>
+      <select id="modelSelect"></select>
+    </div>
     <div class="upload-box" id="dropzone">
       <div class="upload-mark">
         <svg viewBox="0 0 100 54.67" width="72" aria-hidden="true">
@@ -306,6 +310,61 @@ fetch('/api/field-meta')
   .then(data => { _fieldMeta = data; })
   .catch(() => { console.warn('field-meta unavailable — labels will fall back to key names'); });
 
+// ── LLM model picker ─────────────────────────────────────────────────────────
+const MODEL_STORAGE_KEY = 'haystacked_selected_model_id';
+let _selectedModelId = null;
+
+function populateModelSelect(statuses) {
+  const select = document.getElementById('modelSelect');
+  if (!select) return;
+  select.innerHTML = '';
+
+  const remembered = localStorage.getItem(MODEL_STORAGE_KEY);
+  const groups = { local: [], cloud: [] };
+  statuses.forEach(s => (s.is_local ? groups.local : groups.cloud).push(s));
+
+  const addGroup = (label, entries) => {
+    if (!entries.length) return;
+    const og = document.createElement('optgroup');
+    og.label = label;
+    entries.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.available ? s.display_name : `${s.display_name} (${s.reason || 'nicht verfügbar'})`;
+      opt.disabled = !s.available;
+      og.appendChild(opt);
+    });
+    select.appendChild(og);
+  };
+  addGroup('Lokal (Ollama)', groups.local);
+  addGroup('Cloud (OpenRouter)', groups.cloud);
+
+  // Default selection = DEFAULT_MODEL_ID; remembered choice only restored when it
+  // was a local model (senior-architect: a paid cloud selection must not silently
+  // survive into the next session/tab as the pre-selected default).
+  let initial = statuses.find(s => s.id === remembered && s.is_local && s.available);
+  if (!initial) initial = statuses.find(s => s.is_local && s.available) || statuses.find(s => s.available);
+  if (initial) {
+    select.value = initial.id;
+    _selectedModelId = initial.id;
+  }
+
+  select.addEventListener('change', () => {
+    _selectedModelId = select.value;
+    const chosen = statuses.find(s => s.id === _selectedModelId);
+    if (chosen && chosen.is_local) {
+      localStorage.setItem(MODEL_STORAGE_KEY, _selectedModelId);
+    } else {
+      localStorage.removeItem(MODEL_STORAGE_KEY);
+    }
+  });
+}
+
+fetch('/api/llm-models')
+  .then(r => r.json())
+  .then(statuses => populateModelSelect(statuses))
+  .catch(() => { console.warn('llm-models unavailable — falling back to server-side default'); });
+
 // ── Drag & drop ───────────────────────────────────────────────────────────────
 const dropzone  = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
@@ -395,12 +454,23 @@ async function handleFile(file) {
   document.getElementById('logOutput').textContent = '';
   ['upload','extract','llm','parse','domain'].forEach(id => setStep(id, 'pending', 'Waiting…'));
   addLog(`File: ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+  const modelSelect = document.getElementById('modelSelect');
+  const chosenOption = modelSelect && modelSelect.selectedOptions[0];
+  addLog(`Model: ${chosenOption ? chosenOption.textContent : 'default'}`);
 
   const form = new FormData();
   form.append('file', file);
+  if (_selectedModelId) form.append('model_id', _selectedModelId);
   let response;
   try { response = await fetch('/analyze', { method: 'POST', body: form }); }
   catch (e) { showError('Network error: ' + e.message); return; }
+
+  if (response.status === 400) {
+    let msg = 'Model unavailable.';
+    try { msg = (await response.json()).error || msg; } catch (e) {}
+    showError(msg);
+    return;
+  }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();

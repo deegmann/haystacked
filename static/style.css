@@ -104,6 +104,15 @@ body { min-height: 100vh; }
   font-size: 15px; color: var(--hs-steel);
   margin-bottom: 40px; text-align: center; max-width: 46ch;
 }
+.model-select-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 24px; font-size: 14px; color: var(--hs-steel);
+}
+.model-select-row select {
+  font-size: 14px; padding: 6px 10px;
+  border: 1px solid var(--hs-mist); border-radius: var(--radius-sm);
+  background: var(--hs-paper); color: var(--hs-ink);
+}
 .upload-box {
   width: 100%; max-width: 520px;
   border: 2px dashed var(--hs-mist);

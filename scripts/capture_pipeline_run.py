@@ -165,6 +165,10 @@ def capture(pdf_path: Path, out_path: Path, dry_run: bool = False) -> dict:
         # Provenance
         "captured_at":    datetime.now().isoformat(timespec="seconds"),
         "duration_s":     round(elapsed, 1),
+        # R5: which model actually produced this extraction — read back from the
+        # /analyze SSE result payload. Absent model_id in an OLDER capture doc means
+        # the run predates this field (implicitly local, since no other option existed).
+        "model_id":       result.get("model_id"),
     }
 
     # Summary

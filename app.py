@@ -8,7 +8,8 @@ import logging.handlers
 import asyncio
 from datetime import datetime
 from pathlib import Path
-from fastapi import FastAPI, File, UploadFile, Request, Query
+from typing import Optional
+from fastapi import FastAPI, File, UploadFile, Request, Query, Form
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -22,6 +23,7 @@ from src.data_loader import load_suppliers
 from src.matching import match_suppliers_new, TenderRequirements, Matcher
 from src.context_builder import product_type_keyword_fallback, build_system_context, PRODUCT_TYPE_KEYWORDS
 from src.tender_store import init_db, build_tender_run, persist_tender_run, read_run_criteria
+from src.llm_client import call_llm, resolve_model, AVAILABLE_MODELS, DEFAULT_MODEL_ID, list_provider_status, LLMProviderError
 _SUPPLIERS = load_suppliers()
 log_setup = logging.getLogger("haystacked")
 log_setup.info("SQLite DB loaded: %d active supplier records", len(_SUPPLIERS))
@@ -44,10 +46,6 @@ log.setLevel(logging.DEBUG)
 app = FastAPI(title="haystacked – Ausschreibungsanalyse")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-
-OLLAMA_URL      = "http://localhost:11434/api/generate"
-OLLAMA_MODEL    = "qwen2.5:7b"
-_OLLAMA_NUM_CTX = 32_768  # must match num_ctx in call_ollama() options
 
 # ── In-memory analysis cache — analysis_id → result dict ─────────────────────
 _analyses: dict[str, dict] = {}
@@ -477,26 +475,6 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> tuple[str, int]:
     return full_text, num_pages
 
 
-# ── Ollama call ───────────────────────────────────────────────────────────────
-async def call_ollama(system: str, user: str, label: str) -> str:
-    payload = {
-        "model": OLLAMA_MODEL,
-        "system": system,
-        "prompt": user,
-        "stream": False,
-        "options": {"temperature": 0.0, "num_predict": 4096, "num_ctx": _OLLAMA_NUM_CTX},
-    }
-    log.info("Ollama [%s]: system=%d Z., prompt=%d Z.", label, len(system), len(user))
-    t0 = datetime.now()
-    async with httpx.AsyncClient(timeout=3600.0) as client:
-        resp = await client.post(OLLAMA_URL, json=payload)
-        resp.raise_for_status()
-    elapsed = (datetime.now() - t0).total_seconds()
-    raw = resp.json().get("response", "")
-    log.info("Ollama [%s]: %.1fs, %d Z. Antwort", label, elapsed, len(raw))
-    return raw
-
-
 # ── SSE helper ────────────────────────────────────────────────────────────────
 def sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
@@ -579,15 +557,30 @@ async def index(request: Request):
 
 
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...)):
+async def analyze(file: UploadFile = File(...), model_id: Optional[str] = Form(None)):
     filename  = file.filename
     pdf_bytes = await file.read()
 
+    # R2: an absent model_id resolves to DEFAULT_MODEL_ID (local); an unknown/unavailable
+    # model_id is a hard HTTP 400, never a silent fallback to local. Resolved once per
+    # request, before the SSE stream starts, so the error can be a real 400 response
+    # rather than an SSE "error" event.
+    try:
+        chosen_model = resolve_model(model_id)
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
+
     async def stream():
         t0 = datetime.now()
-        log.info("=== Neue Analyse: %s ===", filename)
+        log.info("=== Neue Analyse: %s (model=%s) ===", filename, chosen_model.id)
+
+        # Cost/blast-radius visibility (§2.2): every real call_llm() invocation for this
+        # run increments this counter — logged at the end of stream() so an accidental
+        # expensive cloud run is visible immediately, not discovered on the invoice.
+        _llm_call_stats = {"count": 0, "chars": 0}
 
         yield sse("step", {"id": "upload", "status": "done", "message": f"'{filename}' received"})
+        yield sse("log", {"message": f"Model: {chosen_model.display_name}"})
 
         # D1: per-field extraction provenance — defaulted here so build_tender_run()
         # always receives well-formed data regardless of which branch below runs
@@ -691,16 +684,23 @@ async def analyze(file: UploadFile = File(...)):
 
             # ── LLM Step 1: Basic extraction ──────────────────────────────────────
             yield sse("step", {"id": "llm", "status": "running",
-                                "message": f"Extracting basic data ({OLLAMA_MODEL})…"})
+                                "message": f"Extracting basic data ({chosen_model.display_name})…"})
             await asyncio.sleep(0)
 
             # Use full available text for basic extraction so contact info
             # and summaries from later pages are visible to the model.
             basic_user = _fill(BASIC_USER_TEMPLATE, text=text)
             try:
-                raw_basic = await call_ollama(MAIN_SYSTEM, basic_user, "basic")
+                raw_basic = await call_llm(MAIN_SYSTEM, basic_user, "basic", chosen_model)
+                _llm_call_stats["count"] += 1
+                _llm_call_stats["chars"] += len(MAIN_SYSTEM) + len(basic_user)
             except httpx.ConnectError:
-                yield sse("error", {"message": "Ollama not reachable — please run './start.sh'."}); return
+                if chosen_model.is_local:
+                    yield sse("error", {"message": "Ollama not reachable — please run './start.sh'."})
+                else:
+                    yield sse("error", {"message":
+                        f"Cloud provider not reachable (model={chosen_model.id})."})
+                return
             except Exception as e:
                 log.exception("LLM-Fehler (basic)")
                 yield sse("error", {"message": f"LLM error: {e}"}); return
@@ -735,7 +735,10 @@ async def analyze(file: UploadFile = File(...)):
             if contact_missing and len(text) > 6000:
                 tail = text[-4000:]
                 try:
-                    raw_contact = await call_ollama(CONTACT_SYSTEM, _fill(CONTACT_USER_TEMPLATE, text=tail), "contact")
+                    _contact_user = _fill(CONTACT_USER_TEMPLATE, text=tail)
+                    raw_contact = await call_llm(CONTACT_SYSTEM, _contact_user, "contact", chosen_model)
+                    _llm_call_stats["count"] += 1
+                    _llm_call_stats["chars"] += len(CONTACT_SYSTEM) + len(_contact_user)
                     contact_data = repair_and_parse(raw_contact)
                     contact_data.pop("_parse_method", None)
                     for field in _CONTACT_FALLBACK_TARGET:
@@ -760,7 +763,9 @@ async def analyze(file: UploadFile = File(...)):
                 category_list=CATEGORY_LIST
             )
             try:
-                raw_nace = await call_ollama(NACE_SYSTEM, nace_user, "nace")
+                raw_nace = await call_llm(NACE_SYSTEM, nace_user, "nace", chosen_model)
+                _llm_call_stats["count"] += 1
+                _llm_call_stats["chars"] += len(NACE_SYSTEM) + len(nace_user)
                 nace_data = repair_and_parse(raw_nace)
                 nace_data.pop("_parse_method", None)
                 in_scope = nace_data.pop("in_scope", True)
@@ -785,7 +790,9 @@ async def analyze(file: UploadFile = File(...)):
                 domain_user = _fill(DOMAIN_DETECTION_TEMPLATE,
                                     tender_category=result.get("tender_category") or "",
                                     summary=result.get("summary") or "")
-                raw_domain = await call_ollama(MAIN_SYSTEM, domain_user, "domain_detect")
+                raw_domain = await call_llm(MAIN_SYSTEM, domain_user, "domain_detect", chosen_model)
+                _llm_call_stats["count"] += 1
+                _llm_call_stats["chars"] += len(MAIN_SYSTEM) + len(domain_user)
                 domain_data = repair_and_parse(raw_domain)
                 domain_data.pop("_parse_method", None)
                 detected_domain = domain_data.get("detected_domain")
@@ -851,19 +858,27 @@ async def analyze(file: UploadFile = File(...)):
                 try:
                     for _attempt in range(3):
                         if _attempt == 0:
-                            raw_vt = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], vt_user, "agv_4a")
+                            _4a_system = _DOMAIN_SYSTEM[result.get("detected_domain")]
+                            raw_vt = await call_llm(_4a_system, vt_user, "agv_4a", chosen_model)
+                            _llm_call_stats["count"] += 1
+                            _llm_call_stats["chars"] += len(_4a_system) + len(vt_user)
                             try:
                                 vt_criteria = repair_and_parse(raw_vt)
                             except ValueError:
                                 log.warning("4a-Antwort kein JSON — Retry")
                                 yield sse("log", {"message": "4a: Kein JSON → Retry…"})
-                                raw_vt2 = await call_ollama(EXTRACTION_RETRY_SYSTEM,
-                                                            _fill(EXTRACTION_RETRY_TEMPLATE, text=text), "agv_4a_retry")
+                                _4a_retry_user = _fill(EXTRACTION_RETRY_TEMPLATE, text=text)
+                                raw_vt2 = await call_llm(EXTRACTION_RETRY_SYSTEM, _4a_retry_user,
+                                                          "agv_4a_retry", chosen_model)
+                                _llm_call_stats["count"] += 1
+                                _llm_call_stats["chars"] += len(EXTRACTION_RETRY_SYSTEM) + len(_4a_retry_user)
                                 vt_criteria = repair_and_parse(raw_vt2)
                         else:
                             correction_user = _build_correction_prompt(_ap0_violations_4a, text)
-                            raw_vt = await call_ollama(EXTRACTION_RETRY_SYSTEM, correction_user,
-                                                       f"agv_4a_correction{_attempt}")
+                            raw_vt = await call_llm(EXTRACTION_RETRY_SYSTEM, correction_user,
+                                                     f"agv_4a_correction{_attempt}", chosen_model)
+                            _llm_call_stats["count"] += 1
+                            _llm_call_stats["chars"] += len(EXTRACTION_RETRY_SYSTEM) + len(correction_user)
                             try:
                                 correction = repair_and_parse(raw_vt)
                             except ValueError:
@@ -899,6 +914,15 @@ async def analyze(file: UploadFile = File(...)):
                             yield sse("warning", {"field": "required_product_type",
                                                   "message": f"{_msg} — keyword fallback used"})
 
+                except (LLMProviderError, httpx.HTTPError) as e:
+                    # Post-implementation fix (senior-architect audit, 2026-08-25): a
+                    # provider/transport failure must abort loudly, never be treated the
+                    # same as "the model answered but the answer was unusable" — the
+                    # latter degrades to keyword fallback, the former means we never got
+                    # an answer at all and must not silently produce a shortlist anyway.
+                    log.exception("Pass 4a: LLM-Provider-Fehler")
+                    yield sse("error", {"message": f"LLM provider error (4a, model={chosen_model.id}): {e}"})
+                    return
                 except Exception as e:
                     log.exception("Pass 4a fehlgeschlagen")
                     yield sse("log", {"message": f"⚠ 4a error: {e} — keyword fallback"})
@@ -940,11 +964,11 @@ async def analyze(file: UploadFile = File(...)):
             _TEXT_TOKEN_ESTIMATE = len(text) // 4
             _FIXED_OVERHEAD_TOKENS = (len(_DOMAIN_SYSTEM[result.get("detected_domain")]) + len(template_4b)) // 4
             _TOTAL_ESTIMATE = _TEXT_TOKEN_ESTIMATE + _FIXED_OVERHEAD_TOKENS
-            if _TOTAL_ESTIMATE > _OLLAMA_NUM_CTX:
+            if _TOTAL_ESTIMATE > chosen_model.context_tokens:
                 yield sse("log", {
                     "message": (
                         f"⚠ Document too large for reliable extraction "
-                        f"(~{_TOTAL_ESTIMATE:,} tokens estimated, limit: {_OLLAMA_NUM_CTX:,}). "
+                        f"(~{_TOTAL_ESTIMATE:,} tokens estimated, limit: {chosen_model.context_tokens:,}). "
                         f"Please upload only the technical specification section "
                         f"(typically 5–15 pages) instead of the full tender document. "
                         f"Results may be incomplete."
@@ -960,18 +984,25 @@ async def analyze(file: UploadFile = File(...)):
             try:
                 for _attempt in range(3):
                     if _attempt == 0:
-                        raw_agv = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], agv_user_4b, "agv_4b")
+                        _4b_system = _DOMAIN_SYSTEM[result.get("detected_domain")]
+                        raw_agv = await call_llm(_4b_system, agv_user_4b, "agv_4b", chosen_model)
+                        _llm_call_stats["count"] += 1
+                        _llm_call_stats["chars"] += len(_4b_system) + len(agv_user_4b)
                         try:
                             domain_criteria = repair_and_parse(raw_agv)
                         except ValueError:
                             log.warning("4b-Antwort kein JSON — Retry mit typ-spezifischem Template")
                             yield sse("log", {"message": "4b: Kein JSON → Retry mit typ-spezifischem Template…"})
-                            raw_agv2 = await call_ollama(EXTRACTION_RETRY_SYSTEM, agv_user_4b, "agv_4b_retry")
+                            raw_agv2 = await call_llm(EXTRACTION_RETRY_SYSTEM, agv_user_4b, "agv_4b_retry", chosen_model)
+                            _llm_call_stats["count"] += 1
+                            _llm_call_stats["chars"] += len(EXTRACTION_RETRY_SYSTEM) + len(agv_user_4b)
                             domain_criteria = repair_and_parse(raw_agv2)
                     else:
                         correction_user = _build_correction_prompt(_ap0_violations, text)
-                        raw_agv = await call_ollama(EXTRACTION_RETRY_SYSTEM, correction_user,
-                                                    f"agv_4b_correction{_attempt}")
+                        raw_agv = await call_llm(EXTRACTION_RETRY_SYSTEM, correction_user,
+                                                  f"agv_4b_correction{_attempt}", chosen_model)
+                        _llm_call_stats["count"] += 1
+                        _llm_call_stats["chars"] += len(EXTRACTION_RETRY_SYSTEM) + len(correction_user)
                         try:
                             correction = repair_and_parse(raw_agv)
                         except ValueError:
@@ -1009,6 +1040,12 @@ async def analyze(file: UploadFile = File(...)):
                     _tk = w.split(":")[0]
                     yield sse("warning", {"field": _tk, "message": w})
 
+            except (LLMProviderError, httpx.HTTPError) as e:
+                # Post-implementation fix (senior-architect audit, 2026-08-25) — see
+                # the matching comment at the Pass 4a handler above for the rationale.
+                log.exception("Pass 4b: LLM-Provider-Fehler")
+                yield sse("error", {"message": f"LLM provider error (4b, model={chosen_model.id}): {e}"})
+                return
             except Exception as e:
                 log.exception("Pass 4b fehlgeschlagen")
                 yield sse("log", {"message": f"⚠ 4b Fehler: {e}"})
@@ -1064,7 +1101,10 @@ async def analyze(file: UploadFile = File(...)):
                         f'{{"{_fk}": <number or null>, "{_fk}_source": "<verbatim quote or null>"}}'
                     )
                     try:
-                        _per_raw    = await call_ollama(_DOMAIN_SYSTEM[result.get("detected_domain")], _per_user, f"agv_4c_{_fk}")
+                        _4c_system  = _DOMAIN_SYSTEM[result.get("detected_domain")]
+                        _per_raw    = await call_llm(_4c_system, _per_user, f"agv_4c_{_fk}", chosen_model)
+                        _llm_call_stats["count"] += 1
+                        _llm_call_stats["chars"] += len(_4c_system) + len(_per_user)
                         _per_parsed = repair_and_parse(_per_raw)
                         if _fk in _per_parsed:
                             _4c_val = _per_parsed[_fk]
@@ -1087,6 +1127,23 @@ async def analyze(file: UploadFile = File(...)):
                             _4c_abstained.add(_fk)
                             _4c_state[_fk] = "key_absent"
                             log.debug("4c %s: field absent in parse result → abstained", _fk)
+                    except (LLMProviderError, httpx.HTTPError) as _pe:
+                        # Post-implementation fix (senior-architect audit, 2026-08-25):
+                        # a provider/transport failure must NEVER be added to
+                        # _4c_abstained — that set feeds directly into
+                        # enforce_source_spans()'s Layer-2 trigger, so treating "we
+                        # never got an answer" the same as "4c explicitly abstained"
+                        # would launder a rate limit / bad key / timeout into
+                        # hallucination-guard evidence, nulling perfectly good 4b
+                        # values and producing a false "this model hallucinates more"
+                        # reading. Abort the whole run instead — a provider failure on
+                        # one 4c call means the remaining ~7 calls will very likely
+                        # fail too, so continuing would only burn more paid tokens on
+                        # a run that cannot produce a trustworthy result anyway.
+                        log.exception("Pass 4c '%s': LLM-Provider-Fehler", _fk)
+                        yield sse("error", {"message":
+                            f"LLM provider error (4c/{_fk}, model={chosen_model.id}): {_pe}"})
+                        return
                     except Exception as _pe:
                         # Parse or call failure → abstained so L2 can still check 4b value
                         _4c_abstained.add(_fk)
@@ -1250,8 +1307,17 @@ async def analyze(file: UploadFile = File(...)):
         result["matches"]                = matches
         result["matches_all"]            = matches_all if matches_all else []
         result["vehicle_type_canonical"] = canonical_product_type
+        # R5: provenance — which model actually produced this extraction. Replay mode
+        # never calls an LLM, so it carries forward whatever model_id (if any) the
+        # replayed capture doc itself recorded, not the currently-selected dropdown value.
+        result["model_id"] = cached.get("model_id") if is_replay else chosen_model.id
 
         yield sse("log", {"message": f"Gesamt: {total:.1f}s"})
+        yield sse("log", {"message": f"LLM-Aufrufe: {_llm_call_stats['count']} "
+                                      f"(~{_llm_call_stats['chars']:,} Z. gesendet, "
+                                      f"model={chosen_model.id})"})
+        log.info("LLM calls this run: %d (~%d chars sent, model=%s)",
+                 _llm_call_stats["count"], _llm_call_stats["chars"], chosen_model.id)
         result["analysis_id"] = analysis_id
         _analyses[analysis_id] = result
         yield sse("result", result)
@@ -1456,20 +1522,25 @@ async def field_meta():
 
 @app.get("/health")
 async def health():
-    try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            r = await client.get("http://localhost:11434/api/tags")
-            models = [m["name"] for m in r.json().get("models", [])]
-        model_ok = OLLAMA_MODEL in models
-        return {
-            "status": "ok" if model_ok else "degraded",
-            "ollama": "running",
-            "model": OLLAMA_MODEL,
-            "model_available": model_ok,
-            "models": models,
-        }
-    except Exception:
-        return {"status": "degraded", "ollama": "not reachable", "model_available": False}
+    # reference-integrity-guardian (required): both former OLLAMA_MODEL-constant reads
+    # (single hardcoded model) become per-entry status over AVAILABLE_MODELS — "Ollama
+    # down" is no longer treated as globally fatal, since the caller's stated intent
+    # may be a cloud model. list_provider_status() already does the live Ollama /api/tags
+    # ping + manifest check for local entries and the OPENROUTER_API_KEY presence check
+    # for cloud entries.
+    statuses = await list_provider_status()
+    default_status = next((s for s in statuses if s["id"] == DEFAULT_MODEL_ID), None)
+    default_available = bool(default_status and default_status["available"])
+    return {
+        "status": "ok" if default_available else "degraded",
+        "default_model_id": DEFAULT_MODEL_ID,
+        "models": statuses,
+    }
+
+
+@app.get("/api/llm-models")
+async def llm_models():
+    return await list_provider_status()
 
 
 @app.get("/debug-page", response_class=HTMLResponse)

@@ -16,15 +16,15 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from src.llm_client import AVAILABLE_MODELS, DEFAULT_MODEL_ID
+
 OLLAMA_URL   = "http://localhost:11434"
-# Read from app.py to avoid drift — single source of model name
-_APP         = Path(__file__).parent.parent.parent / "app.py"
-REQUIRED_MODEL = next(
-    (line.split("=")[1].strip().strip('"').strip("'")
-     for line in _APP.read_text().splitlines()
-     if line.startswith("OLLAMA_MODEL")),
-    "qwen2.5:7b",
-)
+# Import from src.llm_client to avoid drift — single source of model name. Preflight-checks
+# only the local DEFAULT_MODEL_ID by default (never iterates AVAILABLE_MODELS / pings
+# OpenRouter — that would be a real network call to a paid provider on every plain
+# `pytest tests/` invocation, forbidden by the cost-safety hard rule, §2.5).
+_DEFAULT_MODEL = next(m for m in AVAILABLE_MODELS if m.id == DEFAULT_MODEL_ID)
+REQUIRED_MODEL = _DEFAULT_MODEL.model_name
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -69,7 +69,7 @@ def test_I_S_01_model_in_manifest():
 def test_I_S_02_model_json_smoke():
     """qwen2.5:7b must respond to a minimal prompt with parseable JSON.
 
-    Uses /api/generate (same endpoint as app.py call_ollama).
+    Uses /api/generate (same endpoint as src.llm_client's Ollama branch).
     Verifies the full inference path: manifest → weights loaded → JSON output.
     """
     payload = {

@@ -971,7 +971,10 @@ Robustheit:
 - [ ] LLM-Timeout (> 30s): Fallback auf regelbasiertes Ergebnis ohne Erklaerungstext
 - [ ] Ladezeit < 3 Sekunden fuer Matching (ohne LLM-Erklaerung)
 - [ ] Kein JS-Fehler in Browser-Konsole
-- [ ] Kein Netzwerkaufruf ausser localhost:11434 (Ollama)
+- [ ] Kein Netzwerkaufruf ausser localhost:11434 (Ollama) — **amended 2026-08-25** (siehe
+  `docs/spec_llm_provider_abstraction_v0_1.md` §4): local-only mode has no external
+  network calls (unchanged guarantee); cloud mode (OpenRouter) is an explicit,
+  user-initiated opt-in and is understood to leave the offline envelope.
 
 ### Deliverable
 - `docs/frontend_evaluation_YYYYMMDD.md`
@@ -1190,10 +1193,14 @@ tests/
 | F-05 | ?debug=true aktiviert Debug-Panel | Panel sichtbar |
 | F-06 | Gewichtung aendern --> sofortiges Re-Ranking | Kein Reload |
 | F-07 | Debug-Panel zeigt LLM-Prompt und Rohausgabe | Sichtbar |
-| F-08 | Kein externer Netzwerkaufruf (nur localhost:11434) | Network-Tab leer |
+| F-08 | Kein externer Netzwerkaufruf im local-only mode (nur localhost:11434); Cloud-Modus (OpenRouter) ist expliziter User-Opt-in [1] | Network-Tab leer (local-only) |
 | F-09 | LLM-Timeout: Ergebnis ohne Erklaerungstext angezeigt | Kein Absturz |
 | F-10 | Ladezeit Matching (ohne LLM) < 1 Sekunde | Timing-Check |
 | F-11 | Kein JS-Fehler in Browser-Konsole | Konsole leer |
+
+[1] **Amended 2026-08-25** (siehe `docs/spec_llm_provider_abstraction_v0_1.md` §4): local-only
+mode has no external network calls (unchanged guarantee); cloud mode (OpenRouter) is an
+explicit, user-initiated opt-in and is understood to leave the offline envelope.
 
 ---
 

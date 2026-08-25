@@ -102,7 +102,9 @@ At startup, `app.py` checksums the AP0 xlsx and auto-regenerates all config if i
 ```
 PDF upload
   → pdfplumber text extraction
-  → Ollama (qwen2.5:7b) — up to 16 LLM passes per AGV tender:
+  → call_llm() (src/llm_client.py) — local Ollama qwen2.5:7b by default, or an
+    OpenRouter cloud model selected per request via model_id — up to 16 LLM
+    passes per AGV tender:
       1. basic_extraction: buyer, project, contact, is_agv_amr, summary
       2. contact_fallback: targeted pass on last 4000 chars (only if contact missing)
       3. nace_classification: NACE code + in_scope flag
@@ -124,6 +126,13 @@ PDF upload
 ```
 
 **Typical: 13–16 LLM calls per AGV tender, ~330 s wall time.**
+
+**Reproducibility note (R7):** `temperature=0.0` is production-proven deterministic for
+local Ollama calls, but gives no reproducibility guarantee on OpenRouter cloud models —
+no uniform seed across providers, and provider-side batching/MoE routing can vary output
+run-to-run even at temp 0. Reproducibility (and therefore the golden-run capture workflow,
+`scripts/capture_pipeline_run.py` + `tests/unit/test_golden_extraction.py`) is a
+**local-only property** from here on.
 
 ### Pass 4c and Source-Span Hallucination Guard
 
@@ -189,9 +198,24 @@ The industry README is the primary domain knowledge source. Edit `Spec/haystacke
 
 All prompts live in `config/prompts/*.txt`. The `_fill()` function in `app.py` replaces `{key}` placeholders without touching JSON braces inside prompt templates.
 
+### LLM Provider Abstraction (`src/llm_client.py`)
+
+`call_llm(system, user, label, model)` is the ONE function every `/analyze` pipeline call site
+uses — no default for `model`, ever; a forgotten call site is a `TypeError`, not a silent
+fallback to local. Dispatches on `model.provider` ("ollama" | "openrouter") to build the right
+request and parse the right response shape. `AVAILABLE_MODELS` (a list of `LLMModelChoice`) is
+the registry of selectable models — local Ollama plus curated open-weight OpenRouter cloud
+entries; every entry must have `weights_open=True` (no closed/API-only model is ever added).
+`resolve_model(model_id)` resolves an absent `model_id` to `DEFAULT_MODEL_ID` (local
+`qwen2.5:7b`, preserving zero-config behaviour) and raises on an unknown/unavailable
+`model_id` — never falls back to local silently. See `docs/spec_llm_provider_abstraction_v0_1.md`
+for the full design.
+
 ### Environment
 
 - Requires `.env` with `AIRTABLE_TOKEN=pat...` and `AIRTABLE_BASE_ID=app...` for `sync_airtable.py`
+- Optional `.env` entry `OPENROUTER_API_KEY=...` — only required to use any `openrouter-*` model
+  from `src/llm_client.py`'s `AVAILABLE_MODELS`; local-only usage needs nothing new
 - Ollama must be running locally at `http://localhost:11434` with `qwen2.5:7b` pulled
 - `start.sh` handles starting Ollama automatically
 
@@ -205,3 +229,4 @@ All prompts live in `config/prompts/*.txt`. The `_fill()` function in `app.py` r
 - **`source_confirms_value()` is field-agnostic** (`src/json_repair.py`): it contains no field names, no AP0 allowed-value lists, no domain knowledge. Never add field-specific logic to it.
 - **`source_is_grounded()` is field-agnostic** (`src/json_repair.py`): anchor + co-location check against the real document text. No domain knowledge, no field names, no AP0 lists. Never add field-specific logic to it.
 - **Pass 4c abstention ≠ unconditional override**: a 4c null result does not null the 4b value unless Layer 2 also fires. Abstention is evidence, not proof.
+- **`src/llm_client.py` is field-agnostic** — no domain/industry logic, no field names, no AP0 values, no per-model prompt variants, ever. It knows how to talk to an LLM provider, never what to ask it. Never add field-specific or per-model prompt logic to it.
