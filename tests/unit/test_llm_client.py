@@ -67,8 +67,8 @@ def test_resolve_model_blank_defaults():
 
 
 def test_resolve_model_known_id_returns_that_model():
-    m = resolve_model("openrouter-qwen2.5-72b")
-    assert m.id == "openrouter-qwen2.5-72b"
+    m = resolve_model(_CLOUD_MODEL.id)
+    assert m.id == _CLOUD_MODEL.id
     assert m.provider == "openrouter"
 
 
@@ -203,6 +203,10 @@ def test_call_llm_openrouter_builds_openai_compatible_payload(monkeypatch):
     ]
     assert payload["temperature"] == 0.0
     assert payload["max_tokens"] == _CLOUD_MODEL.max_output_tokens
+    # R4 enforcement (2026-08-25): reasoning must be disabled on every OpenRouter
+    # call, unconditionally — not just claimed via is_reasoning_model=False on a
+    # model that may default reasoning to enabled (e.g. qwen/qwen3.8-27b).
+    assert payload["reasoning"] == {"enabled": False}
 
 
 def test_call_llm_openrouter_missing_api_key_raises_without_network_call(monkeypatch):

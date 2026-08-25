@@ -73,14 +73,30 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
                     "Qwen 2.5 7B (lokal, Ollama)", is_local=True,
                     is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
                     weights_open=True),
-    LLMModelChoice("openrouter-qwen2.5-72b", "openrouter", "qwen/qwen-2.5-72b-instruct",
-                    "Qwen 2.5 72B (Cloud, OpenRouter)", is_local=False,
-                    is_reasoning_model=False, context_tokens=32_768, max_output_tokens=4096,
+    LLMModelChoice("openrouter-qwen3.8-27b", "openrouter", "qwen/qwen3.8-27b",
+                    "Qwen 3.8 27B (Cloud, OpenRouter)", is_local=False,
+                    is_reasoning_model=False, context_tokens=1_000_000, max_output_tokens=4096,
                     weights_open=True),
-    # model_name corrected 2026-08-25: OpenRouter's live slug is "qwen/qwen-2.5-72b-instruct"
-    # (hyphen before "2.5") — the originally-planned "qwen/qwen2.5-72b-instruct" (no hyphen)
-    # does not exist on OpenRouter and would 404. Caught by a free GET /api/v1/models check
-    # before any paid call was made; verify any newly-added entry's exact slug the same way.
+    # User decision 2026-08-25: swapped in for the originally-planned Qwen 2.5 72B.
+    # Open-weight (hugging_face_id "Qwen/Qwen3.8-27B" per OpenRouter's own model
+    # metadata, description explicitly says "open-weight"), 1M-token context.
+    #
+    # is_reasoning_model=False here is a claim about OUR CONFIGURED USE of this entry,
+    # not about the model's underlying capability: qwen/qwen3.8-27b is genuinely
+    # reasoning-capable and defaults to reasoning ENABLED at "xhigh" effort on
+    # OpenRouter (per its live /api/v1/models metadata, checked 2026-08-25) — which is
+    # exactly what R4 excludes, since a <think>-style preamble would break
+    # repair_and_parse()'s "first {, shortest balanced object" JSON extraction. This is
+    # made safe, not just claimed safe, by _call_openrouter() sending
+    # `"reasoning": {"enabled": false}` unconditionally on every OpenRouter call (see
+    # that function) — OpenRouter's documented reasoning.enabled=false switch. NOT YET
+    # LIVE-VERIFIED against a real API response as of this comment (verification
+    # requires a paid call and explicit authorization, same gate as the DoD #4/R6
+    # cloud comparison) — until that verification happens, treat this entry's
+    # non-reasoning behavior as configured-but-unconfirmed, not proven.
+    # Originally-planned slug "qwen/qwen-2.5-72b-instruct" (hyphen before "2.5" — an
+    # earlier fix already caught the no-hyphen variant as wrong) was correct and live
+    # but has been replaced per this swap, not because it was broken.
     LLMModelChoice("openrouter-llama3.3-70b", "openrouter", "meta-llama/llama-3.3-70b-instruct",
                     "Llama 3.3 70B (Cloud, OpenRouter)", is_local=False,
                     is_reasoning_model=False, context_tokens=131_072, max_output_tokens=4096,
@@ -185,6 +201,15 @@ async def _call_openrouter(system: str, user: str, model: LLMModelChoice) -> str
         ],
         "temperature": 0.0,
         "max_tokens": model.max_output_tokens,
+        # R4 enforcement at the request level (2026-08-25): OpenRouter's unified
+        # "reasoning" parameter is sent unconditionally on every OpenRouter call, not
+        # branched per model id — every AVAILABLE_MODELS entry asserts
+        # is_reasoning_model=False, so every call must actually suppress reasoning
+        # output, regardless of whether the underlying model is reasoning-capable and
+        # defaults it on (e.g. qwen/qwen3.8-27b defaults to default_effort="xhigh").
+        # A model that ignores/doesn't support this field treats it as a harmless
+        # no-op (OpenRouter's own normalized schema, not the raw provider API).
+        "reasoning": {"enabled": False},
     }
     headers = {"Authorization": f"Bearer {api_key}"}
     async with httpx.AsyncClient(timeout=_OPENROUTER_TIMEOUT_S) as client:

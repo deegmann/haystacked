@@ -23,7 +23,7 @@ Design invariants (each maps to a past failure mode that this avoids):
 Usage:
     python3 scripts/benchmark_models.py
     python3 scripts/benchmark_models.py --include-cloud
-    python3 scripts/benchmark_models.py --models local-qwen2.5-7b,openrouter-qwen2.5-72b
+    python3 scripts/benchmark_models.py --models local-qwen2.5-7b,openrouter-qwen3.8-27b
 Outputs (persistent — never /tmp):
     tests/benchmark_results/benchmark_<model_id>_<YYYYMMDD_HHMMSS>.json
     tests/benchmark_results/logs/server_<YYYYMMDD_HHMMSS>.log

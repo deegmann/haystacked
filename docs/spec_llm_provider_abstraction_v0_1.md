@@ -10,6 +10,21 @@ Reviews (Implementierung, post-impl. 2026-08-25): ap0-architecture-guardian **AP
 
 **Nachtrag 2026-08-25 (nach Commit, echter API-Key erstmals verfügbar):** kostenloser Key-Check (`GET /api/v1/auth/key`, kein Token-Verbrauch) bestätigte einen gültigen, aktiven Key. Ein anschließender kostenloser Abgleich gegen `GET /api/v1/models` (ebenfalls kein Token-Verbrauch) deckte auf, dass der registrierte Slug `qwen/qwen2.5-72b-instruct` bei OpenRouter **nicht existiert** — korrekt ist `qwen/qwen-2.5-72b-instruct` (Bindestrich vor "2.5"), vermutlich ein Rechercheversehen aus der ursprünglichen Planungsphase. Vor jeglichem bezahlten Aufruf korrigiert und live gegengeprüft. Lehre: jeder neu registrierte Modell-Slug sollte künftig direkt gegen `GET /api/v1/models` verifiziert werden, nicht nur gegen eine Websuche.
 
+**Nachtrag 2 2026-08-25 (User-Wunsch: Qwen 3.8 27B statt Qwen 2.5 72B):** `openrouter-qwen2.5-72b`
+ersetzt durch `openrouter-qwen3.8-27b` (`qwen/qwen3.8-27b`, offene Gewichte laut
+`hugging_face_id: Qwen/Qwen3.8-27B`, 1M-Token-Kontext). **Wichtiger Fund dabei:** dieses Modell
+hat laut OpenRouters `GET /api/v1/models`-Metadaten Reasoning standardmäßig aktiviert
+(`default_enabled: true`, `default_effort: "xhigh"`) — genau die Kategorie, die R4 beim
+Plan-Review ausdrücklich ausgeschlossen hatte, weil ein `<think>`-artiger Vorspann
+`repair_and_parse()`s "erste `{`, kürzestes balanciertes Objekt"-Extraktion bricht. Statt den
+Swap abzulehnen (User-Entscheidung): `_call_openrouter()` sendet jetzt unconditional bei **jedem**
+OpenRouter-Aufruf `"reasoning": {"enabled": false}` (OpenRouters dokumentierter Schalter) — nicht
+modellspezifisch verzweigt, sondern als generelle Durchsetzung von R4 auf Request-Ebene. Damit
+bleibt `is_reasoning_model=False` für diesen Eintrag eine Aussage über unsere KONFIGURIERTE
+Nutzung, nicht über die Modell-Fähigkeit selbst — das Modell kann reasoning, wir schalten es
+immer ab. **Nicht live verifiziert** (bräuchte einen bezahlten Aufruf + Freigabe, gleiches Gate
+wie DoD #4/R6) — bis dahin gilt: konfiguriert-aber-unbestätigt, nicht bewiesen.
+
 Key finding (senior-architect): **ein stärkeres Modell kann durch Layer 0 des Halluzinations-Guards SCHLECHTER abschneiden**, weil die Guard-Annahme des wörtlichen Zitierens im Prompt verankert ist, nicht im Code — stärkere Modelle weichen häufiger vom wörtlichen Zitat ab (Whitespace-/Bindestrich-Normalisierung, Tabelle→Prosa-Umformulierung, gelegentlich englische Antworten auf deutschen Ausschreibungen) als das 7B-Modell. Jedes neue Modell muss über Layer-Null-Zählungen bewertet werden (R6), nie über reine Füllquote. Falls ein Modell Layer 0 in die Höhe treibt: Fix liegt im Prompt via AP0 — niemals eine Guard-Lockerung, niemals modellspezifische Logik in `src/json_repair.py`.
 
 ## 0. Problem / Goal
