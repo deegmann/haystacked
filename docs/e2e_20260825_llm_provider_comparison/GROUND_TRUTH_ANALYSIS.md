@@ -27,11 +27,11 @@ können: **war das, was beide Modelle extrahiert haben, tatsächlich richtig?**
   Extraktion auf den kritischen Feldern fast komplett weg (0/3 bzw. 1/4 gefunden).
 - **Zwei echte lokale Halluzinationen gefunden**, eine davon vom Source-Span-Guard live
   abgefangen — ein konkreter Beleg, dass der Guard funktioniert, nicht nur in der Theorie.
-- **Korrektur (nach Doku-Review, 2026-08-25):** die beiden folgenden Muster waren **keine
-  Neuentdeckungen** — beide stehen bereits in `docs/architecture.md` §5.4 bzw. §5.6, datiert
-  31.07., einen knappen Monat vor dieser Analyse. Was hier tatsächlich neu ist: eine frische,
-  konkrete Bestätigung an zusätzlichen Feldern/Tendern, plus der direkte Cloud-Vergleich, den es
-  vorher nicht gab.
+- **Korrektur (nach Doku-Review, 2026-08-25):** die folgenden drei Muster waren **keine
+  Neuentdeckungen** — alle drei stehen bereits im bestehenden Backlog (`docs/architecture.md`
+  §5.4/§5.6 bzw. `OI-123`), datiert 31.07. bzw. 01.08., einen knappen Monat vor dieser Analyse.
+  Was hier tatsächlich neu ist: eine frische, konkrete Bestätigung an zusätzlichen Feldern/
+  Tendern, plus der direkte Cloud-Vergleich, den es vorher nicht gab.
   - **Pass-4c-Vergessens-Muster** (§5.4 in architecture.md, dort bereits für `max_payload`
     dokumentiert): heute bestätigt an mehreren weiteren Feldern (Hubhöhe, Gassenbreite, Gefälle,
     Temperatur) auf Nordlicht — und neu: bei Cloud tritt das Muster **nicht** auf, was vorher
@@ -41,6 +41,9 @@ können: **war das, was beide Modelle extrahiert haben, tatsächlich richtig?**
     gefunden, davon eine mit einer neuen Nuance — komplett ohne Quellenangabe (statt einer
     falschen-aber-begründeten Zitation wie in den ursprünglich dokumentierten Fällen), wodurch
     der Guard sie diesmal tatsächlich abfangen konnte.
+  - **Kälteleistung: falsche Zahl von mehreren echten gewählt** (`OI-123`, dort bereits exakt
+    für IK Deep Freeze mit denselben 280/340-kW-Werten dokumentiert): heute erstmals im direkten
+    Cloud-Vergleich — lokal wählt weiterhin falsch (280), Cloud wählt richtig (340).
 
 ## Pro-Ausschreibung-Detailbefunde
 
@@ -90,7 +93,10 @@ kamen am Guard vorbei).
 ### IK Deep Freeze — die härteste Ausschreibung: zwei bewusste Mehrdeutigkeits-Fallen
 Das Dokument nennt drei Kälteleistungswerte (280 kW nur für den Schockfroster, 340 kW für die
 Gesamtanlage) und zwei Temperaturwerte (-18°C Kerntemperatur-Ziel vs. -22°C, explizit als
-"verbindlicher Temperatursollwert" markiert).
+"verbindlicher Temperatursollwert" markiert). **Korrektur:** die Kälteleistungs-Falle ist keine
+Neuentdeckung — sie ist **OI-123** im Open-Items-Backlog (dokumentiert seit 01.08., exakt
+dieselbe Ausschreibung, exakter derselbe Mechanismus: "MAXIMUM-Richtungsregel nicht angewendet
+bei mehreren echten Kandidaten-Zitaten"). Neu ist hier nur der direkte Cloud-Vergleich.
 - **Cloud löst beide Fallen korrekt:** 340 kW (Gesamtanlage) und -22°C (verbindlicher Wert).
 - **Lokal löst nur die Temperatur-Falle korrekt** (-22°C), **wählt bei der Kälteleistung aber die
   falsche der beiden Zahlen** (280 kW — nur der Schockfroster-Teilwert, nicht die Gesamtanlage).
