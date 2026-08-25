@@ -1,0 +1,147 @@
+{
+  "model_id_requested": "openrouter-deepseek-v4-flash",
+  "started_at": "2026-08-25T18:01:13",
+  "tenders": {
+    "Beispielausschreibung_AGV_Nordlicht.pdf": {
+      "elapsed_s": 153.7,
+      "analysis_id": "071bd8d4-15c2-4de5-a283-1d8d6a1109d2",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 20,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "CompanyX.pdf": {
+      "elapsed_s": 150.6,
+      "analysis_id": "0461e6ac-c2bf-45e5-b5e7-857179d92cb0",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 9,
+      "top_match": {
+        "product": "REACHY",
+        "score": 46
+      }
+    },
+    "Dragonfly.pdf": {
+      "elapsed_s": 72.6,
+      "analysis_id": "ddd4bd24-e424-4ca2-bfa6-479fff7f647e",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 8,
+      "top_match": {
+        "product": "EKX 516ka",
+        "score": 17
+      }
+    },
+    "Mama.pdf": {
+      "elapsed_s": 106.5,
+      "analysis_id": "4823894d-1405-4ef6-8fcf-aaa4f26ad359",
+      "vehicle_type": "Forklift AGV",
+      "in_scope": true,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": "28.99",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 12,
+      "top_match": {
+        "product": "ek robotics COMPACT MOVE CB 25",
+        "score": 27
+      }
+    },
+    "OeA-199-25 Leistungsbeschreibung.pdf": {
+      "elapsed_s": 33.7,
+      "analysis_id": "f809135c-d7df-475b-9ce3-1466eacab203",
+      "vehicle_type": null,
+      "in_scope": false,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": null,
+      "layer_counts": {
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 0
+      },
+      "non_null_field_count": 0,
+      "top_match": null
+    },
+    "tender_ik_cold_store.pdf": {
+      "elapsed_s": 29.7,
+      "analysis_id": "7ad8a3f5-c613-4286-ac62-1120a5cc6b32",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": "43.22",
+      "layer_counts": {
+        "not_nulled": 134,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 10,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    },
+    "tender_ik_deep_freeze.pdf": {
+      "elapsed_s": 120.6,
+      "analysis_id": "209a8aee-0d60-4ee7-96d5-633efdd05457",
+      "vehicle_type": null,
+      "in_scope": false,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "layer_counts": {
+        "not_nulled": 132,
+        "L0": 1,
+        "plausibility": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 7,
+      "top_match": null,
+      "note": "first attempt failed at 18:10:20 (empty/whitespace-only DeepSeek response on the basic pass, triggered a genuine repair_and_parse() failure that aborted the run before the R3 whitespace-content fix landed); retried successfully at 18:15:51 after the fix was deployed and the server restarted; see src/llm_client.py commit for the fix and GROUND_TRUTH_ANALYSIS.md / REPORT.md for discussion."
+    },
+    "tender_ik_process_cooling.pdf": {
+      "elapsed_s": 126.7,
+      "analysis_id": "ee084d42-921c-4315-afd6-f0be77a07f3b",
+      "vehicle_type": "Industrial Refrigeration",
+      "in_scope": true,
+      "actual_model_id": "openrouter-deepseek-v4-flash",
+      "nace_tender": "33.20",
+      "layer_counts": {
+        "not_nulled": 133,
+        "L0": 1,
+        "L2_RESCUED": 0,
+        "total_fields_tracked": 134
+      },
+      "non_null_field_count": 8,
+      "top_match": {
+        "product": "ARNY Duplex",
+        "score": 0
+      }
+    }
+  },
+  "finished_at": "2026-08-25T18:12:30"
+}

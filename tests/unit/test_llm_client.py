@@ -238,8 +238,12 @@ def test_call_llm_openrouter_no_choices_raises(monkeypatch):
         _run(call_llm("SYS", "USER", "label", _CLOUD_MODEL))
 
 
-@pytest.mark.parametrize("bad_content", [None, ""])
+@pytest.mark.parametrize("bad_content", [None, "", " ", "\n\t "])
 def test_call_llm_openrouter_empty_or_none_content_raises(monkeypatch, bad_content):
+    """Whitespace-only cases (2026-08-25): live evidence from the DeepSeek V4 Flash
+    comparison run — a single-space response is a non-empty Python string (`not " "`
+    is False), so the original `if not content` check let it through. Fixed with
+    `.strip()`; regression-tested here so it can't silently reopen."""
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key-123")
     _FakeAsyncClient.next_response = _FakeResponse(200, _openrouter_ok_body(content=bad_content))
     with pytest.raises(RuntimeError):

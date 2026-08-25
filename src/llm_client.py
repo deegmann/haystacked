@@ -89,14 +89,13 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
     # repair_and_parse()'s "first {, shortest balanced object" JSON extraction. This is
     # made safe, not just claimed safe, by _call_openrouter() sending
     # `"reasoning": {"enabled": false}` unconditionally on every OpenRouter call (see
-    # that function) — OpenRouter's documented reasoning.enabled=false switch. NOT YET
-    # LIVE-VERIFIED against a real API response as of this comment (verification
-    # requires a paid call and explicit authorization, same gate as the DoD #4/R6
-    # cloud comparison) — until that verification happens, treat this entry's
-    # non-reasoning behavior as configured-but-unconfirmed, not proven.
-    # Originally-planned slug "qwen/qwen-2.5-72b-instruct" (hyphen before "2.5" — an
-    # earlier fix already caught the no-hyphen variant as wrong) was correct and live
-    # but has been replaced per this swap, not because it was broken.
+    # that function) — OpenRouter's documented reasoning.enabled=false switch.
+    # LIVE-VERIFIED 2026-08-25 against a real 8-tender comparison run: zero reasoning/
+    # <think> leakage in the raw completions (docs/e2e_20260825_llm_provider_comparison/
+    # qwen3.8-27b_raw_output.txt) — the mechanism is proven for this model, not just
+    # configured. Originally-planned slug "qwen/qwen-2.5-72b-instruct" (hyphen before
+    # "2.5" — an earlier fix already caught the no-hyphen variant as wrong) was correct
+    # and live but has been replaced per this swap, not because it was broken.
     LLMModelChoice("openrouter-llama3.3-70b", "openrouter", "meta-llama/llama-3.3-70b-instruct",
                     "Llama 3.3 70B (Cloud, OpenRouter)", is_local=False,
                     is_reasoning_model=False, context_tokens=131_072, max_output_tokens=4096,
@@ -105,19 +104,40 @@ AVAILABLE_MODELS: list[LLMModelChoice] = [
                     "Mistral Large 3 (Cloud, OpenRouter)", is_local=False,
                     is_reasoning_model=False, context_tokens=128_000, max_output_tokens=4096,
                     weights_open=True),
+    LLMModelChoice("openrouter-deepseek-v4-flash", "openrouter", "deepseek/deepseek-v4-flash-0731",
+                    "DeepSeek V4 Flash (Cloud, OpenRouter)", is_local=False,
+                    is_reasoning_model=False, context_tokens=1_310_720, max_output_tokens=4096,
+                    weights_open=True),
     # User decision 2026-08-25: seed with 3 cloud entries spanning different model families
     # (Qwen/Llama/Mistral) rather than just the one confirmed slug — lets the guard-layer
     # comparison (R6) distinguish "qwen-family quirk" from "generic stronger-model behavior".
     # All three slugs verified live against OpenRouter's own model pages 2026-08-25.
+    #
+    # DeepSeek V4 Flash added 2026-08-25 (user request): open weights
+    # (hugging_face_id "deepseek-ai/DeepSeek-V4-Flash-0731"), sparse MoE, 284B total /
+    # 13B active parameters, 1.3M-token context. Same reasoning situation as Qwen 3.8
+    # 27B: reasoning-capable, defaults to ENABLED on OpenRouter ("high" effort,
+    # mandatory=False) — this repo's original plan flagged "DeepSeek's current V4
+    # family" specifically as having its own unverified reasoning quirks (see prior
+    # comments in this file's history). is_reasoning_model=False here is again a claim
+    # about our CONFIGURED use (the unconditional `"reasoning": {"enabled": false}` in
+    # _call_openrouter() applies to every OpenRouter call regardless of provider), not
+    # the model's raw capability — verify this the same way Qwen 3.8 27B was verified
+    # (real completions, checked for <think>/reasoning leakage) before treating it as
+    # proven for this specific family.
     #
     # CURATION RULE (user requirement, 2026-08-25): every AVAILABLE_MODELS entry must be an
     # open-weight model — one that could, with the right hardware, also run as a local Ollama
     # entry. No closed/API-only proprietary model (GPT-*, Claude, Gemini, etc.) is ever added,
     # regardless of quality, because it can NEVER satisfy that condition.
     #
-    # Further entries go here only — but see R4: non-reasoning instruct models only at launch;
-    # a reasoning/CoT model (e.g. anything emitting a <think> preamble or a wrapper object)
-    # needs its own repair_and_parse() handling and is explicitly OUT of scope here.
+    # R4 note (revised 2026-08-25): "non-reasoning instruct models only at launch" no longer
+    # means "reasoning-capable models are excluded" — it means every entry's reasoning must be
+    # verifiably suppressible via the request-level `"reasoning": {"enabled": false}` switch
+    # (proven for Qwen 3.8 27B; DeepSeek V4 Flash is configured the same way but not yet
+    # independently verified — see note above). A model that emits a wrapper object instead of
+    # a <think> block, or whose reasoning cannot be disabled via this switch at all, still needs
+    # its own repair_and_parse() handling and remains explicitly OUT of scope here.
 ]
 
 DEFAULT_MODEL_ID = "local-qwen2.5-7b"   # preserves today's zero-config behaviour
@@ -251,8 +271,20 @@ async def _call_openrouter(system: str, user: str, model: LLMModelChoice) -> str
     # R3: raise on missing/empty/None choices[0].message.content — an empty completion
     # flows into repair_and_parse() -> {} -> "all fields null" -> a clean guard pass with
     # zero criteria -> a plausible-looking, entirely empty match result. Must be visible.
-    if not content:
-        raise LLMProviderError("OpenRouter response has missing/empty/None message content.")
+    #
+    # Whitespace-only counts as empty too (fix 2026-08-25, live evidence from the
+    # DeepSeek V4 Flash comparison run): `content=" "` is a non-empty string in Python
+    # (`not " "` is False), so the original `if not content` check silently let a
+    # single-space response through. On IK Deep Freeze this reached the "basic" pass's
+    # own broad exception handler, which still aborted the run loudly (str.strip() found
+    # no JSON, `repair_and_parse()` raised, "basic" catches *any* Exception and aborts) —
+    # but Pass 4b's handler does NOT abort on a generic parse failure (only on
+    # LLMProviderError/httpx.HTTPError), so the same whitespace-only response on 4b would
+    # have silently degraded into an empty domain_criteria instead of failing visibly.
+    # `.strip()` closes that gap without touching the missing/None/`""` cases already
+    # covered.
+    if not content or not content.strip():
+        raise LLMProviderError("OpenRouter response has missing/empty/whitespace-only message content.")
     finish_reason = choices[0].get("finish_reason")
     if finish_reason == "length":
         # R3: at minimum warn-log — 4b emits ~80 keys against a 4096-token cap, not
